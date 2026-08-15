@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { crearFamiliar, desvincularFamiliar } from './actions'
+import { useConfirm } from '../../../providers/confirm-provider'
+import { useToast } from '../../../providers/toast-provider'
 
 type Familiar = { perfil_id: string; nombre: string; email: string }
 
@@ -15,10 +17,11 @@ export default function FamiliaresSection({
 }) {
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   return (
     <section className="space-y-4">
@@ -27,9 +30,9 @@ export default function FamiliaresSection({
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!nombre.trim() || !email.trim() || !password.trim()) return
+          if (!nombre.trim() || !email.trim()) return
           startTransition(async () => {
-            const res = await crearFamiliar(alumnoId, nombre, email, password)
+            const res = await crearFamiliar(alumnoId, nombre, email)
             if (res.error) {
               setError(res.error)
               return
@@ -37,11 +40,11 @@ export default function FamiliaresSection({
             setError(null)
             setNombre('')
             setEmail('')
-            setPassword('')
+            toast('Invitación enviada', 'exito')
             router.refresh()
           })
         }}
-        className="grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
       >
         <input
           value={nombre}
@@ -56,21 +59,14 @@ export default function FamiliaresSection({
           placeholder="Email"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
-        <input
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          placeholder="Contraseña provisional"
-          className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-        />
         <button
           type="submit"
           disabled={isPending}
-          className="sm:col-span-3 rounded-lg bg-indigo-600 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="sm:col-span-2 rounded-lg bg-indigo-600 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
         >
-          Crear y vincular familiar
+          Invitar familiar
         </button>
-        {error && <p className="sm:col-span-3 text-sm text-rose-600">{error}</p>}
+        {error && <p className="sm:col-span-2 text-sm text-rose-600">{error}</p>}
       </form>
 
       <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
@@ -89,10 +85,21 @@ export default function FamiliaresSection({
                 <td className="p-3 text-slate-600">{f.email}</td>
                 <td className="p-3">
                   <button
-                    onClick={() => {
-                      if (!confirm(`¿Desvincular a ${f.nombre} de este alumno?`)) return
+                    onClick={async () => {
+                      const ok = await confirmar({
+                        titulo: 'Desvincular familiar',
+                        mensaje: `¿Desvincular a ${f.nombre} de este alumno?`,
+                        textoConfirmar: 'Desvincular',
+                        peligroso: true,
+                      })
+                      if (!ok) return
                       startTransition(async () => {
-                        await desvincularFamiliar(f.perfil_id, alumnoId)
+                        const res = await desvincularFamiliar(f.perfil_id, alumnoId)
+                        if (res?.error) {
+                          toast(res.error, 'error')
+                          return
+                        }
+                        toast('Familiar desvinculado', 'exito')
                         router.refresh()
                       })
                     }}

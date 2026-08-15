@@ -2,6 +2,8 @@
 
 import { useState, useTransition, useMemo } from 'react'
 import { crearPreferencia, eliminarPreferencia } from './preferencias/actions'
+import { useConfirm } from '../../../providers/confirm-provider'
+import { useToast } from '../../../providers/toast-provider'
 
 type Preferencia = {
   id: string
@@ -45,6 +47,8 @@ export default function PreferenciasSection({
   const [preferencias, setPreferencias] = useState<Preferencia[]>(preferenciasIniciales)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   const [claveOrden, setClaveOrden] = useState<ClaveOrden>('fecha')
   const [direccion, setDireccion] = useState<'asc' | 'desc'>('desc')
@@ -90,14 +94,26 @@ export default function PreferenciasSection({
         ...prev,
       ])
       setNombre('')
+      toast('Preferencia añadida', 'exito')
     })
   }
 
-  const borrar = (id: string) => {
-    if (!confirm('¿Eliminar esta preferencia?')) return
+  const borrar = async (id: string) => {
+    const ok = await confirmar({
+      titulo: 'Eliminar preferencia',
+      mensaje: '¿Eliminar esta preferencia? No se puede deshacer.',
+      textoConfirmar: 'Eliminar',
+      peligroso: true,
+    })
+    if (!ok) return
     startTransition(async () => {
-      await eliminarPreferencia(id, alumnoId)
+      const res = await eliminarPreferencia(id, alumnoId)
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
       setPreferencias((prev) => prev.filter((p) => p.id !== id))
+      toast('Preferencia eliminada', 'exito')
     })
   }
 
@@ -110,7 +126,6 @@ export default function PreferenciasSection({
       {flechaOrden(claveOrden === clave, direccion)}
     </th>
   )
-
   return (
     <section className="space-y-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-3">

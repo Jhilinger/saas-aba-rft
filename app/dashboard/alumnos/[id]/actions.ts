@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+const URL_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
 // Importa un programa (de Currículo base, Currículo clínica o Mis programas
 // — los 3 viven en la misma tabla programas_base): copia sus conjuntos y
 // estímulos (solo aplica de verdad a ABA; en RFT solo se copian los metadatos)
@@ -44,7 +46,6 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
     .single()
 
   if (insertError) {
-    // 23505 = violación de restricción única (este programa ya está importado)
     if (insertError.code === '23505') {
       return { error: `"${base.nombre}" ya está importado en el PEI de este alumno. No se puede añadir dos veces.` }
     }
@@ -55,7 +56,6 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
     return { error: 'Error creando el programa' }
   }
 
-  // Si es ABA, copiamos los conjuntos y estímulos de la plantilla
   if (base.tipo === 'aba_clasico') {
     const { data: conjuntosBase } = await supabase
       .from('conjuntos_estimulos_base')
@@ -120,12 +120,7 @@ export async function crearProgramaPersonalizado(
 
 // --- FAMILIA ---
 
-export async function crearFamiliar(
-  alumnoId: string,
-  nombre: string,
-  email: string,
-  password: string
-) {
+export async function crearFamiliar(alumnoId: string, nombre: string, email: string) {
   const supabase = await createClient()
 
   const { data: alumno } = await supabase
@@ -138,14 +133,18 @@ export async function crearFamiliar(
 
   const admin = createAdminClient()
 
-  const { data: authUser, error: authError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
+  // Comprobamos que el email no esté ya en uso, para dar un error claro
+  const { data: existente } = await admin.from('perfiles').select('id').eq('email', email).maybeSingle()
+  if (existente) {
+    return { error: `Ya existe una cuenta con el email "${email}".` }
+  }
+
+  const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${URL_BASE}/login`,
   })
 
   if (authError || !authUser.user) {
-    return { error: authError?.message ?? 'Error creando el usuario' }
+    return { error: authError?.message ?? 'Error invitando al familiar' }
   }
 
   const { error: perfilError } = await admin.from('perfiles').insert({

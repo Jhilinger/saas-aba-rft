@@ -3,19 +3,34 @@
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { archivarAlumno, reactivarAlumno } from './actions'
+import { useConfirm } from '../../providers/confirm-provider'
+import { useToast } from '../../providers/toast-provider'
 
 export default function AlumnoActions({ id, activo }: { id: string; activo: boolean }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   if (activo) {
     return (
       <button
         disabled={isPending}
-        onClick={() => {
-          if (!confirm('¿Archivar este alumno? Se conservará todo su historial, pero dejará de aparecer como activo.')) return
+        onClick={async () => {
+          const ok = await confirmar({
+            titulo: 'Archivar alumno',
+            mensaje: 'Se conservará todo su historial, pero dejará de aparecer como activo.',
+            textoConfirmar: 'Archivar',
+            peligroso: true,
+          })
+          if (!ok) return
           startTransition(async () => {
-            await archivarAlumno(id)
+            const res = await archivarAlumno(id)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
+            toast('Alumno archivado', 'exito')
             router.refresh()
           })
         }}
@@ -31,7 +46,12 @@ export default function AlumnoActions({ id, activo }: { id: string; activo: bool
       disabled={isPending}
       onClick={() => {
         startTransition(async () => {
-          await reactivarAlumno(id)
+          const res = await reactivarAlumno(id)
+          if (res?.error) {
+            toast(res.error, 'error')
+            return
+          }
+          toast('Alumno reactivado', 'exito')
           router.refresh()
         })
       }}

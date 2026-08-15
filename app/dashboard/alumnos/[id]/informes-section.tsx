@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import jsPDF from 'jspdf'
 import { generarInforme, eliminarInforme } from './informes/actions'
+import { useConfirm } from '../../../providers/confirm-provider'
+import { useToast } from '../../../providers/toast-provider'
 
 type Informe = {
   id: string
@@ -23,8 +25,6 @@ function hoy(): string {
   return new Date().toISOString().split('T')[0]
 }
 
-// Una línea se considera "título de sección" si está toda en mayúsculas
-// (según le pedimos a la IA que formatee: INTRODUCCIÓN, RESUMEN, etc.)
 function esTitulo(linea: string): boolean {
   const limpia = linea.trim()
   if (limpia.length === 0) return false
@@ -122,7 +122,6 @@ function descargarPdf(informe: Informe, nombreAlumno: string, nombreClinica: str
 
   doc.save(`informe-${nombreAlumno}-${informe.periodo_hasta}.pdf`)
 }
-
 export default function InformesSection({
   alumnoId,
   nombreAlumno,
@@ -141,6 +140,8 @@ export default function InformesSection({
   const [informeAbierto, setInformeAbierto] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   const generar = () => {
     setError(null)
@@ -160,18 +161,29 @@ export default function InformesSection({
       }
       setInformes((prev) => [nuevo, ...prev])
       setInformeAbierto(nuevo.id)
+      toast('Informe generado', 'exito')
     })
   }
 
-  const borrar = (id: string) => {
-    if (!confirm('¿Eliminar este informe? No se puede deshacer.')) return
+  const borrar = async (id: string) => {
+    const ok = await confirmar({
+      titulo: 'Eliminar informe',
+      mensaje: '¿Eliminar este informe? No se puede deshacer.',
+      textoConfirmar: 'Eliminar',
+      peligroso: true,
+    })
+    if (!ok) return
     startTransition(async () => {
-      await eliminarInforme(id, alumnoId)
+      const res = await eliminarInforme(id, alumnoId)
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
       setInformes((prev) => prev.filter((i) => i.id !== id))
       if (informeAbierto === id) setInformeAbierto(null)
+      toast('Informe eliminado', 'exito')
     })
   }
-
   return (
     <section className="space-y-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">

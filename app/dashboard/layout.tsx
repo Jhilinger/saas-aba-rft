@@ -3,8 +3,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { logout } from '../logout-action'
 import MobileNav from './mobile-nav'
+import { ConfirmProvider } from '../providers/confirm-provider'
+import { ToastProvider } from '../providers/toast-provider'
 
-type Enlace = { href: string; label: string }
+type Enlace = { href: string; label: string; grupo?: 'gestion' | 'trabajo' }
 
 function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   if (rol === 'superadmin') {
@@ -18,16 +20,18 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   if (rol === 'clinica_admin') {
     const enlaces: Enlace[] = [
       { href: '/dashboard', label: 'Inicio' },
-      { href: '/dashboard/equipo', label: 'Equipo y Alumnos' },
-      { href: '/dashboard/agenda', label: 'Agenda' },
+      { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'gestion' },
+      { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'gestion' },
+      { href: '/dashboard/curriculo', label: 'Currículo clínica', grupo: 'gestion' },
+      { href: '/dashboard/facturacion', label: 'Facturación', grupo: 'gestion' },
     ]
     if (tambienTerapeuta) {
-      enlaces.push({ href: '/dashboard/mis-alumnos', label: 'Mis Alumnos' })
+      enlaces.push(
+        { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos', grupo: 'trabajo' },
+        { href: '/dashboard/agenda', label: 'Agenda', grupo: 'trabajo' },
+        { href: '/dashboard/mis-programas', label: 'Mis programas', grupo: 'trabajo' }
+      )
     }
-    enlaces.push(
-      { href: '/dashboard/curriculo', label: 'Currículo clínica' },
-      { href: '/dashboard/mis-programas', label: 'Mis programas' }
-    )
     return enlaces
   }
 
@@ -47,6 +51,11 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   return []
 }
 
+const NOMBRE_GRUPO: Record<string, string> = {
+  gestion: 'Gestión del centro',
+  trabajo: 'Mi trabajo',
+}
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -63,7 +72,6 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single()
 
-  // Cuenta desactivada: cerramos su sesión y la expulsamos al login con aviso
   if (perfil && perfil.activo === false) {
     await supabase.auth.signOut()
     redirect('/login?error=' + encodeURIComponent('Tu cuenta ha sido desactivada. Contacta con tu clínica.'))
@@ -71,12 +79,14 @@ export default async function DashboardLayout({
 
   const enlaces = construirEnlaces(perfil?.rol ?? '', perfil?.tambien_terapeuta ?? false)
 
+  let grupoAnterior: string | undefined = undefined
+
   return (
+    <ToastProvider>
+    <ConfirmProvider>
     <div className="flex min-h-screen flex-col md:flex-row bg-slate-50">
-      {/* Menú móvil (barra superior + panel deslizante), oculto en escritorio */}
       <MobileNav enlaces={enlaces} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
 
-      {/* Barra lateral fija, solo visible en escritorio */}
       <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 bg-white p-5 flex-col">
         <div className="mb-8">
           <p className="font-bold text-slate-800">SaaS ABA/RFT</p>
@@ -86,16 +96,26 @@ export default async function DashboardLayout({
           </span>
         </div>
 
-        <nav className="flex-1 space-y-1">
-          {enlaces.map((e) => (
-            <Link
-              key={e.href}
-              href={e.href}
-              className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            >
-              {e.label}
-            </Link>
-          ))}
+        <nav className="flex-1">
+          {enlaces.map((e, i) => {
+            const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
+            grupoAnterior = e.grupo
+            return (
+              <div key={e.href}>
+                {mostrarCabecera && (
+                  <p className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 ${i === 0 ? '' : 'mt-6'}`}>
+                    {NOMBRE_GRUPO[e.grupo!]}
+                  </p>
+                )}
+                <Link
+                  href={e.href}
+                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {e.label}
+                </Link>
+              </div>
+            )
+          })}
         </nav>
 
         <form action={logout}>
@@ -110,5 +130,7 @@ export default async function DashboardLayout({
 
       <main className="flex-1 min-w-0">{children}</main>
     </div>
+    </ConfirmProvider>
+    </ToastProvider>
   )
 }

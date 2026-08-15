@@ -4,7 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { logout } from '../logout-action'
 
-type Enlace = { href: string; label: string }
+type Enlace = { href: string; label: string; grupo?: 'gestion' | 'trabajo' }
+
+const NOMBRE_GRUPO: Record<string, string> = {
+  gestion: 'Gestión del centro',
+  trabajo: 'Mi trabajo',
+}
 
 export default function MobileNav({
   enlaces,
@@ -16,6 +21,7 @@ export default function MobileNav({
   rol: string
 }) {
   const [abierto, setAbierto] = useState(false)
+  let grupoAnterior: string | undefined = undefined
 
   return (
     <>
@@ -62,17 +68,27 @@ export default function MobileNav({
               </button>
             </div>
 
-            <nav className="flex-1 space-y-1">
-              {enlaces.map((e) => (
-                <Link
-                  key={e.href}
-                  href={e.href}
-                  onClick={() => setAbierto(false)}
-                  className="block rounded-lg px-3 py-3 text-base font-medium text-slate-600 hover:bg-slate-100"
-                >
-                  {e.label}
-                </Link>
-              ))}
+            <nav className="flex-1 space-y-1 overflow-y-auto">
+              {enlaces.map((e) => {
+                const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
+                grupoAnterior = e.grupo
+                return (
+                  <div key={e.href}>
+                    {mostrarCabecera && (
+                      <p className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 first:mt-0">
+                        {NOMBRE_GRUPO[e.grupo!]}
+                      </p>
+                    )}
+                    <Link
+                      href={e.href}
+                      onClick={() => setAbierto(false)}
+                      className="block rounded-lg px-3 py-3 text-base font-medium text-slate-600 hover:bg-slate-100"
+                    >
+                      {e.label}
+                    </Link>
+                  </div>
+                )
+              })}
             </nav>
 
             <form action={logout}>

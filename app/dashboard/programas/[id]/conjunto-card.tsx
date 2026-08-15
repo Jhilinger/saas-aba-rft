@@ -8,6 +8,8 @@ import {
   eliminarEstimuloAlumnoForzado,
   eliminarConjuntoAlumno,
 } from './actions'
+import { useConfirm } from '../../../providers/confirm-provider'
+import { useToast } from '../../../providers/toast-provider'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estado: string; estimulos_alumno: Estimulo[] }
@@ -23,6 +25,8 @@ export default function ConjuntoCard({
   const [descripcion, setDescripcion] = useState('')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4">
@@ -39,10 +43,21 @@ export default function ConjuntoCard({
             Tomar datos
           </a>
           <button
-            onClick={() => {
-              if (!confirm(`¿Eliminar "${conjunto.nombre}" y todos sus estímulos?`)) return
+            onClick={async () => {
+              const ok = await confirmar({
+                titulo: 'Eliminar conjunto',
+                mensaje: `¿Eliminar "${conjunto.nombre}" y todos sus estímulos? No se puede deshacer.`,
+                textoConfirmar: 'Eliminar',
+                peligroso: true,
+              })
+              if (!ok) return
               startTransition(async () => {
-                await eliminarConjuntoAlumno(conjunto.id, programaAlumnoId)
+                const res = await eliminarConjuntoAlumno(conjunto.id, programaAlumnoId)
+                if (res?.error) {
+                  toast(res.error, 'error')
+                  return
+                }
+                toast('Conjunto eliminado', 'exito')
                 router.refresh()
               })
             }}
@@ -64,28 +79,37 @@ export default function ConjuntoCard({
               {e.descripcion ? ` — ${e.descripcion}` : ''}
             </span>
             <button
-              onClick={() => {
-                startTransition(async () => {
-                  const res = await eliminarEstimuloAlumno(e.id, programaAlumnoId)
+              onClick={async () => {
+                const res = await eliminarEstimuloAlumno(e.id, programaAlumnoId)
 
-                  if (res?.error === 'tiene_datos') {
-                    const confirmar = confirm(
-                      `"${e.nombre}" ya tiene ensayos registrados. Si lo eliminas, se perderán esos datos permanentemente. ¿Eliminar de todas formas?`
-                    )
-                    if (confirmar) {
-                      await eliminarEstimuloAlumnoForzado(e.id, programaAlumnoId)
+                if (res?.error === 'tiene_datos') {
+                  const confirmado = await confirmar({
+                    titulo: 'Estímulo con datos registrados',
+                    mensaje: `"${e.nombre}" ya tiene ensayos registrados. Si lo eliminas, se perderán esos datos permanentemente. ¿Eliminar de todas formas?`,
+                    textoConfirmar: 'Eliminar de todas formas',
+                    peligroso: true,
+                  })
+                  if (confirmado) {
+                    startTransition(async () => {
+                      const res2 = await eliminarEstimuloAlumnoForzado(e.id, programaAlumnoId)
+                      if (res2?.error) {
+                        toast(res2.error, 'error')
+                        return
+                      }
+                      toast('Estímulo eliminado', 'exito')
                       router.refresh()
-                    }
-                    return
+                    })
                   }
+                  return
+                }
 
-                  if (res?.error) {
-                    alert('Error: ' + res.error)
-                    return
-                  }
+                if (res?.error) {
+                  toast('Error: ' + res.error, 'error')
+                  return
+                }
 
-                  router.refresh()
-                })
+                toast('Estímulo eliminado', 'exito')
+                router.refresh()
               }}
               className="text-xs text-rose-500 hover:text-rose-700 shrink-0"
             >

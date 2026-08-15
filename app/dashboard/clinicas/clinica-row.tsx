@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { editarClinica, archivarClinica, reactivarClinica } from './actions'
+import { useConfirm } from '../../providers/confirm-provider'
+import { useToast } from '../../providers/toast-provider'
 
 type Clinica = {
   id: string
@@ -43,6 +45,8 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
   const [nuevoLogo, setNuevoLogo] = useState<File | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   if (editando) {
     return (
@@ -91,7 +95,12 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
               fd.set('precio_por_alumno', precioAlumno)
               if (nuevoLogo) fd.set('logo', nuevoLogo)
               startTransition(async () => {
-                await editarClinica(clinica.id, fd)
+                const res = await editarClinica(clinica.id, fd)
+                if (res?.error) {
+                  toast(res.error, 'error')
+                  return
+                }
+                toast('Clínica actualizada', 'exito')
                 setEditando(false)
                 router.refresh()
               })
@@ -116,7 +125,6 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
       </tr>
     )
   }
-
   return (
     <tr className={`border-b border-slate-100 last:border-0 ${!clinica.activa ? 'opacity-50' : ''}`}>
       <td className="p-3 font-medium text-slate-800">
@@ -156,10 +164,21 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
         {clinica.activa ? (
           <button
             disabled={isPending}
-            onClick={() => {
-              if (!confirm(`¿Archivar "${clinica.nombre}"? Sus terapeutas y familias perderán acceso, pero los datos se conservan.`)) return
+            onClick={async () => {
+              const ok = await confirmar({
+                titulo: 'Archivar clínica',
+                mensaje: `¿Archivar "${clinica.nombre}"? Sus terapeutas y familias perderán acceso, pero los datos se conservan.`,
+                textoConfirmar: 'Archivar',
+                peligroso: true,
+              })
+              if (!ok) return
               startTransition(async () => {
-                await archivarClinica(clinica.id)
+                const res = await archivarClinica(clinica.id)
+                if (res?.error) {
+                  toast(res.error, 'error')
+                  return
+                }
+                toast('Clínica archivada', 'exito')
                 router.refresh()
               })
             }}
@@ -172,7 +191,12 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
             disabled={isPending}
             onClick={() => {
               startTransition(async () => {
-                await reactivarClinica(clinica.id)
+                const res = await reactivarClinica(clinica.id)
+                if (res?.error) {
+                  toast(res.error, 'error')
+                  return
+                }
+                toast('Clínica reactivada', 'exito')
                 router.refresh()
               })
             }}

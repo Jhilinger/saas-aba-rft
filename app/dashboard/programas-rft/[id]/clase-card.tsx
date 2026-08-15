@@ -8,6 +8,8 @@ import {
   eliminarClase,
   eliminarRelacionEntrenada,
 } from './actions'
+import { useConfirm } from '../../../providers/confirm-provider'
+import { useToast } from '../../../providers/toast-provider'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = {
@@ -52,6 +54,8 @@ export default function ClaseCard({
   const [posicion, setPosicion] = useState('A')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   const nombreEstimuloPorId = (id: string) =>
     clase.estimulos_rft.find((e) => e.id === id)?.etiqueta ?? '?'
@@ -71,10 +75,21 @@ export default function ClaseCard({
           </span>
         </div>
         <button
-          onClick={() => {
-            if (!confirm(`¿Eliminar "${clase.nombre}" entera?`)) return
+          onClick={async () => {
+            const ok = await confirmar({
+              titulo: 'Eliminar clase',
+              mensaje: `¿Eliminar "${clase.nombre}" entera? No se puede deshacer.`,
+              textoConfirmar: 'Eliminar',
+              peligroso: true,
+            })
+            if (!ok) return
             startTransition(async () => {
-              await eliminarClase(clase.id, programaAlumnoId)
+              const res = await eliminarClase(clase.id, programaAlumnoId)
+              if (res?.error) {
+                toast(res.error, 'error')
+                return
+              }
+              toast('Clase eliminada', 'exito')
               router.refresh()
             })
           }}
@@ -83,7 +98,6 @@ export default function ClaseCard({
           Eliminar clase
         </button>
       </div>
-
       {/* Estímulos */}
       <div>
         <p className="mb-1 text-xs font-medium text-slate-500">Estímulos</p>
@@ -192,7 +206,6 @@ export default function ClaseCard({
             )}
           </ul>
         </div>
-
         <div>
           <p className="mb-1 text-xs font-medium text-slate-500">Tests realizados (último resultado)</p>
           <ul className="space-y-1">

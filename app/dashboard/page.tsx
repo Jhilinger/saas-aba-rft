@@ -215,9 +215,19 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
     (a: any) => !a.alumno_terapeuta || a.alumno_terapeuta.length === 0
   )
 
+  const { data: clinica } = await supabase
+    .from('clinicas')
+    .select('precio_fijo_mensual, precio_por_alumno, sin_facturacion, estado_suscripcion')
+    .eq('id', clinicaId)
+    .single()
+
+  const totalEstimado = clinica
+    ? Number(clinica.precio_fijo_mensual) + Number(clinica.precio_por_alumno) * (alumnosActivos ?? 0)
+    : null
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnosActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Alumnos activos</p>
@@ -226,27 +236,29 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{terapeutasActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Terapeutas activos</p>
         </div>
+        {clinica && !clinica.sin_facturacion && totalEstimado !== null && (
+          <Link
+            href="/dashboard/facturacion"
+            className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 hover:border-indigo-300 transition-colors"
+          >
+            <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalEstimado.toFixed(2)} €</p>
+            <p className="text-sm text-slate-500">Próxima factura estimada</p>
+          </Link>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href="/dashboard/equipo"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-        >
-          Equipo y Alumnos
-        </Link>
-        <Link
-          href="/dashboard/curriculo"
-          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
-        >
-          Currículo clínica
-        </Link>
-      </div>
-
-      {(sinTerapeuta.length > 0 || (terapeutasDesactivados ?? 0) > 0) && (
+      {(sinTerapeuta.length > 0 || (terapeutasDesactivados ?? 0) > 0 || clinica?.estado_suscripcion === 'past_due') && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold text-slate-700">Avisos</h2>
           <div className="space-y-2">
+            {clinica?.estado_suscripcion === 'past_due' && (
+              <Link
+                href="/dashboard/facturacion"
+                className="block rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 hover:bg-rose-100"
+              >
+                Hay un pago pendiente en tu suscripción. Revísalo en Facturación.
+              </Link>
+            )}
             {sinTerapeuta.length > 0 && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm">
                 <p className="font-medium text-amber-800">

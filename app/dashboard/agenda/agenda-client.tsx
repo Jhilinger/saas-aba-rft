@@ -7,6 +7,8 @@ import {
   marcarAsistencia,
   eliminarSesion,
 } from './actions'
+import { useConfirm } from '../../providers/confirm-provider'
+import { useToast } from '../../providers/toast-provider'
 
 type Sesion = {
   id: string
@@ -57,6 +59,8 @@ export default function AgendaClient({
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [mensajeExito, setMensajeExito] = useState<string | null>(null)
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   const ahora = new Date()
 
@@ -73,21 +77,32 @@ export default function AgendaClient({
     startTransition(async () => {
       const res = await marcarAsistencia(sesionId, estado, canceladoPor)
       if (res.error) {
-        setError(res.error)
+        toast(res.error, 'error')
         return
       }
+      toast('Asistencia registrada', 'exito')
       recargar()
     })
   }
 
-  const borrar = (sesionId: string) => {
-    if (!confirm('¿Eliminar esta sesión programada?')) return
+  const borrar = async (sesionId: string) => {
+    const ok = await confirmar({
+      titulo: 'Eliminar sesión',
+      mensaje: '¿Eliminar esta sesión programada? No se puede deshacer.',
+      textoConfirmar: 'Eliminar',
+      peligroso: true,
+    })
+    if (!ok) return
     startTransition(async () => {
-      await eliminarSesion(sesionId)
+      const res = await eliminarSesion(sesionId)
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Sesión eliminada', 'exito')
       recargar()
     })
   }
-
   const filaSesion = (s: Sesion, mostrarAcciones: boolean) => (
     <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -111,6 +126,7 @@ export default function AgendaClient({
           {s.estado !== 'programada' && (s.confirmada_familia ? ' · Confirmada por familia' : ' · Sin confirmar')}
         </span>
       </div>
+
       {mostrarAcciones && (
         <div className="flex flex-wrap gap-2">
           <button
@@ -154,7 +170,6 @@ export default function AgendaClient({
       )}
     </div>
   )
-
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
