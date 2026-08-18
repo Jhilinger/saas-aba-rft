@@ -67,7 +67,7 @@ function GraficoFase({
             {series.map((s, i) => (
               <Line
                 key={s.id}
-                type="monotone"
+                type="linear"
                 dataKey={s.id}
                 name={s.label}
                 stroke={COLORES[i % COLORES.length]}

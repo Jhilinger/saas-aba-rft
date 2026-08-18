@@ -7,6 +7,8 @@ import EvolucionChart from './evolucion-chart'
 import { obtenerEvolucionAba } from './evolucion-actions'
 import ProgramaAbaTabs from './programa-aba-tabs'
 
+const COLORES = ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2']
+
 export default async function ProgramaAlumnoPage({
   params,
 }: {
@@ -52,6 +54,9 @@ export default async function ProgramaAlumnoPage({
 
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
+
+  const enAdquisicion = (conjuntos ?? []).filter((c: any) => c.estado !== 'dominado')
+  const dominados = (conjuntos ?? []).filter((c: any) => c.estado === 'dominado')
 
   return (
     <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
@@ -113,22 +118,53 @@ export default async function ProgramaAlumnoPage({
           </p>
         )}
       </div>
-
       <ProgramaAbaTabs
-        evolucion={
-          <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
-            <EvolucionChart conjuntos={datosEvolucion} porcentajeDominio={programa.porcentaje_dominio} />
+       evolucion={
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+              <EvolucionChart
+                conjuntos={datosEvolucion}
+                porcentajeDominio={programa.porcentaje_dominio}
+                titulo={`${alumnoNombre} — ${programa.nombre}`}
+                estimulosPorConjunto={(conjuntos ?? []).map((c: any) => ({
+                  id: c.id,
+                  nombre: c.nombre,
+                  estimulos: c.estimulos_alumno.map((e: any) => e.nombre),
+                }))}
+              />
+            </div>
           </div>
         }
         conjuntos={
-          <section className="space-y-4">
+          <section className="space-y-6">
             <NuevoConjuntoForm programaAlumnoId={id} />
 
-            <div className="space-y-4">
-              {conjuntos?.map((c: any) => (
-                <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
-              ))}
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-slate-700">
+                En adquisición ({enAdquisicion.length})
+              </h2>
+              <div className="space-y-4">
+                {enAdquisicion.map((c: any) => (
+                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                ))}
+                {enAdquisicion.length === 0 && (
+                  <p className="text-sm text-slate-400">Sin conjuntos en adquisición.</p>
+                )}
+              </div>
             </div>
+
+            {dominados.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="text-sm font-semibold text-emerald-700">
+                  Dominados ({dominados.length})
+                </h2>
+                <div className="space-y-4">
+                  {dominados.map((c: any) => (
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             {(!conjuntos || conjuntos.length === 0) && (
               <p className="text-center text-slate-400">Sin conjuntos de estímulos todavía.</p>

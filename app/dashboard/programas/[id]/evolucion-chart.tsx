@@ -11,10 +11,11 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 
 type Punto = { fecha: string; fechaISO: string; porcentaje: number }
 type Conjunto = { id: string; nombre: string; estado: string; bloques: Punto[] }
+type ConjuntoEstimulos = { id: string; nombre: string; estimulos: string[] }
 
 const COLORES = ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2']
 
@@ -44,10 +45,44 @@ function calcularTendencia(puntos: { x: number; y: number }[]) {
 export default function EvolucionChart({
   conjuntos,
   porcentajeDominio,
+  titulo,
+  estimulosPorConjunto,
 }: {
   conjuntos: Conjunto[]
   porcentajeDominio: number
+  titulo?: string
+  estimulosPorConjunto?: ConjuntoEstimulos[]
 }) {
+  const chartRef = useRef<HTMLDivElement>(null)
+
+  const imprimir = () => {
+    if (!chartRef.current) return
+    const contenido = chartRef.current.innerHTML
+    const ventana = window.open('', '_blank')
+    if (!ventana) return
+    ventana.document.write(`
+      <html>
+        <head>
+          <title>${titulo ?? 'Gráfico de evolución'}</title>
+          <style>
+            body { margin: 24px; font-family: sans-serif; }
+            h1 { font-size: 16px; margin-bottom: 16px; color: #1e293b; }
+          </style>
+        </head>
+        <body>
+          ${titulo ? `<h1>${titulo}</h1>` : ''}
+          ${contenido}
+        </body>
+      </html>
+    `)
+    ventana.document.close()
+    ventana.focus()
+    setTimeout(() => {
+      ventana.print()
+      ventana.close()
+    }, 300)
+  }
+
   const { series, maxSesion } = useMemo(() => {
     const todos = conjuntos.flatMap((c) =>
       c.bloques.map((b) => ({ ...b, conjuntoId: c.id }))
@@ -82,63 +117,89 @@ export default function EvolucionChart({
       </p>
     )
   }
-
   return (
-    <div className="h-72 sm:h-80 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-          <XAxis
-            type="number"
-            dataKey="x"
-            domain={[1, Math.max(maxSesion, 1)]}
-            allowDecimals={false}
-            tick={{ fontSize: 12 }}
-            label={{ value: 'Sesión', position: 'insideBottom', offset: -5, fontSize: 12 }}
-          />
-          <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} unit="%" />
-          <Tooltip />
-          <Legend />
-          <ReferenceLine
-            y={porcentajeDominio}
-            stroke="#94a3b8"
-            strokeDasharray="4 4"
-            label={{ value: `Dominio (${porcentajeDominio}%)`, fontSize: 11, fill: '#64748b' }}
-          />
+    <div className="space-y-2">
+      <div className="flex justify-end">
+        <button
+          onClick={imprimir}
+          className="text-xs font-medium text-indigo-600 hover:underline"
+        >
+          🖨️ Imprimir gráfico
+        </button>
+      </div>
 
-          {series.map((s) => (
-            <Line
-              key={s.id}
-              data={s.puntos}
-              dataKey="y"
-              name={s.nombre}
-              type="linear"
-              stroke={s.color}
-              strokeWidth={2}
-              dot={{ r: 3 }}
-              connectNulls
-            />
-          ))}
+      <div ref={chartRef}>
+        <div className="h-72 sm:h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart margin={{ top: 10, right: 20, left: 0, bottom: 30 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                type="number"
+                dataKey="x"
+                domain={[1, Math.max(maxSesion, 1)]}
+                allowDecimals={false}
+                tick={{ fontSize: 12 }}
+                label={{ value: 'Sesión', position: 'insideBottom', offset: -5, fontSize: 12 }}
+              />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} unit="%" />
+              <Tooltip />
+              <Legend wrapperStyle={{ paddingTop: 20 }} />
+              <ReferenceLine y={porcentajeDominio} stroke="#94a3b8" strokeDasharray="4 4" />
 
-          {series.map(
-            (s) =>
-              s.tendencia.length === 2 && (
+              {series.map((s) => (
                 <Line
-                  key={`${s.id}-tendencia`}
-                  data={s.tendencia}
+                  key={s.id}
+                  data={s.puntos}
                   dataKey="y"
-                  name={`${s.nombre} (tendencia)`}
+                  name={s.nombre}
                   type="linear"
                   stroke={s.color}
-                  strokeWidth={1}
-                  strokeDasharray="4 4"
-                  dot={false}
-                  legendType="none"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  connectNulls
                 />
-              )
-          )}
-        </ComposedChart>
-      </ResponsiveContainer>
+              ))}
+
+              {series.map(
+                (s) =>
+                  s.tendencia.length === 2 && (
+                    <Line
+                      key={`${s.id}-tendencia`}
+                      data={s.tendencia}
+                      dataKey="y"
+                      name={`${s.nombre} (tendencia)`}
+                      type="linear"
+                      stroke={s.color}
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
+                      dot={false}
+                      legendType="none"
+                    />
+                  )
+              )}
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+
+        {estimulosPorConjunto && estimulosPorConjunto.length > 0 && (
+          <div className="mt-3 space-y-1.5 text-sm">
+            {estimulosPorConjunto.map((c, i) => (
+              <div key={c.id} className="flex items-start gap-2">
+                <span
+                  className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: COLORES[i % COLORES.length] }}
+                />
+                <span>
+                  <strong className="text-slate-700">{c.nombre}:</strong>{' '}
+                  <span className="text-slate-500">
+                    {c.estimulos.length > 0 ? c.estimulos.join(', ') : 'sin estímulos todavía'}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
