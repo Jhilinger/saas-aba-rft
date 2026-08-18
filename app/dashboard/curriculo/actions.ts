@@ -182,3 +182,74 @@ export async function editarPrograma(id: string, formData: FormData) {
   revalidatePath(`/dashboard/curriculo/${id}`)
   return { success: true }
 }
+export async function clonarPrograma(id: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const { data: original, error: fetchError } = await supabase
+    .from('programas_base')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !original) return { error: 'Programa no encontrado' }
+
+  const { data: nuevo, error: insertError } = await supabase
+    .from('programas_base')
+    .insert({
+      nombre: `${original.nombre} (copia)`,
+      tipo: original.tipo,
+      tipo_relacion: original.tipo_relacion,
+      area: original.area,
+      objetivo: original.objetivo,
+      materiales: original.materiales,
+      instrucciones_terapeuta: original.instrucciones_terapeuta,
+      ayudas_posibles: original.ayudas_posibles,
+      ensayos_por_bloque: original.ensayos_por_bloque,
+      bloques_para_dominio: original.bloques_para_dominio,
+      porcentaje_dominio: original.porcentaje_dominio,
+      orden: null,
+      clinica_id: original.clinica_id,
+      visibilidad: original.visibilidad,
+      creado_por: user.id,
+      activo: true,
+    })
+    .select('id')
+    .single()
+
+  if (insertError || !nuevo) {
+    return { error: insertError?.message ?? 'Error clonando el programa' }
+  }
+
+  if (original.tipo === 'aba_clasico') {
+    const { data: conjuntos } = await supabase
+      .from('conjuntos_estimulos_base')
+      .select('nombre, orden, estimulos_base(nombre, descripcion, orden)')
+      .eq('programa_base_id', id)
+      .order('orden')
+
+    for (const conjunto of conjuntos ?? []) {
+      const { data: nuevoConjunto } = await supabase
+        .from('conjuntos_estimulos_base')
+        .insert({ programa_base_id: nuevo.id, nombre: conjunto.nombre, orden: conjunto.orden })
+        .select('id')
+        .single()
+
+      if (nuevoConjunto && conjunto.estimulos_base?.length) {
+        await supabase.from('estimulos_base').insert(
+          conjunto.estimulos_base.map((e: any) => ({
+            conjunto_id: nuevoConjunto.id,
+            nombre: e.nombre,
+            descripcion: e.descripcion,
+            orden: e.orden,
+          }))
+        )
+      }
+    }
+  }
+
+  revalidatePath('/dashboard/curriculo')
+  revalidatePath('/dashboard/mis-programas')
+  return { success: true, id: nuevo.id }
+}

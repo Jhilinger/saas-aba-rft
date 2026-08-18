@@ -2,7 +2,9 @@
 
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { eliminarPrograma, togglePrograma } from './actions'
+import { eliminarPrograma, togglePrograma, clonarPrograma } from './actions'
+import { useConfirm } from '../../providers/confirm-provider'
+import { useToast } from '../../providers/toast-provider'
 
 export default function ProgramaRowActions({
   id,
@@ -13,9 +15,28 @@ export default function ProgramaRowActions({
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const confirmar = useConfirm()
+  const toast = useToast()
 
   return (
     <div className="flex gap-3">
+      <button
+        onClick={() => {
+          startTransition(async () => {
+            const res = await clonarPrograma(id)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
+            toast('Programa clonado', 'exito')
+            router.refresh()
+          })
+        }}
+        disabled={isPending}
+        className="text-xs font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+      >
+        Clonar
+      </button>
       <button
         onClick={() => {
           startTransition(async () => {
@@ -29,10 +50,21 @@ export default function ProgramaRowActions({
         {activo ? 'Desactivar' : 'Activar'}
       </button>
       <button
-        onClick={() => {
-          if (!confirm('¿Eliminar este programa del currículo base?')) return
+        onClick={async () => {
+          const ok = await confirmar({
+            titulo: 'Eliminar programa',
+            mensaje: '¿Eliminar este programa? No se puede deshacer.',
+            textoConfirmar: 'Eliminar',
+            peligroso: true,
+          })
+          if (!ok) return
           startTransition(async () => {
-            await eliminarPrograma(id)
+            const res = await eliminarPrograma(id)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
+            toast('Programa eliminado', 'exito')
             router.refresh()
           })
         }}
