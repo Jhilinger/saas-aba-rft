@@ -41,6 +41,15 @@ const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
   no_asistio: { label: 'No asistió', color: 'bg-rose-50 text-rose-700' },
 }
 
+function primerDiaDelMes(): string {
+  const d = new Date()
+  return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]
+}
+
+function hoy(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
 export default function AgendaClient({
   miPerfilId,
   miRol,
@@ -62,6 +71,10 @@ export default function AgendaClient({
   const confirmar = useConfirm()
   const toast = useToast()
 
+  const [filtroAlumnoId, setFiltroAlumnoId] = useState('')
+  const [filtroDesde, setFiltroDesde] = useState(primerDiaDelMes())
+  const [filtroHasta, setFiltroHasta] = useState(hoy())
+
   const ahora = new Date()
 
   const { pendientes, proximas, historial } = useMemo(() => {
@@ -70,6 +83,27 @@ export default function AgendaClient({
     const historial = sesiones.filter((s) => s.estado !== 'programada')
     return { pendientes, proximas, historial }
   }, [sesiones])
+
+  const sesionesFacturacion = useMemo(() => {
+    if (!filtroAlumnoId) return []
+    const desde = new Date(filtroDesde + 'T00:00:00')
+    const hasta = new Date(filtroHasta + 'T23:59:59')
+    return sesiones
+      .filter((s) => s.estado !== 'programada')
+      .filter((s) => s.alumno_id === filtroAlumnoId)
+      .filter((s) => {
+        const f = new Date(s.fecha_hora)
+        return f >= desde && f <= hasta
+      })
+      .sort((a, b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime())
+  }, [sesiones, filtroAlumnoId, filtroDesde, filtroHasta])
+
+  const resumenFacturacion = useMemo(() => {
+    const asistio = sesionesFacturacion.filter((s) => s.estado === 'asistio').length
+    const cancelada = sesionesFacturacion.filter((s) => s.estado === 'cancelada').length
+    const noAsistio = sesionesFacturacion.filter((s) => s.estado === 'no_asistio').length
+    return { total: sesionesFacturacion.length, asistio, cancelada, noAsistio }
+  }, [sesionesFacturacion])
 
   const recargar = () => window.location.reload()
 
@@ -103,6 +137,7 @@ export default function AgendaClient({
       recargar()
     })
   }
+
   const filaSesion = (s: Sesion, mostrarAcciones: boolean) => (
     <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -311,6 +346,99 @@ export default function AgendaClient({
         {mensajeExito && <p className="text-sm text-emerald-600">{mensajeExito}</p>}
       </div>
 
+      {miRol === 'clinica_admin' && (
+        <section className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-4 sm:p-6 space-y-4">
+          <h2 className="font-semibold text-slate-800">Sesiones por alumno (para facturación)</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select
+              value={filtroAlumnoId}
+              onChange={(e) => setFiltroAlumnoId(e.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+            >
+              <option value="">Selecciona un alumno...</option>
+              {alumnos.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.nombre_anonimizado}
+                </option>
+              ))}
+            </select>
+            <input
+              type="date"
+              value={filtroDesde}
+              onChange={(e) => setFiltroDesde(e.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+            />
+            <input
+              type="date"
+              value={filtroHasta}
+              onChange={(e) => setFiltroHasta(e.target.value)}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+            />
+          </div>
+
+          {filtroAlumnoId && (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="rounded-xl bg-white p-3 text-center">
+                  <p className="text-xl font-bold text-slate-800">{resumenFacturacion.total}</p>
+                  <p className="text-xs text-slate-500">Total sesiones</p>
+                </div>
+                <div className="rounded-xl bg-white p-3 text-center">
+                  <p className="text-xl font-bold text-emerald-600">{resumenFacturacion.asistio}</p>
+                  <p className="text-xs text-slate-500">Asistidas</p>
+                </div>
+                <div className="rounded-xl bg-white p-3 text-center">
+                  <p className="text-xl font-bold text-amber-600">{resumenFacturacion.cancelada}</p>
+                  <p className="text-xs text-slate-500">Canceladas</p>
+                </div>
+                <div className="rounded-xl bg-white p-3 text-center">
+                  <p className="text-xl font-bold text-rose-600">{resumenFacturacion.noAsistio}</p>
+                  <p className="text-xs text-slate-500">No asistió</p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+                <table className="w-full text-sm min-w-[450px]">
+                  <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
+                    <tr>
+                      <th className="p-3">Fecha</th>
+                      <th className="p-3">Terapeuta</th>
+                      <th className="p-3">Estado</th>
+                      <th className="p-3">Confirmada</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sesionesFacturacion.map((s) => (
+                      <tr key={s.id} className="border-b border-slate-100 last:border-0">
+                        <td className="p-3 text-slate-700 whitespace-nowrap">
+                          {new Date(s.fecha_hora).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })}
+                        </td>
+                        <td className="p-3 text-slate-600">{s.terapeuta?.nombre ?? '—'}</td>
+                        <td className="p-3">
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${ETIQUETA_ESTADO[s.estado].color}`}>
+                            {ETIQUETA_ESTADO[s.estado].label}
+                          </span>
+                        </td>
+                        <td className="p-3 text-slate-600">{s.confirmada_familia ? '✓ Sí' : 'Pendiente'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {sesionesFacturacion.length === 0 && (
+                  <p className="p-6 text-center text-slate-400">
+                    Sin sesiones realizadas para este alumno en el período seleccionado.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
       {pendientes.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold text-slate-700">Pendientes de marcar ({pendientes.length})</h2>
