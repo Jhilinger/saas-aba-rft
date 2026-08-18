@@ -62,7 +62,7 @@ export async function crearPrograma(formData: FormData) {
   }
 
   revalidatePath('/dashboard/curriculo')
-  return { success: true }
+  return { success: true, id: data.id }
 }
 
 export async function eliminarPrograma(id: string) {

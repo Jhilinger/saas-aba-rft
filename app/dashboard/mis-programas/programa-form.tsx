@@ -13,7 +13,7 @@ export default function ProgramaFormPrivado() {
       action={async (formData) => {
         formData.set('visibilidad', 'privado')
         const res = await crearPrograma(formData)
-        if (!res.error) router.refresh()
+        if (!res.error && res.id) router.push(`/dashboard/curriculo/${res.id}`)
       }}
       className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
     >
