@@ -27,6 +27,7 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
         estado: c.estado,
         bloques: (bloques ?? []).map((b) => ({
           fecha: new Date(b.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
+          fechaISO: b.fecha,
           porcentaje: Number(b.porcentaje),
         })),
       }
