@@ -22,13 +22,16 @@ export async function guardarBloqueAba(
 
   if (ensayos.length === 0) return { error: 'No hay ensayos que guardar' }
 
-  // Estado del conjunto ANTES de guardar, para poder detectar si el dominio
-  // se logra justo con este bloque (y así mostrar una celebración)
+  // Estado del conjunto ANTES de guardar, para saber en qué fase se toma
+  // este bloque y si el dominio se logra justo con él (celebración)
   const { data: conjuntoAntes } = await supabase
     .from('conjuntos_estimulos_alumno')
     .select('estado')
     .eq('id', conjuntoId)
     .single()
+
+  const enLineaBase = conjuntoAntes?.estado === 'linea_base'
+  const fase = enLineaBase ? 'linea_base' : 'intervencion'
 
   const totalEnsayos = ensayos.length
   // Solo cuenta como acierto si fue correcto Y sin ayuda (independiente).
@@ -43,6 +46,7 @@ export async function guardarBloqueAba(
       total_ensayos: totalEnsayos,
       aciertos,
       notas: notas?.trim() || null,
+      fase,
     })
     .select('id')
     .single()
@@ -62,17 +66,30 @@ export async function guardarBloqueAba(
 
   if (detalleError) return { error: detalleError.message }
 
-  // El trigger de la base de datos ya actualizó el estado del conjunto si
-  // corresponde (se ejecuta automáticamente al insertar el bloque). Lo
-  // comprobamos para saber si el dominio se acaba de lograr justo ahora.
-  const { data: conjuntoDespues } = await supabase
-    .from('conjuntos_estimulos_alumno')
-    .select('estado')
-    .eq('id', conjuntoId)
-    .single()
+  let dominioLogrado = false
 
-  const dominioLogrado =
-    conjuntoAntes?.estado !== 'dominado' && conjuntoDespues?.estado === 'dominado'
+  if (enLineaBase) {
+    // En línea base no se evalúa el criterio de dominio. El trigger de la
+    // base de datos no distingue esto, así que si ha tocado el estado del
+    // conjunto, lo devolvemos a "línea base" para que no se dispare
+    // ninguna celebración ni transición no deseada.
+    await supabase
+      .from('conjuntos_estimulos_alumno')
+      .update({ estado: 'linea_base' })
+      .eq('id', conjuntoId)
+  } else {
+    // El trigger de la base de datos ya actualizó el estado del conjunto si
+    // corresponde (se ejecuta automáticamente al insertar el bloque). Lo
+    // comprobamos para saber si el dominio se acaba de lograr justo ahora.
+    const { data: conjuntoDespues } = await supabase
+      .from('conjuntos_estimulos_alumno')
+      .select('estado')
+      .eq('id', conjuntoId)
+      .single()
+
+    dominioLogrado =
+      conjuntoAntes?.estado !== 'dominado' && conjuntoDespues?.estado === 'dominado'
+  }
 
   revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   revalidatePath(`/dashboard/alumnos/${alumnoId}`)

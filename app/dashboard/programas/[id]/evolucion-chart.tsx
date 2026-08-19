@@ -13,7 +13,7 @@ import {
 } from 'recharts'
 import { useMemo, useRef } from 'react'
 
-type Punto = { fecha: string; fechaISO: string; porcentaje: number }
+type Punto = { fecha: string; fechaISO: string; porcentaje: number; fase: 'linea_base' | 'intervencion' }
 type Conjunto = { id: string; nombre: string; estado: string; bloques: Punto[] }
 type ConjuntoEstimulos = { id: string; nombre: string; estimulos: string[] }
 
@@ -82,8 +82,7 @@ export default function EvolucionChart({
       ventana.close()
     }, 300)
   }
-
-  const { series, maxSesion } = useMemo(() => {
+  const { series, maxSesion, transiciones } = useMemo(() => {
     const todos = conjuntos.flatMap((c) =>
       c.bloques.map((b) => ({ ...b, conjuntoId: c.id }))
     )
@@ -92,23 +91,34 @@ export default function EvolucionChart({
     const conSesionGlobal = todos.map((b, i) => ({ ...b, sesionGlobal: i + 1 }))
 
     const series = conjuntos.map((c, i) => {
-      const puntos = conSesionGlobal
-        .filter((b) => b.conjuntoId === c.id)
+      const puntosConjunto = conSesionGlobal.filter((b) => b.conjuntoId === c.id)
+
+      const puntosLineaBase = puntosConjunto
+        .filter((b) => b.fase === 'linea_base')
+        .map((b) => ({ x: b.sesionGlobal, y: b.porcentaje }))
+
+      const puntosIntervencion = puntosConjunto
+        .filter((b) => b.fase === 'intervencion')
         .map((b) => ({ x: b.sesionGlobal, y: b.porcentaje }))
 
       return {
         id: c.id,
         nombre: c.nombre,
         color: COLORES[i % COLORES.length],
-        puntos,
-        tendencia: calcularTendencia(puntos),
+        puntosLineaBase,
+        puntosIntervencion,
+        tendencia: calcularTendencia(puntosIntervencion),
       }
     })
 
-    return { series, maxSesion: conSesionGlobal.length }
+    const transiciones = series
+      .filter((s) => s.puntosLineaBase.length > 0 && s.puntosIntervencion.length > 0)
+      .map((s) => ({ x: s.puntosIntervencion[0].x, color: s.color, nombre: s.nombre }))
+
+    return { series, maxSesion: conSesionGlobal.length, transiciones }
   }, [conjuntos])
 
-  const hayDatos = series.some((s) => s.puntos.length > 0)
+  const hayDatos = series.some((s) => s.puntosLineaBase.length > 0 || s.puntosIntervencion.length > 0)
 
   if (!hayDatos) {
     return (
@@ -146,19 +156,51 @@ export default function EvolucionChart({
               <Legend wrapperStyle={{ paddingTop: 20 }} />
               <ReferenceLine y={porcentajeDominio} stroke="#94a3b8" strokeDasharray="4 4" />
 
-              {series.map((s) => (
-                <Line
-                  key={s.id}
-                  data={s.puntos}
-                  dataKey="y"
-                  name={s.nombre}
-                  type="linear"
-                  stroke={s.color}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  connectNulls
+              {transiciones.map((t, i) => (
+                <ReferenceLine
+                  key={i}
+                  x={t.x}
+                  stroke={t.color}
+                  strokeOpacity={0.4}
+                  strokeDasharray="2 2"
                 />
               ))}
+
+              {series.map(
+                (s) =>
+                  s.puntosLineaBase.length > 0 && (
+                   <Line
+                      key={`${s.id}-base`}
+                      data={s.puntosLineaBase}
+                      dataKey="y"
+                      name={s.puntosIntervencion.length > 0 ? `${s.nombre} (línea base)` : s.nombre}
+                      type="linear"
+                      stroke={s.color}
+                      strokeWidth={2}
+                      strokeDasharray="5 3"
+                      dot={{ r: 3, fill: '#fff', stroke: s.color, strokeWidth: 2 }}
+                      connectNulls
+                      legendType={s.puntosIntervencion.length > 0 ? 'none' : 'line'}
+                    />
+                  )
+              )}
+
+              {series.map(
+                (s) =>
+                  s.puntosIntervencion.length > 0 && (
+                    <Line
+                      key={`${s.id}-intervencion`}
+                      data={s.puntosIntervencion}
+                      dataKey="y"
+                      name={s.nombre}
+                      type="linear"
+                      stroke={s.color}
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      connectNulls
+                    />
+                  )
+              )}
 
               {series.map(
                 (s) =>

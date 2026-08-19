@@ -17,7 +17,7 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
     conjuntos.map(async (c) => {
       const { data: bloques } = await supabase
         .from('bloques_ensayo')
-        .select('fecha, porcentaje')
+        .select('fecha, porcentaje, fase')
         .eq('conjunto_id', c.id)
         .order('fecha', { ascending: true })
 
@@ -29,6 +29,7 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
           fecha: new Date(b.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }),
           fechaISO: b.fecha,
           porcentaje: Number(b.porcentaje),
+          fase: b.fase,
         })),
       }
     })

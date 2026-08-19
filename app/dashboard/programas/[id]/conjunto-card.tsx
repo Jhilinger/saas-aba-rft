@@ -7,12 +7,21 @@ import {
   eliminarEstimuloAlumno,
   eliminarEstimuloAlumnoForzado,
   eliminarConjuntoAlumno,
+  iniciarIntervencion,
 } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estado: string; estimulos_alumno: Estimulo[] }
+
+const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
+  linea_base: { label: 'Línea base', color: 'bg-sky-50 text-sky-700' },
+  adquisicion: { label: 'En adquisición', color: 'bg-amber-50 text-amber-700' },
+  mantenimiento: { label: 'Mantenimiento', color: 'bg-blue-50 text-blue-700' },
+  dominado: { label: 'Dominado', color: 'bg-emerald-50 text-emerald-700' },
+  pausado: { label: 'Pausado', color: 'bg-slate-100 text-slate-500' },
+}
 
 export default function ConjuntoCard({
   conjunto,
@@ -28,14 +37,42 @@ export default function ConjuntoCard({
   const confirmar = useConfirm()
   const toast = useToast()
 
+  const infoEstado = ETIQUETA_ESTADO[conjunto.estado] ?? { label: conjunto.estado, color: 'bg-slate-100 text-slate-500' }
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h3 className="font-semibold text-slate-800">{conjunto.nombre}</h3>
-          <span className="text-xs text-slate-400">{conjunto.estado}</span>
+          <span className={`inline-block mt-1 rounded-full px-2 py-0.5 text-xs font-medium ${infoEstado.color}`}>
+            {infoEstado.label}
+          </span>
         </div>
         <div className="flex items-center gap-3">
+          {conjunto.estado === 'linea_base' && (
+            <button
+              onClick={async () => {
+                const ok = await confirmar({
+                  titulo: 'Iniciar intervención',
+                  mensaje: `¿Dar por finalizada la línea base de "${conjunto.nombre}" y empezar la intervención? A partir de ahora se evaluará el criterio de dominio y se podrán registrar ayudas.`,
+                  textoConfirmar: 'Iniciar intervención',
+                })
+                if (!ok) return
+                startTransition(async () => {
+                  const res = await iniciarIntervencion(conjunto.id, programaAlumnoId)
+                  if (res?.error) {
+                    toast(res.error, 'error')
+                    return
+                  }
+                  toast('Intervención iniciada', 'exito')
+                  router.refresh()
+                })
+              }}
+              className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-500"
+            >
+              Iniciar intervención
+            </button>
+          )}
           
             <a href={`/dashboard/tomar-datos/aba/${conjunto.id}`}
             className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
@@ -121,7 +158,6 @@ export default function ConjuntoCard({
           <li className="text-xs text-slate-400 italic">Sin estímulos todavía.</li>
         )}
       </ul>
-
       <form
         onSubmit={(e) => {
           e.preventDefault()

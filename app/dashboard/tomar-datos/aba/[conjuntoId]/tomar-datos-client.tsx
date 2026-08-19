@@ -61,6 +61,7 @@ export default function TomarDatosClient({
   ensayosPorBloque,
   instrucciones,
   ayudasPosibles,
+  faseConjunto,
 }: {
   conjuntoId: string
   programaAlumnoId: string
@@ -69,7 +70,10 @@ export default function TomarDatosClient({
   ensayosPorBloque: number
   instrucciones: string | null
   ayudasPosibles: string | null
+  faseConjunto: 'linea_base' | 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
 }) {
+  const enLineaBase = faseConjunto === 'linea_base'
+
   const [tamanoBloque, setTamanoBloque] = useState<number>(ensayosPorBloque)
   const [secuencia, setSecuencia] = useState<Estimulo[] | null>(null)
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
@@ -117,7 +121,6 @@ export default function TomarDatosClient({
   const deshacerUltimo = () => {
     setEnsayos((prev) => prev.slice(0, -1))
   }
-
   if (resultado) {
     return (
       <div className={`rounded-2xl border p-4 sm:p-6 text-center space-y-3 ${
@@ -133,7 +136,9 @@ export default function TomarDatosClient({
         }`}>
           {resultado.dominioLogrado
             ? '¡Dominio conseguido! Este conjunto acaba de superar el criterio'
-            : `Bloque guardado — ${resultado.porcentaje}% de acierto independiente`}
+            : enLineaBase
+              ? `Bloque de línea base guardado — ${resultado.porcentaje}% de acierto`
+              : `Bloque guardado — ${resultado.porcentaje}% de acierto independiente`}
         </p>
         {resultado.dominioLogrado && (
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
@@ -162,6 +167,11 @@ export default function TomarDatosClient({
   if (!secuencia) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+        {enLineaBase && (
+          <div className="rounded-lg bg-sky-50 border border-sky-200 p-3 text-sm text-sky-800">
+            Estás en fase de <strong>línea base</strong>: no se evalúa el criterio de dominio ni se registran ayudas, solo el nivel de partida sin intervención.
+          </div>
+        )}
         <p className="text-sm font-medium text-slate-600">Tamaño del bloque</p>
         <div className="flex gap-2">
           {[10, 20].map((n) => (
@@ -211,6 +221,12 @@ export default function TomarDatosClient({
         )}
       </div>
 
+      {enLineaBase && (
+        <div className="rounded-lg bg-sky-50 border border-sky-200 px-3 py-2 text-xs text-sky-800">
+          Fase de línea base — sin ayudas, sin criterio de dominio.
+        </div>
+      )}
+
       {(instrucciones || ayudasPosibles) && (
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
           {instrucciones && (
@@ -219,7 +235,7 @@ export default function TomarDatosClient({
               <p className="whitespace-pre-wrap">{instrucciones}</p>
             </div>
           )}
-          {ayudasPosibles && (
+          {!enLineaBase && ayudasPosibles && (
             <div>
               <strong>Ayudas sugeridas:</strong>
               <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
@@ -231,7 +247,24 @@ export default function TomarDatosClient({
       <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
         <p className="text-xl sm:text-2xl font-bold text-slate-800">{estimuloActual.nombre}</p>
 
-        {!mostrandoAyudas ? (
+        {enLineaBase ? (
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => registrar(true, 'independiente')}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+            >
+              ✓ Correcto
+            </button>
+            <button
+              onClick={() => registrar(false, 'independiente')}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+            >
+              ✗ Incorrecto
+            </button>
+          </div>
+        ) : !mostrandoAyudas ? (
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => registrar(true, 'independiente')}

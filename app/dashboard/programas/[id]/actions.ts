@@ -65,3 +65,17 @@ export async function eliminarEstimuloAlumnoForzado(id: string, programaAlumnoId
   revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   return { success: true }
 }
+export async function iniciarIntervencion(conjuntoId: string, programaAlumnoId: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('conjuntos_estimulos_alumno')
+    .update({ estado: 'adquisicion' })
+    .eq('id', conjuntoId)
+    .eq('estado', 'linea_base')
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
+  return { success: true }
+}

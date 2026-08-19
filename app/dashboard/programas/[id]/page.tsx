@@ -55,7 +55,8 @@ export default async function ProgramaAlumnoPage({
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
 
-  const enAdquisicion = (conjuntos ?? []).filter((c: any) => c.estado !== 'dominado')
+  const enLineaBase = (conjuntos ?? []).filter((c: any) => c.estado === 'linea_base')
+  const enAdquisicion = (conjuntos ?? []).filter((c: any) => c.estado !== 'dominado' && c.estado !== 'linea_base')
   const dominados = (conjuntos ?? []).filter((c: any) => c.estado === 'dominado')
 
   return (
@@ -138,6 +139,19 @@ export default async function ProgramaAlumnoPage({
         conjuntos={
           <section className="space-y-6">
             <NuevoConjuntoForm programaAlumnoId={id} />
+
+            {enLineaBase.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="text-sm font-semibold text-sky-700">
+                  Línea base ({enLineaBase.length})
+                </h2>
+                <div className="space-y-4">
+                  {enLineaBase.map((c: any) => (
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-slate-700">
