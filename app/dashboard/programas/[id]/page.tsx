@@ -6,6 +6,7 @@ import ConjuntoCard from './conjunto-card'
 import EvolucionChart from './evolucion-chart'
 import { obtenerEvolucionAba } from './evolucion-actions'
 import ProgramaAbaTabs from './programa-aba-tabs'
+import EstadoProgramaSelector from './estado-programa-selector'
 
 const COLORES = ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2']
 
@@ -69,9 +70,14 @@ export default async function ProgramaAlumnoPage({
           ← Volver a {alumnoNombre}
         </Link>
         <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
-        <p className="text-sm text-slate-500">
-          {programa.area ? `${programa.area} · ` : ''}Estado: {programa.estado}
-        </p>
+        <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+          {programa.area && <span>{programa.area}</span>}
+          <EstadoProgramaSelector
+            programaAlumnoId={programa.id}
+            alumnoId={programa.alumno_id}
+            estadoActual={programa.estado}
+          />
+        </div>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm space-y-3">

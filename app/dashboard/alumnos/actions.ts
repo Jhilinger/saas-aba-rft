@@ -98,3 +98,36 @@ export async function reactivarAlumno(id: string) {
   revalidatePath('/dashboard/alumnos')
   return { success: true }
 }
+export async function actualizarTerapeutasAlumno(
+  alumnoId: string,
+  terapeutaIds: string[],
+  terapeutaPrincipalId: string | null
+) {
+  const supabase = await createClient()
+
+  // Sustitución completa: borramos los vínculos actuales y creamos los nuevos
+  const { error: deleteError } = await supabase
+    .from('alumno_terapeuta')
+    .delete()
+    .eq('alumno_id', alumnoId)
+
+  if (deleteError) return { error: deleteError.message }
+
+  const idsFinal = new Set(terapeutaIds)
+  if (terapeutaPrincipalId) idsFinal.add(terapeutaPrincipalId)
+
+  if (idsFinal.size > 0) {
+    const { error: insertError } = await supabase.from('alumno_terapeuta').insert(
+      [...idsFinal].map((tid) => ({
+        alumno_id: alumnoId,
+        terapeuta_id: tid,
+        es_principal: tid === terapeutaPrincipalId,
+      }))
+    )
+
+    if (insertError) return { error: insertError.message }
+  }
+
+  revalidatePath('/dashboard/alumnos')
+  return { success: true }
+}

@@ -79,3 +79,22 @@ export async function iniciarIntervencion(conjuntoId: string, programaAlumnoId: 
   revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   return { success: true }
 }
+export async function actualizarEstadoPrograma(
+  programaAlumnoId: string,
+  alumnoId: string,
+  estado: 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
+) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('programas_alumno')
+    .update({ estado })
+    .eq('id', programaAlumnoId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/alumnos/${alumnoId}`)
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/progreso`)
+  return { success: true }
+}

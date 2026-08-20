@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import AlumnoActions from './alumno-actions'
+import AlumnoRow from './alumno-row'
 
 type Alumno = {
   id: string
@@ -52,29 +52,7 @@ export default function AlumnosTabla({
           </thead>
           <tbody>
             {filtrados.map((a) => (
-              <tr key={a.id} className={`border-b border-slate-100 last:border-0 ${!a.activo ? 'opacity-50' : ''}`}>
-                <td className="p-3 font-medium text-slate-800">
-                  <Link href={`/dashboard/alumnos/${a.id}`} className="hover:underline">
-                    {a.nombre_anonimizado}
-                  </Link>
-                  {!a.activo && (
-                    <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 whitespace-nowrap">
-                      Archivado
-                    </span>
-                  )}
-                </td>
-                <td className="p-3 text-slate-600 whitespace-nowrap">{a.fecha_nacimiento}</td>
-                <td className="p-3 text-slate-600">
-                  {a.alumno_terapeuta.length === 0
-                    ? '—'
-                    : a.alumno_terapeuta
-                        .map((at) => nombreTerapeuta(at.terapeuta_id) + (at.es_principal ? ' (principal)' : ''))
-                        .join(', ')}
-                </td>
-                <td className="p-3">
-                  <AlumnoActions id={a.id} activo={a.activo} />
-                </td>
-              </tr>
+              <AlumnoRow key={a.id} alumno={a} terapeutas={terapeutas} />
             ))}
           </tbody>
         </table>
