@@ -153,7 +153,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {enLineaBase.map((c: any) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id}/>
                   ))}
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default async function ProgramaAlumnoPage({
               </h2>
               <div className="space-y-4">
                 {enAdquisicion.map((c: any) => (
-                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
                 ))}
                 {enAdquisicion.length === 0 && (
                   <p className="text-sm text-slate-400">Sin conjuntos en adquisición.</p>
@@ -180,7 +180,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {dominados.map((c: any) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} />
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
                   ))}
                 </div>
               </div>

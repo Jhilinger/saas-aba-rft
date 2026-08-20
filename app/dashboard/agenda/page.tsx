@@ -55,14 +55,14 @@ export default async function AgendaPage() {
   if (perfil.rol === 'clinica_admin' || perfil.rol === 'superadmin') {
     const { data } = await supabase
       .from('sesiones_programadas')
-      .select('id, fecha_hora, duracion_minutos, estado, cancelado_por, notas, confirmada_familia, alumno_id, terapeuta_id, alumnos(nombre_anonimizado), terapeuta:terapeuta_id(nombre)')
+      .select('id, fecha_hora, duracion_minutos, estado, cancelado_por, notas, confirmada_familia, alumno_id, terapeuta_id, serie_id, alumnos(nombre_anonimizado), terapeuta:terapeuta_id(nombre)')
       .in('alumno_id', alumnos.map((a) => a.id))
       .order('fecha_hora', { ascending: true })
     sesiones = data ?? []
   } else {
     const { data } = await supabase
       .from('sesiones_programadas')
-      .select('id, fecha_hora, duracion_minutos, estado, cancelado_por, notas, confirmada_familia, alumno_id, terapeuta_id, alumnos(nombre_anonimizado)')
+      .select('id, fecha_hora, duracion_minutos, estado, cancelado_por, notas, confirmada_familia, alumno_id, terapeuta_id, serie_id, alumnos(nombre_anonimizado)')
       .eq('terapeuta_id', perfil.id)
       .order('fecha_hora', { ascending: true })
     sesiones = data ?? []

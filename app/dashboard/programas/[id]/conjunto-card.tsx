@@ -11,6 +11,7 @@ import {
 } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import HistorialBloques from './historial-bloques'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estado: string; estimulos_alumno: Estimulo[] }
@@ -26,9 +27,11 @@ const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
 export default function ConjuntoCard({
   conjunto,
   programaAlumnoId,
+  alumnoId,
 }: {
   conjunto: Conjunto
   programaAlumnoId: string
+  alumnoId: string
 }) {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -191,6 +194,8 @@ export default function ConjuntoCard({
           Añadir
         </button>
       </form>
+
+      <HistorialBloques conjuntoId={conjunto.id} programaAlumnoId={programaAlumnoId} alumnoId={alumnoId} />
     </div>
   )
 }

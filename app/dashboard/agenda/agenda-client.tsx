@@ -6,6 +6,9 @@ import {
   crearSesionUnica,
   marcarAsistencia,
   eliminarSesion,
+  cancelarSerieFutura,
+  eliminarSerieFutura,
+  cambiarHoraSerie,
 } from './actions'
 import { useConfirm } from '../../providers/confirm-provider'
 import { useToast } from '../../providers/toast-provider'
@@ -20,6 +23,7 @@ type Sesion = {
   confirmada_familia: boolean
   alumno_id: string
   terapeuta_id: string
+  serie_id: string | null
   alumnos: { nombre_anonimizado: string } | null
   terapeuta?: { nombre: string } | null
 }
@@ -41,15 +45,6 @@ const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
   no_asistio: { label: 'No asistió', color: 'bg-rose-50 text-rose-700' },
 }
 
-function primerDiaDelMes(): string {
-  const d = new Date()
-  return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0]
-}
-
-function hoy(): string {
-  return new Date().toISOString().split('T')[0]
-}
-
 export default function AgendaClient({
   miPerfilId,
   miRol,
@@ -68,12 +63,10 @@ export default function AgendaClient({
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [mensajeExito, setMensajeExito] = useState<string | null>(null)
+  const [serieAbierta, setSerieAbierta] = useState<string | null>(null)
+  const [nuevaHoraSerie, setNuevaHoraSerie] = useState('')
   const confirmar = useConfirm()
   const toast = useToast()
-
-  const [filtroAlumnoId, setFiltroAlumnoId] = useState('')
-  const [filtroDesde, setFiltroDesde] = useState(primerDiaDelMes())
-  const [filtroHasta, setFiltroHasta] = useState(hoy())
 
   const ahora = new Date()
 
@@ -84,26 +77,17 @@ export default function AgendaClient({
     return { pendientes, proximas, historial }
   }, [sesiones])
 
-  const sesionesFacturacion = useMemo(() => {
-    if (!filtroAlumnoId) return []
-    const desde = new Date(filtroDesde + 'T00:00:00')
-    const hasta = new Date(filtroHasta + 'T23:59:59')
-    return sesiones
-      .filter((s) => s.estado !== 'programada')
-      .filter((s) => s.alumno_id === filtroAlumnoId)
-      .filter((s) => {
-        const f = new Date(s.fecha_hora)
-        return f >= desde && f <= hasta
-      })
-      .sort((a, b) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime())
-  }, [sesiones, filtroAlumnoId, filtroDesde, filtroHasta])
-
-  const resumenFacturacion = useMemo(() => {
-    const asistio = sesionesFacturacion.filter((s) => s.estado === 'asistio').length
-    const cancelada = sesionesFacturacion.filter((s) => s.estado === 'cancelada').length
-    const noAsistio = sesionesFacturacion.filter((s) => s.estado === 'no_asistio').length
-    return { total: sesionesFacturacion.length, asistio, cancelada, noAsistio }
-  }, [sesionesFacturacion])
+  const seriesFuturas = useMemo(() => {
+    const mapa = new Map<string, { serieId: string; count: number; alumnoNombre: string }>()
+    for (const s of proximas) {
+      if (!s.serie_id) continue
+      if (!mapa.has(s.serie_id)) {
+        mapa.set(s.serie_id, { serieId: s.serie_id, count: 0, alumnoNombre: s.alumnos?.nombre_anonimizado ?? '—' })
+      }
+      mapa.get(s.serie_id)!.count++
+    }
+    return [...mapa.values()]
+  }, [proximas])
 
   const recargar = () => window.location.reload()
 
@@ -138,6 +122,58 @@ export default function AgendaClient({
     })
   }
 
+  const cancelarSerie = async (serieId: string, count: number) => {
+    const ok = await confirmar({
+      titulo: 'Cancelar serie completa',
+      mensaje: `¿Cancelar las ${count} sesiones futuras de esta serie?`,
+      textoConfirmar: 'Cancelar todas',
+      peligroso: true,
+    })
+    if (!ok) return
+    startTransition(async () => {
+      const res = await cancelarSerieFutura(serieId, 'terapeuta')
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Serie cancelada', 'exito')
+      recargar()
+    })
+  }
+
+  const eliminarSerie = async (serieId: string, count: number) => {
+    const ok = await confirmar({
+      titulo: 'Eliminar serie completa',
+      mensaje: `¿Eliminar las ${count} sesiones futuras de esta serie? No se puede deshacer.`,
+      textoConfirmar: 'Eliminar todas',
+      peligroso: true,
+    })
+    if (!ok) return
+    startTransition(async () => {
+      const res = await eliminarSerieFutura(serieId)
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Serie eliminada', 'exito')
+      recargar()
+    })
+  }
+
+  const cambiarHora = (serieId: string) => {
+    if (!nuevaHoraSerie) return
+    startTransition(async () => {
+      const res = await cambiarHoraSerie(serieId, nuevaHoraSerie)
+      if (res.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast(`${res.actualizadas} sesiones actualizadas`, 'exito')
+      setSerieAbierta(null)
+      setNuevaHoraSerie('')
+      recargar()
+    })
+  }
   const filaSesion = (s: Sesion, mostrarAcciones: boolean) => (
     <div key={s.id} className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -355,6 +391,55 @@ export default function AgendaClient({
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Próximas sesiones ({proximas.length})</h2>
+
+        {seriesFuturas.map((serie) => (
+          <div key={serie.serieId} className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm text-indigo-800">
+                Serie de <strong>{serie.alumnoNombre}</strong> — {serie.count} sesiones futuras
+              </p>
+              <button
+                onClick={() => setSerieAbierta(serieAbierta === serie.serieId ? null : serie.serieId)}
+                className="text-xs font-medium text-indigo-600 hover:underline"
+              >
+                {serieAbierta === serie.serieId ? 'Ocultar' : 'Gestionar serie'}
+              </button>
+            </div>
+
+            {serieAbierta === serie.serieId && (
+              <div className="flex flex-wrap items-center gap-2 border-t border-indigo-200 pt-2">
+                <input
+                  type="time"
+                  value={nuevaHoraSerie}
+                  onChange={(e) => setNuevaHoraSerie(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+                />
+                <button
+                  onClick={() => cambiarHora(serie.serieId)}
+                  disabled={!nuevaHoraSerie || isPending}
+                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                >
+                  Cambiar hora de todas
+                </button>
+                <button
+                  onClick={() => cancelarSerie(serie.serieId, serie.count)}
+                  disabled={isPending}
+                  className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-400 disabled:opacity-50"
+                >
+                  Cancelar todas
+                </button>
+                <button
+                  onClick={() => eliminarSerie(serie.serieId, serie.count)}
+                  disabled={isPending}
+                  className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
+                >
+                  Eliminar todas
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+
         <div className="space-y-2">{proximas.map((s) => filaSesion(s, false))}</div>
         {proximas.length === 0 && <p className="text-sm text-slate-400">No hay sesiones próximas programadas.</p>}
       </section>
