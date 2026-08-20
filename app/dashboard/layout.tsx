@@ -6,7 +6,7 @@ import MobileNav from './mobile-nav'
 import { ConfirmProvider } from '../providers/confirm-provider'
 import { ToastProvider } from '../providers/toast-provider'
 
-type Enlace = { href: string; label: string; grupo?: 'gestion' | 'trabajo' }
+type Enlace = { href: string; label: string; grupo?: 'centro' | 'perfiles' | 'trabajo' }
 
 function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   if (rol === 'superadmin') {
@@ -20,13 +20,14 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   if (rol === 'clinica_admin') {
     const enlaces: Enlace[] = [
       { href: '/dashboard', label: 'Inicio' },
-      { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'gestion' },
-      { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'gestion' },
-      { href: '/dashboard/familia', label: 'Familia', grupo: 'gestion' },
-      { href: '/dashboard/curriculo', label: 'Currículo clínica', grupo: 'gestion' },
-      { href: '/dashboard/facturacion', label: 'Suscripción', grupo: 'gestion' },
-      { href: '/dashboard/facturacion-alumnos', label: 'Facturación', grupo: 'gestion' },
+      { href: '/dashboard/facturacion', label: 'Suscripción', grupo: 'centro' },
+      { href: '/dashboard/facturacion-alumnos', label: 'Facturación', grupo: 'centro' },
+      { href: '/dashboard/curriculo', label: 'Currículo clínica', grupo: 'centro' },
+      { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'perfiles' },
+      { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'perfiles' },
+      { href: '/dashboard/familia', label: 'Familia', grupo: 'perfiles' },
     ]
+
     if (tambienTerapeuta) {
       enlaces.push(
         { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos', grupo: 'trabajo' },
@@ -54,7 +55,8 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
 }
 
 const NOMBRE_GRUPO: Record<string, string> = {
-  gestion: 'Gestión del centro',
+  centro: 'Gestión del centro',
+  perfiles: 'Gestión de perfiles',
   trabajo: 'Mi trabajo',
 }
 

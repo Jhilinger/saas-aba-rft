@@ -4,10 +4,11 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { logout } from '../logout-action'
 
-type Enlace = { href: string; label: string; grupo?: 'gestion' | 'trabajo' }
+type Enlace = { href: string; label: string; grupo?: 'centro' | 'perfiles' | 'trabajo' }
 
 const NOMBRE_GRUPO: Record<string, string> = {
-  gestion: 'Gestión del centro',
+  centro: 'Gestión del centro',
+  perfiles: 'Gestión de perfiles',
   trabajo: 'Mi trabajo',
 }
 
