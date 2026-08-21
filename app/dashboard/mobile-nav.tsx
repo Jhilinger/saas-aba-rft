@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { logout } from '../logout-action'
-
-type Enlace = { href: string; label: string; grupo?: 'centro' | 'perfiles' | 'trabajo' }
+import { useEnlacesEfectivos } from './use-enlaces-efectivos'
+import type { Enlace } from './alumno-nav-utils'
 
 const NOMBRE_GRUPO: Record<string, string> = {
   centro: 'Gestión del centro',
@@ -22,15 +22,17 @@ export default function MobileNav({
   rol: string
 }) {
   const [abierto, setAbierto] = useState(false)
+  const { enModoAlumno, alumnoNombre, volver, enlaces: enlacesEfectivos } = useEnlacesEfectivos(enlaces)
   let grupoAnterior: string | undefined = undefined
 
   return (
     <>
-      {/* Barra superior, solo visible en móvil */}
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 md:hidden">
         <div>
           <p className="text-sm font-bold text-slate-800">SaaS ABA/RFT</p>
-          <p className="text-xs text-slate-400">{nombre}</p>
+          <p className="text-xs text-slate-400">
+            {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
+          </p>
         </div>
         <button
           onClick={() => setAbierto(true)}
@@ -44,8 +46,6 @@ export default function MobileNav({
           </svg>
         </button>
       </div>
-
-      {/* Panel deslizante */}
       {abierto && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
@@ -69,14 +69,29 @@ export default function MobileNav({
               </button>
             </div>
 
+            {enModoAlumno && volver && (
+              <div className="mb-4">
+                <Link
+                  href={volver.href}
+                  onClick={() => setAbierto(false)}
+                  className="text-xs text-slate-400 hover:text-slate-600"
+                >
+                  {volver.label}
+                </Link>
+                {alumnoNombre && (
+                  <p className="mt-1 font-semibold text-slate-800 text-sm truncate">{alumnoNombre}</p>
+                )}
+              </div>
+            )}
+
             <nav className="flex-1 space-y-1 overflow-y-auto">
-              {enlaces.map((e) => {
+              {enlacesEfectivos.map((e, i) => {
                 const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
                 grupoAnterior = e.grupo
                 return (
                   <div key={e.href}>
                     {mostrarCabecera && (
-                      <p className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 first:mt-0">
+                      <p className={`mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 ${i === 0 ? '' : 'mt-4'}`}>
                         {NOMBRE_GRUPO[e.grupo!]}
                       </p>
                     )}

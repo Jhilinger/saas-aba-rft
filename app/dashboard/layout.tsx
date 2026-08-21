@@ -1,12 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { logout } from '../logout-action'
 import MobileNav from './mobile-nav'
+import DesktopSidebarNav from './desktop-sidebar-nav'
 import { ConfirmProvider } from '../providers/confirm-provider'
 import { ToastProvider } from '../providers/toast-provider'
-
-type Enlace = { href: string; label: string; grupo?: 'centro' | 'perfiles' | 'trabajo' }
+import type { Enlace } from './alumno-nav-utils'
 
 function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   if (rol === 'superadmin') {
@@ -29,7 +28,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'perfiles' },
       { href: '/dashboard/familia', label: 'Familia', grupo: 'perfiles' },
     ]
-
     if (tambienTerapeuta) {
       enlaces.push(
         { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos', grupo: 'trabajo' },
@@ -62,12 +60,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   return []
 }
 
-const NOMBRE_GRUPO: Record<string, string> = {
-  centro: 'Gestión del centro',
-  perfiles: 'Gestión de perfiles',
-  trabajo: 'Mi trabajo',
-}
-
 export default async function DashboardLayout({
   children,
 }: {
@@ -89,15 +81,13 @@ export default async function DashboardLayout({
     redirect('/login?error=' + encodeURIComponent('Tu cuenta ha sido desactivada. Contacta con tu clínica.'))
   }
 
-  const enlaces = construirEnlaces(perfil?.rol ?? '', perfil?.tambien_terapeuta ?? false)
-
-  let grupoAnterior: string | undefined = undefined
+  const enlacesRol = construirEnlaces(perfil?.rol ?? '', perfil?.tambien_terapeuta ?? false)
 
   return (
     <ToastProvider>
     <ConfirmProvider>
     <div className="flex min-h-screen flex-col md:flex-row bg-slate-50">
-      <MobileNav enlaces={enlaces} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
+      <MobileNav enlaces={enlacesRol} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
 
       <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 bg-white p-5 flex-col">
         <div className="mb-8">
@@ -108,27 +98,7 @@ export default async function DashboardLayout({
           </span>
         </div>
 
-        <nav className="flex-1">
-          {enlaces.map((e, i) => {
-            const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
-            grupoAnterior = e.grupo
-            return (
-              <div key={e.href}>
-                {mostrarCabecera && (
-                  <p className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 ${i === 0 ? '' : 'mt-6'}`}>
-                    {NOMBRE_GRUPO[e.grupo!]}
-                  </p>
-                )}
-                <Link
-                  href={e.href}
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                >
-                  {e.label}
-                </Link>
-              </div>
-            )
-          })}
-        </nav>
+        <DesktopSidebarNav enlacesRol={enlacesRol} />
 
         <form action={logout}>
           <button
