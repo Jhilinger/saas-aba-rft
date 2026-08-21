@@ -23,6 +23,8 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/facturacion', label: 'Suscripción', grupo: 'centro' },
       { href: '/dashboard/facturacion-alumnos', label: 'Facturación', grupo: 'centro' },
       { href: '/dashboard/curriculo', label: 'Currículo clínica', grupo: 'centro' },
+      { href: '/dashboard/documentos-legales', label: 'Documentos legales', grupo: 'centro' },
+      { href: '/dashboard/informes-lote', label: 'Informes en lote', grupo: 'centro' },
       { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'perfiles' },
       { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'perfiles' },
       { href: '/dashboard/familia', label: 'Familia', grupo: 'perfiles' },

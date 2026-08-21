@@ -35,7 +35,35 @@ export default function EvaluacionClient({
   const toast = useToast()
   const router = useRouter()
 
-const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() => {
+  // --- Modo "continuar valorando pendientes" (revisión manual, sin límite
+  // automático de parada, ya que el usuario ha decidido seguir a propósito) ---
+  const [continuando, setContinuando] = useState(false)
+  const [listaContinuacion, setListaContinuacion] = useState<string[]>([])
+  const [indiceContinuacion, setIndiceContinuacion] = useState(0)
+
+  const iniciarContinuacion = () => {
+    const pendientes = programas.filter((p) => mapa[p.id] !== 'dominado').map((p) => p.id)
+    setListaContinuacion(pendientes)
+    setIndiceContinuacion(0)
+    setContinuando(true)
+  }
+
+  const valorarContinuacion = (programaId: string, valoracion: 'dominado' | 'parcial' | 'no') => {
+    setMapa((prev) => ({ ...prev, [programaId]: valoracion }))
+    startTransition(async () => {
+      const res = await guardarValoracion(alumnoId, programaId, valoracion)
+      if (res?.error) toast(res.error, 'error')
+    })
+    if (indiceContinuacion + 1 >= listaContinuacion.length) {
+      setContinuando(false)
+    } else {
+      setIndiceContinuacion((i) => i + 1)
+    }
+  }
+  // Calculamos: hasta dónde llega la PRIMERA pasada (racha de 3 seguidos sin
+  // dominar, o 5 en total, o fin del currículo), y cuál es el siguiente
+  // programa a valorar — esto no cambia respecto a como ya lo teníamos
+  const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() => {
     let racha = 0
     let detenida = false
     let motivoParada: 'racha' | 'total' | null = null
@@ -76,7 +104,7 @@ const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() =>
     return { detenida, motivoParada, siguienteIndex, racha, resumen }
   }, [mapa, programas])
 
-  const finalizada = detenida || siguienteIndex === null
+  const finalizadaPrimeraPasada = detenida || siguienteIndex === null
 
   const valorar = (programaId: string, valoracion: 'dominado' | 'parcial' | 'no') => {
     setMapa((prev) => ({ ...prev, [programaId]: valoracion }))
@@ -100,6 +128,7 @@ const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() =>
       router.refresh()
     })
   }
+
   if (programas.length === 0) {
     return (
       <p className="text-center text-slate-400 py-8">
@@ -107,9 +136,76 @@ const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() =>
       </p>
     )
   }
+  // --- MODO: continuando (revisión manual de pendientes) ---
+  if (continuando) {
+    const idActual = listaContinuacion[indiceContinuacion]
+    const programaActual = programas.find((p) => p.id === idActual)
 
-  if (finalizada) {
+    if (!programaActual) {
+      setContinuando(false)
+      return null
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between text-sm text-slate-500">
+          <span>
+            Revisando pendiente <strong>{indiceContinuacion + 1}</strong> / {listaContinuacion.length}
+          </span>
+          <button onClick={() => setContinuando(false)} className="text-slate-400 hover:text-slate-600">
+            Detener y ver resumen
+          </button>
+        </div>
+
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 sm:p-8 text-center space-y-4">
+          {programaActual.area && (
+            <span className="inline-block rounded-full bg-white px-2 py-0.5 text-xs font-medium text-indigo-600">
+              {programaActual.area}
+            </span>
+          )}
+          <p className="text-xl sm:text-2xl font-bold text-slate-800">{programaActual.nombre}</p>
+          {programaActual.objetivo && (
+            <p className="text-sm text-slate-600 whitespace-pre-wrap">{programaActual.objetivo}</p>
+          )}
+
+          <p className="text-sm font-medium text-slate-500 pt-2">
+            ¿Cómo está el alumno en esta habilidad ahora?
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => valorarContinuacion(programaActual.id, 'dominado')}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+            >
+              Dominado
+            </button>
+            <button
+              onClick={() => valorarContinuacion(programaActual.id, 'parcial')}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-amber-500 py-4 sm:py-3 text-base font-semibold text-white hover:bg-amber-400 disabled:opacity-50 active:scale-[0.98]"
+            >
+              Parcial
+            </button>
+            <button
+              onClick={() => valorarContinuacion(programaActual.id, 'no')}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // --- MODO: resumen (primera pasada terminada, o revisión de pendientes
+  // ya recorrida entera) ---
+  if (finalizadaPrimeraPasada) {
     const totalNoOParcial = resumen.parcial + resumen.no
+    const pendientesRestantes = programas.filter((p) => mapa[p.id] !== 'dominado').length
+
     return (
       <div className="space-y-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
@@ -155,6 +251,15 @@ const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() =>
             </button>
           )}
 
+          {pendientesRestantes > 0 && (
+            <button
+              onClick={iniciarContinuacion}
+              className="w-full rounded-lg bg-sky-600 py-3 text-sm font-semibold text-white hover:bg-sky-500"
+            >
+              Continuar valorando pendientes ({pendientesRestantes})
+            </button>
+          )}
+
           {resultadoImport && (
             <p className="text-sm text-emerald-600 text-center">
               ✓ {resultadoImport.importados} programa(s) añadidos al PEI. Ya puedes empezar a tomar
@@ -166,6 +271,7 @@ const { detenida, motivoParada, siguienteIndex, racha, resumen } = useMemo(() =>
     )
   }
 
+  // --- MODO: primera pasada (secuencial, tal como ya la teníamos) ---
   const programaActual = programas[siguienteIndex!]
   const posicion = siguienteIndex! + 1
 

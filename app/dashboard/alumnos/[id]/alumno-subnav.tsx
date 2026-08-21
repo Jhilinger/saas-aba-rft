@@ -8,12 +8,12 @@ export default function AlumnoSubNav({ alumnoId }: { alumnoId: string }) {
   const base = `/dashboard/alumnos/${alumnoId}`
 
   const enlaces = [
-    { href: base, label: 'PEI' },
-    { href: `${base}/valoracion`, label: 'Valoración' },
+    { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },
     { href: `${base}/progreso`, label: 'Progreso' },
+    { href: `${base}/valoracion`, label: 'Valoración' },
+    { href: base, label: 'PEI' },
     { href: `${base}/preferencias`, label: 'Preferencias' },
     { href: `${base}/informes`, label: 'Informes' },
-    { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },
   ]
 
   const activo = (href: string) => (href === base ? pathname === base : pathname.startsWith(href))
