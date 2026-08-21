@@ -9,6 +9,7 @@ type Fila = {
   area: string
   orden: number
   estado: 'dominado' | 'adquisicion' | 'sin_ensenar'
+  graficoHref?: string | null
 }
 
 type ClaveOrden = 'orden' | 'nombre' | 'tipo' | 'area' | 'estado'
@@ -31,7 +32,15 @@ function flechaOrden(activa: boolean, dir: 'asc' | 'desc') {
   return <span className="ml-1">{dir === 'asc' ? '▲' : '▼'}</span>
 }
 
-export default function ProgresoTabla({ filas }: { filas: Fila[] }) {
+export default function ProgresoTabla({
+  filas,
+  ocultarSinEnsenar,
+  mostrarColumnaGrafico,
+}: {
+  filas: Fila[]
+  ocultarSinEnsenar?: boolean
+  mostrarColumnaGrafico?: boolean
+}) {
   const [busqueda, setBusqueda] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('todos')
   const [filtroEstado, setFiltroEstado] = useState('todos')
@@ -49,24 +58,26 @@ export default function ProgresoTabla({ filas }: { filas: Fila[] }) {
     setPagina(1)
   }
 
+  const filasVisibles = ocultarSinEnsenar ? filas.filter((f) => f.estado !== 'sin_ensenar') : filas
+
   const totales = useMemo(
     () => ({
-      dominado: filas.filter((f) => f.estado === 'dominado').length,
-      adquisicion: filas.filter((f) => f.estado === 'adquisicion').length,
-      sin_ensenar: filas.filter((f) => f.estado === 'sin_ensenar').length,
+      dominado: filasVisibles.filter((f) => f.estado === 'dominado').length,
+      adquisicion: filasVisibles.filter((f) => f.estado === 'adquisicion').length,
+      sin_ensenar: filasVisibles.filter((f) => f.estado === 'sin_ensenar').length,
     }),
-    [filas]
+    [filasVisibles]
   )
 
   const filtradas = useMemo(() => {
     const q = busqueda.trim().toLowerCase()
-    return filas.filter((f) => {
+    return filasVisibles.filter((f) => {
       if (q && !f.nombre.toLowerCase().includes(q)) return false
       if (filtroTipo !== 'todos' && f.tipo !== filtroTipo) return false
       if (filtroEstado !== 'todos' && f.estado !== filtroEstado) return false
       return true
     })
-  }, [filas, busqueda, filtroTipo, filtroEstado])
+  }, [filasVisibles, busqueda, filtroTipo, filtroEstado])
 
   const ordenadas = useMemo(() => {
     const copia = [...filtradas]
@@ -167,6 +178,7 @@ export default function ProgresoTabla({ filas }: { filas: Fila[] }) {
               {th('tipo', 'Tipo')}
               {th('area', 'Área')}
               {th('estado', 'Estado')}
+              {mostrarColumnaGrafico && <th className="p-3">Gráfico</th>}
             </tr>
           </thead>
           <tbody>
@@ -181,17 +193,31 @@ export default function ProgresoTabla({ filas }: { filas: Fila[] }) {
                     {ETIQUETA_ESTADO[f.estado].label}
                   </span>
                 </td>
+                {mostrarColumnaGrafico && (
+                  <td className="p-3">
+                    {f.graficoHref ? (
+                      
+                        <a href={f.graficoHref}
+                        className="text-xs font-medium text-indigo-600 hover:underline"
+                      >
+                        Ver gráfico
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-300">—</span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
         {ordenadas.length === 0 && (
           <p className="p-6 text-center text-slate-400">
-            {filas.length === 0 ? 'No hay programas en el currículo todavía.' : 'Ningún programa coincide con los filtros.'}
+            {filasVisibles.length === 0 ? 'No hay programas en el currículo todavía.' : 'Ningún programa coincide con los filtros.'}
           </p>
         )}
       </div>
-
+        
       {totalPaginas > 1 && (
         <div className="flex items-center justify-between text-sm text-slate-500">
           <button

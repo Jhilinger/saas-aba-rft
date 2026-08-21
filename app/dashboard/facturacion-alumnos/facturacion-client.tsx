@@ -28,12 +28,25 @@ function hoy(): string {
   return new Date().toISOString().split('T')[0]
 }
 
+type DatosFacturacion = {
+  alumno_id: string
+  nombre_razon_social: string | null
+  nif: string | null
+  direccion: string | null
+  codigo_postal: string | null
+  ciudad: string | null
+  pais: string | null
+  updated_at: string
+}
+
 export default function FacturacionClient({
   alumnos,
   sesiones,
+  datosFacturacion,
 }: {
   alumnos: { id: string; nombre_anonimizado: string }[]
   sesiones: Sesion[]
+  datosFacturacion: DatosFacturacion[]
 }) {
   const [filtroAlumnoId, setFiltroAlumnoId] = useState('')
   const [filtroDesde, setFiltroDesde] = useState(primerDiaDelMes())
@@ -93,24 +106,44 @@ export default function FacturacionClient({
           <p className="text-sm text-slate-400">Selecciona un alumno para ver sus sesiones realizadas.</p>
         )}
       </div>
-
       {filtroAlumnoId && (
         <>
+          {(() => {
+            const datos = datosFacturacion.find((d) => d.alumno_id === filtroAlumnoId)
+            return (
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+                <h3 className="text-sm font-semibold text-slate-700 mb-2">Datos de facturación (aportados por la familia)</h3>
+                {datos ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
+                    <p><span className="text-slate-400">Nombre/razón social:</span> {datos.nombre_razon_social || '—'}</p>
+                    <p><span className="text-slate-400">NIF/DNI:</span> {datos.nif || '—'}</p>
+                    <p className="sm:col-span-2"><span className="text-slate-400">Dirección:</span> {datos.direccion || '—'}</p>
+                    <p><span className="text-slate-400">Código postal:</span> {datos.codigo_postal || '—'}</p>
+                    <p><span className="text-slate-400">Ciudad:</span> {datos.ciudad || '—'}</p>
+                    <p><span className="text-slate-400">País:</span> {datos.pais || '—'}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400">La familia todavía no ha aportado sus datos de facturación.</p>
+                )}
+              </div>
+            )
+          })()}
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-              <p className="text-2xl font-bold text-slate-800">{resumen.total}</p>
+            <div className="rounded-xl bg-white p-3 text-center">
+              <p className="text-xl font-bold text-slate-800">{resumen.total}</p>
               <p className="text-xs text-slate-500">Total sesiones</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-              <p className="text-2xl font-bold text-emerald-600">{resumen.asistio}</p>
+            <div className="rounded-xl bg-white p-3 text-center">
+              <p className="text-xl font-bold text-emerald-600">{resumen.asistio}</p>
               <p className="text-xs text-slate-500">Asistidas</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-              <p className="text-2xl font-bold text-amber-600">{resumen.cancelada}</p>
+            <div className="rounded-xl bg-white p-3 text-center">
+              <p className="text-xl font-bold text-amber-600">{resumen.cancelada}</p>
               <p className="text-xs text-slate-500">Canceladas</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-              <p className="text-2xl font-bold text-rose-600">{resumen.noAsistio}</p>
+            <div className="rounded-xl bg-white p-3 text-center">
+              <p className="text-xl font-bold text-rose-600">{resumen.noAsistio}</p>
               <p className="text-xs text-slate-500">No asistió</p>
             </div>
           </div>

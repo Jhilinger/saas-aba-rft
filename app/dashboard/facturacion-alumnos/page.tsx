@@ -36,6 +36,13 @@ export default async function FacturacionAlumnosPage() {
         .order('fecha_hora', { ascending: false })
     : { data: [] }
 
+    const { data: datosFacturacion } = alumnoIds.length
+    ? await supabase
+        .from('datos_facturacion_familia')
+        .select('alumno_id, nombre_razon_social, nif, direccion, codigo_postal, ciudad, pais, updated_at')
+        .in('alumno_id', alumnoIds)
+    : { data: [] }
+
   return (
     <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
       <div>
@@ -43,7 +50,11 @@ export default async function FacturacionAlumnosPage() {
         <p className="text-sm text-slate-500">Consulta las sesiones realizadas por alumno para facilitar su facturación a las familias.</p>
       </div>
 
-      <FacturacionClient alumnos={alumnos ?? []} sesiones={(sesiones as any) ?? []} />
+      <FacturacionClient
+        alumnos={alumnos ?? []}
+        sesiones={(sesiones as any) ?? []}
+        datosFacturacion={(datosFacturacion as any) ?? []}
+      />
     </div>
   )
 }

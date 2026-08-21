@@ -50,7 +50,13 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
   }
 
   if (rol === 'familia') {
-    return [{ href: '/dashboard/mi-hijo', label: 'Mi hijo/a' }]
+    return [
+      { href: '/dashboard/mi-hijo', label: 'Progreso' },
+      { href: '/dashboard/mi-hijo/asistencia', label: 'Asistencia' },
+      { href: '/dashboard/mi-hijo/informes', label: 'Informes' },
+      { href: '/dashboard/mi-hijo/documentos', label: 'Documentos' },
+      { href: '/dashboard/mi-hijo/facturacion', label: 'Facturación' },
+    ]
   }
 
   return []
