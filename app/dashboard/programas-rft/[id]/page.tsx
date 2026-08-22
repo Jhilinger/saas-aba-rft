@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
+import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selector'
 
 export default async function ProgramaRftPage({
   params,
@@ -94,9 +95,14 @@ export default async function ProgramaRftPage({
           ← Volver a {alumnoNombre}
         </Link>
         <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
-        <p className="text-sm text-slate-500">
-          {programa.area ? `${programa.area} · ` : ''}Estado: {programa.estado}
-        </p>
+        <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+          {programa.area && <span>{programa.area}</span>}
+          <EstadoProgramaSelector
+            programaAlumnoId={programa.id}
+            alumnoId={programa.alumno_id}
+            estadoActual={programa.estado}
+          />
+        </div>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm space-y-3">

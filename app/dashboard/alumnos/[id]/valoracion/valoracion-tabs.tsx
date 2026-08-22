@@ -4,8 +4,10 @@ import { useState } from 'react'
 
 export default function ValoracionTabs({
   aba,
+  rft,
 }: {
   aba: React.ReactNode
+  rft: React.ReactNode
 }) {
   const [tab, setTab] = useState<'aba' | 'rft'>('aba')
 
@@ -30,16 +32,7 @@ export default function ValoracionTabs({
         </button>
       </div>
 
-      {tab === 'aba' ? (
-        aba
-      ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
-          <p className="text-slate-400">
-            La evaluación inicial para Aprendizaje Relacional (RFT) todavía no está disponible.
-            Próximamente.
-          </p>
-        </div>
-      )}
+      {tab === 'aba' ? aba : rft}
     </div>
   )
 }

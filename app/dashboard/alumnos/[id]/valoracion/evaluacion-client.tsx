@@ -8,8 +8,8 @@ import { useToast } from '../../../../providers/toast-provider'
 type Programa = { id: string; nombre: string; tipo: string; area: string | null; objetivo: string | null; orden: number }
 type Valoracion = { programa_base_id: string; valoracion: 'dominado' | 'parcial' | 'no' }
 
-const RACHA_LIMITE = 3
-const TOTAL_LIMITE = 5
+const RACHA_LIMITE_DEFECTO = 3
+const TOTAL_LIMITE_DEFECTO = 5
 
 const ETIQUETA: Record<string, { label: string; color: string }> = {
   dominado: { label: 'Dominado', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
@@ -21,10 +21,14 @@ export default function EvaluacionClient({
   alumnoId,
   programas,
   valoracionesIniciales,
+  rachaLimite = RACHA_LIMITE_DEFECTO,
+  totalLimite = TOTAL_LIMITE_DEFECTO,
 }: {
   alumnoId: string
   programas: Programa[]
   valoracionesIniciales: Valoracion[]
+  rachaLimite?: number
+  totalLimite?: number
 }) {
   const [mapa, setMapa] = useState<Record<string, 'dominado' | 'parcial' | 'no'>>(
     Object.fromEntries(valoracionesIniciales.map((v) => [v.programa_base_id, v.valoracion]))
@@ -82,24 +86,23 @@ export default function EvaluacionClient({
         racha = 0
       } else {
         racha++
-        if (racha >= RACHA_LIMITE) {
+        if (racha >= rachaLimite) {
           detenida = true
           motivoParada = 'racha'
           break
         }
       }
-      if (resumen.parcial + resumen.no >= TOTAL_LIMITE) {
+      if (resumen.parcial + resumen.no >= totalLimite) {
         detenida = true
         motivoParada = 'total'
         break
       }
     }
 
-    if (siguienteIndex === null && !detenida) {
-      for (let i = 0; i < programas.length; i++) {
-        if (!mapa[programas[i].id]) resumen.sinEvaluar++
-      }
-    }
+    // El contador de "sin evaluar" se calcula siempre sobre el currículo
+    // completo, independientemente de por qué se haya detenido el bucle
+    // (si no, al pararse por racha/total, se quedaba erróneamente en 0)
+    resumen.sinEvaluar = programas.filter((p) => !mapa[p.id]).length
 
     return { detenida, motivoParada, siguienteIndex, racha, resumen }
   }, [mapa, programas])
@@ -215,8 +218,8 @@ export default function EvaluacionClient({
           {detenida && (
             <p className="text-sm text-slate-500">
               {motivoParada === 'racha'
-                ? `Se han encontrado ${RACHA_LIMITE} programas seguidos sin dominar — es un buen punto para parar, ya que el currículo va de menor a mayor complejidad.`
-                : `Se han acumulado ${TOTAL_LIMITE} programas sin dominar en total — es un buen punto para parar y trabajar con lo ya identificado.`}
+                ? `Se han encontrado ${rachaLimite} programa${rachaLimite > 1 ? 's' : ''} seguido${rachaLimite > 1 ? 's' : ''} sin dominar — es un buen punto para parar.`
+                : `Se han acumulado ${totalLimite} programas sin dominar en total — es un buen punto para parar y trabajar con lo ya identificado.`}
             </p>
           )}
 

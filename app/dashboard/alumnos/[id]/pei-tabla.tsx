@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 
 type Programa = {
@@ -16,13 +16,35 @@ const POR_PAGINA = 10
 
 export default function PeiTabla({ programas }: { programas: Programa[] }) {
   const [pagina, setPagina] = useState(1)
+  const [mostrarPausados, setMostrarPausados] = useState(false)
 
-  const totalPaginas = Math.max(1, Math.ceil(programas.length / POR_PAGINA))
+  const visibles = useMemo(
+    () => (mostrarPausados ? programas : programas.filter((p) => p.estado !== 'pausado')),
+    [programas, mostrarPausados]
+  )
+
+  const numPausados = useMemo(() => programas.filter((p) => p.estado === 'pausado').length, [programas])
+
+  const totalPaginas = Math.max(1, Math.ceil(visibles.length / POR_PAGINA))
   const paginaActual = Math.min(pagina, totalPaginas)
-  const paginados = programas.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
+  const paginados = visibles.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
 
   return (
     <div className="space-y-3">
+      {numPausados > 0 && (
+        <label className="flex items-center gap-2 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={mostrarPausados}
+            onChange={(e) => {
+              setMostrarPausados(e.target.checked)
+              setPagina(1)
+            }}
+          />
+          Mostrar pausados ({numPausados})
+        </label>
+      )}
+
       <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
         <table className="w-full text-sm min-w-[550px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
@@ -36,7 +58,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
           </thead>
           <tbody>
             {paginados.map((p) => (
-              <tr key={p.id} className="border-b border-slate-100 last:border-0">
+              <tr key={p.id} className={`border-b border-slate-100 last:border-0 ${p.estado === 'pausado' ? 'opacity-50' : ''}`}>
                 <td className="p-3 text-slate-500">{p.orden ?? '—'}</td>
                 <td className="p-3 font-medium text-slate-800">
                   {p.tipo === 'aba_clasico' ? (
@@ -60,9 +82,11 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
             ))}
           </tbody>
         </table>
-        {programas.length === 0 && (
+        {visibles.length === 0 && (
           <p className="p-6 text-center text-slate-400">
-            Este alumno todavía no tiene programas asignados.
+            {programas.length === 0
+              ? 'Este alumno todavía no tiene programas asignados.'
+              : 'Todos los programas están pausados. Marca "Mostrar pausados" para verlos.'}
           </p>
         )}
       </div>
@@ -77,7 +101,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
             ← Anterior
           </button>
           <span>
-            Página {paginaActual} de {totalPaginas} ({programas.length} en total)
+            Página {paginaActual} de {totalPaginas} ({visibles.length} en total)
           </span>
           <button
             onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
