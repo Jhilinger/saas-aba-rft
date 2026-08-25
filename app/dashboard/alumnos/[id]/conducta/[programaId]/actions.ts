@@ -31,6 +31,34 @@ export async function crearRegistroAbc(
   return { success: true }
 }
 
+export async function editarRegistroAbc(
+  registroId: string,
+  alumnoId: string,
+  programaAlumnoId: string,
+  datos: { antecedente: string; conducta: string; consecuencia: string; notas?: string }
+) {
+  const supabase = await createClient()
+
+  if (!datos.antecedente.trim() || !datos.conducta.trim() || !datos.consecuencia.trim()) {
+    return { error: 'Antecedente, conducta y consecuencia son obligatorios' }
+  }
+
+  const { error } = await supabase
+    .from('registros_abc')
+    .update({
+      antecedente: datos.antecedente.trim(),
+      conducta: datos.conducta.trim(),
+      consecuencia: datos.consecuencia.trim(),
+      notas: datos.notas?.trim() || null,
+    })
+    .eq('id', registroId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
+
 export async function eliminarRegistroAbc(registroId: string, alumnoId: string, programaAlumnoId: string) {
   const supabase = await createClient()
 
@@ -79,6 +107,31 @@ export async function guardarBloqueTasa(
   return { success: true }
 }
 
+export async function editarBloqueTasa(
+  bloqueId: string,
+  alumnoId: string,
+  programaAlumnoId: string,
+  duracionObservacionSegundos: number,
+  numeroOcurrencias: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('bloques_tasa')
+    .update({
+      duracion_observacion_segundos: duracionObservacionSegundos,
+      numero_ocurrencias: numeroOcurrencias,
+      notas: notas?.trim() || null,
+    })
+    .eq('id', bloqueId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
+
 export async function eliminarBloqueTasa(bloqueId: string, alumnoId: string, programaAlumnoId: string) {
   const supabase = await createClient()
 
@@ -113,6 +166,33 @@ export async function guardarBloqueDuracion(
     duracion_total_conducta_segundos: duracionTotalConductaSegundos,
     notas: notas?.trim() || null,
   })
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
+
+export async function editarBloqueDuracion(
+  bloqueId: string,
+  alumnoId: string,
+  programaAlumnoId: string,
+  duracionSesionSegundos: number,
+  numeroEpisodios: number,
+  duracionTotalConductaSegundos: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('bloques_duracion')
+    .update({
+      duracion_sesion_segundos: duracionSesionSegundos,
+      numero_episodios: numeroEpisodios,
+      duracion_total_conducta_segundos: duracionTotalConductaSegundos,
+      notas: notas?.trim() || null,
+    })
+    .eq('id', bloqueId)
 
   if (error) return { error: error.message }
 
@@ -156,6 +236,35 @@ export async function guardarBloqueIntervalo(
     intervalos_con_conducta: intervalosConConducta,
     notas: notas?.trim() || null,
   })
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
+
+export async function editarBloqueIntervalo(
+  bloqueId: string,
+  alumnoId: string,
+  programaAlumnoId: string,
+  tipoIntervalo: 'parcial' | 'total' | 'momentaneo',
+  duracionIntervaloSegundos: number,
+  totalIntervalos: number,
+  intervalosConConducta: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('bloques_intervalo')
+    .update({
+      tipo_intervalo: tipoIntervalo,
+      duracion_intervalo_segundos: duracionIntervaloSegundos,
+      total_intervalos: totalIntervalos,
+      intervalos_con_conducta: intervalosConConducta,
+      notas: notas?.trim() || null,
+    })
+    .eq('id', bloqueId)
 
   if (error) return { error: error.message }
 

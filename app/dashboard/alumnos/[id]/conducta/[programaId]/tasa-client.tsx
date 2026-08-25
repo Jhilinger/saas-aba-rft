@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { guardarBloqueTasa, eliminarBloqueTasa } from './actions'
+import { guardarBloqueTasa, editarBloqueTasa, eliminarBloqueTasa } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
 
@@ -37,6 +37,10 @@ export default function TasaClient({
   const [notas, setNotas] = useState('')
   const [resultado, setResultado] = useState<{ segundos: number; ocurrencias: number } | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [editSegundos, setEditSegundos] = useState(0)
+  const [editOcurrencias, setEditOcurrencias] = useState(0)
+  const [editNotas, setEditNotas] = useState('')
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const router = useRouter()
   const confirmar = useConfirm()
@@ -79,7 +83,25 @@ export default function TasaClient({
       router.refresh()
     })
   }
+    const empezarEdicion = (b: Bloque) => {
+    setEditandoId(b.id)
+    setEditSegundos(b.duracion_observacion_segundos)
+    setEditOcurrencias(b.numero_ocurrencias)
+    setEditNotas(b.notas ?? '')
+  }
 
+  const guardarEdicion = () => {
+    startTransition(async () => {
+      const res = await editarBloqueTasa(editandoId!, alumnoId, programaAlumnoId, editSegundos, editOcurrencias, editNotas)
+      if (res.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Bloque actualizado', 'exito')
+      setEditandoId(null)
+      router.refresh()
+    })
+  }
   const borrar = async (id: string) => {
     const ok = await confirmar({
       titulo: 'Eliminar bloque',
@@ -169,21 +191,68 @@ export default function TasaClient({
         )}
       </div>
 
-      <div className="space-y-2">
+            <div className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
         {bloquesIniciales.map((b) => (
-          <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between text-sm">
-            <div>
-              <p className="text-slate-700">
-                {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_ocurrencias} en{' '}
-                {formatearSegundos(b.duracion_observacion_segundos)}
-                {b.fase === 'linea_base' && ' · Línea base'}
-              </p>
-              <p className="text-xs text-slate-400">{b.tasa_por_minuto} / min</p>
-            </div>
-            <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
-              Eliminar
-            </button>
+          <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm space-y-2">
+            {editandoId === b.id ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-500">Segundos observados</label>
+                    <input
+                      type="number"
+                      value={editSegundos}
+                      onChange={(e) => setEditSegundos(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-500">Ocurrencias</label>
+                    <input
+                      type="number"
+                      value={editOcurrencias}
+                      onChange={(e) => setEditOcurrencias(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  </div>
+                </div>
+                <textarea
+                  value={editNotas}
+                  onChange={(e) => setEditNotas(e.target.value)}
+                  placeholder="Notas"
+                  rows={2}
+                  className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                />
+                <div className="flex gap-3">
+                  <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                    Guardar
+                  </button>
+                  <button onClick={() => setEditandoId(null)} className="text-xs text-slate-500 hover:text-slate-700">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-700">
+                    {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_ocurrencias} en{' '}
+                    {formatearSegundos(b.duracion_observacion_segundos)}
+                    {b.fase === 'linea_base' && ' · Línea base'}
+                  </p>
+                  <p className="text-xs text-slate-400">{b.tasa_por_minuto} / min</p>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
+                    Editar
+                  </button>
+                  <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
         {bloquesIniciales.length === 0 && <p className="text-center text-slate-400 py-4">Sin bloques todavía.</p>}

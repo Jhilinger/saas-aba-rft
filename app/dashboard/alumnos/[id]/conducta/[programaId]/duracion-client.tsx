@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { guardarBloqueDuracion, eliminarBloqueDuracion } from './actions'
+import { guardarBloqueDuracion, editarBloqueDuracion, eliminarBloqueDuracion } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
 
@@ -45,7 +45,12 @@ export default function DuracionClient({
     numeroEpisodios: number
     duracionTotalConducta: number
   } | null>(null)
-  const [isPending, startTransition] = useTransition()
+    const [isPending, startTransition] = useTransition()
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [editSesion, setEditSesion] = useState(0)
+  const [editEpisodios, setEditEpisodios] = useState(0)
+  const [editConducta, setEditConducta] = useState(0)
+  const [editNotas, setEditNotas] = useState('')
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const router = useRouter()
   const confirmar = useConfirm()
@@ -114,7 +119,34 @@ export default function DuracionClient({
       router.refresh()
     })
   }
+    const empezarEdicion = (b: Bloque) => {
+    setEditandoId(b.id)
+    setEditSesion(b.duracion_sesion_segundos)
+    setEditEpisodios(b.numero_episodios)
+    setEditConducta(b.duracion_total_conducta_segundos)
+    setEditNotas(b.notas ?? '')
+  }
 
+  const guardarEdicion = () => {
+    startTransition(async () => {
+      const res = await editarBloqueDuracion(
+        editandoId!,
+        alumnoId,
+        programaAlumnoId,
+        editSesion,
+        editEpisodios,
+        editConducta,
+        editNotas
+      )
+      if (res.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Bloque actualizado', 'exito')
+      setEditandoId(null)
+      router.refresh()
+    })
+  }
   const borrar = async (id: string) => {
     const ok = await confirmar({
       titulo: 'Eliminar bloque',
@@ -227,22 +259,78 @@ export default function DuracionClient({
         )}
       </div>
 
-      <div className="space-y-2">
+            <div className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
         {bloquesIniciales.map((b) => (
-          <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between text-sm">
-            <div>
-              <p className="text-slate-700">
-                {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_episodios} episodio
-                {b.numero_episodios !== 1 ? 's' : ''}, {formatearSegundos(b.duracion_total_conducta_segundos)} de{' '}
-                {formatearSegundos(b.duracion_sesion_segundos)}
-                {b.fase === 'linea_base' && ' · Línea base'}
-              </p>
-              <p className="text-xs text-slate-400">{b.porcentaje}% del tiempo</p>
-            </div>
-            <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
-              Eliminar
-            </button>
+          <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm space-y-2">
+            {editandoId === b.id ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="text-xs text-slate-500">Sesión (seg)</label>
+                    <input
+                      type="number"
+                      value={editSesion}
+                      onChange={(e) => setEditSesion(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-500">Episodios</label>
+                    <input
+                      type="number"
+                      value={editEpisodios}
+                      onChange={(e) => setEditEpisodios(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-slate-500">Conducta (seg)</label>
+                    <input
+                      type="number"
+                      value={editConducta}
+                      onChange={(e) => setEditConducta(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  </div>
+                </div>
+                <textarea
+                  value={editNotas}
+                  onChange={(e) => setEditNotas(e.target.value)}
+                  placeholder="Notas"
+                  rows={2}
+                  className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                />
+                <div className="flex gap-3">
+                  <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                    Guardar
+                  </button>
+                  <button onClick={() => setEditandoId(null)} className="text-xs text-slate-500 hover:text-slate-700">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-700">
+                    {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_episodios} episodio
+                    {b.numero_episodios !== 1 ? 's' : ''}, {formatearSegundos(b.duracion_total_conducta_segundos)} de{' '}
+                    {formatearSegundos(b.duracion_sesion_segundos)}
+                    {b.fase === 'linea_base' && ' · Línea base'}
+                  </p>
+                  <p className="text-xs text-slate-400">{b.porcentaje}% del tiempo</p>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
+                    Editar
+                  </button>
+                  <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
         {bloquesIniciales.length === 0 && <p className="text-center text-slate-400 py-4">Sin bloques todavía.</p>}

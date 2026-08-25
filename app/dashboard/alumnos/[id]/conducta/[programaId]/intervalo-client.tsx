@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { guardarBloqueIntervalo, eliminarBloqueIntervalo } from './actions'
+import { guardarBloqueIntervalo, editarBloqueIntervalo, eliminarBloqueIntervalo } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
 
@@ -46,9 +46,15 @@ export default function IntervaloClient({
   const [esperandoRespuesta, setEsperandoRespuesta] = useState(false)
   const [intervalosConConducta, setIntervalosConConducta] = useState(0)
 
-  const [notas, setNotas] = useState('')
+    const [notas, setNotas] = useState('')
   const [resultado, setResultado] = useState<{ total: number; conConducta: number } | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [editTipo, setEditTipo] = useState<'parcial' | 'total' | 'momentaneo'>('parcial')
+  const [editDuracion, setEditDuracion] = useState(0)
+  const [editTotal, setEditTotal] = useState(0)
+  const [editConConducta, setEditConConducta] = useState(0)
+  const [editNotas, setEditNotas] = useState('')
   const router = useRouter()
   const confirmar = useConfirm()
   const toast = useToast()
@@ -91,7 +97,36 @@ export default function IntervaloClient({
     setSegundosRestantes(duracionIntervalo)
     setEsperandoRespuesta(false)
   }
+    const empezarEdicion = (b: Bloque) => {
+    setEditandoId(b.id)
+    setEditTipo(b.tipo_intervalo)
+    setEditDuracion(b.duracion_intervalo_segundos)
+    setEditTotal(b.total_intervalos)
+    setEditConConducta(b.intervalos_con_conducta)
+    setEditNotas(b.notas ?? '')
+  }
 
+  const guardarEdicion = () => {
+    startTransition(async () => {
+      const res = await editarBloqueIntervalo(
+        editandoId!,
+        alumnoId,
+        programaAlumnoId,
+        editTipo,
+        editDuracion,
+        editTotal,
+        editConConducta,
+        editNotas
+      )
+      if (res.error) {
+        toast(res.error, 'error')
+        return
+      }
+      toast('Bloque actualizado', 'exito')
+      setEditandoId(null)
+      router.refresh()
+    })
+  }
   const detenerAntes = () => {
     // Termina antes de completar todos los intervalos planeados; cuenta
     // solo los ya respondidos (el actual, si está esperando respuesta,
@@ -173,7 +208,25 @@ export default function IntervaloClient({
             </button>
           </div>
         </div>
-        {historial(bloquesIniciales, borrar)}
+                {historial(
+          bloquesIniciales,
+          borrar,
+          editandoId,
+          empezarEdicion,
+          () => setEditandoId(null),
+          guardarEdicion,
+          isPending,
+          editTipo,
+          setEditTipo,
+          editDuracion,
+          setEditDuracion,
+          editTotal,
+          setEditTotal,
+          editConConducta,
+          setEditConConducta,
+          editNotas,
+          setEditNotas
+        )}
       </div>
     )
   }
@@ -265,29 +318,109 @@ export default function IntervaloClient({
         </button>
       </div>
 
-      {historial(bloquesIniciales, borrar)}
+              {historial(
+          bloquesIniciales,
+          borrar,
+          editandoId,
+          empezarEdicion,
+          () => setEditandoId(null),
+          guardarEdicion,
+          isPending,
+          editTipo,
+          setEditTipo,
+          editDuracion,
+          setEditDuracion,
+          editTotal,
+          setEditTotal,
+          editConConducta,
+          setEditConConducta,
+          editNotas,
+          setEditNotas
+        )}
     </div>
   )
 }
 
-function historial(bloques: Bloque[], borrar: (id: string) => void) {
+function historial(
+  bloques: Bloque[],
+  borrar: (id: string) => void,
+  editandoId: string | null,
+  empezarEdicion: (b: Bloque) => void,
+  cancelarEdicion: () => void,
+  guardarEdicion: () => void,
+  isPending: boolean,
+  editTipo: string,
+  setEditTipo: (v: any) => void,
+  editDuracion: number,
+  setEditDuracion: (v: number) => void,
+  editTotal: number,
+  setEditTotal: (v: number) => void,
+  editConConducta: number,
+  setEditConConducta: (v: number) => void,
+  editNotas: string,
+  setEditNotas: (v: string) => void
+) {
   return (
     <div className="space-y-2">
       <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
       {bloques.map((b) => (
-        <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 flex items-center justify-between text-sm">
-          <div>
-            <p className="text-slate-700">
-              {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.intervalos_con_conducta}/{b.total_intervalos} intervalos
-              {b.fase === 'linea_base' && ' · Línea base'}
-            </p>
-            <p className="text-xs text-slate-400">
-              {b.porcentaje}% · {ETIQUETA_TIPO[b.tipo_intervalo].split(' (')[0]} · {b.duracion_intervalo_segundos}s/intervalo
-            </p>
-          </div>
-          <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
-            Eliminar
-          </button>
+        <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm space-y-2">
+          {editandoId === b.id ? (
+            <div className="space-y-2">
+              <select
+                value={editTipo}
+                onChange={(e) => setEditTipo(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+              >
+                <option value="parcial">Parcial</option>
+                <option value="total">Total</option>
+                <option value="momentaneo">Momentáneo</option>
+              </select>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-xs text-slate-500">Seg/intervalo</label>
+                  <input type="number" value={editDuracion} onChange={(e) => setEditDuracion(parseInt(e.target.value) || 0)} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500">Total intervalos</label>
+                  <input type="number" value={editTotal} onChange={(e) => setEditTotal(parseInt(e.target.value) || 0)} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500">Con conducta</label>
+                  <input type="number" value={editConConducta} onChange={(e) => setEditConConducta(parseInt(e.target.value) || 0)} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
+                </div>
+              </div>
+              <textarea value={editNotas} onChange={(e) => setEditNotas(e.target.value)} placeholder="Notas" rows={2} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
+              <div className="flex gap-3">
+                <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                  Guardar
+                </button>
+                <button onClick={cancelarEdicion} className="text-xs text-slate-500 hover:text-slate-700">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-slate-700">
+                  {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.intervalos_con_conducta}/{b.total_intervalos} intervalos
+                  {b.fase === 'linea_base' && ' · Línea base'}
+                </p>
+                <p className="text-xs text-slate-400">
+                  {b.porcentaje}% · {ETIQUETA_TIPO[b.tipo_intervalo].split(' (')[0]} · {b.duracion_intervalo_segundos}s/intervalo
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
+                  Editar
+                </button>
+                <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ))}
       {bloques.length === 0 && <p className="text-center text-slate-400 py-4">Sin bloques todavía.</p>}
