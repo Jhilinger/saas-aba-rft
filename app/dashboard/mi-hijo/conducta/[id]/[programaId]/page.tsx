@@ -1,14 +1,13 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
-import AbcClient from './abc-client'
-import TasaClient from './tasa-client'
-import DuracionClient from './duracion-client'
-import IntervaloClient from './intervalo-client'
-import GraficoConducta from './grafico-conducta'
-import EstadoProgramaSelector from '../../../../programas/[id]/estado-programa-selector'
+import AbcClient from '../../../../alumnos/[id]/conducta/[programaId]/abc-client'
+import TasaClient from '../../../../alumnos/[id]/conducta/[programaId]/tasa-client'
+import DuracionClient from '../../../../alumnos/[id]/conducta/[programaId]/duracion-client'
+import IntervaloClient from '../../../../alumnos/[id]/conducta/[programaId]/intervalo-client'
+import GraficoConducta from '../../../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
 
-export default async function ProgramaConductaPage({
+export default async function ProgramaConductaFamiliaPage({
   params,
 }: {
   params: Promise<{ id: string; programaId: string }>
@@ -19,43 +18,35 @@ export default async function ProgramaConductaPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: perfil } = await supabase
-    .from('perfiles')
-    .select('rol')
-    .eq('id', user.id)
-    .single()
+  const { data: vinculo } = await supabase
+    .from('alumno_familia')
+    .select('alumno_id')
+    .eq('alumno_id', alumnoId)
+    .eq('perfil_id', user.id)
+    .maybeSingle()
 
-  if (!perfil || !['superadmin', 'clinica_admin', 'terapeuta'].includes(perfil.rol)) {
-    redirect('/dashboard')
-  }
+  if (!vinculo) redirect('/dashboard/mi-hijo/conducta')
 
   const { data: programa } = await supabase
     .from('programas_alumno')
-    .select('id, nombre, tipo, formato_recogida, direccion_objetivo, estado, objetivo, alumno_id')
+    .select('id, nombre, tipo, formato_recogida, direccion_objetivo, objetivo, alumno_id, visible_familia')
     .eq('id', programaId)
     .single()
 
-  if (!programa || programa.tipo !== 'conducta' || programa.alumno_id !== alumnoId) notFound()
+  if (!programa || programa.tipo !== 'conducta' || programa.alumno_id !== alumnoId || !programa.visible_familia) {
+    notFound()
+  }
 
   const cabecera = (
     <div>
-      <Link href={`/dashboard/alumnos/${alumnoId}/conducta`} className="text-sm text-indigo-600 hover:underline">
+      <Link href="/dashboard/mi-hijo/conducta" className="text-sm text-indigo-600 hover:underline">
         ← Volver a Registros de conducta
       </Link>
       <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
-      <div className="mt-1">
-        <EstadoProgramaSelector
-          programaAlumnoId={programa.id}
-          alumnoId={alumnoId}
-          estadoActual={programa.estado}
-          variante="conducta"
-        />
-      </div>
       {programa.objetivo && <p className="text-sm text-slate-500 mt-1">{programa.objetivo}</p>}
     </div>
   )
-
-  if (programa.formato_recogida === 'abc') {
+    if (programa.formato_recogida === 'abc') {
     const { data: registros } = await supabase
       .from('registros_abc')
       .select('id, fecha_hora, antecedente, conducta, consecuencia, notas')
@@ -94,7 +85,8 @@ export default async function ProgramaConductaPage({
       </div>
     )
   }
-    if (programa.formato_recogida === 'duracion') {
+
+  if (programa.formato_recogida === 'duracion') {
     const { data: bloques } = await supabase
       .from('bloques_duracion')
       .select('id, fecha, fase, duracion_sesion_segundos, numero_episodios, duracion_total_conducta_segundos, porcentaje, notas')
@@ -146,12 +138,5 @@ export default async function ProgramaConductaPage({
     )
   }
 
-  return (
-    <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
-      {cabecera}
-      <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-400">
-        La toma de datos para "{programa.formato_recogida}" está en construcción.
-      </p>
-    </div>
-  )
+  return null
 }
