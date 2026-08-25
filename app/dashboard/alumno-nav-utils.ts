@@ -12,10 +12,11 @@ export function extraerAlumnoId(pathname: string): string | null {
 export function enlacesAlumno(alumnoId: string): Enlace[] {
   const base = `/dashboard/alumnos/${alumnoId}`
   return [
+    { href: base, label: 'Inicio' },
     { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },
     { href: `${base}/progreso`, label: 'Progreso' },
     { href: `${base}/valoracion`, label: 'Valoración' },
-    { href: base, label: 'PEI' },
+    { href: `${base}/pei`, label: 'PEI' },
     { href: `${base}/conducta`, label: 'Registros de conducta' },
     { href: `${base}/preferencias`, label: 'Preferencias' },
     { href: `${base}/informes`, label: 'Informes' },
