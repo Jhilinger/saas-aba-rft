@@ -5,10 +5,17 @@ import { useRouter } from 'next/navigation'
 import { actualizarEstadoPrograma } from './actions'
 import { useToast } from '../../../providers/toast-provider'
 
-const OPCIONES = [
+const OPCIONES_HABILIDAD = [
   { value: 'adquisicion', label: 'En adquisición' },
   { value: 'mantenimiento', label: 'Mantenimiento' },
   { value: 'dominado', label: 'Dominado' },
+  { value: 'pausado', label: 'Pausado' },
+]
+
+const OPCIONES_CONDUCTA = [
+  { value: 'adquisicion', label: 'Intervención' },
+  { value: 'mantenimiento', label: 'Mantenimiento' },
+  { value: 'dominado', label: 'Finalizado' },
   { value: 'pausado', label: 'Pausado' },
 ]
 
@@ -23,11 +30,14 @@ export default function EstadoProgramaSelector({
   programaAlumnoId,
   alumnoId,
   estadoActual,
+  variante = 'habilidad',
 }: {
   programaAlumnoId: string
   alumnoId: string
   estadoActual: string
+  variante?: 'habilidad' | 'conducta'
 }) {
+  const OPCIONES = variante === 'conducta' ? OPCIONES_CONDUCTA : OPCIONES_HABILIDAD
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const toast = useToast()
