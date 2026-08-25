@@ -46,8 +46,9 @@ export default async function AlumnoPage({
     .order('orden', { ascending: true, nullsFirst: false })
     .order('nombre')
 
-  return (
+    return (
     <section className="space-y-4">
+      <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
       <AsignarProgramaForm alumnoId={id} programasBase={programasBase ?? []} miPerfilId={perfil.id} />
       <PeiTabla programas={(programas as any) ?? []} />
     </section>

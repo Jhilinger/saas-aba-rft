@@ -55,7 +55,9 @@ export default async function ValoracionPage({
     .select('programa_base_id, valoracion')
     .eq('alumno_id', alumnoId)
 
-  return (
+    return (
+    <div className="space-y-4">
+    <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
     <ValoracionTabs
       aba={
         <EvaluacionClient
@@ -73,6 +75,7 @@ export default async function ValoracionPage({
           totalLimite={1}
         />
       }
-    />
+        />
+    </div>
   )
 }

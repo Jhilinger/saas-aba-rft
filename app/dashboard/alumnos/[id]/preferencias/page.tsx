@@ -29,5 +29,10 @@ export default async function PreferenciasAlumnoPage({
 
   const preferenciasIniciales = await listarPreferencias(id)
 
-  return <PreferenciasSection alumnoId={id} preferenciasIniciales={preferenciasIniciales as any} />
+    return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold text-slate-800">Preferencias</h2>
+      <PreferenciasSection alumnoId={id} preferenciasIniciales={preferenciasIniciales as any} />
+    </div>
+  )
 }

@@ -77,5 +77,10 @@ export default async function ProgresoPage({
     }
   })
 
-  return <ProgresoTabla filas={filas} />
+    return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold text-slate-800">Progreso del Alumno</h2>
+      <ProgresoTabla filas={filas} />
+    </div>
+  )
 }

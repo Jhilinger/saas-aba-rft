@@ -40,12 +40,15 @@ export default async function InformesAlumnoPage({
 
   const informesIniciales = await listarInformes(id)
 
-  return (
+    return (
+    <div className="space-y-4">
+    <h2 className="text-lg font-semibold text-slate-800">Informes</h2>
     <InformesSection
       alumnoId={id}
       nombreAlumno={alumno.nombre_anonimizado}
       nombreClinica={clinicaDatos?.nombre ?? 'Centro de terapia'}
       informesIniciales={informesIniciales as any}
-    />
+        />
+    </div>
   )
 }
