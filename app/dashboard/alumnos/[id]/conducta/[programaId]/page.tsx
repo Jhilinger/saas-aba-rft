@@ -4,6 +4,7 @@ import Link from 'next/link'
 import AbcClient from './abc-client'
 import TasaClient from './tasa-client'
 import DuracionClient from './duracion-client'
+import IntervaloClient from './intervalo-client'
 import EstadoProgramaSelector from '../../../../programas/[id]/estado-programa-selector'
 
 export default async function ProgramaConductaPage({
@@ -97,7 +98,20 @@ export default async function ProgramaConductaPage({
       </div>
     )
   }
+    if (programa.formato_recogida === 'intervalo') {
+    const { data: bloques } = await supabase
+      .from('bloques_intervalo')
+      .select('id, fecha, fase, tipo_intervalo, duracion_intervalo_segundos, total_intervalos, intervalos_con_conducta, porcentaje, notas')
+      .eq('programa_alumno_id', programaId)
+      .order('fecha', { ascending: false })
 
+    return (
+      <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
+        {cabecera}
+        <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+      </div>
+    )
+  }
   // Intervalo se construye en la siguiente fase — de momento, un aviso
   // claro en vez de un error.
   return (

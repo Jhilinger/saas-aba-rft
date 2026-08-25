@@ -130,3 +130,46 @@ export async function eliminarBloqueDuracion(bloqueId: string, alumnoId: string,
   revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
   return { success: true }
 }
+
+export async function guardarBloqueIntervalo(
+  programaAlumnoId: string,
+  alumnoId: string,
+  tipoIntervalo: 'parcial' | 'total' | 'momentaneo',
+  duracionIntervaloSegundos: number,
+  totalIntervalos: number,
+  intervalosConConducta: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const fase = await obtenerFase(supabase, programaAlumnoId)
+
+  const { error } = await supabase.from('bloques_intervalo').insert({
+    programa_alumno_id: programaAlumnoId,
+    terapeuta_id: user.id,
+    fase,
+    tipo_intervalo: tipoIntervalo,
+    duracion_intervalo_segundos: duracionIntervaloSegundos,
+    total_intervalos: totalIntervalos,
+    intervalos_con_conducta: intervalosConConducta,
+    notas: notas?.trim() || null,
+  })
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
+
+export async function eliminarBloqueIntervalo(bloqueId: string, alumnoId: string, programaAlumnoId: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase.from('bloques_intervalo').delete().eq('id', bloqueId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  return { success: true }
+}
