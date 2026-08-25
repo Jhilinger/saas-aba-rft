@@ -22,11 +22,11 @@ export default function NuevoConjuntoForm({ programaAlumnoId }: { programaAlumno
       }}
       className="flex flex-col sm:flex-row gap-2"
     >
-      <input
+            <input
         value={nombre}
         onChange={(e) => setNombre(e.target.value)}
         placeholder="Nombre del conjunto (ej. Conjunto 2: colores secundarios)"
-        className="flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+        className="w-full flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
       />
       <button
         type="submit"
