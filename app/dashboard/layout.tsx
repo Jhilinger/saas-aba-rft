@@ -92,7 +92,7 @@ export default async function DashboardLayout({
 
       <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 bg-white p-5 flex-col">
         <div className="mb-8">
-          <p className="font-bold text-slate-800">SaaS ABA/RFT</p>
+          <p className="font-bold text-slate-800">ABAContext</p>
           <p className="text-xs text-slate-400">{perfil?.nombre}</p>
           <span className="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
             {perfil?.rol}

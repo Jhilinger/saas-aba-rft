@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { crearProgramaConducta, toggleVisibleFamilia } from './actions'
@@ -23,6 +23,14 @@ const ETIQUETA_FORMATO: Record<string, string> = {
   abc: 'ABC (registro narrativo)',
 }
 
+const ETIQUETA_ESTADO: Record<string, string> = {
+  linea_base: 'Línea base',
+  adquisicion: 'Intervención',
+  mantenimiento: 'Mantenimiento',
+  dominado: 'Finalizado',
+  pausado: 'Pausado',
+}
+
 export default function ConductaClient({
   alumnoId,
   programasIniciales,
@@ -30,11 +38,12 @@ export default function ConductaClient({
   alumnoId: string
   programasIniciales: Programa[]
 }) {
-    const [programas, setProgramas] = useState(programasIniciales)
+  const [programas, setProgramas] = useState(programasIniciales)
 
   useEffect(() => {
     setProgramas(programasIniciales)
   }, [programasIniciales])
+
   const [mostrandoForm, setMostrandoForm] = useState(false)
   const [nombre, setNombre] = useState('')
   const [formato, setFormato] = useState<'intervalo' | 'duracion' | 'tasa' | 'abc'>('intervalo')
@@ -44,6 +53,10 @@ export default function ConductaClient({
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const toast = useToast()
+
+  const [busqueda, setBusqueda] = useState('')
+  const [filtroFormato, setFiltroFormato] = useState('todos')
+  const [mostrarInactivos, setMostrarInactivos] = useState(false)
 
   const crear = () => {
     setError(null)
@@ -78,7 +91,22 @@ export default function ConductaClient({
       toast(!valorActual ? 'Compartido con la familia' : 'Ya no se comparte con la familia', 'exito')
     })
   }
-    return (
+
+  const inactivosCount = useMemo(
+    () => programas.filter((p) => p.estado === 'dominado' || p.estado === 'pausado').length,
+    [programas]
+  )
+
+  const visibles = useMemo(() => {
+    return programas.filter((p) => {
+      if (!mostrarInactivos && (p.estado === 'dominado' || p.estado === 'pausado')) return false
+      if (busqueda.trim() && !p.nombre.toLowerCase().includes(busqueda.trim().toLowerCase())) return false
+      if (filtroFormato !== 'todos' && p.formato_recogida !== filtroFormato) return false
+      return true
+    })
+  }, [programas, busqueda, filtroFormato, mostrarInactivos])
+
+  return (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-slate-800">Registros de conducta</h2>
@@ -163,9 +191,35 @@ export default function ConductaClient({
         </div>
       )}
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <input
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar por nombre..."
+          className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+        />
+        <select
+          value={filtroFormato}
+          onChange={(e) => setFiltroFormato(e.target.value)}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+        >
+          <option value="todos">Todos los formatos</option>
+          <option value="intervalo">Intervalo</option>
+          <option value="duracion">Duración</option>
+          <option value="tasa">Tasa</option>
+          <option value="abc">ABC</option>
+        </select>
+        {inactivosCount > 0 && (
+          <label className="flex items-center gap-2 text-sm text-slate-600 px-1">
+            <input type="checkbox" checked={mostrarInactivos} onChange={(e) => setMostrarInactivos(e.target.checked)} />
+            Mostrar finalizados/pausados ({inactivosCount})
+          </label>
+        )}
+      </div>
+
       <div className="space-y-3">
-        {programas.map((p) => (
-          <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+        {visibles.map((p) => (
+          <div key={p.id} className={`rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 ${p.estado === 'pausado' ? 'opacity-60' : ''}`}>
             <div>
               <Link href={`/dashboard/alumnos/${alumnoId}/conducta/${p.id}`} className="font-semibold text-slate-800 hover:underline">
                 {p.nombre}
@@ -174,7 +228,7 @@ export default function ConductaClient({
                 {ETIQUETA_FORMATO[p.formato_recogida]}
                 {p.direccion_objetivo && ` · Objetivo: ${p.direccion_objetivo === 'reducir' ? 'disminuir' : 'aumentar'}`}
                 {' · '}
-                {p.estado}
+                {ETIQUETA_ESTADO[p.estado] ?? p.estado}
               </p>
             </div>
             <label className="flex items-center gap-2 text-xs text-slate-600">
@@ -183,8 +237,12 @@ export default function ConductaClient({
             </label>
           </div>
         ))}
-        {programas.length === 0 && (
-          <p className="text-center text-slate-400 py-6">Sin registros de conducta todavía.</p>
+        {visibles.length === 0 && (
+          <p className="text-center text-slate-400 py-6">
+            {programas.length === 0
+              ? 'Sin registros de conducta todavía.'
+              : 'Ningún registro coincide con los filtros.'}
+          </p>
         )}
       </div>
     </div>

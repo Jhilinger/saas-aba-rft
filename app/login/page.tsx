@@ -16,7 +16,7 @@ export default async function LoginPage({
         action={login}
         className="w-full max-w-sm space-y-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
       >
-        <h1 className="text-xl font-bold text-slate-800">SaaS ABA/RFT — Acceso</h1>
+        <h1 className="text-xl font-bold text-slate-800">ABAContext — Acceso</h1>
 
         {error && (
           <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">

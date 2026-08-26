@@ -11,9 +11,9 @@ export default function RegistroPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-800">Crea tu clínica</h1>
+          <h1 className="text-2xl font-bold text-slate-800">Crea tu centro</h1>
           <p className="mt-1 text-sm text-slate-500">
-            30€/mes de cuota fija + 5€/mes por cada alumno activo. Cancela cuando quieras.
+            30€/mes de cuota fija + 4€/mes por cada alumno activo. Cancela cuando quieras.
           </p>
         </div>
 

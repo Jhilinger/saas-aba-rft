@@ -37,9 +37,9 @@ export default async function EquipoPage() {
 
       <section className="space-y-4">
         <form
-          action={async (formData) => {
+                   action={async (formData) => {
             'use server'
-            await crearTerapeuta(formData)
+            const resultado = await crearTerapeuta(formData)
           }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
         >

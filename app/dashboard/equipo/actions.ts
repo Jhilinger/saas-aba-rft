@@ -36,7 +36,7 @@ export async function crearTerapeuta(formData: FormData) {
     return { error: `Ya existe una cuenta con el email "${email}".` }
   }
 
-  const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
+      const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${URL_BASE}/login`,
   })
 

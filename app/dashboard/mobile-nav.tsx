@@ -29,7 +29,7 @@ export default function MobileNav({
     <>
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 md:hidden">
         <div>
-          <p className="text-sm font-bold text-slate-800">SaaS ABA/RFT</p>
+          <p className="text-sm font-bold text-slate-800">ABAContext</p>
           <p className="text-xs text-slate-400">
             {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
           </p>
