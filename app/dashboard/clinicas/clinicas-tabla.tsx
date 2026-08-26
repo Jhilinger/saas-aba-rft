@@ -12,6 +12,11 @@ type Clinica = {
   precio_por_alumno: number
   activa: boolean
   sin_facturacion: boolean
+  telefono: string | null
+  ciudad: string | null
+  pais: string | null
+  admin_nombre: string | null
+  admin_email: string | null
 }
 
 export default function ClinicasTabla({ clinicas }: { clinicas: Clinica[] }) {

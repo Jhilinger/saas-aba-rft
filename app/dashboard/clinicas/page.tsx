@@ -19,10 +19,23 @@ export default async function ClinicasPage() {
     redirect('/dashboard')
   }
 
-  const { data: clinicas, error } = await supabase
+    const { data: clinicasData, error } = await supabase
     .from('clinicas')
-    .select('id, nombre, logo_url, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, activa, sin_facturacion, created_at')
+    .select('id, nombre, logo_url, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, activa, sin_facturacion, created_at, telefono, ciudad, pais')
     .order('created_at', { ascending: false })
+
+  const { data: admins } = await supabase
+    .from('perfiles')
+    .select('clinica_id, nombre, email')
+    .eq('rol', 'clinica_admin')
+
+  const adminPorClinica = new Map((admins ?? []).map((a) => [a.clinica_id, a]))
+
+  const clinicas = (clinicasData ?? []).map((c) => ({
+    ...c,
+    admin_nombre: adminPorClinica.get(c.id)?.nombre ?? null,
+    admin_email: adminPorClinica.get(c.id)?.email ?? null,
+  }))
 
   return (
     <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6 sm:space-y-8">
