@@ -1,9 +1,200 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import AbacontextIcon from './abacontext-icon'
+
+function Nodo() {
+  return (
+    <span className="relative inline-flex h-3 w-4 shrink-0 items-center">
+      <span className="absolute left-0 h-3 w-3 rounded-full bg-indigo-500 opacity-80" />
+      <span className="absolute left-1.5 h-3 w-3 rounded-full bg-amber-500 opacity-80" />
+    </span>
+  )
+}
 
 export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  redirect(user ? '/dashboard' : '/login')
+  if (user) redirect('/dashboard')
+
+  const funcionalidades = [
+    {
+      titulo: 'PEI y evaluación inicial',
+      texto:
+        'Valora el punto de partida de cada alumno en Aprendizaje Directo y Relacional, y arma el plan de intervención con el currículo de tu clínica.',
+    },
+    {
+      titulo: 'Registros de conducta',
+      texto:
+        'Intervalo, duración, tasa y registro ABC, con línea base propia y gráficos que reflejan si el objetivo es aumentar o reducir la conducta.',
+    },
+    {
+      titulo: 'Agenda semanal',
+      texto:
+        'Sesiones recurrentes, cuadrícula semanal, y un aviso siempre visible de lo que quedó pendiente de marcar.',
+    },
+    {
+      titulo: 'Portal de familia',
+      texto:
+        'Progreso, asistencia, informes generados con IA, documentos con firma digital y datos de facturación, todo en un único acceso.',
+    },
+    {
+      titulo: 'Documentos con firma',
+      texto:
+        'Consentimiento informado, protección de datos y lo que necesite tu clínica, firmado desde el móvil con validez real.',
+    },
+    {
+      titulo: 'Facturación integrada',
+      texto:
+        'Suscripción por alumno activo, portal de facturación propio, sin depender de una herramienta aparte.',
+    },
+  ]
+
+  return (
+    <div className="min-h-screen bg-white">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-8">
+        <div className="flex items-center gap-2">
+          <AbacontextIcon className="h-7 w-7" />
+          <span className="text-lg font-bold text-slate-800">abacontext</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+            Iniciar sesión
+          </Link>
+          <Link
+            href="/registro"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+          >
+            Crear cuenta
+          </Link>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-4xl px-4 pt-12 pb-20 text-center sm:px-8 sm:pt-20">
+        <div className="mb-6 flex justify-center">
+          <div className="relative h-20 w-28">
+            <div className="absolute left-0 top-0 h-16 w-16 rounded-full bg-indigo-500 opacity-80" />
+            <div className="absolute left-10 top-0 h-16 w-16 rounded-full bg-amber-500 opacity-80" />
+          </div>
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+          Del aprendizaje directo al relacional,<br className="hidden sm:block" /> en un mismo lugar
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-base text-slate-500 sm:text-lg">
+          Abacontext gestiona tu clínica de ABA y te acompaña a incorporar RFT — con la toma de datos,
+          la agenda, la familia y la facturación resueltas desde el primer día.
+        </p>
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/registro"
+            className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-base font-semibold text-white hover:bg-indigo-500 sm:w-auto"
+          >
+            Crea tu centro
+          </Link>
+          <Link
+            href="/login"
+            className="w-full rounded-lg border border-slate-300 px-6 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 sm:w-auto"
+          >
+            Ya tengo cuenta
+          </Link>
+        </div>
+      </section>
+            <section className="border-y border-slate-100 bg-slate-50">
+        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">Lo habitual</p>
+              <p className="mt-2 text-lg text-slate-700">
+                Una herramienta para tomar datos, otra para la agenda, un Excel para facturar, y RFT
+                como una asignatura pendiente que nunca encuentra hueco.
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Con Abacontext</p>
+              <p className="mt-2 text-lg text-slate-700">
+                Todo conectado desde el principio — y un camino claro para empezar a trabajar
+                también el aprendizaje relacional, con el mismo criterio clínico de siempre.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-8">
+        <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl">
+          Todo lo que necesita tu clínica
+        </h2>
+        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {funcionalidades.map((f) => (
+            <div key={f.titulo}>
+              <div className="mb-3 flex items-center gap-2">
+                <Nodo />
+                <h3 className="font-semibold text-slate-800">{f.titulo}</h3>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-500">{f.texto}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-100 bg-slate-50">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-8">
+          <h2 className="text-center text-2xl font-bold text-slate-900">Un acceso para cada persona</h2>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="font-semibold text-slate-800">Administración</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Equipo, alumnos, familia, currículo, facturación y documentos legales, todo desde un
+                único panel.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="font-semibold text-slate-800">Terapeutas</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Toma de datos pensada para usarse en sesión, agenda semanal, y gráficos que se
+                construyen solos.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <p className="font-semibold text-slate-800">Familias</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Progreso, asistencia, informes y firma de documentos, sin depender de que alguien se
+                lo explique por teléfono.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+            <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
+        <h2 className="text-2xl font-bold text-slate-900">Precio simple</h2>
+        <div className="mt-8 rounded-2xl border border-slate-200 p-8">
+          <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-400">/mes</span></p>
+          <p className="mt-1 text-sm text-slate-500">+ 4€/mes por cada alumno activo</p>
+          <ul className="mt-6 space-y-3 text-left text-sm text-slate-600">
+            <li className="flex items-center gap-2"><Nodo /> Equipo y alumnos sin límite</li>
+            <li className="flex items-center gap-2"><Nodo /> ABA y RFT incluidos</li>
+            <li className="flex items-center gap-2"><Nodo /> Portal de familia incluido</li>
+            <li className="flex items-center gap-2"><Nodo /> Cancela cuando quieras</li>
+          </ul>
+          <Link
+            href="/registro"
+            className="mt-8 block w-full rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white hover:bg-indigo-500"
+          >
+            Crea tu centro
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-100 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-400 sm:flex-row sm:px-8">
+          <div className="flex items-center gap-2">
+            <AbacontextIcon className="h-5 w-5" />
+            <span>abacontext</span>
+          </div>
+          <p>© {new Date().getFullYear()} Abacontext</p>
+        </div>
+      </footer>
+    </div>
+  )
 }
