@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { login } from './actions'
 import InviteHashHandler from './invite-hash-handler'
+import AbacontextIcon from '../abacontext-icon'
 
 export default async function LoginPage({
   searchParams,
@@ -16,7 +17,10 @@ export default async function LoginPage({
         action={login}
         className="w-full max-w-sm space-y-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
       >
-        <h1 className="text-xl font-bold text-slate-800">ABAContext — Acceso</h1>
+                <div className="flex flex-col items-center gap-2 mb-2">
+          <AbacontextIcon className="w-12 h-12" />
+          <h1 className="text-xl font-bold text-slate-800">abacontext</h1>
+        </div>
 
         {error && (
           <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">

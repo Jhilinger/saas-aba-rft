@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { logout } from '../logout-action'
+import AbacontextIcon from '../abacontext-icon'
 import { useEnlacesEfectivos } from './use-enlaces-efectivos'
 import type { Enlace } from './alumno-nav-utils'
 
@@ -28,12 +29,15 @@ export default function MobileNav({
   return (
     <>
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 md:hidden">
-        <div>
-          <p className="text-sm font-bold text-slate-800">ABAContext</p>
+                <div className="flex items-center gap-2">
+          <AbacontextIcon className="w-6 h-6" />
+          <div>
+            <p className="text-sm font-bold text-slate-800">Abacontext</p>
           <p className="text-xs text-slate-400">
             {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
           </p>
         </div>
+      </div>  
         <button
           onClick={() => setAbierto(true)}
           className="rounded-lg border border-slate-300 p-2"

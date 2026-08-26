@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { logout } from '../logout-action'
 import MobileNav from './mobile-nav'
 import DesktopSidebarNav from './desktop-sidebar-nav'
+import AbacontextIcon from '../abacontext-icon'
 import { ConfirmProvider } from '../providers/confirm-provider'
 import { ToastProvider } from '../providers/toast-provider'
 import type { Enlace } from './alumno-nav-utils'
@@ -91,8 +92,11 @@ export default async function DashboardLayout({
       <MobileNav enlaces={enlacesRol} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
 
       <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 bg-white p-5 flex-col">
-        <div className="mb-8">
-          <p className="font-bold text-slate-800">ABAContext</p>
+                <div className="mb-8">
+          <div className="flex items-center gap-2">
+            <AbacontextIcon className="w-6 h-6" />
+            <p className="font-bold text-slate-800">Abacontext</p>
+          </div>
           <p className="text-xs text-slate-400">{perfil?.nombre}</p>
           <span className="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
             {perfil?.rol}
