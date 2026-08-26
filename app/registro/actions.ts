@@ -9,8 +9,11 @@ export async function iniciarRegistro(formData: FormData) {
   const nombreClinica = formData.get('nombre_clinica') as string
   const nombreAdmin = formData.get('nombre_admin') as string
   const emailAdmin = formData.get('email_admin') as string
+  const telefono = formData.get('telefono') as string
+  const pais = formData.get('pais') as string
+  const ciudad = formData.get('ciudad') as string
 
-  if (!nombreClinica || !nombreAdmin || !emailAdmin) {
+  if (!nombreClinica || !nombreAdmin || !emailAdmin || !telefono || !pais || !ciudad) {
     return { error: 'Rellena todos los campos.' }
   }
 
@@ -25,6 +28,15 @@ export async function iniciarRegistro(formData: FormData) {
     return { error: `Ya existe una cuenta con el email "${emailAdmin}". Usa otro email o inicia sesión.` }
   }
 
+  const metadataComun = {
+    nombre_clinica: nombreClinica,
+    nombre_admin: nombreAdmin,
+    email_admin: emailAdmin,
+    telefono,
+    pais,
+    ciudad,
+  }
+
   let session: any
   try {
     session = await stripe.checkout.sessions.create({
@@ -36,19 +48,9 @@ export async function iniciarRegistro(formData: FormData) {
       customer_email: emailAdmin,
       success_url: `${URL_BASE}/registro/completado?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${URL_BASE}/registro`,
-      metadata: {
-        nombre_clinica: nombreClinica,
-        nombre_admin: nombreAdmin,
-        email_admin: emailAdmin,
-        pais: 'ES',
-      },
+      metadata: metadataComun,
       subscription_data: {
-        metadata: {
-          nombre_clinica: nombreClinica,
-          nombre_admin: nombreAdmin,
-          email_admin: emailAdmin,
-          pais: 'ES',
-        },
+        metadata: metadataComun,
       },
     })
   } catch (err: any) {

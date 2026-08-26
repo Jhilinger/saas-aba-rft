@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { iniciarRegistro } from './actions'
+import AbacontextIcon from '../abacontext-icon'
 
 export default function RegistroPage() {
   const [error, setError] = useState<string | null>(null)
@@ -11,6 +12,9 @@ export default function RegistroPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
+          <div className="flex justify-center mb-2">
+            <AbacontextIcon className="w-12 h-12" />
+          </div>
           <h1 className="text-2xl font-bold text-slate-800">Crea tu centro</h1>
           <p className="mt-1 text-sm text-slate-500">
             30€/mes de cuota fija + 4€/mes por cada alumno activo. Cancela cuando quieras.
@@ -55,6 +59,34 @@ export default function RegistroPage() {
               required
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
             />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm text-slate-600">Teléfono</label>
+            <input
+              name="telefono"
+              type="tel"
+              required
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
+            />
+          </div>
+                    <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Ciudad</label>
+              <input
+                name="ciudad"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">País</label>
+              <input
+                name="pais"
+                required
+                defaultValue="España"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
+              />
+            </div>
           </div>
 
           {error && (

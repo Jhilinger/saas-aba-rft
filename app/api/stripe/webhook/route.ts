@@ -48,11 +48,13 @@ export async function POST(req: NextRequest) {
 
       if (yaExiste) break
 
-      const { data: clinica, error: clinicaError } = await admin
+            const { data: clinica, error: clinicaError } = await admin
         .from('clinicas')
         .insert({
           nombre: metadata.nombre_clinica,
           pais: metadata.pais ?? 'ES',
+          telefono: metadata.telefono ?? null,
+          ciudad: metadata.ciudad ?? null,
           precio_fijo_mensual: 30,
           precio_por_alumno: 5,
           sin_facturacion: false,
