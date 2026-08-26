@@ -314,8 +314,59 @@ async function InicioSuperadmin() {
     .order('created_at', { ascending: false })
     .limit(5)
 
+  const { data: clinicasParaMrr } = await supabase
+    .from('clinicas')
+    .select('id, precio_fijo_mensual, precio_por_alumno')
+    .eq('activa', true)
+
+  const { data: alumnosActivosPorClinica } = await supabase
+    .from('alumnos')
+    .select('clinica_id')
+    .eq('activo', true)
+
+  const conteoAlumnos = new Map<string, number>()
+  for (const a of alumnosActivosPorClinica ?? []) {
+    conteoAlumnos.set(a.clinica_id, (conteoAlumnos.get(a.clinica_id) ?? 0) + 1)
+  }
+
+  const mrr = (clinicasParaMrr ?? []).reduce((total, c) => {
+    const numAlumnos = conteoAlumnos.get(c.id) ?? 0
+    return total + (c.precio_fijo_mensual ?? 0) + (c.precio_por_alumno ?? 0) * numAlumnos
+  }, 0)
+
+  const primerDiaMes = new Date()
+  primerDiaMes.setDate(1)
+  primerDiaMes.setHours(0, 0, 0, 0)
+
+  const { count: nuevasEsteMes } = await supabase
+    .from('clinicas')
+    .select('id', { count: 'exact', head: true })
+    .gte('created_at', primerDiaMes.toISOString())
+
+  const { count: enRiesgo } = await supabase
+    .from('clinicas')
+    .select('id', { count: 'exact', head: true })
+    .in('estado_suscripcion', ['past_due', 'unpaid', 'incomplete'])
+
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5 col-span-2 sm:col-span-1">
+          <p className="text-2xl sm:text-3xl font-bold text-indigo-700">
+            {mrr.toLocaleString('es-ES', { minimumFractionDigits: 0 })}€
+          </p>
+          <p className="text-sm text-indigo-600">MRR (ingreso mensual recurrente)</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{nuevasEsteMes ?? 0}</p>
+          <p className="text-sm text-slate-500">Nuevas este mes</p>
+        </div>
+        <div className={`rounded-2xl border p-4 sm:p-5 ${(enRiesgo ?? 0) > 0 ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+          <p className={`text-2xl sm:text-3xl font-bold ${(enRiesgo ?? 0) > 0 ? 'text-amber-700' : 'text-slate-800'}`}>{enRiesgo ?? 0}</p>
+          <p className={`text-sm ${(enRiesgo ?? 0) > 0 ? 'text-amber-600' : 'text-slate-500'}`}>En riesgo (impago)</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{clinicasActivas ?? 0}</p>
