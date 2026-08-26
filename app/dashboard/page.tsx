@@ -334,6 +334,8 @@ async function InicioSuperadmin() {
     return total + (c.precio_fijo_mensual ?? 0) + (c.precio_por_alumno ?? 0) * numAlumnos
   }, 0)
 
+  const arpu = clinicasActivas && clinicasActivas > 0 ? mrr / clinicasActivas : 0
+
   const primerDiaMes = new Date()
   primerDiaMes.setDate(1)
   primerDiaMes.setHours(0, 0, 0, 0)
@@ -343,12 +345,32 @@ async function InicioSuperadmin() {
     .select('id', { count: 'exact', head: true })
     .gte('created_at', primerDiaMes.toISOString())
 
-  const { count: enRiesgo } = await supabase
+  const { data: clinicasEnRiesgo } = await supabase
     .from('clinicas')
-    .select('id', { count: 'exact', head: true })
+    .select('id, nombre, estado_suscripcion')
     .in('estado_suscripcion', ['past_due', 'unpaid', 'incomplete'])
 
-  return (
+  const { count: totalTerapeutas } = await supabase
+    .from('perfiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('rol', 'terapeuta')
+
+  const { count: totalFamilias } = await supabase
+    .from('perfiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('rol', 'familia')
+
+  const { count: informesEsteMes } = await supabase
+    .from('informes')
+    .select('id', { count: 'exact', head: true })
+    .gte('created_at', primerDiaMes.toISOString())
+
+  const ETIQUETA_ESTADO_SUS: Record<string, string> = {
+    past_due: 'Pago atrasado',
+    unpaid: 'Impagado',
+    incomplete: 'Pago incompleto',
+  }
+      return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5 col-span-2 sm:col-span-1">
@@ -358,14 +380,51 @@ async function InicioSuperadmin() {
           <p className="text-sm text-indigo-600">MRR (ingreso mensual recurrente)</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <p className="text-2xl sm:text-3xl font-bold text-slate-800">
+            {arpu.toLocaleString('es-ES', { minimumFractionDigits: 0 })}€
+          </p>
+          <p className="text-sm text-slate-500">ARPU (ingreso medio/clínica)</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{nuevasEsteMes ?? 0}</p>
           <p className="text-sm text-slate-500">Nuevas este mes</p>
         </div>
-        <div className={`rounded-2xl border p-4 sm:p-5 ${(enRiesgo ?? 0) > 0 ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}>
-          <p className={`text-2xl sm:text-3xl font-bold ${(enRiesgo ?? 0) > 0 ? 'text-amber-700' : 'text-slate-800'}`}>{enRiesgo ?? 0}</p>
-          <p className={`text-sm ${(enRiesgo ?? 0) > 0 ? 'text-amber-600' : 'text-slate-500'}`}>En riesgo (impago)</p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalTerapeutas ?? 0}</p>
+          <p className="text-sm text-slate-500">Terapeutas (total)</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalFamilias ?? 0}</p>
+          <p className="text-sm text-slate-500">Familias (total)</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{informesEsteMes ?? 0}</p>
+          <p className="text-sm text-slate-500">Informes este mes</p>
         </div>
       </div>
+
+      {clinicasEnRiesgo && clinicasEnRiesgo.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-amber-700">⚠️ Clínicas en riesgo de impago</h2>
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 overflow-hidden">
+            {clinicasEnRiesgo.map((c) => (
+              <Link
+                key={c.id}
+                href="/dashboard/clinicas"
+                className="flex items-center justify-between border-b border-amber-100 last:border-0 px-4 py-3 text-sm hover:bg-amber-100"
+              >
+                <span className="font-medium text-slate-800">{c.nombre}</span>
+                <span className="text-xs font-medium text-amber-700">
+                  {ETIQUETA_ESTADO_SUS[c.estado_suscripcion] ?? c.estado_suscripcion}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
