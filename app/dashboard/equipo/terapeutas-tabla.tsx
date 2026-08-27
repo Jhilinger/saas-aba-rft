@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import TerapeutaActions from './terapeuta-actions'
+import { descargarCSV } from '@/utils/csv'
 
 type Terapeuta = { id: string; nombre: string; email: string; activo: boolean }
 
@@ -16,14 +17,32 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
     )
   }, [terapeutas, busqueda])
 
+  const exportar = () => {
+    const filas = filtrados.map((t) => ({
+      Nombre: t.nombre,
+      Email: t.email,
+      Estado: t.activo ? 'Activo' : 'Desactivado',
+    }))
+    descargarCSV(`terapeutas-${new Date().toISOString().split('T')[0]}.csv`, filas)
+  }
+
   return (
     <div className="space-y-2">
-      <input
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        placeholder="Buscar terapeuta por nombre o email..."
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-      />
+      <div className="flex flex-col sm:flex-row gap-2">
+        <input
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar terapeuta por nombre o email..."
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+        />
+        <button
+          onClick={exportar}
+          disabled={filtrados.length === 0}
+          className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40 whitespace-nowrap"
+        >
+          Exportar CSV
+        </button>
+      </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
         <table className="w-full text-sm min-w-[480px]">

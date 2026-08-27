@@ -1,6 +1,9 @@
 'use client'
 
+'use client'
+
 import { useState, useMemo } from 'react'
+import { descargarCSV } from '@/utils/csv'
 
 type Fila = {
   id: string
@@ -101,9 +104,20 @@ export default function ProgresoTabla({
     return copia
   }, [filtradas, claveOrden, direccion])
 
-  const totalPaginas = Math.max(1, Math.ceil(ordenadas.length / POR_PAGINA))
+    const totalPaginas = Math.max(1, Math.ceil(ordenadas.length / POR_PAGINA))
   const paginaActual = Math.min(pagina, totalPaginas)
   const paginadas = ordenadas.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA)
+
+  const exportar = () => {
+    const filas = ordenadas.map((f) => ({
+      '#': f.orden < 999999 ? f.orden : '',
+      Programa: f.nombre,
+      Tipo: ETIQUETA_TIPO[f.tipo] ?? f.tipo,
+      Área: f.area,
+      Estado: ETIQUETA_ESTADO[f.estado].label,
+    }))
+    descargarCSV(`progreso-${new Date().toISOString().split('T')[0]}.csv`, filas)
+  }
 
   const th = (clave: ClaveOrden, label: string) => (
     <th
@@ -154,7 +168,7 @@ export default function ProgresoTabla({
           <option value="aba_clasico">Aprendizaje Directo</option>
           <option value="rft">Aprendizaje Relacional</option>
         </select>
-        <select
+                <select
           value={filtroEstado}
           onChange={(e) => {
             setFiltroEstado(e.target.value)
@@ -167,6 +181,16 @@ export default function ProgresoTabla({
           <option value="adquisicion">En adquisición</option>
           <option value="sin_ensenar">Sin enseñar</option>
         </select>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={exportar}
+          disabled={ordenadas.length === 0}
+          className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40"
+        >
+          Exportar CSV ({ordenadas.length})
+        </button>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
