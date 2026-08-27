@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { descargarCSV } from '@/utils/csv'
 
 type Sesion = {
   id: string
@@ -72,6 +73,19 @@ export default function FacturacionClient({
     return { total: sesionesFiltradas.length, asistio, cancelada, noAsistio }
   }, [sesionesFiltradas])
 
+  const nombreAlumnoSeleccionado = alumnos.find((a) => a.id === filtroAlumnoId)?.nombre_anonimizado ?? 'alumno'
+
+  const exportar = () => {
+    const filas = sesionesFiltradas.map((s) => ({
+      Alumno: nombreAlumnoSeleccionado,
+      Fecha: new Date(s.fecha_hora).toLocaleDateString('es-ES'),
+      Terapeuta: s.terapeuta?.nombre ?? '—',
+      Estado: ETIQUETA_ESTADO[s.estado].label,
+      'Confirmada por familia': s.confirmada_familia ? 'Sí' : 'Pendiente',
+    }))
+    descargarCSV(`facturacion-${nombreAlumnoSeleccionado}-${filtroDesde}-a-${filtroHasta}.csv`, filas)
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
@@ -106,7 +120,7 @@ export default function FacturacionClient({
           <p className="text-sm text-slate-400">Selecciona un alumno para ver sus sesiones realizadas.</p>
         )}
       </div>
-      {filtroAlumnoId && (
+            {filtroAlumnoId && (
         <>
           {(() => {
             const datos = datosFacturacion.find((d) => d.alumno_id === filtroAlumnoId)
@@ -146,6 +160,16 @@ export default function FacturacionClient({
               <p className="text-xl font-bold text-rose-600">{resumen.noAsistio}</p>
               <p className="text-xs text-slate-500">No asistió</p>
             </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={exportar}
+              disabled={sesionesFiltradas.length === 0}
+              className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40"
+            >
+              Exportar CSV
+            </button>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
