@@ -166,7 +166,39 @@ export default async function Home() {
           </div>
         </div>
       </section>
-            <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
+            <section className="mx-auto max-w-3xl px-4 py-20 sm:px-8">
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-10">
+          <img
+            src="/javier-hilinger.jpg"
+            alt="Javier Hilinger"
+            className="h-32 w-32 shrink-0 rounded-full object-cover ring-4 ring-indigo-50 sm:h-40 sm:w-40"
+          />
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Quién hay detrás</p>
+            <h2 className="mt-1 text-2xl font-bold text-slate-900">Javier Hilinger</h2>
+            <p className="text-sm text-slate-500">
+              Licenciado en Psicología · Programa de doctorado en Análisis Funcional en
+              Contextos Clínicos y de la Salud, Universidad de Almería
+            </p>
+            <p className="mt-4 text-base leading-relaxed text-slate-700">
+              Desde hace 16 años dirijo <strong>ABA Almería</strong>, centro dedicado a
+              niños con autismo, donde he sido pionero en habla hispana en el desarrollo
+              de programas basados en la Teoría del Marco Relacional (RFT). También
+              dirijo <strong>Eureka Psicología</strong>, centrado en terapia para adultos
+              desde una perspectiva contextual y la Terapia de Aceptación y Compromiso
+              (ACT).
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-slate-700">
+              He impartido formaciones y presentado en congresos nacionales e
+              internacionales sobre RFT y ACT. Abacontext nace de esa misma experiencia
+              clínica de 16 años — y de mi otra faceta como desarrollador de software —
+              para dar a otras clínicas ABA el mismo camino hacia lo relacional que yo
+              mismo recorrí.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
         <h2 className="text-2xl font-bold text-slate-900">Precio simple</h2>
         <div className="mt-8 rounded-2xl border border-slate-200 p-8">
           <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-400">/mes</span></p>
