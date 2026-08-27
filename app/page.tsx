@@ -186,13 +186,24 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-100 py-8">
+            <footer className="border-t border-slate-100 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-400 sm:flex-row sm:px-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="h-5 w-5" />
             <span>abacontext</span>
           </div>
-          <p>© {new Date().getFullYear()} Abacontext</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+            <Link href="/legal/privacidad" className="hover:text-slate-600">
+              Privacidad
+            </Link>
+            <Link href="/legal/terminos" className="hover:text-slate-600">
+              Términos
+            </Link>
+            <Link href="/legal/aviso-legal" className="hover:text-slate-600">
+              Aviso Legal
+            </Link>
+          </div>
+          <p>© {new Date().getFullYear()} abacontext</p>
         </div>
       </footer>
     </div>

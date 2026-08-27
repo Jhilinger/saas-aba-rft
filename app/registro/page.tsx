@@ -93,6 +93,20 @@ export default function RegistroPage() {
             <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>
           )}
 
+                    <label className="flex items-start gap-2 text-xs text-slate-500">
+            <input type="checkbox" name="acepta_terminos" required className="mt-0.5" />
+            <span>
+              He leído y acepto los{' '}
+              <a href="/legal/terminos" target="_blank" className="text-indigo-600 hover:underline">
+                Términos de Uso
+              </a>{' '}
+              y la{' '}
+              <a href="/legal/privacidad" target="_blank" className="text-indigo-600 hover:underline">
+                Política de Privacidad
+              </a>.
+            </span>
+          </label>
+
           <button
             type="submit"
             disabled={isPending}
