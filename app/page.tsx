@@ -224,7 +224,10 @@ export default async function Home() {
             <AbacontextIcon className="h-5 w-5" />
             <span>abacontext</span>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+                    <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+            <Link href="/faq" className="hover:text-slate-600">
+              Preguntas frecuentes
+            </Link>
             <Link href="/legal/privacidad" className="hover:text-slate-600">
               Privacidad
             </Link>
