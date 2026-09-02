@@ -32,7 +32,7 @@ export default function MobileNav({
                 <div className="flex items-center gap-2">
           <AbacontextIcon className="w-6 h-6" />
           <div>
-            <p className="text-sm font-bold text-slate-800">Abacontext</p>
+            <p className="text-sm font-bold text-slate-800">abacontext</p>
           <p className="text-xs text-slate-400">
             {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
           </p>
@@ -75,10 +75,10 @@ export default function MobileNav({
 
             {enModoAlumno && volver && (
               <div className="mb-4">
-                <Link
+                                <Link
                   href={volver.href}
                   onClick={() => setAbierto(false)}
-                  className="text-xs text-slate-400 hover:text-slate-600"
+                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
                 >
                   {volver.label}
                 </Link>
@@ -94,8 +94,8 @@ export default function MobileNav({
                 grupoAnterior = e.grupo
                 return (
                   <div key={e.href}>
-                    {mostrarCabecera && (
-                      <p className={`mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 ${i === 0 ? '' : 'mt-4'}`}>
+                      {mostrarCabecera && (
+                      <p className={`mb-2 px-3 text-xs font-bold uppercase tracking-wide text-slate-600 border-b border-slate-100 pb-1 ${i === 0 ? '' : 'mt-4'}`}>
                         {NOMBRE_GRUPO[e.grupo!]}
                       </p>
                     )}

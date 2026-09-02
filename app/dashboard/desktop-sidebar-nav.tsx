@@ -19,7 +19,7 @@ export default function DesktopSidebarNav({ enlacesRol }: { enlacesRol: Enlace[]
     <nav className="flex-1">
       {enModoAlumno && volver && (
         <div className="mb-4">
-          <Link href={volver.href} className="text-xs text-slate-400 hover:text-slate-600">
+            <Link href={volver.href} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
             {volver.label}
           </Link>
           {alumnoNombre && (
@@ -33,8 +33,8 @@ export default function DesktopSidebarNav({ enlacesRol }: { enlacesRol: Enlace[]
         grupoAnterior = e.grupo
         return (
           <div key={e.href}>
-            {mostrarCabecera && (
-              <p className={`mb-2 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400 ${i === 0 ? '' : 'mt-6'}`}>
+                        {mostrarCabecera && (
+              <p className={`mb-2 px-3 text-xs font-bold uppercase tracking-wide text-slate-600 border-b border-slate-100 pb-1 ${i === 0 ? '' : 'mt-6'}`}>
                 {NOMBRE_GRUPO[e.grupo!]}
               </p>
             )}
