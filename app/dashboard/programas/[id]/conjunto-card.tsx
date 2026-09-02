@@ -108,13 +108,13 @@ export default function ConjuntoCard({
         </div>
       </div>
 
-      <ul className="space-y-1">
+            <ul className="space-y-1">
         {conjunto.estimulos_alumno.map((e) => (
           <li
             key={e.id}
             className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm gap-2"
           >
-            <span>
+            <span className="text-slate-800">
               <strong>{e.nombre}</strong>
               {e.descripcion ? ` — ${e.descripcion}` : ''}
             </span>

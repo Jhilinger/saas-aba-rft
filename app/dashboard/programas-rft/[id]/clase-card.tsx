@@ -103,11 +103,11 @@ export default function ClaseCard({
         <p className="mb-1 text-xs font-medium text-slate-500">Estímulos</p>
         <ul className="space-y-1">
           {clase.estimulos_rft.map((e) => (
-            <li
+              <li
               key={e.id}
               className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
             >
-              <span>
+              <span className="text-slate-800">
                 <strong>{e.etiqueta}</strong>
                 {e.posicion ? (
                   <span className="ml-1 rounded bg-indigo-100 px-1.5 py-0.5 text-xs text-indigo-700">
@@ -181,11 +181,11 @@ export default function ClaseCard({
           <p className="mb-1 text-xs font-medium text-slate-500">Relaciones entrenadas</p>
           <ul className="space-y-1">
             {clase.relaciones_entrenadas_rft.map((r) => (
-              <li
+                <li
                 key={r.id}
                 className="flex items-center justify-between rounded-lg bg-indigo-50 px-3 py-2 text-sm"
               >
-                <span>
+                <span className="text-indigo-800">
                   {nombreEstimuloPorId(r.estimulo_origen_id)} → {nombreEstimuloPorId(r.estimulo_destino_id)}
                 </span>
                 <button

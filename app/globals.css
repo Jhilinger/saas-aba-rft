@@ -27,10 +27,10 @@ body {
 input,
 textarea,
 select {
-  color: #1e293b; /* slate-800, texto oscuro y legible */
+  color: #1e293b !important; /* slate-800, texto oscuro y legible */
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #94a3b8; /* slate-400, para diferenciar placeholder de texto real */
+  color: #94a3b8 !important; /* slate-400, para diferenciar placeholder de texto real */
 }

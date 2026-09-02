@@ -38,9 +38,9 @@ export default function MobileNav({
           </p>
         </div>
       </div>  
-        <button
+                <button
           onClick={() => setAbierto(true)}
-          className="rounded-lg border border-slate-300 p-2"
+          className="rounded-lg border border-slate-300 p-2 text-slate-700"
           aria-label="Abrir menú"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
