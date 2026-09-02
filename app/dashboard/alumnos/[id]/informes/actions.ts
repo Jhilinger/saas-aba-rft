@@ -82,7 +82,25 @@ export async function generarInforme(
       ? preferencias.map((p) => `${p.nombre} (${ETIQUETA_TIPO[p.tipo] ?? p.tipo})`).join(', ')
       : null
 
-  // --- Asistencia del período ---
+  // --- Evaluaciones formales de preferencia (MSWO/MSW) del período ---
+  const { data: evaluacionesPref } = await supabase
+    .from('evaluaciones_preferencia')
+    .select('fecha, tipo, resultado')
+    .eq('alumno_id', alumnoId)
+    .gte('fecha', periodoDesde)
+    .lt('fecha', periodoHasta + 'T23:59:59.999')
+    .order('fecha', { ascending: true })
+
+  let textoEvaluacionesPref: string | null = null
+  if (evaluacionesPref && evaluacionesPref.length > 0) {
+    textoEvaluacionesPref = evaluacionesPref
+      .map((e) => {
+        const top3 = (e.resultado as any[]).slice(0, 3).map((r) => r.item).join(', ')
+        return `${e.tipo === 'mswo' ? 'MSWO' : 'MSW'} el ${e.fecha.split('T')[0]}: más preferidos → ${top3}`
+      })
+      .join('; ')
+  }
+    // --- Asistencia del período ---
   const { data: sesionesPeriodo } = await supabase
     .from('sesiones_programadas')
     .select('estado')
@@ -102,7 +120,7 @@ export async function generarInforme(
   // --- Programas del alumno ---
   const { data: programas } = await supabase
     .from('programas_alumno')
-    .select('id, nombre, tipo, area, estado, porcentaje_dominio')
+    .select('id, nombre, tipo, area, estado, porcentaje_dominio, formato_recogida, direccion_objetivo')
     .eq('alumno_id', alumnoId)
 
   // Agrupamos el texto recopilado POR ÁREA, no por programa suelto
@@ -157,8 +175,7 @@ export async function generarInforme(
         .order('fecha', { ascending: true })
 
       if (!bloques || bloques.length === 0) continue
-
-      const gruposDelPeriodo = [...new Set(bloques.map((b) => b.grupo))]
+            const gruposDelPeriodo = [...new Set(bloques.map((b) => b.grupo))]
 
       for (const grupo of gruposDelPeriodo) {
         const bloquesGrupo = bloques.filter((b) => b.grupo === grupo)
@@ -176,6 +193,86 @@ export async function generarInforme(
           (dominadas ? `Combinaciones ya dominadas: ${dominadas}\n` : '') +
           (notas ? `Notas del terapeuta:\n${notas}\n` : '')
         )
+      }
+    } else if (programa.tipo === 'conducta') {
+      const direccion = programa.direccion_objetivo === 'reducir' ? 'reducir' : 'aumentar'
+      const notaDireccion = `Objetivo: ${direccion === 'reducir' ? 'DISMINUIR' : 'AUMENTAR'} esta conducta — si el % baja/sube en el sentido de "${direccion}", es progreso positivo.`
+
+      if (programa.formato_recogida === 'tasa') {
+        const { data: bloques } = await supabase
+          .from('bloques_tasa')
+          .select('fecha, tasa_por_minuto, notas')
+          .eq('programa_alumno_id', programa.id)
+          .gte('fecha', periodoDesde)
+          .lt('fecha', periodoHasta + 'T23:59:59.999')
+          .order('fecha', { ascending: true })
+
+        if (bloques && bloques.length > 0) {
+          const valores = bloques.map((b) => `${b.tasa_por_minuto}/min`).join(', ')
+          const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
+          anadirAArea(
+            'Conducta',
+            `Registro de conducta "${programa.nombre}" (Tasa). ${notaDireccion}\n` +
+            `Valores del período: ${valores}\n` +
+            (notas ? `Notas del terapeuta:\n${notas}\n` : '')
+          )
+        }
+      } else if (programa.formato_recogida === 'duracion') {
+        const { data: bloques } = await supabase
+          .from('bloques_duracion')
+          .select('fecha, porcentaje, notas')
+          .eq('programa_alumno_id', programa.id)
+          .gte('fecha', periodoDesde)
+          .lt('fecha', periodoHasta + 'T23:59:59.999')
+          .order('fecha', { ascending: true })
+
+        if (bloques && bloques.length > 0) {
+          const valores = bloques.map((b) => `${b.porcentaje}%`).join(', ')
+          const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
+          anadirAArea(
+            'Conducta',
+            `Registro de conducta "${programa.nombre}" (Duración, % del tiempo de sesión). ${notaDireccion}\n` +
+            `Valores del período: ${valores}\n` +
+            (notas ? `Notas del terapeuta:\n${notas}\n` : '')
+          )
+        }
+      } else if (programa.formato_recogida === 'intervalo') {
+        const { data: bloques } = await supabase
+          .from('bloques_intervalo')
+          .select('fecha, porcentaje, notas')
+          .eq('programa_alumno_id', programa.id)
+          .gte('fecha', periodoDesde)
+          .lt('fecha', periodoHasta + 'T23:59:59.999')
+          .order('fecha', { ascending: true })
+
+        if (bloques && bloques.length > 0) {
+          const valores = bloques.map((b) => `${b.porcentaje}%`).join(', ')
+          const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
+          anadirAArea(
+            'Conducta',
+            `Registro de conducta "${programa.nombre}" (Intervalo, % de intervalos con conducta). ${notaDireccion}\n` +
+            `Valores del período: ${valores}\n` +
+            (notas ? `Notas del terapeuta:\n${notas}\n` : '')
+          )
+        }
+      } else if (programa.formato_recogida === 'abc') {
+        const { data: registros } = await supabase
+          .from('registros_abc')
+          .select('fecha_hora, antecedente, conducta, consecuencia')
+          .eq('programa_alumno_id', programa.id)
+          .gte('fecha_hora', periodoDesde)
+          .lt('fecha_hora', periodoHasta + 'T23:59:59.999')
+          .order('fecha_hora', { ascending: true })
+
+        if (registros && registros.length > 0) {
+          const episodios = registros
+            .map((r) => `Antecedente: ${r.antecedente}. Conducta: ${r.conducta}. Consecuencia: ${r.consecuencia}.`)
+            .join('\n')
+          anadirAArea(
+            'Conducta',
+            `Registro narrativo ABC "${programa.nombre}" — ${registros.length} episodio(s) registrado(s) en el período:\n${episodios}`
+          )
+        }
       }
     }
   }
@@ -199,14 +296,13 @@ export async function generarInforme(
   const prompt = `Eres un asistente que redacta informes de progreso para un centro de terapia infantil especializado en autismo (métodos ABA/RFT).
 
 ${instruccionTono}
-
 FORMATO OBLIGATORIO:
 - No uses markdown de ningún tipo (nada de **, #, -, *, listas con guiones). Solo texto plano.
 - Cada título de sección debe ir en su propia línea, EN MAYÚSCULAS y sin ningún símbolo delante (ej.: INTRODUCCIÓN, en vez de "## Introducción" o "**Introducción**").
 - Extensión objetivo: entre 300 y 500 palabras en total.
 - Estructura exacta:
   1. Título "INTRODUCCIÓN" — 2-3 frases situando el período y el alumno. Si hay reforzadores/preferencias conocidos, puedes mencionarlos brevemente aquí como contexto (ej. "durante las sesiones se han utilizado sus reforzadores habituales, como..."), sin dedicarles una sección propia. Si hay datos de asistencia, menciona aquí también de forma breve cuántas sesiones hubo y cuántas se asistieron.
-  2. Un apartado por cada ÁREA de trabajo (usa el nombre del área, ya en mayúsculas, como título). DENTRO de cada área, combina TODOS los programas de esa área en un único párrafo fluido y natural — NO crees un sub-apartado ni un título separado para cada programa individual, intégralos en el mismo relato.
+  2. Un apartado por cada ÁREA de trabajo (usa el nombre del área, ya en mayúsculas, como título). DENTRO de cada área, combina TODOS los programas de esa área en un único párrafo fluido y natural — NO crees un sub-apartado ni un título separado para cada programa individual, intégralos en el mismo relato. El área "CONDUCTA" (si existe) sigue esta misma regla: combina todos los registros de conducta del período en un relato fluido.
   3. Título "RESUMEN" — 1-2 frases de cierre general.
 
 REGLAS DE CONTENIDO:
@@ -215,11 +311,12 @@ REGLAS DE CONTENIDO:
 - Integra las notas del terapeuta de forma natural en el relato, no las cites literalmente entre comillas.
 - Los reforzadores/preferencias son solo contexto de fondo, no un progreso a describir — menciónalos como mucho una vez, brevemente.
 - La asistencia es un dato objetivo a mencionar brevemente en la introducción, sin interpretarla (no valores si es "buena" o "mala" asistencia, solo indica las cifras).
+- Para los registros de CONDUCTA: presta mucha atención a si el objetivo es "aumentar" o "reducir" (te lo indico explícitamente en cada registro) — nunca describas una bajada de porcentaje como "empeoramiento" si el objetivo era precisamente reducir esa conducta, y viceversa.
 
 DATOS DEL ALUMNO:
 - Iniciales: ${alumno.nombre_anonimizado}
 - Edad: ${edad} años
-${destinatario === 'formal' && alumno.diagnostico ? `- Diagnóstico: ${alumno.diagnostico}\n` : ''}${textoPreferencias ? `- Reforzadores/preferencias conocidos: ${textoPreferencias}\n` : ''}${textoAsistencia ? `- Asistencia del período: ${textoAsistencia}\n` : ''}- Centro: ${clinica?.nombre ?? 'Centro de terapia'}
+${destinatario === 'formal' && alumno.diagnostico ? `- Diagnóstico: ${alumno.diagnostico}\n` : ''}${textoPreferencias ? `- Reforzadores/preferencias conocidos: ${textoPreferencias}\n` : ''}${textoEvaluacionesPref ? `- Evaluación formal de preferencias en el período: ${textoEvaluacionesPref}\n` : ''}${textoAsistencia ? `- Asistencia del período: ${textoAsistencia}\n` : ''}- Centro: ${clinica?.nombre ?? 'Centro de terapia'}
 - Período del informe: ${periodoDesde} a ${periodoHasta}
 
 DATOS DEL PERÍODO (agrupados por área):
