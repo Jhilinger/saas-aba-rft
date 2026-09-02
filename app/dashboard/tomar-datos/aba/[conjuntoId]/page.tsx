@@ -30,10 +30,10 @@ export default async function TomarDatosAbaPage({
     redirect('/dashboard')
   }
 
-  const { data: conjunto } = await supabase
+    const { data: conjunto } = await supabase
     .from('conjuntos_estimulos_alumno')
     .select(
-      'id, nombre, estado, programa_alumno_id, estimulos_alumno(id, nombre), programas_alumno(id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles))'
+      'id, nombre, estado, programa_alumno_id, estimulos_alumno(id, nombre), programas_alumno(id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url))'
     )
     .eq('id', conjuntoId)
     .single()

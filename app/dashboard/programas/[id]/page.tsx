@@ -7,6 +7,7 @@ import EvolucionChart from './evolucion-chart'
 import { obtenerEvolucionAba } from './evolucion-actions'
 import ProgramaAbaTabs from './programa-aba-tabs'
 import EstadoProgramaSelector from './estado-programa-selector'
+import VideoDiferido from '../../video-diferido'
 
 const COLORES = ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2']
 
@@ -31,10 +32,10 @@ export default async function ProgramaAlumnoPage({
     redirect('/dashboard')
   }
 
-  const { data: programa } = await supabase
+    const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, alumnos(nombre_anonimizado)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -112,10 +113,16 @@ export default async function ProgramaAlumnoPage({
             <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
           </div>
         )}
-        {programa.ayudas_posibles && (
+                {programa.ayudas_posibles && (
           <div>
             <span className="text-slate-400">Ayudas posibles</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
+          </div>
+        )}
+        {(programa.programas_base as any)?.video_url && (
+          <div>
+            <span className="text-slate-400">Vídeo de ejemplo</span>
+            <VideoDiferido url={(programa.programas_base as any).video_url} />
           </div>
         )}
         {!tieneInfo && (
