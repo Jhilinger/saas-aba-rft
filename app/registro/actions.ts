@@ -55,7 +55,9 @@ export async function iniciarRegistro(formData: FormData) {
       success_url: `${URL_BASE}/registro/completado?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${URL_BASE}/registro`,
       metadata: metadataComun,
-      subscription_data: {
+            subscription_data: {
+        trial_period_days: 14,
+        ...(pais === 'España' ? { default_tax_rates: [process.env.STRIPE_TAX_RATE_ID!] } : {}),
         metadata: metadataComun,
       },
     })
