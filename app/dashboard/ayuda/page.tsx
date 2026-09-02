@@ -12,7 +12,13 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
       resumen: 'Crea tu equipo de terapeutas, da de alta a tus alumnos, y configura el currículo de tu clínica.',
     },
   ],
-  terapeuta: [],
+  terapeuta: [
+    {
+      href: '/dashboard/ayuda/dia-a-dia-terapeuta',
+      titulo: 'Tu día a día como terapeuta',
+      resumen: 'Agenda, toma de datos en el PEI, Registros de conducta, preferencias, y progreso.',
+    },
+  ],
   familia: [],
 }
 
