@@ -1,7 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import PreferenciasSection from '../preferencias-section'
-import { listarPreferencias } from './actions'
+import EvaluacionPreferencia from './evaluacion-preferencia'
+import { listarPreferencias, listarEvaluacionesPreferencia } from './actions'
 
 export default async function PreferenciasAlumnoPage({
   params,
@@ -27,11 +28,13 @@ export default async function PreferenciasAlumnoPage({
   const { data: alumno } = await supabase.from('alumnos').select('id').eq('id', id).single()
   if (!alumno) notFound()
 
-  const preferenciasIniciales = await listarPreferencias(id)
+    const preferenciasIniciales = await listarPreferencias(id)
+  const evaluacionesIniciales = await listarEvaluacionesPreferencia(id)
 
-    return (
-    <div className="space-y-4">
+  return (
+    <div className="space-y-8">
       <h2 className="text-lg font-semibold text-slate-800">Preferencias</h2>
+      <EvaluacionPreferencia alumnoId={id} evaluacionesIniciales={evaluacionesIniciales as any} />
       <PreferenciasSection alumnoId={id} preferenciasIniciales={preferenciasIniciales as any} />
     </div>
   )
