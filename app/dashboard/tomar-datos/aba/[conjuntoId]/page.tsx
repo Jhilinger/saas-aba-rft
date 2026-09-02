@@ -57,7 +57,7 @@ export default async function TomarDatosAbaPage({
         </h1>
       </div>
 
-      <TomarDatosClient
+            <TomarDatosClient
         conjuntoId={conjunto.id}
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
@@ -65,6 +65,7 @@ export default async function TomarDatosAbaPage({
         ensayosPorBloque={programa.ensayos_por_bloque}
         instrucciones={programa.programas_base?.instrucciones_terapeuta ?? null}
         ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
+        videoUrl={programa.programas_base?.video_url ?? null}
         faseConjunto={conjunto.estado as any}
       />
     </div>

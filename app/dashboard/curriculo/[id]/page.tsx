@@ -4,6 +4,7 @@ import Link from 'next/link'
 import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
 import EditarProgramaForm from './editar-programa-form'
+import VideoDiferido from '../../video-diferido'
 
 export default async function ProgramaDetallePage({
   params,
@@ -26,10 +27,10 @@ export default async function ProgramaDetallePage({
     redirect('/dashboard')
   }
 
-  const { data: programa } = await supabase
+    const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por'
+      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url'
     )
     .eq('id', id)
     .single()
@@ -82,6 +83,12 @@ export default async function ProgramaDetallePage({
             {programa.ayudas_posibles || '—'}
           </p>
         </div>
+        {programa.video_url && (
+          <div className="sm:col-span-3">
+            <span className="text-slate-400">Vídeo de ejemplo</span>
+            <VideoDiferido url={programa.video_url} />
+          </div>
+        )}
         {programa.tipo === 'rft' && (
           <div className="sm:col-span-3">
             <span className="text-slate-400">Tipo de relación</span>

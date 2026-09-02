@@ -18,6 +18,7 @@ type Programa = {
   porcentaje_dominio: number
   tipo_relacion: string | null
   orden: number | null
+  video_url: string | null
 }
 
 export default function EditarProgramaForm({ programa }: { programa: Programa }) {
@@ -163,13 +164,24 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
         </div>
-        <div className="space-y-1">
+                <div className="space-y-1">
           <label className="text-sm text-slate-600">% de dominio</label>
           <input
             name="porcentaje_dominio"
             type="number"
             step="0.01"
             defaultValue={programa.porcentaje_dominio}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+          />
+        </div>
+
+        <div className="sm:col-span-2 space-y-1">
+          <label className="text-sm text-slate-600">Vídeo de ejemplo (opcional)</label>
+          <input
+            name="video_url"
+            type="url"
+            defaultValue={programa.video_url ?? ''}
+            placeholder="https://youtube.com/watch?v=... (recomendado: subido como 'No listado')"
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
         </div>

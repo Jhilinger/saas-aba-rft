@@ -33,10 +33,10 @@ export default async function TomarDatosRftPage({
     redirect('/dashboard')
   }
 
-  const { data: programa } = await supabase
+    const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles)'
+      'id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
     )
     .eq('id', programaId)
     .single()
@@ -66,13 +66,14 @@ export default async function TomarDatosRftPage({
         </h1>
       </div>
 
-      <TomarDatosRftClient
+            <TomarDatosRftClient
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
         clases={(clases as any) ?? []}
         ensayosPorBloqueDefecto={programa.ensayos_por_bloque}
         instrucciones={(programa.programas_base as any)?.instrucciones_terapeuta ?? null}
         ayudasPosibles={(programa.programas_base as any)?.ayudas_posibles ?? null}
+        videoUrl={(programa.programas_base as any)?.video_url ?? null}
         grupoInicial={grupo ?? null}
       />
     </div>

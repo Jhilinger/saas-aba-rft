@@ -209,6 +209,7 @@ export async function clonarPrograma(id: string) {
       ensayos_por_bloque: original.ensayos_por_bloque,
       bloques_para_dominio: original.bloques_para_dominio,
       porcentaje_dominio: original.porcentaje_dominio,
+      video_url: original.video_url,
       orden: null,
       clinica_id: original.clinica_id,
       visibilidad: original.visibilidad,

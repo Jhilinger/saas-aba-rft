@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueRft } from './actions'
+import VideoDiferido from '../../../video-diferido'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -83,6 +84,7 @@ export default function TomarDatosRftClient({
   ensayosPorBloqueDefecto,
   instrucciones,
   ayudasPosibles,
+  videoUrl,
   grupoInicial,
 }: {
   programaAlumnoId: string
@@ -91,6 +93,7 @@ export default function TomarDatosRftClient({
   ensayosPorBloqueDefecto: number
   instrucciones: string | null
   ayudasPosibles: string | null
+  videoUrl: string | null
   grupoInicial?: string | null
 }) {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<string | null>(grupoInicial ?? null)
@@ -400,7 +403,7 @@ export default function TomarDatosRftClient({
         )}
       </div>
 
-      {(instrucciones || ayudasPosibles) && (
+            {(instrucciones || ayudasPosibles || videoUrl) && (
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
           {instrucciones && (
             <div>
@@ -412,6 +415,12 @@ export default function TomarDatosRftClient({
             <div>
               <strong>Ayudas sugeridas:</strong>
               <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
+            </div>
+          )}
+          {videoUrl && (
+            <div>
+              <strong>Vídeo de ejemplo:</strong>
+              <VideoDiferido url={videoUrl} />
             </div>
           )}
         </div>

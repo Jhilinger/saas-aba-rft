@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueAba } from './actions'
+import VideoDiferido from '../../../video-diferido'
 
 type Estimulo = { id: string; nombre: string }
 
@@ -61,6 +62,7 @@ export default function TomarDatosClient({
   ensayosPorBloque,
   instrucciones,
   ayudasPosibles,
+  videoUrl,
   faseConjunto,
 }: {
   conjuntoId: string
@@ -70,6 +72,7 @@ export default function TomarDatosClient({
   ensayosPorBloque: number
   instrucciones: string | null
   ayudasPosibles: string | null
+  videoUrl: string | null
   faseConjunto: 'linea_base' | 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
 }) {
   const enLineaBase = faseConjunto === 'linea_base'
@@ -227,7 +230,7 @@ export default function TomarDatosClient({
         </div>
       )}
 
-      {(instrucciones || ayudasPosibles) && (
+            {(instrucciones || ayudasPosibles || videoUrl) && (
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
           {instrucciones && (
             <div>
@@ -239,6 +242,12 @@ export default function TomarDatosClient({
             <div>
               <strong>Ayudas sugeridas:</strong>
               <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
+            </div>
+          )}
+          {videoUrl && (
+            <div>
+              <strong>Vídeo de ejemplo:</strong>
+              <VideoDiferido url={videoUrl} />
             </div>
           )}
         </div>
