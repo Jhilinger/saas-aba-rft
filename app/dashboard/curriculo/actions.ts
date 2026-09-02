@@ -43,6 +43,7 @@ export async function crearPrograma(formData: FormData) {
       ensayos_por_bloque: parseInt(formData.get('ensayos_por_bloque') as string) || 10,
       bloques_para_dominio: parseInt(formData.get('bloques_para_dominio') as string) || 3,
       porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
+      video_url: (formData.get('video_url') as string)?.trim() || null,
       creado_por: user.id,
       clinica_id: esGlobal ? null : perfil.clinica_id,
       visibilidad,
@@ -151,9 +152,10 @@ export async function editarPrograma(id: string, formData: FormData) {
     materiales: formData.get('materiales') as string,
     instrucciones_terapeuta: formData.get('instrucciones_terapeuta') as string,
     ayudas_posibles: formData.get('ayudas_posibles') as string,
-    ensayos_por_bloque: parseInt(formData.get('ensayos_por_bloque') as string) || 10,
+        ensayos_por_bloque: parseInt(formData.get('ensayos_por_bloque') as string) || 10,
     bloques_para_dominio: parseInt(formData.get('bloques_para_dominio') as string) || 3,
     porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
+    video_url: (formData.get('video_url') as string)?.trim() || null,
     tipo_relacion: tipo === 'rft' ? (formData.get('tipo_relacion') as string) : null,
   }
 
