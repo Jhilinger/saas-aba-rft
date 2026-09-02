@@ -80,12 +80,13 @@ export default async function Home() {
         <div className="mb-6 flex justify-center">
           <AbacontextIcon className="h-20 w-20" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          Del aprendizaje directo al relacional,<br className="hidden sm:block" /> en un mismo lugar
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+          ABA, con el aprendizaje<br className="hidden sm:block" /> relacional integrado
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-base text-slate-500 sm:text-lg">
-          Abacontext gestiona tu clínica de ABA y te acompaña a incorporar RFT — con la toma de datos,
-          la agenda, la familia y la facturación resueltas desde el primer día.
+          Un mismo currículo, una misma toma de datos, para trabajar habilidades directas y
+          relaciones — sin cambiar de herramienta. Agenda, familia y facturación, resueltas desde
+          el primer día.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
