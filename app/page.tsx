@@ -5,10 +5,10 @@ import AbacontextIcon from './abacontext-icon'
 
 function Nodo() {
   return (
-    <span className="relative inline-flex h-3 w-4 shrink-0 items-center">
-      <span className="absolute left-0 h-3 w-3 rounded-full bg-indigo-500 opacity-80" />
-      <span className="absolute left-1.5 h-3 w-3 rounded-full bg-amber-500 opacity-80" />
-    </span>
+    <svg viewBox="0 0 24 16" className="h-3 w-4 shrink-0" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 9 3 L 5 3 L 5 13 L 9 13" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M 15 3 L 19 3 L 19 13 L 15 13" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
@@ -49,6 +49,11 @@ export default async function Home() {
       texto:
         'Suscripción por alumno activo, portal de facturación propio, sin depender de una herramienta aparte.',
     },
+    {
+      titulo: 'Evaluación de preferencias',
+      texto:
+        'MSWO y MSW guiados paso a paso, con la jerarquía de preferencia calculada automáticamente al terminar.',
+    },
   ]
 
   return (
@@ -73,10 +78,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-4xl px-4 pt-12 pb-20 text-center sm:px-8 sm:pt-20">
         <div className="mb-6 flex justify-center">
-          <div className="relative h-20 w-28">
-            <div className="absolute left-0 top-0 h-16 w-16 rounded-full bg-indigo-500 opacity-80" />
-            <div className="absolute left-10 top-0 h-16 w-16 rounded-full bg-amber-500 opacity-80" />
-          </div>
+          <AbacontextIcon className="h-20 w-20" />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           Del aprendizaje directo al relacional,<br className="hidden sm:block" /> en un mismo lugar
@@ -166,7 +168,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
-            <section className="mx-auto max-w-3xl px-4 py-20 sm:px-8">
+
+      <section className="mx-auto max-w-3xl px-4 py-20 sm:px-8">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-10">
           <img
             src="/javier-hilinger.jpg"
@@ -198,7 +201,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
+            <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
         <h2 className="text-2xl font-bold text-slate-900">Precio simple</h2>
         <div className="mt-8 rounded-2xl border border-slate-200 p-8">
           <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-400">/mes</span></p>
@@ -218,13 +221,13 @@ export default async function Home() {
         </div>
       </section>
 
-            <footer className="border-t border-slate-100 py-8">
+      <footer className="border-t border-slate-100 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-400 sm:flex-row sm:px-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="h-5 w-5" />
             <span>abacontext</span>
           </div>
-                    <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
             <Link href="/faq" className="hover:text-slate-600">
               Preguntas frecuentes
             </Link>

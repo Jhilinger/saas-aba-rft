@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
           ciudad: metadata.ciudad ?? null,
           terminos_aceptados_at: metadata.terminos_aceptados_en ?? new Date().toISOString(),
           precio_fijo_mensual: 30,
-          precio_por_alumno: 5,
+          precio_por_alumno: 4,
           sin_facturacion: false,
           estado_suscripcion: suscripcion.status,
           stripe_customer_id: session.customer as string,
