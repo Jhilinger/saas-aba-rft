@@ -5,11 +5,26 @@ import Link from 'next/link'
 type Articulo = { href: string; titulo: string; resumen: string }
 
 const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
-  clinica_admin: [
+    clinica_admin: [
     {
       href: '/dashboard/ayuda/primeros-pasos-admin',
       titulo: 'Primeros pasos como administrador',
       resumen: 'Crea tu equipo de terapeutas, da de alta a tus alumnos, y configura el currículo de tu clínica.',
+    },
+    {
+      href: '/dashboard/ayuda/facturacion-admin',
+      titulo: 'Facturación y suscripción',
+      resumen: 'Cómo funciona el cobro de tu suscripción, y la facturación de cada alumno.',
+    },
+    {
+      href: '/dashboard/ayuda/documentos-legales-admin',
+      titulo: 'Documentos legales',
+      resumen: 'Crear plantillas de documentos y hacer seguimiento de las firmas de las familias.',
+    },
+    {
+      href: '/dashboard/ayuda/informes-lote-admin',
+      titulo: 'Informes en lote',
+      resumen: 'Genera el informe de progreso de varios alumnos a la vez.',
     },
   ],
   terapeuta: [
@@ -19,7 +34,13 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
       resumen: 'Agenda, toma de datos en el PEI, Registros de conducta, preferencias, y progreso.',
     },
   ],
-  familia: [],
+    familia: [
+    {
+      href: '/dashboard/ayuda/guia-familia',
+      titulo: 'Guía para familias',
+      resumen: 'Progreso, asistencia, informes, registros de conducta, documentos y facturación.',
+    },
+  ],
 }
 
 export default async function AyudaPage() {
