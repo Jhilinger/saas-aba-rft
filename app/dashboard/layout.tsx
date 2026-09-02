@@ -28,6 +28,7 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'perfiles' },
       { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'perfiles' },
       { href: '/dashboard/familia', label: 'Familia', grupo: 'perfiles' },
+      { href: '/dashboard/ayuda', label: 'Ayuda' }
     ]
     if (tambienTerapeuta) {
       enlaces.push(
@@ -45,6 +46,7 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos' },
       { href: '/dashboard/agenda', label: 'Agenda' },
       { href: '/dashboard/mis-programas', label: 'Mis programas' },
+      { href: '/dashboard/ayuda', label: 'Ayuda' }
     ]
   }
 
@@ -56,6 +58,7 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/mi-hijo/conducta', label: 'Registros de conducta' },
       { href: '/dashboard/mi-hijo/documentos', label: 'Documentos' },
       { href: '/dashboard/mi-hijo/facturacion', label: 'Facturación' },
+      { href: '/dashboard/ayuda', label: 'Ayuda' }
     ]
   }
 
