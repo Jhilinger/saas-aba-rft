@@ -77,8 +77,9 @@ export default function ConjuntoCard({
             </button>
           )}
           
+                      
             <a href={`/dashboard/tomar-datos/aba/${conjunto.id}`}
-            className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
+            className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 text-center"
           >
             Tomar datos
           </a>
@@ -101,7 +102,7 @@ export default function ConjuntoCard({
                 router.refresh()
               })
             }}
-            className="text-xs font-medium text-rose-500 hover:text-rose-700"
+            className="inline-flex items-center justify-center rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100"
           >
             Eliminar conjunto
           </button>
@@ -186,10 +187,10 @@ export default function ConjuntoCard({
           placeholder="Descripción (opcional)"
           className="w-full flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-1.5 text-base sm:text-sm"
         />
-        <button
+                <button
           type="submit"
           disabled={isPending}
-          className="rounded-lg bg-slate-100 px-3 py-1.5 text-base sm:text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+          className="rounded-lg bg-indigo-600 px-4 py-1.5 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
         >
           Añadir
         </button>
