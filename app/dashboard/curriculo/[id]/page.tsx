@@ -5,6 +5,8 @@ import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
 import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
+import NuevaClaseRftForm from './nueva-clase-rft-form'
+import ClaseRftBaseCard from './clase-rft-base-card'
 
 export default async function ProgramaDetallePage({
   params,
@@ -44,9 +46,15 @@ export default async function ProgramaDetallePage({
 
   if (!puedeVer) redirect('/dashboard')
 
-  const { data: conjuntos } = await supabase
+    const { data: conjuntos } = await supabase
     .from('conjuntos_estimulos_base')
     .select('id, nombre, estimulos_base(id, nombre, descripcion)')
+    .eq('programa_base_id', id)
+    .order('orden')
+
+  const { data: clasesRft } = await supabase
+    .from('clases_rft_base')
+    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion)')
     .eq('programa_base_id', id)
     .order('orden')
 
@@ -107,7 +115,7 @@ export default async function ProgramaDetallePage({
         </div>
       </div>
 
-      {programa.tipo === 'aba_clasico' && (
+            {programa.tipo === 'aba_clasico' && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Conjuntos de estímulos (plantilla)</h2>
           <NuevoConjuntoForm programaBaseId={id} />
@@ -120,6 +128,23 @@ export default async function ProgramaDetallePage({
 
           {(!conjuntos || conjuntos.length === 0) && (
             <p className="text-center text-slate-400">Sin conjuntos de estímulos todavía.</p>
+          )}
+        </section>
+      )}
+
+      {programa.tipo === 'rft' && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-slate-700">Clases (plantilla)</h2>
+          <NuevaClaseRftForm programaBaseId={id} />
+
+          <div className="space-y-4">
+            {clasesRft?.map((c: any) => (
+              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} />
+            ))}
+          </div>
+
+          {(!clasesRft || clasesRft.length === 0) && (
+            <p className="text-center text-slate-400">Sin clases todavía.</p>
           )}
         </section>
       )}

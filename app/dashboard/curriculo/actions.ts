@@ -225,7 +225,7 @@ export async function clonarPrograma(id: string) {
     return { error: insertError?.message ?? 'Error clonando el programa' }
   }
 
-  if (original.tipo === 'aba_clasico') {
+   if (original.tipo === 'aba_clasico') {
     const { data: conjuntos } = await supabase
       .from('conjuntos_estimulos_base')
       .select('nombre, orden, estimulos_base(nombre, descripcion, orden)')
@@ -250,9 +250,81 @@ export async function clonarPrograma(id: string) {
         )
       }
     }
+  } else if (original.tipo === 'rft') {
+    const { data: clases } = await supabase
+      .from('clases_rft_base')
+      .select('nombre, grupo, orden, estimulos_rft_base(etiqueta, nombre, posicion, orden)')
+      .eq('programa_base_id', id)
+      .order('orden')
+
+    for (const clase of clases ?? []) {
+      const { data: nuevaClase } = await supabase
+        .from('clases_rft_base')
+        .insert({ programa_base_id: nuevo.id, nombre: clase.nombre, grupo: clase.grupo, orden: clase.orden })
+        .select('id')
+        .single()
+
+      if (nuevaClase && clase.estimulos_rft_base?.length) {
+        await supabase.from('estimulos_rft_base').insert(
+          clase.estimulos_rft_base.map((e: any) => ({
+            clase_base_id: nuevaClase.id,
+            etiqueta: e.etiqueta,
+            nombre: e.nombre,
+            posicion: e.posicion,
+            orden: e.orden,
+          }))
+        )
+      }
+    }
   }
 
   revalidatePath('/dashboard/curriculo')
   revalidatePath('/dashboard/mis-programas')
   return { success: true, id: nuevo.id }
+}
+
+// --- CLASES RFT BASE (solo programas RFT) ---
+
+export async function crearClaseRftBase(programaBaseId: string, nombre: string, grupo: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('clases_rft_base')
+    .insert({ programa_base_id: programaBaseId, nombre, grupo })
+    .select('id')
+    .single()
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true, id: data.id }
+}
+
+export async function eliminarClaseRftBase(id: string, programaBaseId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('clases_rft_base').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
+}
+
+export async function crearEstimuloRftBase(
+  claseBaseId: string,
+  programaBaseId: string,
+  etiqueta: string,
+  nombre: string,
+  posicion: string
+) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('estimulos_rft_base')
+    .insert({ clase_base_id: claseBaseId, etiqueta, nombre, posicion })
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
+}
+
+export async function eliminarEstimuloRftBase(id: string, programaBaseId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('estimulos_rft_base').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
 }
