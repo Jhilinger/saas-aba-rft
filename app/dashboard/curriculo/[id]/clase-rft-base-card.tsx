@@ -80,7 +80,6 @@ export default function ClaseRftBaseCard({
                   sin posición
                 </span>
               )}
-              {' '}— {e.nombre}
             </span>
             <button
               onClick={() => {
