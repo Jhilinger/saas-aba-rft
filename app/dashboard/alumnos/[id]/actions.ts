@@ -14,10 +14,10 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 
-  const { data: base, error: baseError } = await supabase
+    const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden'
+      'nombre, tipo, tipo_relacion, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden'
     )
     .eq('id', programaBaseId)
     .single()
@@ -75,13 +75,43 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
         .select('id')
         .single()
 
-      if (nuevoConjunto && conjunto.estimulos_base?.length) {
+            if (nuevoConjunto && conjunto.estimulos_base?.length) {
         await supabase.from('estimulos_alumno').insert(
           conjunto.estimulos_base.map((e: any) => ({
             conjunto_id: nuevoConjunto.id,
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+          }))
+        )
+      }
+    }
+  } else if (base.tipo === 'rft') {
+    const { data: clasesBase } = await supabase
+      .from('clases_rft_base')
+      .select('id, nombre, grupo, orden, estimulos_rft_base(etiqueta, nombre, posicion, orden)')
+      .eq('programa_base_id', programaBaseId)
+      .order('orden')
+
+    for (const clase of clasesBase ?? []) {
+      const { data: nuevaClase } = await supabase
+        .from('clases_rft')
+        .insert({
+          programa_alumno_id: programaAlumno.id,
+          nombre: clase.nombre,
+          grupo: clase.grupo,
+          tipo_relacion: base.tipo_relacion,
+        })
+        .select('id')
+        .single()
+
+      if (nuevaClase && clase.estimulos_rft_base?.length) {
+        await supabase.from('estimulos_rft').insert(
+          clase.estimulos_rft_base.map((e: any) => ({
+            clase_id: nuevaClase.id,
+            etiqueta: e.etiqueta,
+            nombre: e.nombre,
+            posicion: e.posicion,
           }))
         )
       }
