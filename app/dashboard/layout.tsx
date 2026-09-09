@@ -98,7 +98,7 @@ export default async function DashboardLayout({
                 <div className="mb-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="w-6 h-6" />
-            <p className="font-bold text-slate-800">Abacontext</p>
+            <p className="font-bold text-slate-800">abacontext</p>
           </div>
           <p className="text-xs text-slate-400">{perfil?.nombre}</p>
           <span className="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
