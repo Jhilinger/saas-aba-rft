@@ -436,9 +436,9 @@ export default function TomarDatosRftClient({
               {comparativos.map((c) => (
                 <span
                   key={c.claseId}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium ${
+                  className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
                     c.esCorrecto
-                      ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
+                      ? 'border-emerald-600 bg-emerald-600 text-white'
                       : 'border-slate-300 bg-white text-slate-600'
                   }`}
                   title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
