@@ -20,7 +20,6 @@ export default function ClaseRftBaseCard({
   clase: Clase
   programaBaseId: string
 }) {
-  const [etiqueta, setEtiqueta] = useState('')
   const [nombreEstimulo, setNombreEstimulo] = useState('')
   const [posicion, setPosicion] = useState('A')
   const [isPending, startTransition] = useTransition()
@@ -101,44 +100,37 @@ export default function ClaseRftBaseCard({
         )}
       </ul>
 
-      <form
+            <form
         onSubmit={(e) => {
           e.preventDefault()
-          if (!etiqueta.trim() || !nombreEstimulo.trim()) return
+          if (!nombreEstimulo.trim()) return
           startTransition(async () => {
-            await crearEstimuloRftBase(clase.id, programaBaseId, etiqueta, nombreEstimulo, posicion)
-            setEtiqueta('')
+            await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, '', posicion)
             setNombreEstimulo('')
             router.refresh()
           })
         }}
-        className="flex flex-col sm:flex-row gap-2"
+        className="flex gap-2"
       >
         <select
           value={posicion}
           onChange={(e) => setPosicion(e.target.value)}
-          className="w-full sm:w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-base sm:text-sm"
+          className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
         >
           <option value="A">A</option>
           <option value="B">B</option>
           <option value="C">C</option>
         </select>
         <input
-          value={etiqueta}
-          onChange={(e) => setEtiqueta(e.target.value)}
-          placeholder="Etiqueta (ej. A1)"
-          className="w-full sm:w-24 rounded-lg border border-slate-300 px-3 py-1.5 text-base sm:text-sm"
-        />
-        <input
           value={nombreEstimulo}
           onChange={(e) => setNombreEstimulo(e.target.value)}
           placeholder="Nombre del estímulo"
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-base sm:text-sm"
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
         />
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-lg bg-indigo-600 px-4 py-1.5 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
         >
           Añadir
         </button>
