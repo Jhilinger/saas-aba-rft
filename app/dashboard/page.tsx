@@ -140,11 +140,11 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnoIds.length}</p>
           <p className="text-sm text-slate-500">Alumnos asignados</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalProgramas ?? 0}</p>
           <p className="text-sm text-slate-500">Programas en total</p>
         </Panel>
@@ -257,18 +257,19 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnosActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Alumnos activos</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{terapeutasActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Terapeutas activos</p>
         </Panel>
         {clinica && !clinica.sin_facturacion && totalEstimado !== null && (
           <Link
             href="/dashboard/facturacion"
-            className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 hover:border-indigo-300 transition-colors"
+            className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 hover:border-indigo-300 transition-colors border-t-4"
+            style={{ borderTopColor: 'var(--brand-primary)' }}
           >
             <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalEstimado.toFixed(2)} €</p>
             <p className="text-sm text-slate-500">Próxima factura estimada</p>
@@ -408,28 +409,28 @@ async function InicioSuperadmin() {
           </p>
           <p className="text-sm text-indigo-600">MRR (ingreso mensual recurrente)</p>
         </div>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">
             {arpu.toLocaleString('es-ES', { minimumFractionDigits: 0 })}€
           </p>
           <p className="text-sm text-slate-500">ARPU (ingreso medio/clínica)</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{nuevasEsteMes ?? 0}</p>
           <p className="text-sm text-slate-500">Nuevas este mes</p>
         </Panel>
       </div>
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalTerapeutas ?? 0}</p>
           <p className="text-sm text-slate-500">Terapeutas (total)</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalFamilias ?? 0}</p>
           <p className="text-sm text-slate-500">Familias (total)</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{informesEsteMes ?? 0}</p>
           <p className="text-sm text-slate-500">Informes este mes</p>
         </Panel>
@@ -456,15 +457,15 @@ async function InicioSuperadmin() {
       )}
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{clinicasActivas ?? 0}</p>
           <p className="text-sm text-slate-500">Clínicas activas</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{clinicasArchivadas ?? 0}</p>
           <p className="text-sm text-slate-500">Archivadas</p>
         </Panel>
-        <Panel className="p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalAlumnos ?? 0}</p>
           <p className="text-sm text-slate-500">Alumnos (total)</p>
         </Panel>
