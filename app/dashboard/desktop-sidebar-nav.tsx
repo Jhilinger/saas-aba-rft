@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEnlacesEfectivos } from './use-enlaces-efectivos'
 import { enlaceActivo, type Enlace } from './alumno-nav-utils'
 
 const NOMBRE_GRUPO: Record<string, string> = {
@@ -13,24 +12,12 @@ const NOMBRE_GRUPO: Record<string, string> = {
 
 export default function DesktopSidebarNav({ enlacesRol }: { enlacesRol: Enlace[] }) {
   const pathname = usePathname()
-  const { enModoAlumno, alumnoNombre, volver, enlaces } = useEnlacesEfectivos(enlacesRol)
-  const hrefActivo = enlaceActivo(pathname, enlaces)
+  const hrefActivo = enlaceActivo(pathname, enlacesRol)
 
   return (
     <nav className="flex-1">
-      {enModoAlumno && volver && (
-        <div className="mb-4">
-            <Link href={volver.href} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
-            {volver.label}
-          </Link>
-          {alumnoNombre && (
-            <p className="mt-1 font-semibold text-slate-800 text-sm truncate">{alumnoNombre}</p>
-          )}
-        </div>
-      )}
-
-      {enlaces.map((e, i) => {
-        const grupoAnterior = i > 0 ? enlaces[i - 1].grupo : undefined
+      {enlacesRol.map((e, i) => {
+        const grupoAnterior = i > 0 ? enlacesRol[i - 1].grupo : undefined
         const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
         return (
           <div key={e.href}>

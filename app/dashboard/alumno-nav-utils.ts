@@ -15,15 +15,6 @@ export function enlaceActivo(pathname: string, enlaces: Enlace[]): string | null
   return mejor
 }
 
-// Si la ruta actual es /dashboard/alumnos/{id}/algo, devuelve ese {id}.
-// Si no, devuelve null (no estamos dentro de la ficha de un alumno).
-export function extraerAlumnoId(pathname: string): string | null {
-  const match = pathname.match(/^\/dashboard\/alumnos\/([^/]+)(\/|$)/)
-  if (!match) return null
-  if (match[1] === '') return null // /dashboard/alumnos (la lista) no cuenta
-  return match[1]
-}
-
 export function enlacesAlumno(alumnoId: string): Enlace[] {
   const base = `/dashboard/alumnos/${alumnoId}`
   return [

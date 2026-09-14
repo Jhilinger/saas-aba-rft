@@ -73,12 +73,12 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
                   )}
                 </td>
                 <td className="p-3">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${p.tipo === 'rft' ? 'bg-purple-50 text-purple-700' : 'bg-indigo-50 text-indigo-700'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${p.tipo === 'rft' ? 'bg-amber-50 text-amber-700' : 'bg-indigo-50 text-indigo-700'}`}>
                     {p.tipo === 'rft' ? 'Aprendizaje Relacional' : 'Aprendizaje Directo'}
                   </span>
                 </td>
                 <td className="p-3 text-slate-600">{p.estado}</td>
-                <td className="p-3 text-slate-600 whitespace-nowrap">{p.fecha_inicio}</td>
+                <td className="p-3 text-slate-600 whitespace-nowrap">{new Date(p.fecha_inicio).toLocaleDateString('es-ES')}</td>
               </tr>
             ))}
           </tbody>

@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Panel } from '../../../ui'
+import AlumnoSubnav from './alumno-subnav'
 
 export default async function AlumnoLayout({
   children,
@@ -41,8 +42,10 @@ export default async function AlumnoLayout({
           ← Volver a alumnos
         </Link>
         <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{alumno.nombre_anonimizado}</h1>
-        <p className="text-sm text-slate-500">Nacimiento: {alumno.fecha_nacimiento}</p>
+        <p className="text-sm text-slate-500">Nacimiento: {new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</p>
       </Panel>
+
+      <AlumnoSubnav alumnoId={id} />
 
       {children}
     </div>

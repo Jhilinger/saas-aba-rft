@@ -68,7 +68,7 @@ export default async function MisAlumnosPage() {
                     {a.nombre_anonimizado}
                   </Link>
                 </td>
-                <td className="p-3 text-slate-600 whitespace-nowrap">{a.fecha_nacimiento}</td>
+                <td className="p-3 text-slate-600 whitespace-nowrap">{new Date(a.fecha_nacimiento).toLocaleDateString('es-ES')}</td>
                 <td className="p-3 text-slate-600">
                   {a.es_principal ? 'Terapeuta principal' : 'Colaborador'}
                 </td>

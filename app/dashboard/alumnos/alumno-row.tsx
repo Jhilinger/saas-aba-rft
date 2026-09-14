@@ -63,7 +63,7 @@ export default function AlumnoRow({
     return (
       <tr className="border-b border-slate-100 last:border-0 bg-slate-50">
         <td className="p-3 font-medium text-slate-800">{alumno.nombre_anonimizado}</td>
-        <td className="p-3 text-slate-600 whitespace-nowrap">{alumno.fecha_nacimiento}</td>
+        <td className="p-3 text-slate-600 whitespace-nowrap">{new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</td>
         <td className="p-3" colSpan={2}>
           <div className="flex flex-wrap gap-2">
             {terapeutas.map((t) => (
@@ -118,7 +118,7 @@ export default function AlumnoRow({
           </span>
         )}
       </td>
-      <td className="p-3 text-slate-600 whitespace-nowrap">{alumno.fecha_nacimiento}</td>
+      <td className="p-3 text-slate-600 whitespace-nowrap">{new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</td>
       <td className="p-3 text-slate-600">
         {alumno.alumno_terapeuta.length === 0
           ? '—'

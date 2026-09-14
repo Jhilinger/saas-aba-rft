@@ -181,7 +181,7 @@ export default function PreferenciasSection({
                     {ETIQUETA_TIPO[p.tipo] ?? p.tipo}
                   </span>
                 </td>
-                <td className="p-3 text-slate-600 whitespace-nowrap">{p.fecha}</td>
+                <td className="p-3 text-slate-600 whitespace-nowrap">{new Date(p.fecha).toLocaleDateString('es-ES')}</td>
                 <td className="p-3">
                   <button
                     onClick={() => borrar(p.id)}

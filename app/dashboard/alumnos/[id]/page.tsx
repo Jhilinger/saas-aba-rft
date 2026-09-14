@@ -83,6 +83,17 @@ export default async function InicioAlumnoPage({
 
   const evaluadosAba = (evaluaciones ?? []).filter((e) => e.programas_base?.tipo === 'aba_clasico').length
   const evaluadosRft = (evaluaciones ?? []).filter((e) => e.programas_base?.tipo === 'rft').length
+
+  const { count: programasDominados } = await supabase
+    .from('programas_alumno')
+    .select('id', { count: 'exact', head: true })
+    .eq('alumno_id', alumnoId)
+    .in('estado', ['dominado', 'mantenimiento'])
+
+  const { count: preferenciasRegistradas } = await supabase
+    .from('preferencias_alumno')
+    .select('id', { count: 'exact', head: true })
+    .eq('alumno_id', alumnoId)
   const terapeutaProximaSesion = proximaSesion?.terapeuta as { nombre: string } | null | undefined
     return (
     <div className="space-y-4">
@@ -144,6 +155,23 @@ export default async function InicioAlumnoPage({
           <p className="text-sm text-slate-600">
             {evaluadosAba} programa{evaluadosAba !== 1 ? 's' : ''} ABA · {evaluadosRft} RFT evaluados
           </p>
+        </Link>
+
+        <Link href={`/dashboard/alumnos/${alumnoId}/progreso`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-emerald-50/30">
+          <p className="text-3xl font-bold text-emerald-700">{programasDominados ?? 0}</p>
+          <p className="text-sm text-slate-500">Programas dominados o en mantenimiento</p>
+        </Link>
+
+        <Link href={`/dashboard/alumnos/${alumnoId}/preferencias`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
+          <p className="text-sm font-semibold text-slate-700 mb-1">Preferencias</p>
+          <p className="text-sm text-slate-600">
+            {preferenciasRegistradas ?? 0} reforzador{preferenciasRegistradas === 1 ? '' : 'es'} registrado{preferenciasRegistradas === 1 ? '' : 's'}
+          </p>
+        </Link>
+
+        <Link href={`/dashboard/alumnos/${alumnoId}/datos-clinicos`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
+          <p className="text-sm font-semibold text-slate-700 mb-1">Datos clínicos</p>
+          <p className="text-sm text-slate-600">Diagnóstico, contacto de emergencia y notas clínicas</p>
         </Link>
       </div>
     </div>

@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '../logout-action'
 import AbacontextIcon from '../abacontext-icon'
-import { useEnlacesEfectivos } from './use-enlaces-efectivos'
 import { enlaceActivo, type Enlace } from './alumno-nav-utils'
 
 const NOMBRE_GRUPO: Record<string, string> = {
@@ -25,8 +24,7 @@ export default function MobileNav({
 }) {
   const [abierto, setAbierto] = useState(false)
   const pathname = usePathname()
-  const { enModoAlumno, alumnoNombre, volver, enlaces: enlacesEfectivos } = useEnlacesEfectivos(enlaces)
-  const hrefActivo = enlaceActivo(pathname, enlacesEfectivos)
+  const hrefActivo = enlaceActivo(pathname, enlaces)
   return (
     <>
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 shadow-[0_1px_0_rgba(79,70,229,0.04)] md:hidden">
@@ -35,10 +33,10 @@ export default function MobileNav({
           <div>
             <p className="text-sm font-bold text-slate-800">abacontext</p>
           <p className="text-xs text-slate-500">
-            {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
+            {nombre}
           </p>
         </div>
-      </div>  
+      </div>
                 <button
           onClick={() => setAbierto(true)}
           className="rounded-lg border border-slate-300 p-2 text-slate-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
@@ -74,24 +72,9 @@ export default function MobileNav({
               </button>
             </div>
 
-            {enModoAlumno && volver && (
-              <div className="mb-4">
-                                <Link
-                  href={volver.href}
-                  onClick={() => setAbierto(false)}
-                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
-                >
-                  {volver.label}
-                </Link>
-                {alumnoNombre && (
-                  <p className="mt-1 font-semibold text-slate-800 text-sm truncate">{alumnoNombre}</p>
-                )}
-              </div>
-            )}
-
             <nav className="flex-1 space-y-1 overflow-y-auto">
-              {enlacesEfectivos.map((e, i) => {
-                const grupoAnterior = i > 0 ? enlacesEfectivos[i - 1].grupo : undefined
+              {enlaces.map((e, i) => {
+                const grupoAnterior = i > 0 ? enlaces[i - 1].grupo : undefined
                 const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
                 return (
                   <div key={e.href}>
