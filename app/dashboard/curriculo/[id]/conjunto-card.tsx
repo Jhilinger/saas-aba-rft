@@ -9,6 +9,7 @@ import {
 } from '../actions'
 import { useToast } from '../../../providers/toast-provider'
 import { useConfirm } from '../../../providers/confirm-provider'
+import { Button, Panel } from '../../../ui'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estimulos_base: Estimulo[] }
@@ -28,7 +29,7 @@ export default function ConjuntoCard({
   const confirmar = useConfirm()
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
+    <Panel className="p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-800">{conjunto.nombre}</h3>
         <button
@@ -116,14 +117,15 @@ export default function ConjuntoCard({
           placeholder="Descripción (opcional)"
           className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
         />
-        <button
+        <Button
           type="submit"
+          variant="secondary"
           disabled={isPending}
-          className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+          className="px-3 py-1.5 font-medium"
         >
           Añadir
-        </button>
+        </Button>
       </form>
-    </div>
+    </Panel>
   )
 }

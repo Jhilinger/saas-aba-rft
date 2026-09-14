@@ -7,6 +7,7 @@ import DuracionClient from './duracion-client'
 import IntervaloClient from './intervalo-client'
 import GraficoConducta from './grafico-conducta'
 import EstadoProgramaSelector from '../../../../programas/[id]/estado-programa-selector'
+import { Panel } from '../../../../../ui'
 
 export default async function ProgramaConductaPage({
   params,
@@ -83,14 +84,14 @@ export default async function ProgramaConductaPage({
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="Ocurrencias/min"
             direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
           />
-        </div>
+        </Panel>
         <TasaClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
@@ -108,7 +109,7 @@ export default async function ProgramaConductaPage({
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% del tiempo"
@@ -116,7 +117,7 @@ export default async function ProgramaConductaPage({
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
-        </div>
+        </Panel>
         <DuracionClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
@@ -135,7 +136,7 @@ export default async function ProgramaConductaPage({
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% de intervalos"
@@ -143,7 +144,7 @@ export default async function ProgramaConductaPage({
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
-        </div>
+        </Panel>
         <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )

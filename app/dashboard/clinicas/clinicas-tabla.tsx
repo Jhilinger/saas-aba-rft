@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import ClinicaRow from './clinica-row'
 import { descargarCSV } from '@/utils/csv'
+import { Button, Panel } from '../../ui'
 
 type Clinica = {
   id: string
@@ -55,16 +56,17 @@ export default function ClinicasTabla({ clinicas }: { clinicas: Clinica[] }) {
           placeholder="Buscar clínica por nombre..."
           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
-        <button
+        <Button
+          variant="secondary"
           onClick={exportar}
           disabled={filtradas.length === 0}
-          className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40 whitespace-nowrap"
+          className="px-3 py-2 font-medium disabled:opacity-40 whitespace-nowrap"
         >
           Exportar CSV
-        </button>
+        </Button>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[550px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -86,7 +88,7 @@ export default function ClinicasTabla({ clinicas }: { clinicas: Clinica[] }) {
             {clinicas.length === 0 ? 'Todavía no hay clínicas creadas.' : 'Ninguna clínica coincide con la búsqueda.'}
           </p>
         )}
-      </div>
+      </Panel>
     </div>
   )
 }

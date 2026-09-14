@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Tables } from '@/database.types'
+import { Panel } from '../../ui'
 
 type VinculoAlumnoTerapeuta = Pick<Tables<'alumno_terapeuta'>, 'es_principal'> & {
   alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'fecha_nacimiento'> | null
@@ -50,7 +51,7 @@ export default async function MisAlumnosPage() {
         <p className="mt-1 text-sm text-slate-500">Accede rápidamente a los perfiles que tienes asignados.</p>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[450px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr className="whitespace-nowrap">
@@ -80,7 +81,7 @@ export default async function MisAlumnosPage() {
             Todavía no tienes alumnos asignados.
           </p>
         )}
-      </div>
+      </Panel>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { editarAlumno } from './actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Alumno = {
   id: string
@@ -24,15 +25,12 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
 
   if (!editando) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-3 text-sm">
+      <Panel className="p-4 sm:p-5 space-y-3 text-sm">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-slate-700">Datos clínicos</h2>
-          <button
-            onClick={() => setEditando(true)}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
-          >
+          <Button variant="secondary" onClick={() => setEditando(true)} className="px-3 py-1.5 text-xs font-medium">
             Editar datos
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
@@ -56,7 +54,7 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
             <p className="text-slate-700 whitespace-pre-wrap">{alumno.notas_clinicas || '—'}</p>
           </div>
         </div>
-      </div>
+      </Panel>
     )
   }
 
@@ -144,20 +142,17 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={isPending} className="px-4 py-3 sm:py-2 text-base sm:text-sm">
           Guardar cambios
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
           type="button"
           onClick={() => setEditando(false)}
-          className="rounded-lg bg-slate-100 px-4 py-3 sm:py-2 text-base sm:text-sm font-medium text-slate-700 hover:bg-slate-200"
+          className="px-4 py-3 sm:py-2 text-base sm:text-sm font-medium"
         >
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

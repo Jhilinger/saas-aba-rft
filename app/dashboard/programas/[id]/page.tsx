@@ -7,7 +7,7 @@ import { obtenerEvolucionAba } from './evolucion-actions'
 import ProgramaAbaTabs from './programa-aba-tabs'
 import EstadoProgramaSelector from './estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
-import { Breadcrumb } from '../../../ui'
+import { Breadcrumb, Panel } from '../../../ui'
 import type { Tables } from '@/database.types'
 
 export default async function ProgramaAlumnoPage({
@@ -78,7 +78,7 @@ export default async function ProgramaAlumnoPage({
         </div>
       </div>
 
-      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm sm:p-5">
+      <Panel className="space-y-3 p-4 text-sm sm:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <span className="text-slate-400">Ensayos por bloque</span>
@@ -128,11 +128,11 @@ export default async function ProgramaAlumnoPage({
             importó antes de que añadiéramos esta información).
           </p>
         )}
-      </div>
+      </Panel>
       <ProgramaAbaTabs
        evolucion={
           <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5">
+            <Panel className="p-3 sm:p-5">
               <EvolucionChart
                 conjuntos={datosEvolucion}
                 porcentajeDominio={programa.porcentaje_dominio}
@@ -143,7 +143,7 @@ export default async function ProgramaAlumnoPage({
                   estimulos: c.estimulos_alumno.map((e) => e.nombre),
                 }))}
               />
-            </div>
+            </Panel>
           </div>
         }
         conjuntos={

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import jsPDF from 'jspdf'
+import { Panel } from '../../ui'
 
 type Informe = {
   id: string
@@ -121,7 +122,7 @@ export default function InformesFamilia({
   return (
     <div className="space-y-3">
       {informes.map((informe) => (
-        <div key={informe.id} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
+        <Panel key={informe.id} className="p-4 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="font-medium text-slate-800">{informe.alumno_nombre}</p>
@@ -149,7 +150,7 @@ export default function InformesFamilia({
               <ContenidoInforme contenido={informe.contenido} />
             </div>
           )}
-        </div>
+        </Panel>
       ))}
     </div>
   )

@@ -5,17 +5,14 @@ import { useFormStatus } from 'react-dom'
 import { crearPrograma } from '../curriculo/actions'
 import { useRouter } from 'next/navigation'
 import { useToast } from '../../providers/toast-provider'
+import { Button, Panel } from '../../ui'
 
 function BotonCrear() {
   const { pending } = useFormStatus()
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-    >
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto py-3 sm:py-2 text-base sm:text-sm">
       {pending ? 'Creando...' : 'Crear programa'}
-    </button>
+    </Button>
   )
 }
 
@@ -25,7 +22,8 @@ export default function ProgramaFormPrivado() {
   const toast = useToast()
 
   return (
-    <form
+    <Panel
+      as="form"
       action={async (formData) => {
         formData.set('visibilidad', 'privado')
         const res = await crearPrograma(formData)
@@ -35,7 +33,7 @@ export default function ProgramaFormPrivado() {
         }
         if (res.id) router.push(`/dashboard/curriculo/${res.id}`)
       }}
-      className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
+      className="space-y-4 p-4 sm:p-6"
     >
       <h2 className="font-semibold text-slate-700">Nuevo programa (privado, solo para ti)</h2>
 
@@ -146,6 +144,6 @@ export default function ProgramaFormPrivado() {
       </div>
 
       <BotonCrear />
-    </form>
+    </Panel>
   )
 }

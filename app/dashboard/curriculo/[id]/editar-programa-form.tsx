@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { editarPrograma } from '../actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button } from '../../../ui'
 
 type Programa = {
   id: string
@@ -31,12 +32,13 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
   if (!editando) {
     return (
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="secondary"
           onClick={() => setEditando(true)}
-          className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          className="px-3 py-1.5 font-medium"
         >
           Editar programa
-        </button>
+        </Button>
       </div>
     )
   }
@@ -192,20 +194,21 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
-        <button
+        <Button
           type="submit"
           disabled={isPending}
-          className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="py-3 sm:py-2 text-base sm:text-sm"
         >
           Guardar cambios
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => setEditando(false)}
-          className="rounded-lg bg-slate-100 px-4 py-3 sm:py-2 text-base sm:text-sm font-medium text-slate-700 hover:bg-slate-200"
+          className="py-3 sm:py-2 text-base sm:text-sm font-medium"
         >
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   )

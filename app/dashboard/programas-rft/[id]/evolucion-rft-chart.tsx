@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from 'recharts'
+import { Panel } from '../../../ui'
 
 type Punto = { fecha: string; porcentaje: number }
 type Serie = { id: string; label: string; grupo: string; bloques: Punto[] }
@@ -48,7 +49,7 @@ function GraficoFase({
   })
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-2">
+    <Panel className="p-5 space-y-2">
       <h3 className="text-sm font-semibold text-slate-700">{titulo}</h3>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
@@ -79,7 +80,7 @@ function GraficoFase({
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </Panel>
   )
 }
 

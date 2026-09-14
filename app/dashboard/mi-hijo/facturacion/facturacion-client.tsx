@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { guardarDatosFacturacion } from './actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Datos = {
   nombre_razon_social: string | null
@@ -44,7 +45,7 @@ function FormularioAlumno({ alumnoId, alumnoNombre, datos }: { alumnoId: string;
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-3">
+    <Panel className="p-4 sm:p-6 space-y-3">
       <h2 className="font-semibold text-slate-700">{alumnoNombre}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <input
@@ -84,14 +85,14 @@ function FormularioAlumno({ alumnoId, alumnoNombre, datos }: { alumnoId: string;
           className="sm:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
       </div>
-      <button
+      <Button
         onClick={guardar}
         disabled={isPending}
-        className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="w-full sm:w-auto py-3 sm:py-2 text-base sm:text-sm"
       >
         {isPending ? 'Guardando...' : 'Guardar datos'}
-      </button>
-    </div>
+      </Button>
+    </Panel>
   )
 }
 export default function FacturacionClient({ alumnosConDatos }: { alumnosConDatos: AlumnoConDatos[] }) {

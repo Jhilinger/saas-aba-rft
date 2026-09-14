@@ -4,6 +4,7 @@ import Link from 'next/link'
 import EvolucionChart from '../../../programas/[id]/evolucion-chart'
 import { obtenerEvolucionAba } from '../../../programas/[id]/evolucion-actions'
 import type { Tables } from '@/database.types'
+import { Panel } from '../../../../ui'
 
 type ProgramaConAlumno = Pick<
   Tables<'programas_alumno'>,
@@ -63,7 +64,7 @@ export default async function ProgramaFamiliaPage({
       </Link>
       <h1 className="text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+      <Panel className="p-3 sm:p-5">
         <EvolucionChart
           conjuntos={datosEvolucion}
           porcentajeDominio={programa.porcentaje_dominio}
@@ -74,7 +75,7 @@ export default async function ProgramaFamiliaPage({
             estimulos: c.estimulos_alumno.map((e) => e.nombre),
           }))}
         />
-      </div>
+      </Panel>
     </div>
   )
 }

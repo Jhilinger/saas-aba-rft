@@ -4,6 +4,7 @@ import { useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { crearClinica } from './actions'
+import { Button } from '../../ui'
 
 export default function CrearClinicaForm() {
   const [isPending, startTransition] = useTransition()
@@ -104,13 +105,13 @@ export default function CrearClinicaForm() {
         <p className="rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>
       )}
 
-      <button
+      <Button
         type="submit"
         disabled={isPending}
-        className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="w-full sm:w-auto py-3 sm:py-2 text-base sm:text-sm"
       >
         {isPending ? 'Creando...' : 'Crear clínica'}
-      </button>
+      </Button>
     </form>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { Button, Panel } from '../../../ui'
 
 type Programa = {
   id: string
@@ -45,7 +46,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
         </label>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[550px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -89,27 +90,29 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
               : 'Todos los programas están pausados. Marca "Mostrar pausados" para verlos.'}
           </p>
         )}
-      </div>
+      </Panel>
 
       {totalPaginas > 1 && (
         <div className="flex items-center justify-between text-sm text-slate-500">
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.max(1, p - 1))}
             disabled={paginaActual === 1}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             ← Anterior
-          </button>
+          </Button>
           <span>
             Página {paginaActual} de {totalPaginas} ({visibles.length} en total)
           </span>
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
             disabled={paginaActual === totalPaginas}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             Siguiente →
-          </button>
+          </Button>
         </div>
       )}
     </div>

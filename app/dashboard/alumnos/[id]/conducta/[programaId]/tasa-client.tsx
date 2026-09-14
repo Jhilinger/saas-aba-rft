@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { guardarBloqueTasa, editarBloqueTasa, eliminarBloqueTasa } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
+import { Button, Panel } from '../../../../../ui'
 
 type Bloque = {
   id: string
@@ -122,14 +123,11 @@ export default function TasaClient({
   }
     return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4 text-center">
+      <Panel className="p-4 sm:p-6 space-y-4 text-center">
         {!observando && !resultado && (
-          <button
-            onClick={empezar}
-            className="w-full rounded-lg bg-indigo-600 py-4 text-lg font-semibold text-white hover:bg-indigo-500"
-          >
+          <Button onClick={empezar} className="w-full py-4 text-lg">
             Iniciar observación
-          </button>
+          </Button>
         )}
 
         {observando && (
@@ -137,25 +135,24 @@ export default function TasaClient({
             <p className="text-4xl font-mono font-bold text-slate-800">{formatearSegundos(segundos)}</p>
             <p className="text-5xl font-bold text-indigo-600">{ocurrencias}</p>
             <div className="flex gap-3">
-              <button
+              <Button
+                variant="success"
                 onClick={() => setOcurrencias((o) => o + 1)}
-                className="flex-1 rounded-lg bg-emerald-600 py-6 text-2xl font-bold text-white hover:bg-emerald-500 active:scale-95"
+                className="flex-1 py-6 text-2xl font-bold active:scale-95"
               >
                 +1
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={() => setOcurrencias((o) => Math.max(0, o - 1))}
-                className="rounded-lg bg-slate-100 px-5 text-lg font-semibold text-slate-600 hover:bg-slate-200"
+                className="px-5 text-lg"
               >
                 −1
-              </button>
+              </Button>
             </div>
-            <button
-              onClick={detener}
-              className="w-full rounded-lg bg-rose-600 py-3 text-base font-semibold text-white hover:bg-rose-500"
-            >
+            <Button variant="danger" onClick={detener} className="w-full py-3 text-base">
               Detener observación
-            </button>
+            </Button>
           </>
         )}
 
@@ -173,23 +170,20 @@ export default function TasaClient({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
             <div className="flex gap-3">
-              <button
-                onClick={guardar}
-                disabled={isPending}
-                className="flex-1 rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-              >
+              <Button onClick={guardar} disabled={isPending} className="flex-1 py-3 text-base">
                 Guardar bloque
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={() => setResultado(null)}
-                className="rounded-lg bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-200"
+                className="px-4 py-3 text-sm font-medium"
               >
                 Descartar
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </div>
+      </Panel>
 
             <div className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>

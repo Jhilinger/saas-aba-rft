@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { guardarBloqueRft } from './actions'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
+import { Button, Panel } from '../../../../ui'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -226,21 +227,22 @@ export default function TomarDatosRftClient({
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
         )}
         <div className="flex flex-col sm:flex-row justify-center gap-3">
-          <button
+          <Button
             onClick={() => {
               setResultado(null)
               setSecuencia(null)
             }}
-            className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500"
+            className="py-3 sm:py-2 text-base sm:text-sm"
           >
             Registrar otro bloque
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => router.push(`/dashboard/programas-rft/${programaAlumnoId}`)}
-            className="rounded-lg bg-slate-100 px-4 py-3 sm:py-2 text-base sm:text-sm font-medium text-slate-700 hover:bg-slate-200"
+            className="py-3 sm:py-2 text-base sm:text-sm"
           >
             Volver al programa
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -248,7 +250,7 @@ export default function TomarDatosRftClient({
 
   if (!grupoSeleccionado) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <p className="text-sm font-medium text-slate-600">¿Qué grupo de clases vas a trabajar?</p>
         <div className="flex flex-wrap gap-2">
           {grupos.map((g) => (
@@ -264,13 +266,13 @@ export default function TomarDatosRftClient({
         {grupos.length === 0 && (
           <p className="text-sm text-slate-400">No hay clases todavía en este programa.</p>
         )}
-      </div>
+      </Panel>
     )
   }
 
   if (!secuencia) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-slate-600">{grupoSeleccionado}</p>
           {!grupoInicial && (
@@ -378,7 +380,7 @@ export default function TomarDatosRftClient({
         >
           Generar secuencia y empezar
         </button>
-      </div>
+      </Panel>
     )
   }
 
@@ -386,9 +388,9 @@ export default function TomarDatosRftClient({
 
   if (!claseActual) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+      <Panel className="p-8 text-center">
         <p className="text-slate-500">Guardando bloque...</p>
-      </div>
+      </Panel>
     )
   }
 
@@ -474,20 +476,22 @@ export default function TomarDatosRftClient({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
             />
             <div className="flex flex-col sm:flex-row gap-3">
-              <button
+              <Button
+                variant="success"
                 onClick={() => registrar(true, 'independiente', preguntaActual)}
                 disabled={isPending}
-                className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
               >
                 ✓ Correcto
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
                 onClick={() => registrar(false, 'independiente', preguntaActual)}
                 disabled={isPending}
-                className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
               >
                 ✗ Incorrecto
-              </button>
+              </Button>
             </div>
           </>
         ) : (
@@ -513,27 +517,30 @@ export default function TomarDatosRftClient({
 
             {esEntrenamiento && !mostrandoAyudas && (
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
+                <Button
+                  variant="success"
                   onClick={() => registrar(true, 'independiente')}
                   disabled={isPending}
-                  className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
                   ✓ Correcto sin ayuda
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="warning"
                   onClick={() => setMostrandoAyudas(true)}
                   disabled={isPending}
-                  className="flex-1 rounded-lg bg-amber-500 py-4 sm:py-3 text-base font-semibold text-white hover:bg-amber-400 disabled:opacity-50 active:scale-[0.98]"
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
                   ✓ Correcto con ayuda
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
                   onClick={() => registrar(false, 'independiente')}
                   disabled={isPending}
-                  className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
                   ✗ Incorrecto
-                </button>
+                </Button>
               </div>
             )}
 
@@ -563,20 +570,22 @@ export default function TomarDatosRftClient({
 
             {!esEntrenamiento && (
               <div className="flex flex-col sm:flex-row gap-3">
-                <button
+                <Button
+                  variant="success"
                   onClick={() => registrar(true, 'independiente')}
                   disabled={isPending}
-                  className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
                   ✓ Correcto
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
                   onClick={() => registrar(false, 'independiente')}
                   disabled={isPending}
-                  className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
                   ✗ Incorrecto
-                </button>
+                </Button>
               </div>
             )}
           </>

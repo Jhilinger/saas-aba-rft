@@ -257,14 +257,14 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnosActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Alumnos activos</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{terapeutasActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Terapeutas activos</p>
-        </div>
+        </Panel>
         {clinica && !clinica.sin_facturacion && totalEstimado !== null && (
           <Link
             href="/dashboard/facturacion"
@@ -408,31 +408,31 @@ async function InicioSuperadmin() {
           </p>
           <p className="text-sm text-indigo-600">MRR (ingreso mensual recurrente)</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">
             {arpu.toLocaleString('es-ES', { minimumFractionDigits: 0 })}€
           </p>
           <p className="text-sm text-slate-500">ARPU (ingreso medio/clínica)</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{nuevasEsteMes ?? 0}</p>
           <p className="text-sm text-slate-500">Nuevas este mes</p>
-        </div>
+        </Panel>
       </div>
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalTerapeutas ?? 0}</p>
           <p className="text-sm text-slate-500">Terapeutas (total)</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalFamilias ?? 0}</p>
           <p className="text-sm text-slate-500">Familias (total)</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{informesEsteMes ?? 0}</p>
           <p className="text-sm text-slate-500">Informes este mes</p>
-        </div>
+        </Panel>
       </div>
 
       {clinicasEnRiesgo && clinicasEnRiesgo.length > 0 && (
@@ -456,18 +456,18 @@ async function InicioSuperadmin() {
       )}
 
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{clinicasActivas ?? 0}</p>
           <p className="text-sm text-slate-500">Clínicas activas</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{clinicasArchivadas ?? 0}</p>
           <p className="text-sm text-slate-500">Archivadas</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalAlumnos ?? 0}</p>
           <p className="text-sm text-slate-500">Alumnos (total)</p>
-        </div>
+        </Panel>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -487,7 +487,7 @@ async function InicioSuperadmin() {
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Últimas clínicas dadas de alta</h2>
-        <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+        <Panel className="overflow-x-auto">
           <table className="w-full text-sm min-w-[400px]">
             <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
               <tr>
@@ -519,7 +519,7 @@ async function InicioSuperadmin() {
           {(!ultimasClinicas || ultimasClinicas.length === 0) && (
             <p className="p-6 text-center text-slate-400">Sin clínicas todavía.</p>
           )}
-        </div>
+        </Panel>
       </section>
     </div>
   )

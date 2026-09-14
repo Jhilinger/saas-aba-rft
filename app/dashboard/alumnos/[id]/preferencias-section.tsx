@@ -4,6 +4,7 @@ import { useState, useTransition, useMemo } from 'react'
 import { crearPreferencia, eliminarPreferencia } from './preferencias/actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Preferencia = {
   id: string
@@ -128,7 +129,7 @@ export default function PreferenciasSection({
   )
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-3">
+      <Panel className="p-4 sm:p-6 space-y-3">
         <h2 className="font-semibold text-slate-700">Añadir preferencia / reforzador</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <input
@@ -155,17 +156,13 @@ export default function PreferenciasSection({
             className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
         </div>
-        <button
-          onClick={crear}
-          disabled={!nombre.trim() || isPending}
-          className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <Button onClick={crear} disabled={!nombre.trim() || isPending} className="w-full sm:w-auto px-4 py-3 sm:py-2 text-base sm:text-sm">
           Añadir
-        </button>
+        </Button>
         {error && <p className="text-sm text-rose-600">{error}</p>}
-      </div>
+      </Panel>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[500px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -200,27 +197,29 @@ export default function PreferenciasSection({
         {ordenadas.length === 0 && (
           <p className="p-6 text-center text-slate-400">Sin preferencias registradas todavía.</p>
         )}
-      </div>
+      </Panel>
 
       {totalPaginas > 1 && (
         <div className="flex items-center justify-between text-sm text-slate-500">
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.max(1, p - 1))}
             disabled={paginaActual === 1}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             ← Anterior
-          </button>
+          </Button>
           <span>
             Página {paginaActual} de {totalPaginas} ({ordenadas.length} en total)
           </span>
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
             disabled={paginaActual === totalPaginas}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             Siguiente →
-          </button>
+          </Button>
         </div>
       )}
     </section>

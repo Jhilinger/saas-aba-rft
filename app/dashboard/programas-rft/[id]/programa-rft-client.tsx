@@ -5,6 +5,7 @@ import Link from 'next/link'
 import NuevaClaseForm from './nueva-clase-form'
 import ClaseCard from './clase-card'
 import EvolucionRftChart from './evolucion-rft-chart'
+import { Panel } from '../../../ui'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
@@ -185,7 +186,7 @@ export default function ProgramaRftClient({
         ) : (
           <div className="space-y-4">
             {dominioDelGrupo.length > 0 && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
+              <Panel className="p-4 space-y-2">
                 <p className="text-sm font-semibold text-slate-700">
                   Dominio por fase — {grupoSeleccionado}
                 </p>
@@ -210,7 +211,7 @@ export default function ProgramaRftClient({
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Panel>
             )}
 
             <EvolucionRftChart porFase={porFaseFiltrado} porcentajeDominio={porcentajeDominio} />

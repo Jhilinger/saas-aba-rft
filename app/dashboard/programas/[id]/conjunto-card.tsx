@@ -12,6 +12,7 @@ import {
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import HistorialBloques from './historial-bloques'
+import { Button, Panel } from '../../../ui'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estado: string; estimulos_alumno: Estimulo[] }
@@ -43,7 +44,7 @@ export default function ConjuntoCard({
   const infoEstado = ETIQUETA_ESTADO[conjunto.estado] ?? { label: conjunto.estado, color: 'bg-slate-100 text-slate-500' }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4">
+    <Panel className="p-4 sm:p-5 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h3 className="font-semibold text-slate-800">{conjunto.nombre}</h3>
@@ -191,16 +192,12 @@ export default function ConjuntoCard({
           placeholder="Descripción (opcional)"
           className="w-full flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-1.5 text-base sm:text-sm"
         />
-                <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg bg-indigo-600 px-4 py-1.5 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={isPending} className="py-1.5 text-base sm:text-sm">
           Añadir
-        </button>
+        </Button>
       </form>
 
       <HistorialBloques conjuntoId={conjunto.id} programaAlumnoId={programaAlumnoId} alumnoId={alumnoId} />
-    </div>
+    </Panel>
   )
 }

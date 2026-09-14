@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { crearFamiliar, desvincularFamiliar } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Familiar = { perfil_id: string; nombre: string; email: string }
 
@@ -27,7 +28,8 @@ export default function FamiliaresSection({
     <section className="space-y-4">
       <h2 className="text-base sm:text-lg font-semibold text-slate-700">Familia</h2>
 
-      <form
+      <Panel
+        as="form"
         onSubmit={(e) => {
           e.preventDefault()
           if (!nombre.trim() || !email.trim()) return
@@ -44,7 +46,7 @@ export default function FamiliaresSection({
             router.refresh()
           })
         }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 sm:p-5"
       >
         <input
           value={nombre}
@@ -59,17 +61,13 @@ export default function FamiliaresSection({
           placeholder="Email"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="sm:col-span-2 rounded-lg bg-indigo-600 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <Button type="submit" disabled={isPending} className="sm:col-span-2 py-3 sm:py-2 text-base sm:text-sm">
           Invitar familiar
-        </button>
+        </Button>
         {error && <p className="sm:col-span-2 text-sm text-rose-600">{error}</p>}
-      </form>
+      </Panel>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[420px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -115,7 +113,7 @@ export default function FamiliaresSection({
         {familiares.length === 0 && (
           <p className="p-6 text-center text-slate-400">Sin familiares vinculados todavía.</p>
         )}
-      </div>
+      </Panel>
     </section>
   )
 }

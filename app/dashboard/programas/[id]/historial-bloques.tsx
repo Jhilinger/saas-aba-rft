@@ -8,6 +8,7 @@ import {
   editarBloqueAba,
 } from '../../tomar-datos/aba/[conjuntoId]/actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button } from '../../../ui'
 
 type Bloque = {
   id: string
@@ -179,13 +180,9 @@ export default function HistorialBloques({
                     className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
                   />
 
-                  <button
-                    onClick={guardar}
-                    disabled={isPending || detalle.length === 0}
-                    className="w-full rounded bg-indigo-600 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-                  >
+                  <Button onClick={guardar} disabled={isPending || detalle.length === 0} className="w-full py-2 text-xs">
                     {isPending ? 'Guardando...' : 'Guardar corrección'}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

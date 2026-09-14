@@ -9,6 +9,7 @@ import {
 } from '../actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft_base: Estimulo[] }
@@ -28,7 +29,7 @@ export default function ClaseRftBaseCard({
   const toast = useToast()
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-4">
+    <Panel className="p-4 sm:p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-slate-800">
@@ -134,14 +135,15 @@ export default function ClaseRftBaseCard({
           placeholder="Nombre del estímulo"
           className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
         />
-        <button
+        <Button
           type="submit"
+          variant="secondary"
           disabled={isPending}
-          className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+          className="px-3 py-1.5 font-medium"
         >
           Añadir
-        </button>
+        </Button>
       </form>
-    </div>
+    </Panel>
   )
 }

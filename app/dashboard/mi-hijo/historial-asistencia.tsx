@@ -1,3 +1,5 @@
+import { Panel } from '../../ui'
+
 type Sesion = {
   id: string
   fecha_hora: string
@@ -16,7 +18,7 @@ const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
 
 export default function HistorialAsistencia({ sesiones }: { sesiones: Sesion[] }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+    <Panel className="overflow-x-auto">
       <table className="w-full text-sm min-w-[450px]">
         <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
           <tr>
@@ -53,6 +55,6 @@ export default function HistorialAsistencia({ sesiones }: { sesiones: Sesion[] }
       {sesiones.length === 0 && (
         <p className="p-6 text-center text-slate-400">Todavía no hay sesiones registradas.</p>
       )}
-    </div>
+    </Panel>
   )
 }

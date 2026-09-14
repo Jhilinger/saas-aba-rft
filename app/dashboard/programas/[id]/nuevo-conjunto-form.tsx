@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { crearConjuntoAlumno } from './actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button } from '../../../ui'
 
 export default function NuevoConjuntoForm({ programaAlumnoId }: { programaAlumnoId: string }) {
   const [nombre, setNombre] = useState('')
@@ -34,13 +35,9 @@ export default function NuevoConjuntoForm({ programaAlumnoId }: { programaAlumno
         placeholder="Nombre del conjunto (ej. Conjunto 2: colores secundarios)"
         className="w-full flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
       />
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isPending} className="py-3 sm:py-2 text-base sm:text-sm">
         Añadir conjunto
-      </button>
+      </Button>
     </form>
   )
 }

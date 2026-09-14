@@ -10,6 +10,7 @@ import {
 } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = {
@@ -61,7 +62,7 @@ export default function ClaseCard({
     clase.estimulos_rft.find((e) => e.id === id)?.etiqueta ?? '?'
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
+    <Panel className="p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-slate-800">
@@ -173,13 +174,9 @@ export default function ClaseCard({
             placeholder="Nombre del estímulo"
             className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
           />
-                    <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={isPending} className="py-1.5">
             Añadir
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -242,6 +239,6 @@ export default function ClaseCard({
           </ul>
         </div>
       </div>
-    </div>
+    </Panel>
   )
 }

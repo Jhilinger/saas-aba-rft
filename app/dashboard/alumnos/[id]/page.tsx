@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Panel } from '../../../ui'
 
 function primerDiaDelMes() {
   const d = new Date()
@@ -98,16 +99,16 @@ export default async function InicioAlumnoPage({
           <p className="text-sm text-slate-500">Registros de conducta activos</p>
         </Link>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <Panel className="p-5">
           <p className="text-sm font-semibold text-slate-700 mb-2">Sesiones este mes</p>
           <div className="flex gap-4 text-sm">
             <span className="text-emerald-600">✓ {resumenSesiones.asistio} asistidas</span>
             <span className="text-amber-600">{resumenSesiones.cancelada} canceladas</span>
             <span className="text-rose-600">{resumenSesiones.no_asistio} no asistió</span>
           </div>
-        </div>
+        </Panel>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <Panel className="p-5">
           <p className="text-sm font-semibold text-slate-700 mb-1">Próxima sesión</p>
           {proximaSesion ? (
             <p className="text-sm text-slate-600">
@@ -123,7 +124,7 @@ export default async function InicioAlumnoPage({
           ) : (
             <p className="text-sm text-slate-400">Sin sesiones programadas</p>
           )}
-        </div>
+        </Panel>
 
         <Link href={`/dashboard/alumnos/${alumnoId}/informes`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
           <p className="text-sm font-semibold text-slate-700 mb-1">Último informe</p>

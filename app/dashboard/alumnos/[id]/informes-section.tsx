@@ -5,6 +5,7 @@ import jsPDF from 'jspdf'
 import { generarInforme, eliminarInforme } from './informes/actions'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Informe = {
   id: string
@@ -186,7 +187,7 @@ export default function InformesSection({
   }
   return (
     <section className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <h2 className="font-semibold text-slate-700">Generar informe de progreso</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -221,16 +222,12 @@ export default function InformesSection({
           </div>
         </div>
 
-        <button
-          onClick={generar}
-          disabled={isPending}
-          className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
+        <Button onClick={generar} disabled={isPending} className="w-full sm:w-auto px-4 py-3 sm:py-2 text-base sm:text-sm">
           {isPending ? 'Generando...' : 'Generar informe'}
-        </button>
+        </Button>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
-      </div>
+      </Panel>
 
       <div className="space-y-3">
         <h2 className="font-semibold text-slate-700">Historial</h2>
@@ -238,7 +235,7 @@ export default function InformesSection({
           <p className="text-sm text-slate-400">Todavía no se ha generado ningún informe.</p>
         )}
         {informes.map((informe) => (
-          <div key={informe.id} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
+          <Panel key={informe.id} className="p-4 space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
                 <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 mr-2">
@@ -274,7 +271,7 @@ export default function InformesSection({
                 <ContenidoInforme contenido={informe.contenido} />
               </div>
             )}
-          </div>
+          </Panel>
         ))}
       </div>
     </section>
