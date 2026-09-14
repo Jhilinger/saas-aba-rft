@@ -63,7 +63,7 @@ export default async function DashboardPage() {
       {perfil.rol === 'familia' && (
         <p className="text-slate-600">
           Ve a{' '}
-          <Link href="/dashboard/mi-hijo" className="text-indigo-600 hover:underline">
+          <Link href="/dashboard/mi-hijo" className="text-indigo-600 underline underline-offset-2 hover:text-indigo-800">
             Mi hijo/a
           </Link>{' '}
           para ver su progreso.

@@ -69,6 +69,11 @@ export default async function ProgresoFamiliaPage() {
 
   return (
     <div className="space-y-10">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Seguimiento</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Progreso</h1>
+      </div>
+
       {secciones.map((s) => (
         <div key={s.alumnoId} className="space-y-3">
           {secciones.length > 1 && (

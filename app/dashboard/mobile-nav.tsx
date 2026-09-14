@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { logout } from '../logout-action'
 import AbacontextIcon from '../abacontext-icon'
 import { useEnlacesEfectivos } from './use-enlaces-efectivos'
-import type { Enlace } from './alumno-nav-utils'
+import { enlaceActivo, type Enlace } from './alumno-nav-utils'
 
 const NOMBRE_GRUPO: Record<string, string> = {
   centro: 'Gestión del centro',
@@ -26,6 +26,7 @@ export default function MobileNav({
   const [abierto, setAbierto] = useState(false)
   const pathname = usePathname()
   const { enModoAlumno, alumnoNombre, volver, enlaces: enlacesEfectivos } = useEnlacesEfectivos(enlaces)
+  const hrefActivo = enlaceActivo(pathname, enlacesEfectivos)
   return (
     <>
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 shadow-[0_1px_0_rgba(79,70,229,0.04)] md:hidden">
@@ -102,7 +103,7 @@ export default function MobileNav({
                     <Link
                       href={e.href}
                       onClick={() => setAbierto(false)}
-                      className={`block rounded-lg px-3 py-3 text-base font-medium transition-colors ${pathname === e.href || pathname.startsWith(`${e.href}/`) ? 'bg-indigo-50 text-indigo-800' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800'}`}
+                      className={`block rounded-lg px-3 py-3 text-base font-medium transition-colors ${e.href === hrefActivo ? 'bg-indigo-50 text-indigo-800' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800'}`}
                     >
                       {e.label}
                     </Link>

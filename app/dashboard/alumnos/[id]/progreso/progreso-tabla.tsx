@@ -163,6 +163,7 @@ export default function ProgresoTabla({
             setFiltroTipo(e.target.value)
             setPagina(1)
           }}
+          aria-label="Filtrar por tipo"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         >
           <option value="todos">Todos los tipos</option>
@@ -175,6 +176,7 @@ export default function ProgresoTabla({
             setFiltroEstado(e.target.value)
             setPagina(1)
           }}
+          aria-label="Filtrar por estado"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         >
           <option value="todos">Todos los estados</option>

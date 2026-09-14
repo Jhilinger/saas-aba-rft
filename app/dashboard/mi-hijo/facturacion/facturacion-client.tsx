@@ -52,36 +52,42 @@ function FormularioAlumno({ alumnoId, alumnoNombre, datos }: { alumnoId: string;
           value={nombreRazonSocial}
           onChange={(e) => setNombreRazonSocial(e.target.value)}
           placeholder="Nombre / Razón social"
+          aria-label="Nombre / Razón social"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
         <input
           value={nif}
           onChange={(e) => setNif(e.target.value)}
           placeholder="NIF / DNI"
+          aria-label="NIF / DNI"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
         <input
           value={direccion}
           onChange={(e) => setDireccion(e.target.value)}
           placeholder="Dirección"
+          aria-label="Dirección"
           className="sm:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
         <input
           value={codigoPostal}
           onChange={(e) => setCodigoPostal(e.target.value)}
           placeholder="Código postal"
+          aria-label="Código postal"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
         <input
           value={ciudad}
           onChange={(e) => setCiudad(e.target.value)}
           placeholder="Ciudad"
+          aria-label="Ciudad"
           className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
         <input
           value={pais}
           onChange={(e) => setPais(e.target.value)}
           placeholder="País"
+          aria-label="País"
           className="sm:col-span-2 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
       </div>

@@ -1,10 +1,8 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
-const URL_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 
 // Importa un programa (de Currículo base, Currículo clínica o Mis programas
@@ -149,76 +147,6 @@ export async function crearProgramaPersonalizado(
   return { success: true }
 }
 
-// --- FAMILIA ---
-
-export async function crearFamiliar(alumnoId: string, nombre: string, email: string) {
-  const supabase = await createClient()
-
-  const { data: alumno } = await supabase
-    .from('alumnos')
-    .select('clinica_id')
-    .eq('id', alumnoId)
-    .single()
-
-  if (!alumno) return { error: 'Alumno no encontrado' }
-
-  const admin = createAdminClient()
-
-  // Comprobamos que el email no esté ya en uso, para dar un error claro
-  const { data: existente } = await admin.from('perfiles').select('id').eq('email', email).maybeSingle()
-  if (existente) {
-    return { error: `Ya existe una cuenta con el email "${email}".` }
-  }
-
-  const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${URL_BASE}/login`,
-  })
-
-  if (authError || !authUser.user) {
-    return { error: authError?.message ?? 'Error invitando al familiar' }
-  }
-
-  const { error: perfilError } = await admin.from('perfiles').insert({
-    id: authUser.user.id,
-    clinica_id: alumno.clinica_id,
-    rol: 'familia',
-    nombre,
-    email,
-  })
-
-  if (perfilError) {
-    await admin.auth.admin.deleteUser(authUser.user.id)
-    return { error: perfilError.message }
-  }
-
-  const { error: vinculoError } = await admin.from('alumno_familia').insert({
-    alumno_id: alumnoId,
-    perfil_id: authUser.user.id,
-  })
-
-  if (vinculoError) {
-    await admin.auth.admin.deleteUser(authUser.user.id)
-    return { error: vinculoError.message }
-  }
-
-  revalidatePath(`/dashboard/alumnos/${alumnoId}`)
-  return { success: true }
-}
-
-export async function desvincularFamiliar(perfilId: string, alumnoId: string) {
-  const supabase = await createClient()
-
-  const { error } = await supabase
-    .from('alumno_familia')
-    .delete()
-    .eq('alumno_id', alumnoId)
-    .eq('perfil_id', perfilId)
-
-  if (error) return { error: error.message }
-
-  revalidatePath(`/dashboard/alumnos/${alumnoId}`)
-  return { success: true }
-}
 
 // --- TERAPEUTAS ---
 

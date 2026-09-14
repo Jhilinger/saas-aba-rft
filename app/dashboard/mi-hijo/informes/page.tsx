@@ -58,9 +58,16 @@ export default async function InformesFamiliaPage() {
   }))
 
   return (
-    <InformesFamilia
-      informes={informesFormateados}
-      nombreClinica={clinicaDatos?.nombre ?? 'Centro de terapia'}
-    />
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Seguimiento</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Informes</h1>
+      </div>
+
+      <InformesFamilia
+        informes={informesFormateados}
+        nombreClinica={clinicaDatos?.nombre ?? 'Centro de terapia'}
+      />
+    </div>
   )
 }
