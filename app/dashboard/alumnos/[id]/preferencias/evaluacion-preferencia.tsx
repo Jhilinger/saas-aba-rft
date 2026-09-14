@@ -296,7 +296,7 @@ export default function EvaluacionPreferencia({
                 </button>
               ))}
             </div>
-            <button onClick={terminarMswoAntes} className="text-sm text-slate-400 hover:text-slate-600">
+            <button onClick={terminarMswoAntes} className="text-sm text-slate-500 hover:text-slate-600">
               El alumno no respondió / terminar aquí
             </button>
           </div>
@@ -331,7 +331,7 @@ export default function EvaluacionPreferencia({
                   <span>
                     {i + 1}. {r.item}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500">
                     {tipo === 'mswo' ? `posición ${r.posicion}` : `${r.vecesElegido}/${numeroRondas} · ${r.porcentaje}%`}
                   </span>
                 </li>
@@ -367,15 +367,15 @@ export default function EvaluacionPreferencia({
                 {' · Top: '}
                 {e.resultado.slice(0, 3).map((r) => r.item).join(', ')}
               </p>
-              <button onClick={() => borrarEvaluacion(e.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+              <button onClick={() => borrarEvaluacion(e.id)} className="text-xs font-medium text-rose-700 hover:text-rose-800">
                 Eliminar
               </button>
             </div>
-            {e.notas && <p className="mt-1 text-xs text-slate-400 italic">{e.notas}</p>}
+            {e.notas && <p className="mt-1 text-xs text-slate-500 italic">{e.notas}</p>}
           </div>
         ))}
         {evaluacionesIniciales.length === 0 && (
-          <p className="text-center text-slate-400 py-4">Sin evaluaciones todavía.</p>
+          <p className="text-center text-slate-500 py-4">Sin evaluaciones todavía.</p>
         )}
       </div>
     </section>

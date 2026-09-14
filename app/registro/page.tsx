@@ -40,24 +40,27 @@ export default function RegistroPage() {
           className="relative space-y-4 p-6 shadow-[0_20px_60px_rgba(30,41,59,0.10)] sm:p-8"
         >
           <div className="space-y-1">
-            <label className="text-sm text-slate-600">Nombre de la clínica</label>
+            <label htmlFor="nombre_clinica" className="text-sm text-slate-600">Nombre de la clínica</label>
             <input
+              id="nombre_clinica"
               name="nombre_clinica"
               required
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-slate-600">Tu nombre</label>
+            <label htmlFor="nombre_admin" className="text-sm text-slate-600">Tu nombre</label>
             <input
+              id="nombre_admin"
               name="nombre_admin"
               required
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-slate-600">Tu email</label>
+            <label htmlFor="email_admin" className="text-sm text-slate-600">Tu email</label>
             <input
+              id="email_admin"
               name="email_admin"
               type="email"
               required
@@ -65,8 +68,9 @@ export default function RegistroPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-slate-600">Teléfono</label>
+            <label htmlFor="telefono" className="text-sm text-slate-600">Teléfono</label>
             <input
+              id="telefono"
               name="telefono"
               type="tel"
               required
@@ -75,16 +79,18 @@ export default function RegistroPage() {
           </div>
                     <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Ciudad</label>
+              <label htmlFor="ciudad" className="text-sm text-slate-600">Ciudad</label>
               <input
+                id="ciudad"
                 name="ciudad"
                 required
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">País</label>
+              <label htmlFor="pais" className="text-sm text-slate-600">País</label>
               <input
+                id="pais"
                 name="pais"
                 required
                 defaultValue="España"
@@ -118,7 +124,7 @@ export default function RegistroPage() {
           >
             {isPending ? 'Redirigiendo a pago...' : 'Continuar al pago'}
           </Button>
-          <p className="text-center text-xs text-slate-400">
+          <p className="text-center text-xs text-slate-500">
             Serás redirigido a Stripe para completar el pago de forma segura.
           </p>
         </Panel>

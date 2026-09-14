@@ -77,7 +77,7 @@ export default async function AyudaPage() {
           </Link>
         ))}
         {articulos.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-400">
+          <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
             Todavía no hay artículos para tu rol. ¡Vuelve pronto!
           </p>
         )}

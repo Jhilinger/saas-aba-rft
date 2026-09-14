@@ -135,7 +135,7 @@ export default function EvaluacionClient({
 
   if (programas.length === 0) {
     return (
-      <p className="text-center text-slate-400 py-8">
+      <p className="text-center text-slate-500 py-8">
         No hay programas en el currículo (base o de clínica) para evaluar todavía.
       </p>
     )
@@ -156,7 +156,7 @@ export default function EvaluacionClient({
           <span>
             Revisando pendiente <strong>{indiceContinuacion + 1}</strong> / {listaContinuacion.length}
           </span>
-          <button onClick={() => setContinuando(false)} className="text-slate-400 hover:text-slate-600">
+          <button onClick={() => setContinuando(false)} className="text-slate-500 hover:text-slate-600">
             Detener y ver resumen
           </button>
         </div>
@@ -230,7 +230,7 @@ export default function EvaluacionClient({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="rounded-xl bg-emerald-50 p-3 text-center">
               <p className="text-xl font-bold text-emerald-700">{resumen.dominado}</p>
-              <p className="text-xs text-emerald-600">Dominado</p>
+              <p className="text-xs text-emerald-700">Dominado</p>
             </div>
             <div className="rounded-xl bg-amber-50 p-3 text-center">
               <p className="text-xl font-bold text-amber-700">{resumen.parcial}</p>
@@ -264,7 +264,7 @@ export default function EvaluacionClient({
           )}
 
           {resultadoImport && (
-            <p className="text-sm text-emerald-600 text-center">
+            <p className="text-sm text-emerald-700 text-center">
               ✓ {resultadoImport.importados} programa(s) añadidos al PEI. Ya puedes empezar a tomar
               datos de línea base con ellos.
             </p>

@@ -118,7 +118,7 @@ export default function FacturacionClient({
         </div>
 
         {!filtroAlumnoId && (
-          <p className="text-sm text-slate-400">Selecciona un alumno para ver sus sesiones realizadas.</p>
+          <p className="text-sm text-slate-500">Selecciona un alumno para ver sus sesiones realizadas.</p>
         )}
       </Panel>
             {filtroAlumnoId && (
@@ -130,15 +130,15 @@ export default function FacturacionClient({
                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Datos de facturación (aportados por la familia)</h3>
                 {datos ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
-                    <p><span className="text-slate-400">Nombre/razón social:</span> {datos.nombre_razon_social || '—'}</p>
-                    <p><span className="text-slate-400">NIF/DNI:</span> {datos.nif || '—'}</p>
-                    <p className="sm:col-span-2"><span className="text-slate-400">Dirección:</span> {datos.direccion || '—'}</p>
-                    <p><span className="text-slate-400">Código postal:</span> {datos.codigo_postal || '—'}</p>
-                    <p><span className="text-slate-400">Ciudad:</span> {datos.ciudad || '—'}</p>
-                    <p><span className="text-slate-400">País:</span> {datos.pais || '—'}</p>
+                    <p><span className="text-slate-500">Nombre/razón social:</span> {datos.nombre_razon_social || '—'}</p>
+                    <p><span className="text-slate-500">NIF/DNI:</span> {datos.nif || '—'}</p>
+                    <p className="sm:col-span-2"><span className="text-slate-500">Dirección:</span> {datos.direccion || '—'}</p>
+                    <p><span className="text-slate-500">Código postal:</span> {datos.codigo_postal || '—'}</p>
+                    <p><span className="text-slate-500">Ciudad:</span> {datos.ciudad || '—'}</p>
+                    <p><span className="text-slate-500">País:</span> {datos.pais || '—'}</p>
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-400">La familia todavía no ha aportado sus datos de facturación.</p>
+                  <p className="text-sm text-slate-500">La familia todavía no ha aportado sus datos de facturación.</p>
                 )}
               </Panel>
             )
@@ -150,7 +150,7 @@ export default function FacturacionClient({
               <p className="text-xs text-slate-500">Total sesiones</p>
             </div>
             <div className="rounded-xl bg-white p-3 text-center">
-              <p className="text-xl font-bold text-emerald-600">{resumen.asistio}</p>
+              <p className="text-xl font-bold text-emerald-700">{resumen.asistio}</p>
               <p className="text-xs text-slate-500">Asistidas</p>
             </div>
             <div className="rounded-xl bg-white p-3 text-center">
@@ -206,7 +206,7 @@ export default function FacturacionClient({
               </tbody>
             </table>
             {sesionesFiltradas.length === 0 && (
-              <p className="p-6 text-center text-slate-400">
+              <p className="p-6 text-center text-slate-500">
                 Sin sesiones realizadas para este alumno en el período seleccionado.
               </p>
             )}

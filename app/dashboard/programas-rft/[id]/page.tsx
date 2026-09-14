@@ -115,42 +115,42 @@ export default async function ProgramaRftPage({
 
       <Panel className="space-y-3 p-4 text-sm sm:p-5">
         <div>
-          <span className="text-slate-400">% de acierto para dominio</span>
+          <span className="text-slate-500">% de acierto para dominio</span>
           <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
         </div>
 
         {programa.objetivo && (
           <div>
-            <span className="text-slate-400">Objetivo / habilidad</span>
+            <span className="text-slate-500">Objetivo / habilidad</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo}</p>
           </div>
         )}
         {programa.materiales && (
           <div>
-            <span className="text-slate-400">Materiales</span>
+            <span className="text-slate-500">Materiales</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales}</p>
           </div>
         )}
         {programa.instrucciones_terapeuta && (
           <div>
-            <span className="text-slate-400">Instrucciones para el terapeuta</span>
+            <span className="text-slate-500">Instrucciones para el terapeuta</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
           </div>
         )}
                 {programa.ayudas_posibles && (
           <div>
-            <span className="text-slate-400">Ayudas posibles</span>
+            <span className="text-slate-500">Ayudas posibles</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
           </div>
         )}
         {programaBase?.video_url && (
           <div>
-            <span className="text-slate-400">Vídeo de ejemplo</span>
+            <span className="text-slate-500">Vídeo de ejemplo</span>
             <VideoDiferido url={programaBase.video_url} />
           </div>
         )}
         {!tieneInfo && (
-          <p className="text-xs text-slate-400 italic">
+          <p className="text-xs text-slate-500 italic">
             Este programa no tiene objetivo/materiales/instrucciones registrados (probablemente se
             importó antes de que añadiéramos esta información).
           </p>

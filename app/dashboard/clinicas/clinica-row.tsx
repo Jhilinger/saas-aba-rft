@@ -111,7 +111,7 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
                 router.refresh()
               })
             }}
-            className="text-xs font-medium text-emerald-600 hover:text-emerald-800"
+            className="text-xs font-medium text-emerald-700 hover:text-emerald-800"
           >
             Guardar
           </button>
@@ -195,7 +195,7 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
                   router.refresh()
                 })
               }}
-              className="text-xs font-medium text-rose-500 hover:text-rose-700"
+              className="text-xs font-medium text-rose-700 hover:text-rose-800"
             >
               Archivar
             </button>
@@ -213,7 +213,7 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
                   router.refresh()
                 })
               }}
-              className="text-xs font-medium text-emerald-600 hover:text-emerald-800"
+              className="text-xs font-medium text-emerald-700 hover:text-emerald-800"
             >
               Reactivar
             </button>
@@ -225,10 +225,10 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
         <tr className="border-b border-slate-100 last:border-0 bg-slate-50">
           <td colSpan={5} className="px-3 py-3 text-xs text-slate-600">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <p><span className="text-slate-400">Admin:</span> {clinica.admin_nombre ?? '—'}</p>
-              <p><span className="text-slate-400">Email:</span> {clinica.admin_email ?? '—'}</p>
-              <p><span className="text-slate-400">Teléfono:</span> {clinica.telefono ?? '—'}</p>
-              <p><span className="text-slate-400">Ciudad:</span> {clinica.ciudad ?? '—'}, {clinica.pais ?? '—'}</p>
+              <p><span className="text-slate-500">Admin:</span> {clinica.admin_nombre ?? '—'}</p>
+              <p><span className="text-slate-500">Email:</span> {clinica.admin_email ?? '—'}</p>
+              <p><span className="text-slate-500">Teléfono:</span> {clinica.telefono ?? '—'}</p>
+              <p><span className="text-slate-500">Ciudad:</span> {clinica.ciudad ?? '—'}, {clinica.pais ?? '—'}</p>
             </div>
           </td>
         </tr>

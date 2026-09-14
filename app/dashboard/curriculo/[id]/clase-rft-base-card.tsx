@@ -93,14 +93,14 @@ export default function ClaseRftBaseCard({
                   router.refresh()
                 })
               }}
-              className="text-xs text-rose-500 hover:text-rose-700"
+              className="text-xs text-rose-700 hover:text-rose-800"
             >
               Quitar
             </button>
           </li>
         ))}
         {clase.estimulos_rft_base.length === 0 && (
-          <li className="text-xs text-slate-400 italic">Sin estímulos todavía.</li>
+          <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
         )}
       </ul>
 

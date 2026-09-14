@@ -153,14 +153,14 @@ export default function ConjuntoCard({
                 toast('Estímulo eliminado', 'exito')
                 router.refresh()
               }}
-              className="text-xs text-rose-500 hover:text-rose-700 shrink-0"
+              className="text-xs text-rose-700 hover:text-rose-800 shrink-0"
             >
               Quitar
             </button>
           </li>
         ))}
         {conjunto.estimulos_alumno.length === 0 && (
-          <li className="text-xs text-slate-400 italic">Sin estímulos todavía.</li>
+          <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
         )}
       </ul>
       <form

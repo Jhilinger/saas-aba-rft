@@ -12,7 +12,7 @@ export default function TerminosPage() {
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-slate-900">Términos de Uso</h1>
-      <p className="mt-1 text-sm text-slate-400">Última actualización: [27/08/2026]</p>
+      <p className="mt-1 text-sm text-slate-600">Última actualización: [27/08/2026]</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
@@ -25,7 +25,7 @@ export default function TerminosPage() {
           </p>
           <p className="mt-2">
             Al registrarte y usar la plataforma, aceptas estos Términos y nuestra{' '}
-            <Link href="/legal/privacidad" className="text-indigo-600 hover:underline">
+            <Link href="/legal/privacidad" className="text-indigo-600 underline underline-offset-2 hover:text-indigo-800">
               Política de Privacidad
             </Link>.
           </p>

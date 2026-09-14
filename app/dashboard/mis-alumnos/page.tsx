@@ -77,7 +77,7 @@ export default async function MisAlumnosPage() {
           </tbody>
         </table>
         {alumnos.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             Todavía no tienes alumnos asignados.
           </p>
         )}

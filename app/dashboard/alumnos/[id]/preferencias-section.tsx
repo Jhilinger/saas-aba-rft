@@ -185,7 +185,7 @@ export default function PreferenciasSection({
                 <td className="p-3">
                   <button
                     onClick={() => borrar(p.id)}
-                    className="text-xs font-medium text-rose-500 hover:text-rose-700"
+                    className="text-xs font-medium text-rose-700 hover:text-rose-800"
                   >
                     Eliminar
                   </button>
@@ -195,7 +195,7 @@ export default function PreferenciasSection({
           </tbody>
         </table>
         {ordenadas.length === 0 && (
-          <p className="p-6 text-center text-slate-400">Sin preferencias registradas todavía.</p>
+          <p className="p-6 text-center text-slate-500">Sin preferencias registradas todavía.</p>
         )}
       </Panel>
 

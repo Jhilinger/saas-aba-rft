@@ -189,7 +189,7 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
                       {a.programaNombre}
                     </Link>
                   </td>
-                  <td className={`p-3 font-medium ${a.porcentaje >= 90 ? 'text-emerald-600' : 'text-slate-600'}`}>
+                  <td className={`p-3 font-medium ${a.porcentaje >= 90 ? 'text-emerald-700' : 'text-slate-600'}`}>
                     {a.porcentaje}%
                   </td>
                   <td className="p-3 text-slate-500 whitespace-nowrap">
@@ -200,7 +200,7 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
             </tbody>
           </table>
           {actividad.length === 0 && (
-            <p className="p-6 text-center text-slate-400">Todavía no has tomado datos.</p>
+            <p className="p-6 text-center text-slate-500">Todavía no has tomado datos.</p>
           )}
         </Panel>
       </section>
@@ -517,7 +517,7 @@ async function InicioSuperadmin() {
             </tbody>
           </table>
           {(!ultimasClinicas || ultimasClinicas.length === 0) && (
-            <p className="p-6 text-center text-slate-400">Sin clínicas todavía.</p>
+            <p className="p-6 text-center text-slate-500">Sin clínicas todavía.</p>
           )}
         </Panel>
       </section>

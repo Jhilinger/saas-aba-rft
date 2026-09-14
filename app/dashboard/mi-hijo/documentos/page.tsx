@@ -33,7 +33,7 @@ export default async function DocumentosFamiliaPage() {
   if (alumnos.length === 0) {
     return (
       <div className="mx-auto max-w-2xl p-8">
-        <p className="text-center text-slate-400">
+        <p className="text-center text-slate-500">
           Todavía no hay ningún alumno vinculado a tu cuenta.
         </p>
       </div>

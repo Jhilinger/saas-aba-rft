@@ -171,7 +171,7 @@ const borrar = async (id: string) => {
                   className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
                 />
                 <div className="flex gap-3">
-                  <button onClick={guardarEdicion} disabled={isPending} className="text-sm font-medium text-emerald-600 hover:text-emerald-800">
+                  <button onClick={guardarEdicion} disabled={isPending} className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
                     Guardar
                   </button>
                   <button onClick={() => setEditandoId(null)} className="text-sm text-slate-500 hover:text-slate-700">
@@ -182,7 +182,7 @@ const borrar = async (id: string) => {
             ) : (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     {new Date(r.fecha_hora).toLocaleString('es-ES', {
                       day: '2-digit',
                       month: '2-digit',
@@ -195,7 +195,7 @@ const borrar = async (id: string) => {
                     <button onClick={() => empezarEdicion(r)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
                       Editar
                     </button>
-                    <button onClick={() => borrar(r.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                    <button onClick={() => borrar(r.id)} className="text-xs font-medium text-rose-700 hover:text-rose-800">
                       Eliminar
                     </button>
                   </div>
@@ -209,7 +209,7 @@ const borrar = async (id: string) => {
           </Panel>
         ))}
         {registrosIniciales.length === 0 && (
-          <p className="text-center text-slate-400 py-6">Sin episodios registrados todavía.</p>
+          <p className="text-center text-slate-500 py-6">Sin episodios registrados todavía.</p>
         )}
       </div>
     </div>

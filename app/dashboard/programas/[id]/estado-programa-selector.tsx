@@ -62,6 +62,7 @@ export default function EstadoProgramaSelector({
       value={estadoActual}
       onChange={(e) => cambiar(e.target.value as EstadoPrograma)}
       disabled={isPending}
+      aria-label="Estado del programa"
       className={`rounded-lg border px-2 py-1 text-xs font-medium ${COLOR[estadoActual] ?? 'text-slate-600 bg-slate-50 border-slate-200'} disabled:opacity-50`}
     >
       {!OPCIONES.some((o) => o.value === estadoActual) && (

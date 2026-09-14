@@ -232,7 +232,7 @@ export default function ConductaClient({
           </Panel>
         ))}
         {visibles.length === 0 && (
-          <p className="text-center text-slate-400 py-6">
+          <p className="text-center text-slate-500 py-6">
             {programas.length === 0
               ? 'Sin registros de conducta todavía.'
               : 'Ningún registro coincide con los filtros.'}

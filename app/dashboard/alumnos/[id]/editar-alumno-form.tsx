@@ -34,23 +34,23 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <span className="text-slate-400">Diagnóstico / condición</span>
+            <span className="text-slate-500">Diagnóstico / condición</span>
             <p className="text-slate-700">{alumno.diagnostico || '—'}</p>
           </div>
           <div>
-            <span className="text-slate-400">Colegio</span>
+            <span className="text-slate-500">Colegio</span>
             <p className="text-slate-700">{alumno.colegio || '—'}</p>
           </div>
           <div>
-            <span className="text-slate-400">Contacto de emergencia</span>
+            <span className="text-slate-500">Contacto de emergencia</span>
             <p className="text-slate-700">{alumno.contacto_emergencia || '—'}</p>
           </div>
           <div>
-            <span className="text-slate-400">Alergias / condiciones médicas</span>
+            <span className="text-slate-500">Alergias / condiciones médicas</span>
             <p className="text-slate-700">{alumno.alergias || '—'}</p>
           </div>
           <div className="sm:col-span-2">
-            <span className="text-slate-400">Notas clínicas</span>
+            <span className="text-slate-500">Notas clínicas</span>
             <p className="text-slate-700 whitespace-pre-wrap">{alumno.notas_clinicas || '—'}</p>
           </div>
         </div>

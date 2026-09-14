@@ -84,7 +84,7 @@ export default function ClinicasTabla({ clinicas }: { clinicas: Clinica[] }) {
           </tbody>
         </table>
         {filtradas.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             {clinicas.length === 0 ? 'Todavía no hay clínicas creadas.' : 'Ninguna clínica coincide con la búsqueda.'}
           </p>
         )}

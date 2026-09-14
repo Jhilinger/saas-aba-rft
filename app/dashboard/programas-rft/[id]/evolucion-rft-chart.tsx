@@ -95,7 +95,7 @@ export default function EvolucionRftChart({
 
   if (fasesConDatos.length === 0) {
     return (
-      <p className="text-center text-slate-400 py-8">
+      <p className="text-center text-slate-500 py-8">
         Todavía no hay ensayos registrados para graficar.
       </p>
     )

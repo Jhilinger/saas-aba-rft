@@ -12,7 +12,7 @@ export default function PrivacidadPage() {
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-slate-900">Política de Privacidad</h1>
-      <p className="mt-1 text-sm text-slate-400">Última actualización: [27/08/2026]</p>
+      <p className="mt-1 text-sm text-slate-600">Última actualización: [27/08/2026]</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
@@ -79,7 +79,7 @@ export default function PrivacidadPage() {
           <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Finalidad y base legal</h2>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] border-collapse text-left text-xs">
-              <thead className="border-b border-slate-200 text-slate-500">
+              <thead className="border-b border-slate-200 text-slate-600">
                 <tr>
                   <th className="py-2 pr-3">Finalidad</th>
                   <th className="py-2">Base legal</th>
@@ -130,7 +130,7 @@ export default function PrivacidadPage() {
           </p>
           <div className="mt-2 overflow-x-auto">
             <table className="w-full min-w-[500px] border-collapse text-left text-xs">
-              <thead className="border-b border-slate-200 text-slate-500">
+              <thead className="border-b border-slate-200 text-slate-600">
                 <tr>
                   <th className="py-2 pr-3">Proveedor</th>
                   <th className="py-2 pr-3">Función</th>

@@ -239,7 +239,7 @@ export default function AgendaClient({
                 Eliminar sesión
               </button>
             )}
-            <button onClick={() => setMenuAbierto(null)} className="block w-full py-1 text-slate-400">
+            <button onClick={() => setMenuAbierto(null)} className="block w-full py-1 text-slate-500">
               Cerrar
             </button>
           </div>
@@ -305,7 +305,7 @@ export default function AgendaClient({
           }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
-          <select name="alumno_id" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
+          <select name="alumno_id" aria-label="Alumno" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
             <option value="">Alumno...</option>
             {alumnos.map((a) => (
               <option key={a.id} value={a.id}>
@@ -315,7 +315,7 @@ export default function AgendaClient({
           </select>
 
           {miRol === 'clinica_admin' ? (
-            <select name="terapeuta_id" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
+            <select name="terapeuta_id" aria-label="Terapeuta" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
               <option value="">Terapeuta...</option>
               {terapeutas.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -329,8 +329,8 @@ export default function AgendaClient({
 
           {modo === 'recurrente' ? (
             <>
-              <input name="fecha_inicio" type="date" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
-              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="fecha_inicio" type="date" aria-label="Fecha de inicio" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="hora" type="time" aria-label="Hora" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               <div className="sm:col-span-2 flex flex-wrap gap-2">
                 {DIAS_SEMANA.map((d) => (
                   <label key={d.value} className="flex items-center gap-1 rounded-lg border border-slate-300 px-2 py-1 text-sm">
@@ -340,19 +340,19 @@ export default function AgendaClient({
                 ))}
               </div>
               <div className="space-y-1">
-                <label className="text-sm text-slate-600">Duración (min)</label>
-                <input name="duracion_minutos" type="number" defaultValue="60" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+                <label htmlFor="duracion_minutos" className="text-sm text-slate-600">Duración (min)</label>
+                <input id="duracion_minutos" name="duracion_minutos" type="number" defaultValue="60" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-sm text-slate-600">Nº de semanas</label>
-                <input name="numero_semanas" type="number" defaultValue="8" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+                <label htmlFor="numero_semanas" className="text-sm text-slate-600">Nº de semanas</label>
+                <input id="numero_semanas" name="numero_semanas" type="number" defaultValue="8" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               </div>
             </>
           ) : (
             <>
-              <input name="fecha" type="date" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
-              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
-              <input name="duracion_minutos" type="number" defaultValue="60" placeholder="Duración (min)" className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="fecha" type="date" aria-label="Fecha" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="hora" type="time" aria-label="Hora" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="duracion_minutos" type="number" defaultValue="60" placeholder="Duración (min)" aria-label="Duración (min)" className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
             </>
           )}
 
@@ -366,7 +366,7 @@ export default function AgendaClient({
         </form>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
-        {mensajeExito && <p className="text-sm text-emerald-600">{mensajeExito}</p>}
+        {mensajeExito && <p className="text-sm text-emerald-700">{mensajeExito}</p>}
       </Panel>
 
       {pendientesCount > 0 && (
@@ -401,7 +401,7 @@ export default function AgendaClient({
               </div>
             ))}
           </div>
-          {sesiones.length === 0 && <p className="text-sm text-slate-400">Nada pendiente por aquí 🎉</p>}
+          {sesiones.length === 0 && <p className="text-sm text-slate-500">Nada pendiente por aquí 🎉</p>}
         </section>
       ) : (
         <>

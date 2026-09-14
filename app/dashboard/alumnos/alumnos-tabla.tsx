@@ -82,7 +82,7 @@ export default function AlumnosTabla({
           </tbody>
         </table>
         {filtrados.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             {alumnos.length === 0 ? 'Sin alumnos todavía.' : 'Ningún alumno coincide con la búsqueda.'}
           </p>
         )}

@@ -227,7 +227,7 @@ export default async function Home() {
             <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
         <h2 className="text-2xl font-bold text-slate-900">Precio simple</h2>
         <div className="mt-8 rounded-2xl border border-slate-200 p-8">
-          <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-400">/mes</span></p>
+          <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-500">/mes</span></p>
           <p className="mt-1 text-sm text-slate-500">+ 4€/mes por cada alumno activo</p>
           <p className="mt-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
             14 días de prueba gratis
@@ -248,7 +248,7 @@ export default async function Home() {
       </section>
 
       <footer className="border-t border-slate-100 py-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-400 sm:flex-row sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-500 sm:flex-row sm:px-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="h-5 w-5" />
             <span>abacontext</span>

@@ -2,7 +2,7 @@ import { Panel, Skeleton } from '../../ui'
 
 export default function MiHijoLoading() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-8" aria-label="Cargando progreso">
+    <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-8" aria-label="Cargando progreso" role="status">
       <div className="space-y-2">
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-8 w-56" />

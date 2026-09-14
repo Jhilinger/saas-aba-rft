@@ -71,7 +71,7 @@ export default function ClaseCard({
               {clase.grupo}
             </span>
           </h3>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-500">
             {clase.tipo_relacion}
           </span>
         </div>
@@ -132,14 +132,14 @@ export default function ClaseCard({
                     router.refresh()
                   })
                 }}
-                className="text-xs text-rose-500 hover:text-rose-700"
+                className="text-xs text-rose-700 hover:text-rose-800"
               >
                 Quitar
               </button>
             </li>
           ))}
           {clase.estimulos_rft.length === 0 && (
-            <li className="text-xs text-slate-400 italic">Sin estímulos todavía.</li>
+            <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
           )}
         </ul>
 
@@ -204,14 +204,14 @@ export default function ClaseCard({
                       router.refresh()
                     })
                   }}
-                  className="text-xs text-rose-500 hover:text-rose-700"
+                  className="text-xs text-rose-700 hover:text-rose-800"
                 >
                   Quitar
                 </button>
               </li>
             ))}
             {clase.relaciones_entrenadas_rft.length === 0 && (
-              <li className="text-xs text-slate-400 italic">Sin relaciones entrenadas todavía.</li>
+              <li className="text-xs text-slate-500 italic">Sin relaciones entrenadas todavía.</li>
             )}
           </ul>
         </div>
@@ -227,14 +227,14 @@ export default function ClaseCard({
                   {NOMBRES_FASE[t.fase] ?? t.fase}: {t.posicionOrigen}→{t.posicionDestino}
                 </span>
                 <span
-                  className={t.porcentaje >= 90 ? 'text-emerald-600 font-medium' : 'text-slate-500'}
+                  className={t.porcentaje >= 90 ? 'text-emerald-700 font-medium' : 'text-slate-500'}
                 >
                   {t.porcentaje}%
                 </span>
               </li>
             ))}
             {testsRealizados.length === 0 && (
-              <li className="text-xs text-slate-400 italic">Sin tests realizados todavía.</li>
+              <li className="text-xs text-slate-500 italic">Sin tests realizados todavía.</li>
             )}
           </ul>
         </div>

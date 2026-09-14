@@ -16,7 +16,7 @@ export default function FaqAcordeon({ preguntas }: { preguntas: Pregunta[] }) {
             className="flex w-full items-center justify-between px-5 py-4 text-left"
           >
             <span className="font-medium text-slate-800">{p.pregunta}</span>
-            <span className={`ml-4 shrink-0 text-slate-400 transition-transform ${abierta === i ? 'rotate-45' : ''}`}>
+            <span className={`ml-4 shrink-0 text-slate-500 transition-transform ${abierta === i ? 'rotate-45' : ''}`}>
               +
             </span>
           </button>

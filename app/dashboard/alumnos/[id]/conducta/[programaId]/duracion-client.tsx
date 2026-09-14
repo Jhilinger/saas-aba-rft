@@ -299,7 +299,7 @@ export default function DuracionClient({
                   className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
                 />
                 <div className="flex gap-3">
-                  <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                  <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-700 hover:text-emerald-800">
                     Guardar
                   </button>
                   <button onClick={() => setEditandoId(null)} className="text-xs text-slate-500 hover:text-slate-700">
@@ -316,13 +316,13 @@ export default function DuracionClient({
                     {formatearSegundos(b.duracion_sesion_segundos)}
                     {b.fase === 'linea_base' && ' · Línea base'}
                   </p>
-                  <p className="text-xs text-slate-400">{b.porcentaje}% del tiempo</p>
+                  <p className="text-xs text-slate-500">{b.porcentaje}% del tiempo</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
                     Editar
                   </button>
-                  <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                  <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-700 hover:text-rose-800">
                     Eliminar
                   </button>
                 </div>
@@ -330,7 +330,7 @@ export default function DuracionClient({
             )}
           </div>
         ))}
-        {bloquesIniciales.length === 0 && <p className="text-center text-slate-400 py-4">Sin bloques todavía.</p>}
+        {bloquesIniciales.length === 0 && <p className="text-center text-slate-500 py-4">Sin bloques todavía.</p>}
       </div>
     </div>
   )

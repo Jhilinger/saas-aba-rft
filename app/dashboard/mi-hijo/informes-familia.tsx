@@ -113,7 +113,7 @@ export default function InformesFamilia({
 
   if (informes.length === 0) {
     return (
-      <p className="text-center text-slate-400 py-6">
+      <p className="text-center text-slate-500 py-6">
         Todavía no hay informes disponibles.
       </p>
     )
@@ -139,7 +139,7 @@ export default function InformesFamilia({
               </button>
               <button
                 onClick={() => descargarPdf(informe, nombreClinica)}
-                className="text-xs font-medium text-emerald-600 hover:underline"
+                className="text-xs font-medium text-emerald-700 hover:underline"
               >
                 Descargar PDF
               </button>

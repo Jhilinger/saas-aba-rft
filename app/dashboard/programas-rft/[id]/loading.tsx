@@ -2,7 +2,7 @@ import { Panel, Skeleton } from '../../../ui'
 
 export default function ProgramaRftLoading() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando programa RFT">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando programa RFT" role="status">
       <div className="space-y-2">
         <Skeleton className="h-3 w-48" />
         <Skeleton className="h-8 w-64" />

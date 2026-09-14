@@ -113,7 +113,7 @@ export default function HistorialBloques({
 
       {abierto && (
         <div className="mt-2 space-y-2">
-          {cargando && <p className="text-xs text-slate-400">Cargando...</p>}
+          {cargando && <p className="text-xs text-slate-500">Cargando...</p>}
 
           {bloques?.map((b) => (
             <div key={b.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs space-y-2">
@@ -138,10 +138,10 @@ export default function HistorialBloques({
 
               {editandoId === b.id && (
                 <div className="space-y-2 border-t border-slate-200 pt-2">
-                  {detalle.length === 0 && <p className="text-slate-400">Cargando ensayos...</p>}
+                  {detalle.length === 0 && <p className="text-slate-500">Cargando ensayos...</p>}
                   {detalle.map((e, i) => (
                     <div key={e.id} className="flex flex-wrap items-center gap-2 rounded bg-white px-2 py-1.5">
-                      <span className="w-6 text-slate-400">{i + 1}.</span>
+                      <span className="w-6 text-slate-500">{i + 1}.</span>
                       <span className="flex-1 min-w-[80px] font-medium text-slate-700">{e.estimuloNombre}</span>
                       <button
                         onClick={() => cambiarEnsayo(e.id, { correcto: true, ayuda: faseEditando === 'linea_base' ? 'independiente' : e.ayuda })}
@@ -188,7 +188,7 @@ export default function HistorialBloques({
             </div>
           ))}
 
-          {bloques?.length === 0 && <p className="text-xs text-slate-400">Sin bloques registrados todavía.</p>}
+          {bloques?.length === 0 && <p className="text-xs text-slate-500">Sin bloques registrados todavía.</p>}
         </div>
       )}
     </div>

@@ -103,7 +103,7 @@ export default function FamiliaTabla({
 
         <div>
           <p className="mb-2 text-sm text-slate-600">
-            Alumno(s) a vincular <span className="text-slate-400">(varios si son hermanos)</span>
+            Alumno(s) a vincular <span className="text-slate-500">(varios si son hermanos)</span>
           </p>
           <div className="flex flex-wrap gap-2">
             {alumnos.map((a) => (
@@ -120,7 +120,7 @@ export default function FamiliaTabla({
               </label>
             ))}
             {alumnos.length === 0 && (
-              <p className="text-sm text-slate-400">No hay alumnos activos en esta clínica todavía.</p>
+              <p className="text-sm text-slate-500">No hay alumnos activos en esta clínica todavía.</p>
             )}
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function FamiliaTabla({
                   {a.nombre}
                   <button
                     onClick={() => desvincular(f.perfilId, a.id, f.nombre, a.nombre)}
-                    className="text-rose-500 hover:text-rose-700"
+                    className="text-rose-700 hover:text-rose-800"
                   >
                     ✕
                   </button>
@@ -197,7 +197,7 @@ export default function FamiliaTabla({
           </Panel>
         ))}
         {familiares.length === 0 && (
-          <p className="text-sm text-slate-400 text-center py-6">Sin familiares vinculados todavía.</p>
+          <p className="text-sm text-slate-500 text-center py-6">Sin familiares vinculados todavía.</p>
         )}
       </div>
     </div>

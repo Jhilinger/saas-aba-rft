@@ -2,7 +2,7 @@ import { Panel, Skeleton } from '../../../ui'
 
 export default function AlumnoDetalleLoading() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando alumno">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando alumno" role="status">
       <div className="space-y-2">
         <Skeleton className="h-3 w-32" />
         <Skeleton className="h-8 w-48" />

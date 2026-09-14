@@ -134,7 +134,7 @@ export default function ProgresoTabla({
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
         <Panel className="p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-600">{totales.dominado}</p>
+          <p className="text-2xl font-bold text-emerald-700">{totales.dominado}</p>
           <p className="text-xs text-slate-500">Dominados</p>
         </Panel>
         <Panel className="p-4 text-center">
@@ -210,7 +210,7 @@ export default function ProgresoTabla({
           <tbody>
             {paginadas.map((f) => (
               <tr key={f.id} className="border-b border-slate-100 last:border-0">
-                <td className="p-3 text-slate-400">{f.orden < 999999 ? f.orden : '—'}</td>
+                <td className="p-3 text-slate-500">{f.orden < 999999 ? f.orden : '—'}</td>
                 <td className="p-3 font-medium text-slate-800">{f.nombre}</td>
                 <td className="p-3 text-slate-600 whitespace-nowrap">{ETIQUETA_TIPO[f.tipo] ?? f.tipo}</td>
                 <td className="p-3 text-slate-600">{f.area}</td>
@@ -238,7 +238,7 @@ export default function ProgresoTabla({
           </tbody>
         </table>
         {ordenadas.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             {filasVisibles.length === 0 ? 'No hay programas en el currículo todavía.' : 'Ningún programa coincide con los filtros.'}
           </p>
         )}

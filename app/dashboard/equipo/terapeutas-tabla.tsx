@@ -75,7 +75,7 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
           </tbody>
         </table>
         {filtrados.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             {terapeutas.length === 0 ? 'Sin terapeutas todavía.' : 'Ningún terapeuta coincide con la búsqueda.'}
           </p>
         )}

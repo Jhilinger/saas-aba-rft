@@ -116,7 +116,7 @@ export default function TerapeutasSection({
                         router.refresh()
                       })
                     }}
-                    className="text-xs font-medium text-rose-500 hover:text-rose-700 whitespace-nowrap"
+                    className="text-xs font-medium text-rose-700 hover:text-rose-800 whitespace-nowrap"
                   >
                     Desvincular
                   </button>
@@ -126,7 +126,7 @@ export default function TerapeutasSection({
           </tbody>
         </table>
         {vinculados.length === 0 && (
-          <p className="p-6 text-center text-slate-400">Sin terapeutas vinculados todavía.</p>
+          <p className="p-6 text-center text-slate-500">Sin terapeutas vinculados todavía.</p>
         )}
       </Panel>
     </section>

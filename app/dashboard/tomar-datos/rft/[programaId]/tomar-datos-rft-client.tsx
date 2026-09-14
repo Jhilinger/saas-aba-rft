@@ -264,7 +264,7 @@ export default function TomarDatosRftClient({
           ))}
         </div>
         {grupos.length === 0 && (
-          <p className="text-sm text-slate-400">No hay clases todavía en este programa.</p>
+          <p className="text-sm text-slate-500">No hay clases todavía en este programa.</p>
         )}
       </Panel>
     )
@@ -405,7 +405,7 @@ export default function TomarDatosRftClient({
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
         </span>
         {ensayos.length > 0 && (
-          <button onClick={deshacerUltimo} className="text-rose-500 hover:text-rose-700">
+          <button onClick={deshacerUltimo} className="text-rose-700 hover:text-rose-800">
             Deshacer último
           </button>
         )}
@@ -497,7 +497,7 @@ export default function TomarDatosRftClient({
         ) : (
           <>
             <p className="text-xl sm:text-2xl font-bold text-slate-800">{origenActual.nombre}</p>
-            <p className="text-xs text-slate-400">{claseActual.nombre}</p>
+            <p className="text-xs text-slate-500">{claseActual.nombre}</p>
 
             <div className="flex flex-wrap justify-center gap-2">
               {comparativos.map((c) => (
@@ -561,7 +561,7 @@ export default function TomarDatosRftClient({
                 </div>
                 <button
                   onClick={() => setMostrandoAyudas(false)}
-                  className="text-sm text-slate-400 hover:text-slate-600 py-2"
+                  className="text-sm text-slate-500 hover:text-slate-600 py-2"
                 >
                   Cancelar
                 </button>
@@ -616,7 +616,7 @@ export default function TomarDatosRftClient({
                   {i + 1}. {e.claseNombre}
                   {e.ayuda !== 'independiente' ? ` (${e.ayuda})` : ''}
                 </span>
-                <span className={e.correcto ? 'text-emerald-600' : 'text-rose-600'}>
+                <span className={e.correcto ? 'text-emerald-700' : 'text-rose-600'}>
                   {e.correcto ? '✓' : '✗'}
                 </span>
               </li>

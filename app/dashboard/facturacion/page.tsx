@@ -79,19 +79,19 @@ export default async function FacturacionPage() {
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-slate-400">Cuota fija</p>
+                <p className="text-slate-500">Cuota fija</p>
                 <p className="text-slate-700">{clinica.precio_fijo_mensual} €/mes</p>
               </div>
               <div>
-                <p className="text-slate-400">Por alumno</p>
+                <p className="text-slate-500">Por alumno</p>
                 <p className="text-slate-700">{clinica.precio_por_alumno} €/mes</p>
               </div>
               <div>
-                <p className="text-slate-400">Alumnos activos</p>
+                <p className="text-slate-500">Alumnos activos</p>
                 <p className="text-slate-700">{alumnosActivos ?? 0}</p>
               </div>
               <div>
-                <p className="text-slate-400">Total estimado</p>
+                <p className="text-slate-500">Total estimado</p>
                 <p className="text-slate-700 font-semibold">{totalEstimado.toFixed(2)} €/mes</p>
               </div>
             </div>

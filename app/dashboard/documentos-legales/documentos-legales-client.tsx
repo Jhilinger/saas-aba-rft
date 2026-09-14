@@ -128,7 +128,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                 />
                 <div className="flex gap-3">
-                  <button onClick={guardarEdicion} disabled={isPending} className="text-sm font-medium text-emerald-600 hover:text-emerald-800">
+                  <button onClick={guardarEdicion} disabled={isPending} className="text-sm font-medium text-emerald-700 hover:text-emerald-800">
                     Guardar
                   </button>
                   <button onClick={() => setEditandoId(null)} className="text-sm text-slate-500 hover:text-slate-700">
@@ -141,7 +141,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <p className="font-semibold text-slate-800">{t.titulo}</p>
-                    {!t.activo && <span className="text-xs text-slate-400">Desactivado</span>}
+                    {!t.activo && <span className="text-xs text-slate-500">Desactivado</span>}
                   </div>
                   <div className="flex gap-3 text-xs font-medium">
                     <button onClick={() => verFirmas(t.id)} className="text-indigo-600 hover:text-indigo-800">
@@ -159,9 +159,9 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
 
                 {firmasAbiertoId === t.id && (
                   <div className="mt-2 rounded-lg bg-slate-50 p-3 space-y-1.5 text-sm">
-                    {cargandoFirmas && <p className="text-slate-400">Cargando...</p>}
+                    {cargandoFirmas && <p className="text-slate-500">Cargando...</p>}
                     {!cargandoFirmas && firmas.length === 0 && (
-                      <p className="text-slate-400">Nadie ha firmado este documento todavía.</p>
+                      <p className="text-slate-500">Nadie ha firmado este documento todavía.</p>
                     )}
                     {firmas.map((f) => (
                       <div key={f.id} className="flex flex-wrap items-center justify-between gap-2 rounded bg-white px-2 py-1.5">
@@ -170,7 +170,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
                           <span className="text-slate-500"> — firmado por {f.firmadoPorNombre}</span>
                         </span>
                         <span className="flex items-center gap-2">
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-slate-500">
                             {new Date(f.fechaFirma).toLocaleDateString('es-ES')}
                           </span>
                           {f.pdfUrl && (
@@ -187,7 +187,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
             )}
           </Panel>
         ))}
-        {tipos.length === 0 && <p className="text-center text-slate-400 py-6">Sin documentos creados todavía.</p>}
+        {tipos.length === 0 && <p className="text-center text-slate-500 py-6">Sin documentos creados todavía.</p>}
       </div>
     </div>
   )

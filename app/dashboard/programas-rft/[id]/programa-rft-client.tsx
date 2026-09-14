@@ -139,7 +139,7 @@ export default function ProgramaRftClient({
                   setCreandoGrupo(false)
                   setNombreNuevoGrupo('')
                 }}
-                className="rounded-lg px-2 py-1.5 text-sm text-slate-400 hover:text-slate-600"
+                className="rounded-lg px-2 py-1.5 text-sm text-slate-500 hover:text-slate-600"
               >
                 ✕
               </button>
@@ -182,7 +182,7 @@ export default function ProgramaRftClient({
 
       {tab === 'evolucion' ? (
         gruposVisibles.length === 0 ? (
-          <p className="text-center text-slate-400 py-8">Todavía no hay clases creadas.</p>
+          <p className="text-center text-slate-500 py-8">Todavía no hay clases creadas.</p>
         ) : (
           <div className="space-y-4">
             {dominioDelGrupo.length > 0 && (
@@ -222,7 +222,7 @@ export default function ProgramaRftClient({
           {grupoSeleccionado ? (
             <NuevaClaseForm programaAlumnoId={programaAlumnoId} grupoActual={grupoSeleccionado} />
           ) : (
-            <p className="text-sm text-slate-400">Crea un grupo primero (botón "+ Grupo" arriba).</p>
+            <p className="text-sm text-slate-500">Crea un grupo primero (botón "+ Grupo" arriba).</p>
           )}
 
           <div className="space-y-4">
@@ -237,7 +237,7 @@ export default function ProgramaRftClient({
           </div>
 
           {clasesDelGrupo.length === 0 && grupoSeleccionado && (
-            <p className="text-center text-slate-400">Sin clases en este grupo todavía.</p>
+            <p className="text-center text-slate-500">Sin clases en este grupo todavía.</p>
           )}
         </section>
       )}

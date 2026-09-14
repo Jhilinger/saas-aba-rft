@@ -208,7 +208,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
             onTouchMove={dibujar}
             onTouchEnd={terminarTrazo}
           />
-          <button onClick={limpiarFirma} className="mt-1 text-xs text-slate-400 hover:text-slate-600">
+          <button onClick={limpiarFirma} className="mt-1 text-xs text-slate-500 hover:text-slate-600">
             Limpiar firma
           </button>
         </div>
@@ -247,7 +247,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
               <div>
                 <p className="font-medium text-slate-800">{d.titulo}</p>
                 {d.firmado && (
-                  <p className="text-xs text-emerald-600">
+                  <p className="text-xs text-emerald-700">
                     ✓ Firmado el {new Date(d.firmado.fecha).toLocaleDateString('es-ES')}
                   </p>
                 )}
@@ -270,7 +270,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
             </Panel>
           ))}
           {a.documentos.length === 0 && (
-            <p className="text-sm text-slate-400">La clínica no tiene documentos pendientes de firma.</p>
+            <p className="text-sm text-slate-500">La clínica no tiene documentos pendientes de firma.</p>
           )}
         </div>
       ))}

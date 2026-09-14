@@ -21,8 +21,9 @@ export default async function RestablecerPasswordPage({
         )}
 
         <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-600">Nueva contraseña</label>
+          <label htmlFor="password" className="text-sm font-medium text-slate-600">Nueva contraseña</label>
           <input
+            id="password"
             name="password"
             type="password"
             required
@@ -31,8 +32,9 @@ export default async function RestablecerPasswordPage({
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-600">Confirmar contraseña</label>
+          <label htmlFor="confirmar" className="text-sm font-medium text-slate-600">Confirmar contraseña</label>
           <input
+            id="confirmar"
             name="confirmar"
             type="password"
             required

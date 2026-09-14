@@ -23,7 +23,7 @@ export default async function ConductaFamiliaPage() {
   const alumnos = (vinculos ?? []).map((v) => v.alumnos).filter(Boolean)
 
   if (alumnos.length === 0) {
-    return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
+    return <p className="text-center text-slate-500 py-8">Sin alumnos vinculados todavía.</p>
   }
 
   const datosPorAlumno = await Promise.all(
@@ -68,7 +68,7 @@ export default async function ConductaFamiliaPage() {
             </Link>
           ))}
           {d.programas.length === 0 && (
-            <p className="text-sm text-slate-400">Sin registros compartidos contigo todavía.</p>
+            <p className="text-sm text-slate-500">Sin registros compartidos contigo todavía.</p>
           )}
         </div>
       ))}

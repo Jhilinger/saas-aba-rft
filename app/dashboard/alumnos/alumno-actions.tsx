@@ -34,7 +34,7 @@ export default function AlumnoActions({ id, activo }: { id: string; activo: bool
             router.refresh()
           })
         }}
-        className="text-xs font-medium text-rose-500 hover:text-rose-700"
+        className="text-xs font-medium text-rose-700 hover:text-rose-800"
       >
         Archivar
       </button>
@@ -55,7 +55,7 @@ export default function AlumnoActions({ id, activo }: { id: string; activo: bool
           router.refresh()
         })
       }}
-      className="text-xs font-medium text-emerald-600 hover:text-emerald-800"
+      className="text-xs font-medium text-emerald-700 hover:text-emerald-800"
     >
       Reactivar
     </button>

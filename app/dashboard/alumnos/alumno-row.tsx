@@ -87,14 +87,14 @@ export default function AlumnoRow({
               </div>
             ))}
             {terapeutas.length === 0 && (
-              <p className="text-xs text-slate-400">No hay terapeutas en esta clínica todavía.</p>
+              <p className="text-xs text-slate-500">No hay terapeutas en esta clínica todavía.</p>
             )}
           </div>
           <div className="mt-2 flex gap-3">
             <button
               onClick={guardar}
               disabled={isPending}
-              className="text-xs font-medium text-emerald-600 hover:text-emerald-800 disabled:opacity-50"
+              className="text-xs font-medium text-emerald-700 hover:text-emerald-800 disabled:opacity-50"
             >
               Guardar
             </button>

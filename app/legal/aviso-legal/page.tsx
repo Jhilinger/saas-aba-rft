@@ -12,7 +12,7 @@ export default function AvisoLegalPage() {
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-slate-900">Aviso Legal</h1>
-      <p className="mt-1 text-sm text-slate-400">Última actualización: [27/08/2026]</p>
+      <p className="mt-1 text-sm text-slate-600">Última actualización: [27/08/2026]</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-slate-700">
         <p>
@@ -47,7 +47,7 @@ export default function AvisoLegalPage() {
           <p>
             El acceso al sitio web es gratuito. El uso de la plataforma como servicio
             requiere registro y contratación de una suscripción, conforme a los{' '}
-            <Link href="/legal/terminos" className="text-indigo-600 hover:underline">
+            <Link href="/legal/terminos" className="text-indigo-600 underline underline-offset-2 hover:text-indigo-800">
               Términos de Uso
             </Link>.
           </p>

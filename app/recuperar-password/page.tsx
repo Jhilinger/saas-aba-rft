@@ -30,8 +30,9 @@ export default function RecuperarPasswordPage() {
             className="space-y-4"
           >
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-600">Email</label>
+              <label htmlFor="email" className="text-sm font-medium text-slate-600">Email</label>
               <input
+                id="email"
                 name="email"
                 type="email"
                 required

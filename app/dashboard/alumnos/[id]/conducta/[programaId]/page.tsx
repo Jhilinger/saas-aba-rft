@@ -153,7 +153,7 @@ export default async function ProgramaConductaPage({
   return (
     <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
       {cabecera}
-      <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-400">
+      <p className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
         La toma de datos para "{programa.formato_recogida}" está en construcción.
       </p>
     </div>

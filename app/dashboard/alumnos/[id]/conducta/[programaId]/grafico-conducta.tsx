@@ -94,7 +94,7 @@ export default function GraficoConducta({
 
   if (puntos.length === 0) {
     return (
-      <p className="text-center text-slate-400 py-8">Todavía no hay bloques registrados para graficar.</p>
+      <p className="text-center text-slate-500 py-8">Todavía no hay bloques registrados para graficar.</p>
     )
   }
 

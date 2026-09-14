@@ -9,6 +9,7 @@ export default function PasswordInput() {
   return (
     <div className="relative">
       <input
+        id="password"
         name="password"
         type={visible ? 'text' : 'password'}
         required
@@ -18,7 +19,7 @@ export default function PasswordInput() {
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600"
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 hover:text-slate-600"
       >
         {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>

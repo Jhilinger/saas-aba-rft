@@ -232,7 +232,7 @@ export default function InformesSection({
       <div className="space-y-3">
         <h2 className="font-semibold text-slate-700">Historial</h2>
         {informes.length === 0 && (
-          <p className="text-sm text-slate-400">Todavía no se ha generado ningún informe.</p>
+          <p className="text-sm text-slate-500">Todavía no se ha generado ningún informe.</p>
         )}
         {informes.map((informe) => (
           <Panel key={informe.id} className="p-4 space-y-2">
@@ -254,13 +254,13 @@ export default function InformesSection({
                 </button>
                 <button
                   onClick={() => descargarPdf(informe, nombreAlumno, nombreClinica)}
-                  className="text-xs font-medium text-emerald-600 hover:underline"
+                  className="text-xs font-medium text-emerald-700 hover:underline"
                 >
                   Descargar PDF
                 </button>
                 <button
                   onClick={() => borrar(informe.id)}
-                  className="text-xs font-medium text-rose-500 hover:underline"
+                  className="text-xs font-medium text-rose-600 hover:underline"
                 >
                   Eliminar
                 </button>

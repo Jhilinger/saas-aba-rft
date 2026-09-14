@@ -29,7 +29,7 @@ export default async function ProgresoFamiliaPage() {
     .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> => Boolean(a))
 
   if (alumnos.length === 0) {
-    return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
+    return <p className="text-center text-slate-500 py-8">Sin alumnos vinculados todavía.</p>
   }
 
   const secciones = await Promise.all(

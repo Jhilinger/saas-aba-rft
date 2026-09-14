@@ -66,9 +66,9 @@ export default function FaqPage() {
       </div>
 
       <h1 className="mt-6 text-2xl font-bold text-slate-900">Preguntas frecuentes</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-slate-600">
         Si tienes alguna duda que no aparece aquí, escríbenos a{' '}
-        <a href="mailto:soporte@abacontext.com" className="text-indigo-600 hover:underline">
+        <a href="mailto:soporte@abacontext.com" className="text-indigo-600 underline underline-offset-2 hover:text-indigo-800">
           soporte@abacontext.com
         </a>.
       </p>

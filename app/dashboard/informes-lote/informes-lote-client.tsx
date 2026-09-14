@@ -114,12 +114,12 @@ export default function InformesLoteClient({ alumnos }: { alumnos: Alumno[] }) {
                   <span
                     className={
                       resultados[a.id].estado === 'exito'
-                        ? 'text-xs text-emerald-600'
+                        ? 'text-xs text-emerald-700'
                         : resultados[a.id].estado === 'error'
                           ? 'text-xs text-rose-600'
                           : resultados[a.id].estado === 'generando'
                             ? 'text-xs text-indigo-600'
-                            : 'text-xs text-slate-400'
+                            : 'text-xs text-slate-500'
                     }
                   >
                     {resultados[a.id].estado === 'pendiente' && 'En cola...'}
@@ -130,7 +130,7 @@ export default function InformesLoteClient({ alumnos }: { alumnos: Alumno[] }) {
                 )}
               </label>
             ))}
-            {alumnos.length === 0 && <p className="p-2 text-sm text-slate-400">Sin alumnos activos.</p>}
+            {alumnos.length === 0 && <p className="p-2 text-sm text-slate-500">Sin alumnos activos.</p>}
           </div>
         </div>
 

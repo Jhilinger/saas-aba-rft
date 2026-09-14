@@ -164,7 +164,7 @@ export default function CurriculoTabla({
           </tbody>
         </table>
         {programasOrdenados.length === 0 && (
-          <p className="p-6 text-center text-slate-400">Todavía no hay programas en el currículo.</p>
+          <p className="p-6 text-center text-slate-500">Todavía no hay programas en el currículo.</p>
         )}
       </Panel>
 

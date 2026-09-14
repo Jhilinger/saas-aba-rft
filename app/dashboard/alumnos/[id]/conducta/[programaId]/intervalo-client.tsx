@@ -263,7 +263,7 @@ export default function IntervaloClient({
 
           <p className="text-sm text-slate-500">{intervalosConConducta} con conducta hasta ahora</p>
 
-          <button onClick={detenerAntes} className="text-sm text-slate-400 hover:text-slate-600">
+          <button onClick={detenerAntes} className="text-sm text-slate-500 hover:text-slate-600">
             Detener antes de tiempo
           </button>
         </div>
@@ -307,7 +307,7 @@ export default function IntervaloClient({
             />
           </div>
         </div>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Observación total: {Math.round((duracionIntervalo * totalIntervalosPlan) / 60)} min aprox.
         </p>
         <Button onClick={empezar} className="w-full py-4 text-lg">
@@ -389,7 +389,7 @@ function historial(
               </div>
               <textarea value={editNotas} onChange={(e) => setEditNotas(e.target.value)} placeholder="Notas" rows={2} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
               <div className="flex gap-3">
-                <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                <button onClick={guardarEdicion} disabled={isPending} className="text-xs font-medium text-emerald-700 hover:text-emerald-800">
                   Guardar
                 </button>
                 <button onClick={cancelarEdicion} className="text-xs text-slate-500 hover:text-slate-700">
@@ -404,7 +404,7 @@ function historial(
                   {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.intervalos_con_conducta}/{b.total_intervalos} intervalos
                   {b.fase === 'linea_base' && ' · Línea base'}
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-500">
                   {b.porcentaje}% · {ETIQUETA_TIPO[b.tipo_intervalo].split(' (')[0]} · {b.duracion_intervalo_segundos}s/intervalo
                 </p>
               </div>
@@ -412,7 +412,7 @@ function historial(
                 <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">
                   Editar
                 </button>
-                <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
+                <button onClick={() => borrar(b.id)} className="text-xs font-medium text-rose-700 hover:text-rose-800">
                   Eliminar
                 </button>
               </div>
@@ -420,7 +420,7 @@ function historial(
           )}
         </div>
       ))}
-      {bloques.length === 0 && <p className="text-center text-slate-400 py-4">Sin bloques todavía.</p>}
+      {bloques.length === 0 && <p className="text-center text-slate-500 py-4">Sin bloques todavía.</p>}
     </div>
   )
 }

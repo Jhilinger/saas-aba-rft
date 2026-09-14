@@ -102,7 +102,7 @@ export default async function InicioAlumnoPage({
         <Panel className="p-5">
           <p className="text-sm font-semibold text-slate-700 mb-2">Sesiones este mes</p>
           <div className="flex gap-4 text-sm">
-            <span className="text-emerald-600">✓ {resumenSesiones.asistio} asistidas</span>
+            <span className="text-emerald-700">✓ {resumenSesiones.asistio} asistidas</span>
             <span className="text-amber-600">{resumenSesiones.cancelada} canceladas</span>
             <span className="text-rose-600">{resumenSesiones.no_asistio} no asistió</span>
           </div>
@@ -122,7 +122,7 @@ export default async function InicioAlumnoPage({
               {terapeutaProximaSesion?.nombre && ` · ${terapeutaProximaSesion.nombre}`}
             </p>
           ) : (
-            <p className="text-sm text-slate-400">Sin sesiones programadas</p>
+            <p className="text-sm text-slate-500">Sin sesiones programadas</p>
           )}
         </Panel>
 
@@ -135,7 +135,7 @@ export default async function InicioAlumnoPage({
               {ultimoInforme.destinatario === 'familia' ? 'Para la familia' : 'Formal'}
             </p>
           ) : (
-            <p className="text-sm text-slate-400">Sin informes todavía</p>
+            <p className="text-sm text-slate-500">Sin informes todavía</p>
           )}
         </Link>
 

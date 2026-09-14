@@ -30,7 +30,7 @@ export default function CrearClinicaForm() {
       className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
     >
       <h2 className="font-semibold text-slate-700">Nueva clínica</h2>
-      <p className="text-xs text-slate-400 -mt-2">
+      <p className="text-xs text-slate-500 -mt-2">
         Se crea sin pasar por Stripe (uso interno: tu propia clínica, cortesías, pruebas...).
       </p>
 

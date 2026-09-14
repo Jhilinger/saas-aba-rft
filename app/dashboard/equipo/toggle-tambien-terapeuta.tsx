@@ -37,6 +37,9 @@ export default function ToggleTambienTerapeuta({
           })
         }}
         disabled={isPending}
+        role="switch"
+        aria-checked={activo}
+        aria-label={`¿También eres terapeuta, ${nombre}?`}
         className={`relative shrink-0 h-7 w-12 rounded-full transition-colors disabled:opacity-50 ${
           activo ? 'bg-indigo-600' : 'bg-slate-300'
         }`}

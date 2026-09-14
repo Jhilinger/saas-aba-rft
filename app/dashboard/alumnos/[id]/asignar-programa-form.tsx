@@ -117,7 +117,7 @@ export default function AsignarProgramaForm({
           </select>
         </div>
 
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           {programasFiltrados.length} de {listaDeFuente.length} programas
         </p>
 
@@ -162,7 +162,7 @@ export default function AsignarProgramaForm({
         {error && <p className="text-sm text-rose-600">{error}</p>}
 
         {listaDeFuente.length === 0 && (
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-slate-500">
             {fuente === 'base' && 'No hay programas en el currículo global todavía.'}
             {fuente === 'clinica' && 'Tu clínica todavía no tiene programas compartidos. Créalos desde "Currículo clínica".'}
             {fuente === 'mios' && 'Todavía no has creado ningún programa propio. Créalos desde "Mis programas".'}

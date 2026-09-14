@@ -50,7 +50,7 @@ export default function ConjuntoCard({
               router.refresh()
             })
           }}
-          className="text-xs font-medium text-rose-500 hover:text-rose-700"
+          className="text-xs font-medium text-rose-700 hover:text-rose-800"
         >
           Eliminar conjunto
         </button>
@@ -77,14 +77,14 @@ export default function ConjuntoCard({
                   router.refresh()
                 })
               }}
-              className="text-xs text-rose-500 hover:text-rose-700"
+              className="text-xs text-rose-700 hover:text-rose-800"
             >
               Quitar
             </button>
           </li>
         ))}
         {conjunto.estimulos_base.length === 0 && (
-          <li className="text-xs text-slate-400 italic">Sin estímulos todavía.</li>
+          <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
         )}
       </ul>
 

@@ -33,7 +33,7 @@ export default function MobileNav({
           <AbacontextIcon className="w-6 h-6" />
           <div>
             <p className="text-sm font-bold text-slate-800">abacontext</p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             {enModoAlumno && alumnoNombre ? alumnoNombre : nombre}
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function MobileNav({
               </div>
               <button
                 onClick={() => setAbierto(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
                 aria-label="Cerrar menú"
               >
                 ✕
@@ -114,7 +114,7 @@ export default function MobileNav({
             <form action={logout}>
               <button
                 type="submit"
-                className="w-full rounded-lg px-3 py-3 text-left text-base font-medium text-rose-500 hover:bg-rose-50"
+                className="w-full rounded-lg px-3 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
               >
                 Cerrar sesión
               </button>

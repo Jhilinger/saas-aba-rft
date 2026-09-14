@@ -73,7 +73,7 @@ export default function ProgramaRowActions({
           })
         }}
         disabled={isPending}
-        className="text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-50"
+        className="text-xs font-medium text-rose-700 hover:text-rose-800 disabled:opacity-50"
       >
         Eliminar
       </button>

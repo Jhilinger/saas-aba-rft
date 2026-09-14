@@ -100,7 +100,7 @@ export default async function DashboardLayout({
             <AbacontextIcon className="w-6 h-6" />
             <p className="font-bold tracking-tight text-slate-800">abacontext</p>
           </div>
-          <p className="text-xs text-slate-400">{perfil?.nombre}</p>
+          <p className="text-xs text-slate-500">{perfil?.nombre}</p>
           <span className="mt-2 inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
             {perfil?.rol}
           </span>
@@ -111,7 +111,7 @@ export default async function DashboardLayout({
         <form action={logout}>
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50"
+            className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50"
           >
             Cerrar sesión
           </button>

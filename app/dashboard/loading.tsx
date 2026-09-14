@@ -2,7 +2,7 @@ import { Panel, Skeleton } from '../ui'
 
 export default function DashboardLoading() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando contenido">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8" aria-label="Cargando contenido" role="status">
       <div className="space-y-2">
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-8 w-56" />

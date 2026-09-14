@@ -81,11 +81,11 @@ export default async function ProgramaAlumnoPage({
       <Panel className="space-y-3 p-4 text-sm sm:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <span className="text-slate-400">Ensayos por bloque</span>
+            <span className="text-slate-500">Ensayos por bloque</span>
             <p className="text-slate-700">{programa.ensayos_por_bloque}</p>
           </div>
           <div>
-            <span className="text-slate-400">Criterio de dominio</span>
+            <span className="text-slate-500">Criterio de dominio</span>
             <p className="text-slate-700">
               {programa.bloques_para_dominio} bloques al {programa.porcentaje_dominio}%
             </p>
@@ -94,36 +94,36 @@ export default async function ProgramaAlumnoPage({
 
         {programa.objetivo && (
           <div>
-            <span className="text-slate-400">Objetivo / habilidad</span>
+            <span className="text-slate-500">Objetivo / habilidad</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo}</p>
           </div>
         )}
         {programa.materiales && (
           <div>
-            <span className="text-slate-400">Materiales</span>
+            <span className="text-slate-500">Materiales</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales}</p>
           </div>
         )}
         {programa.instrucciones_terapeuta && (
           <div>
-            <span className="text-slate-400">Instrucciones para el terapeuta</span>
+            <span className="text-slate-500">Instrucciones para el terapeuta</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
           </div>
         )}
                 {programa.ayudas_posibles && (
           <div>
-            <span className="text-slate-400">Ayudas posibles</span>
+            <span className="text-slate-500">Ayudas posibles</span>
             <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
           </div>
         )}
         {programaBase?.video_url && (
           <div>
-            <span className="text-slate-400">Vídeo de ejemplo</span>
+            <span className="text-slate-500">Vídeo de ejemplo</span>
             <VideoDiferido url={programaBase.video_url} />
           </div>
         )}
         {!tieneInfo && (
-          <p className="text-xs text-slate-400 italic">
+          <p className="text-xs text-slate-500 italic">
             Este programa no tiene objetivo/materiales/instrucciones registrados (probablemente se
             importó antes de que añadiéramos esta información).
           </p>
@@ -172,7 +172,7 @@ export default async function ProgramaAlumnoPage({
                   <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
                 ))}
                 {enAdquisicion.length === 0 && (
-                  <p className="text-sm text-slate-400">Sin conjuntos en adquisición.</p>
+                  <p className="text-sm text-slate-500">Sin conjuntos en adquisición.</p>
                 )}
               </div>
             </div>
@@ -191,7 +191,7 @@ export default async function ProgramaAlumnoPage({
             )}
 
             {(!conjuntos || conjuntos.length === 0) && (
-              <p className="text-center text-slate-400">Sin conjuntos de estímulos todavía.</p>
+              <p className="text-center text-slate-500">Sin conjuntos de estímulos todavía.</p>
             )}
           </section>
         }

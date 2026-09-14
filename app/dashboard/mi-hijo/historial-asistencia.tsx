@@ -53,7 +53,7 @@ export default function HistorialAsistencia({ sesiones }: { sesiones: Sesion[] }
         </tbody>
       </table>
       {sesiones.length === 0 && (
-        <p className="p-6 text-center text-slate-400">Todavía no hay sesiones registradas.</p>
+        <p className="p-6 text-center text-slate-500">Todavía no hay sesiones registradas.</p>
       )}
     </Panel>
   )

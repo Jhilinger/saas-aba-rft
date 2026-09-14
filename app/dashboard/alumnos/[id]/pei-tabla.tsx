@@ -84,7 +84,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
           </tbody>
         </table>
         {visibles.length === 0 && (
-          <p className="p-6 text-center text-slate-400">
+          <p className="p-6 text-center text-slate-500">
             {programas.length === 0
               ? 'Este alumno todavía no tiene programas asignados.'
               : 'Todos los programas están pausados. Marca "Mostrar pausados" para verlos.'}

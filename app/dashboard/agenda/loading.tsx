@@ -2,7 +2,7 @@ import { Panel, Skeleton } from '../../ui'
 
 export default function AgendaLoading() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8" aria-label="Cargando agenda">
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8" aria-label="Cargando agenda" role="status">
       <div className="space-y-2">
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-8 w-32" />
