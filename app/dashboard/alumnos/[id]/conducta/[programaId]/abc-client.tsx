@@ -142,7 +142,7 @@ const borrar = async (id: string) => {
             <div className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
         {registrosIniciales.map((r) => (
-          <Panel className="p-4 space-y-1.5 text-sm">
+          <Panel key={r.id} className="p-4 space-y-1.5 text-sm">
             {editandoId === r.id ? (
               <div className="space-y-2">
                 <textarea
@@ -206,7 +206,7 @@ const borrar = async (id: string) => {
                 {r.notas && <p className="text-slate-500 italic">{r.notas}</p>}
               </>
             )}
-          </div>
+          </Panel>
         ))}
         {registrosIniciales.length === 0 && (
           <p className="text-center text-slate-400 py-6">Sin episodios registrados todavía.</p>

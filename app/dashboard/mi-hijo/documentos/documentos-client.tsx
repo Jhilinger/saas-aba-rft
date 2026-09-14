@@ -267,7 +267,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
                   {d.firmado ? 'Volver a firmar' : 'Firmar'}
                 </button>
               </div>
-            </div>
+            </Panel>
           ))}
           {a.documentos.length === 0 && (
             <p className="text-sm text-slate-400">La clínica no tiene documentos pendientes de firma.</p>
