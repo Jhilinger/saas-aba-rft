@@ -1,10 +1,19 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
 import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
+import { Breadcrumb, Panel } from '../../../ui'
+import type { Enums, Tables } from '@/database.types'
+
+type TestBloque = {
+  fase: Enums<'fase_rft'>
+  posicionOrigen: string | null
+  posicionDestino: string | null
+  fecha: string
+  porcentaje: number | null
+}
 
 export default async function ProgramaRftPage({
   params,
@@ -56,10 +65,10 @@ export default async function ProgramaRftPage({
     .neq('fase', 'entrenamiento')
     .order('fecha', { ascending: false })
 
-  const testsPorClase: Record<string, any[]> = {}
+  const testsPorClase: Record<string, TestBloque[]> = {}
   const vistos = new Set<string>()
   for (const bloque of bloquesTest ?? []) {
-    const clasesDelBloque = [...new Set((bloque as any).ensayos_rft_detalle.map((d: any) => d.clase_id))]
+    const clasesDelBloque = [...new Set(bloque.ensayos_rft_detalle.map((d) => d.clase_id))]
     for (const claseId of clasesDelBloque) {
       const clave = `${claseId}-${bloque.fase}-${bloque.posicion_origen}-${bloque.posicion_destino}`
       if (vistos.has(clave)) continue
@@ -80,23 +89,21 @@ export default async function ProgramaRftPage({
     .select('grupo, fase, posicion_origen, posicion_destino, dominado, updated_at')
     .eq('programa_alumno_id', id)
 
-  const alumnoNombre = (programa.alumnos as any)?.nombre_anonimizado ?? ''
+  const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
+
+  const alumnoNombre = alumno?.nombre_anonimizado ?? ''
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]
 
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       <div>
-        <Link
-          href={`/dashboard/alumnos/${programa.alumno_id}`}
-          className="text-sm text-indigo-600 hover:underline"
-        >
-          ← Volver a {alumnoNombre}
-        </Link>
-        <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
-        <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+        <Breadcrumb items={[{ label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}` }, { label: programa.nombre }]} />
+        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
           {programa.area && <span>{programa.area}</span>}
           <EstadoProgramaSelector
             programaAlumnoId={programa.id}
@@ -106,7 +113,7 @@ export default async function ProgramaRftPage({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm space-y-3">
+      <Panel className="space-y-3 p-4 text-sm sm:p-5">
         <div>
           <span className="text-slate-400">% de acierto para dominio</span>
           <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
@@ -136,10 +143,10 @@ export default async function ProgramaRftPage({
             <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
           </div>
         )}
-        {(programa.programas_base as any)?.video_url && (
+        {programaBase?.video_url && (
           <div>
             <span className="text-slate-400">Vídeo de ejemplo</span>
-            <VideoDiferido url={(programa.programas_base as any).video_url} />
+            <VideoDiferido url={programaBase.video_url} />
           </div>
         )}
         {!tieneInfo && (
@@ -148,12 +155,12 @@ export default async function ProgramaRftPage({
             importó antes de que añadiéramos esta información).
           </p>
         )}
-      </div>
+      </Panel>
 
       <ProgramaRftClient
         programaAlumnoId={id}
         grupos={grupos}
-        clases={(clases as any) ?? []}
+        clases={clases ?? []}
         testsPorClase={testsPorClase}
         porFase={porFase}
         dominioFases={dominioFases ?? []}

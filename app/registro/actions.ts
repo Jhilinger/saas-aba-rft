@@ -2,6 +2,7 @@
 
 import { stripe } from '@/utils/stripe'
 import { createAdminClient } from '@/utils/supabase/admin'
+import type Stripe from 'stripe'
 
 const URL_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -43,7 +44,7 @@ export async function iniciarRegistro(formData: FormData) {
     terminos_aceptados_en: new Date().toISOString(),
   }
 
-  let session: any
+  let session: Stripe.Checkout.Session
   try {
     session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -61,8 +62,9 @@ export async function iniciarRegistro(formData: FormData) {
         metadata: metadataComun,
       },
     })
-  } catch (err: any) {
-    return { error: 'Error iniciando el pago: ' + (err?.message ?? 'error desconocido') }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'error desconocido'
+    return { error: 'Error iniciando el pago: ' + message }
   }
 
   if (!session.url) {

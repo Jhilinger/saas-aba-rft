@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import PreferenciasSection from '../preferencias-section'
-import EvaluacionPreferencia from './evaluacion-preferencia'
+import EvaluacionPreferencia, { type Evaluacion } from './evaluacion-preferencia'
 import { listarPreferencias, listarEvaluacionesPreferencia } from './actions'
 
 export default async function PreferenciasAlumnoPage({
@@ -34,8 +34,8 @@ export default async function PreferenciasAlumnoPage({
   return (
     <div className="space-y-8">
       <h2 className="text-lg font-semibold text-slate-800">Preferencias</h2>
-      <EvaluacionPreferencia alumnoId={id} evaluacionesIniciales={evaluacionesIniciales as any} />
-      <PreferenciasSection alumnoId={id} preferenciasIniciales={preferenciasIniciales as any} />
+      <EvaluacionPreferencia alumnoId={id} evaluacionesIniciales={evaluacionesIniciales as Evaluacion[]} />
+      <PreferenciasSection alumnoId={id} preferenciasIniciales={preferenciasIniciales} />
     </div>
   )
 }

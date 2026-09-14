@@ -1,6 +1,9 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import EvaluacionClient from './evaluacion-client'
+
+const VALORACIONES = ['dominado', 'parcial', 'no'] as const
+type Valoracion = (typeof VALORACIONES)[number]
 import ValoracionTabs from './valoracion-tabs'
 
 export default async function ValoracionPage({
@@ -55,6 +58,11 @@ export default async function ValoracionPage({
     .select('programa_base_id, valoracion')
     .eq('alumno_id', alumnoId)
 
+  const valoracionesValidas = (valoraciones ?? []).filter(
+    (valoracion): valoracion is typeof valoracion & { valoracion: Valoracion } =>
+      VALORACIONES.includes(valoracion.valoracion as Valoracion)
+  )
+
     return (
     <div className="space-y-4">
     <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
@@ -62,15 +70,15 @@ export default async function ValoracionPage({
       aba={
         <EvaluacionClient
           alumnoId={alumnoId}
-          programas={(programasAba ?? []).filter((p) => p.orden !== null)}
-          valoracionesIniciales={valoraciones ?? []}
+          programas={(programasAba ?? []).filter((p): p is typeof p & { orden: number } => p.orden !== null)}
+          valoracionesIniciales={valoracionesValidas}
         />
       }
       rft={
         <EvaluacionClient
           alumnoId={alumnoId}
-          programas={(programasRft ?? []).filter((p) => p.orden !== null)}
-          valoracionesIniciales={valoraciones ?? []}
+          programas={(programasRft ?? []).filter((p): p is typeof p & { orden: number } => p.orden !== null)}
+          valoracionesIniciales={valoracionesValidas}
           rachaLimite={1}
           totalLimite={1}
         />

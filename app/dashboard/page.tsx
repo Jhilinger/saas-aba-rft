@@ -1,6 +1,30 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Panel } from '../ui'
+import type { Tables } from '@/database.types'
+
+type BloqueAbaActividad = Pick<Tables<'bloques_ensayo'>, 'fecha' | 'porcentaje'> & {
+  conjuntos_estimulos_alumno: (Pick<Tables<'conjuntos_estimulos_alumno'>, 'programa_alumno_id'> & {
+    programas_alumno:
+      | (Pick<Tables<'programas_alumno'>, 'nombre' | 'alumno_id'> & {
+          alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+        })
+      | null
+  }) | null
+}
+
+type BloqueRftActividad = Pick<Tables<'bloques_ensayo_rft'>, 'fecha' | 'porcentaje' | 'programa_alumno_id'> & {
+  programas_alumno:
+    | (Pick<Tables<'programas_alumno'>, 'nombre' | 'alumno_id'> & {
+        alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+      })
+    | null
+}
+
+type AlumnoConTerapeuta = Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> & {
+  alumno_terapeuta: Pick<Tables<'alumno_terapeuta'>, 'terapeuta_id'>[]
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -24,12 +48,17 @@ export default async function DashboardPage() {
     )
   }
 
+  if (perfil.rol === 'clinica_admin' && !perfil.clinica_id) redirect('/dashboard')
+
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Hola, {perfil.nombre}</h1>
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Resumen</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Hola, {perfil.nombre}</h1>
+      </div>
 
       {perfil.rol === 'terapeuta' && <InicioTerapeuta terapeutaId={perfil.id} />}
-      {perfil.rol === 'clinica_admin' && <InicioClinica clinicaId={perfil.clinica_id} />}
+      {perfil.rol === 'clinica_admin' && perfil.clinica_id && <InicioClinica clinicaId={perfil.clinica_id} />}
       {perfil.rol === 'superadmin' && <InicioSuperadmin />}
       {perfil.rol === 'familia' && (
         <p className="text-slate-600">
@@ -88,15 +117,15 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
   }
 
   const actividad: Actividad[] = [
-    ...(bloquesAba ?? []).map((b: any) => ({
+    ...((bloquesAba ?? []) as unknown as BloqueAbaActividad[]).map((b) => ({
       fecha: b.fecha,
       porcentaje: Number(b.porcentaje),
       tipo: 'aba' as const,
-      programaId: b.conjuntos_estimulos_alumno?.programa_alumno_id,
+      programaId: b.conjuntos_estimulos_alumno?.programa_alumno_id ?? '',
       programaNombre: b.conjuntos_estimulos_alumno?.programas_alumno?.nombre ?? '—',
       alumnoNombre: b.conjuntos_estimulos_alumno?.programas_alumno?.alumnos?.nombre_anonimizado ?? '—',
     })),
-    ...(bloquesRft ?? []).map((b: any) => ({
+    ...((bloquesRft ?? []) as unknown as BloqueRftActividad[]).map((b) => ({
       fecha: b.fecha,
       porcentaje: Number(b.porcentaje),
       tipo: 'rft' as const,
@@ -111,26 +140,26 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnoIds.length}</p>
           <p className="text-sm text-slate-500">Alumnos asignados</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+        </Panel>
+        <Panel className="p-4 sm:p-5">
           <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalProgramas ?? 0}</p>
           <p className="text-sm text-slate-500">Programas en total</p>
-        </div>
+        </Panel>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Link
           href="/dashboard/mis-alumnos"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+          className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
         >
           Mis Alumnos
         </Link>
         <Link
           href="/dashboard/mis-programas"
-          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
         >
           Mis programas
         </Link>
@@ -138,7 +167,7 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Última actividad</h2>
-        <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+        <Panel className="overflow-x-auto">
           <table className="w-full text-sm min-w-[500px]">
             <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
               <tr>
@@ -150,7 +179,7 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
             </thead>
             <tbody>
               {actividad.map((a, i) => (
-                <tr key={i} className="border-b border-slate-100 last:border-0">
+                <tr key={i} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-indigo-50/40">
                   <td className="p-3 font-medium text-slate-800">{a.alumnoNombre}</td>
                   <td className="p-3">
                     <Link
@@ -173,7 +202,7 @@ async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
           {actividad.length === 0 && (
             <p className="p-6 text-center text-slate-400">Todavía no has tomado datos.</p>
           )}
-        </div>
+        </Panel>
       </section>
     </div>
   )
@@ -211,8 +240,8 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
     .eq('clinica_id', clinicaId)
     .eq('activo', true)
 
-  const sinTerapeuta = (alumnosConTerapeuta ?? []).filter(
-    (a: any) => !a.alumno_terapeuta || a.alumno_terapeuta.length === 0
+  const sinTerapeuta = ((alumnosConTerapeuta ?? []) as unknown as AlumnoConTerapeuta[]).filter(
+    (a) => !a.alumno_terapeuta || a.alumno_terapeuta.length === 0
   )
 
   const { data: clinica } = await supabase
@@ -265,7 +294,7 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
                   {sinTerapeuta.length} alumno{sinTerapeuta.length > 1 ? 's' : ''} sin terapeuta asignado
                 </p>
                 <ul className="mt-2 space-y-1">
-                  {sinTerapeuta.slice(0, 5).map((a: any) => (
+                  {sinTerapeuta.slice(0, 5).map((a) => (
                     <li key={a.id}>
                       <Link href={`/dashboard/alumnos/${a.id}`} className="text-amber-700 hover:underline">
                         {a.nombre_anonimizado}

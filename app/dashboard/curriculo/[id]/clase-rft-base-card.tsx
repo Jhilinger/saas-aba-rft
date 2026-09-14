@@ -84,7 +84,11 @@ export default function ClaseRftBaseCard({
             <button
               onClick={() => {
                 startTransition(async () => {
-                  await eliminarEstimuloRftBase(e.id, programaBaseId)
+                  const res = await eliminarEstimuloRftBase(e.id, programaBaseId)
+                  if (res?.error) {
+                    toast(res.error, 'error')
+                    return
+                  }
                   router.refresh()
                 })
               }}
@@ -104,7 +108,11 @@ export default function ClaseRftBaseCard({
           e.preventDefault()
           if (!nombreEstimulo.trim()) return
           startTransition(async () => {
-            await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, '', posicion)
+            const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, '', posicion)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
             setNombreEstimulo('')
             router.refresh()
           })

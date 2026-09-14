@@ -36,7 +36,7 @@ export default async function DatosClinicosPage({
     return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Datos</h2>
-      <EditarAlumnoForm alumno={alumno as any} />
+      <EditarAlumnoForm alumno={alumno} />
     </div>
   )
 }

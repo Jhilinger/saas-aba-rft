@@ -3,13 +3,16 @@
 import { useState, useTransition } from 'react'
 import { iniciarRegistro } from './actions'
 import AbacontextIcon from '../abacontext-icon'
+import { Button, Panel } from '../ui'
 
 export default function RegistroPage() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 p-4 sm:p-8">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-indigo-100/70 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-amber-100/80 blur-3xl" />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <div className="flex justify-center mb-2">
@@ -21,7 +24,8 @@ export default function RegistroPage() {
           </p>
         </div>
 
-        <form
+        <Panel
+          as="form"
           action={(formData: FormData) => {
             setError(null)
             startTransition(async () => {
@@ -33,7 +37,7 @@ export default function RegistroPage() {
               if (res.url) window.location.href = res.url
             })
           }}
-          className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6"
+          className="relative space-y-4 p-6 shadow-[0_20px_60px_rgba(30,41,59,0.10)] sm:p-8"
         >
           <div className="space-y-1">
             <label className="text-sm text-slate-600">Nombre de la clínica</label>
@@ -107,19 +111,18 @@ export default function RegistroPage() {
             </span>
           </label>
 
-          <button
+          <Button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+            className="w-full py-3 text-base"
           >
             {isPending ? 'Redirigiendo a pago...' : 'Continuar al pago'}
-          </button>
-
-          <p className="text-xs text-slate-400 text-center">
+          </Button>
+          <p className="text-center text-xs text-slate-400">
             Serás redirigido a Stripe para completar el pago de forma segura.
           </p>
-        </form>
+        </Panel>
+        </div>
       </div>
-    </div>
   )
 }

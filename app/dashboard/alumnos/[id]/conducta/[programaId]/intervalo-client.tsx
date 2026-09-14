@@ -279,7 +279,7 @@ export default function IntervaloClient({
           <label className="text-sm text-slate-600">Tipo de intervalo</label>
           <select
             value={tipoIntervalo}
-            onChange={(e) => setTipoIntervalo(e.target.value as any)}
+            onChange={(e) => setTipoIntervalo(e.target.value as 'parcial' | 'total' | 'momentaneo')}
             className="w-full mt-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="parcial">{ETIQUETA_TIPO.parcial}</option>
@@ -350,7 +350,7 @@ function historial(
   guardarEdicion: () => void,
   isPending: boolean,
   editTipo: string,
-  setEditTipo: (v: any) => void,
+  setEditTipo: (v: 'parcial' | 'total' | 'momentaneo') => void,
   editDuracion: number,
   setEditDuracion: (v: number) => void,
   editTotal: number,
@@ -369,7 +369,7 @@ function historial(
             <div className="space-y-2">
               <select
                 value={editTipo}
-                onChange={(e) => setEditTipo(e.target.value)}
+                onChange={(e) => setEditTipo(e.target.value as 'parcial' | 'total' | 'momentaneo')}
                 className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
               >
                 <option value="parcial">Parcial</option>

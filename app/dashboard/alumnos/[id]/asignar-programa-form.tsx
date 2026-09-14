@@ -3,6 +3,7 @@
 import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { importarPrograma } from './actions'
+import { Button, Panel } from '../../../ui'
 
 type ProgramaBase = {
   id: string
@@ -72,7 +73,7 @@ export default function AsignarProgramaForm({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+    <Panel className="p-4 sm:p-6 space-y-4">
       <div className="flex flex-wrap gap-2 text-sm">
         {FUENTES.map((f) => (
           <button
@@ -138,7 +139,7 @@ export default function AsignarProgramaForm({
               </option>
             ))}
           </select>
-          <button
+          <Button
             disabled={!programaId || isPending}
             onClick={() => {
               setError(null)
@@ -152,10 +153,10 @@ export default function AsignarProgramaForm({
                 router.refresh()
               })
             }}
-            className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+            className="py-3 sm:py-2 text-base sm:text-sm"
           >
             Importar
-          </button>
+          </Button>
         </div>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
@@ -168,6 +169,6 @@ export default function AsignarProgramaForm({
           </p>
         )}
       </div>
-    </div>
+    </Panel>
   )
 }

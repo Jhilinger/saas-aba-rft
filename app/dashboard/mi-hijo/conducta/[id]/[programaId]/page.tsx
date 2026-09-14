@@ -6,6 +6,7 @@ import TasaClient from '../../../../alumnos/[id]/conducta/[programaId]/tasa-clie
 import DuracionClient from '../../../../alumnos/[id]/conducta/[programaId]/duracion-client'
 import IntervaloClient from '../../../../alumnos/[id]/conducta/[programaId]/intervalo-client'
 import GraficoConducta from '../../../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
+import { Panel } from '../../../../../ui'
 
 export default async function ProgramaConductaFamiliaPage({
   params,
@@ -68,20 +69,21 @@ export default async function ProgramaConductaFamiliaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.tasa_por_minuto, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; tasa_por_minuto: number } => b.tasa_por_minuto !== null && ['linea_base', 'intervencion'].includes(b.fase))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.tasa_por_minuto, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="Ocurrencias/min"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
           />
-        </div>
-        <TasaClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        </Panel>
+        <TasaClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }
@@ -93,21 +95,22 @@ export default async function ProgramaConductaFamiliaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; porcentaje: number } => b.porcentaje !== null && ['linea_base', 'intervencion'].includes(b.fase))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% del tiempo"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
-        </div>
-        <DuracionClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        </Panel>
+        <DuracionClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }
@@ -119,21 +122,22 @@ export default async function ProgramaConductaFamiliaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; tipo_intervalo: 'parcial' | 'total' | 'momentaneo'; porcentaje: number } => b.porcentaje !== null && ['linea_base', 'intervencion'].includes(b.fase) && ['parcial', 'total', 'momentaneo'].includes(b.tipo_intervalo))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
         {cabecera}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+        <Panel className="p-3 sm:p-5">
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% de intervalos"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
-        </div>
-        <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        </Panel>
+        <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { generarInforme } from '../alumnos/[id]/informes/actions'
+import { Button, Panel } from '../../ui'
 
 type Alumno = { id: string; nombre_anonimizado: string }
 type EstadoAlumno = 'pendiente' | 'generando' | 'exito' | 'error'
@@ -62,7 +63,7 @@ export default function InformesLoteClient({ alumnos }: { alumnos: Alumno[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <select
             value={destinatario}
@@ -133,16 +134,16 @@ export default function InformesLoteClient({ alumnos }: { alumnos: Alumno[] }) {
           </div>
         </div>
 
-        <button
+        <Button
           onClick={generarTodos}
           disabled={generando || seleccionados.length === 0}
-          className="w-full rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="w-full py-3 text-base"
         >
           {generando
             ? `Generando... (${Object.values(resultados).filter((r) => r.estado === 'exito' || r.estado === 'error').length}/${seleccionados.length})`
             : `Generar todos (${seleccionados.length} seleccionados)`}
-        </button>
-      </div>
+        </Button>
+      </Panel>
     </div>
   )
 }

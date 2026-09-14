@@ -91,17 +91,17 @@ export default async function DashboardLayout({
   return (
     <ToastProvider>
     <ConfirmProvider>
-    <div className="flex min-h-screen flex-col md:flex-row bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
       <MobileNav enlaces={enlacesRol} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
 
-      <aside className="hidden md:flex w-64 shrink-0 border-r border-slate-200 bg-white p-5 flex-col">
-                <div className="mb-8">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-5 md:flex">
+        <div className="mb-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="w-6 h-6" />
-            <p className="font-bold text-slate-800">abacontext</p>
+            <p className="font-bold tracking-tight text-slate-800">abacontext</p>
           </div>
           <p className="text-xs text-slate-400">{perfil?.nombre}</p>
-          <span className="mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+          <span className="mt-2 inline-block rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
             {perfil?.rol}
           </span>
         </div>
@@ -111,7 +111,7 @@ export default async function DashboardLayout({
         <form action={logout}>
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rose-500 hover:bg-rose-50"
+            className="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-rose-500 transition-colors hover:bg-rose-50"
           >
             Cerrar sesión
           </button>

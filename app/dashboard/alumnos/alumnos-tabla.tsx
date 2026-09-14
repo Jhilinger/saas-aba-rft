@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import AlumnoRow from './alumno-row'
 import { descargarCSV } from '@/utils/csv'
 
@@ -47,27 +46,27 @@ export default function AlumnosTabla({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-col sm:flex-row gap-2">
+    <div className="space-y-3">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           placeholder="Buscar alumno por iniciales..."
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+          className="flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm"
         />
         <button
           onClick={exportar}
           disabled={filtrados.length === 0}
-          className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40 whitespace-nowrap"
+          className="rounded-lg bg-slate-100 px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-40 sm:py-2"
         >
           Exportar CSV
         </button>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-sm min-w-[600px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
-            <tr>
+            <tr className="whitespace-nowrap">
               <th className="p-3">Alumno</th>
               <th className="p-3">Fecha nacimiento</th>
               <th className="p-3">Terapeutas</th>

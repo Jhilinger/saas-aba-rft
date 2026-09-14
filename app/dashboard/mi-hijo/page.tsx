@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import ProgresoTabla from '../alumnos/[id]/progreso/progreso-tabla'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumno = {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> | null
+}
 
 function simplificar(estado: string | null): 'dominado' | 'adquisicion' | 'sin_ensenar' {
   if (!estado) return 'sin_ensenar'
@@ -19,14 +24,16 @@ export default async function ProgresoFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado, clinica_id)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumno[])
+    .map((v) => v.alumnos)
+    .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> => Boolean(a))
 
   if (alumnos.length === 0) {
     return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
   }
 
   const secciones = await Promise.all(
-    alumnos.map(async (alumno: any) => {
+    alumnos.map(async (alumno) => {
       const { data: curriculo } = await supabase
         .from('programas_base')
         .select('id, nombre, tipo, area, orden')

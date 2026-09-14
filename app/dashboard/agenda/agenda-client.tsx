@@ -14,6 +14,7 @@ import {
 } from './actions'
 import { useConfirm } from '../../providers/confirm-provider'
 import { useToast } from '../../providers/toast-provider'
+import { Button, Panel } from '../../ui'
 
 type Sesion = {
   id: string
@@ -219,18 +220,18 @@ export default function AgendaClient({
           <div className="pt-1 border-t border-slate-100 space-y-1">
             {esPasadaSinMarcar && (
               <>
-                <button onClick={() => marcar(s.id, 'asistio')} className="block w-full rounded bg-emerald-600 py-1 text-white font-medium">
+                <Button variant="success" onClick={() => marcar(s.id, 'asistio')} className="block w-full rounded py-1 font-medium">
                   ✓ Asistió
-                </button>
-                <button onClick={() => marcar(s.id, 'cancelada', 'terapeuta')} className="block w-full rounded bg-amber-500 py-1 text-white font-medium">
+                </Button>
+                <Button variant="warning" onClick={() => marcar(s.id, 'cancelada', 'terapeuta')} className="block w-full rounded py-1 font-medium">
                   Cancelada (terapeuta)
-                </button>
-                <button onClick={() => marcar(s.id, 'cancelada', 'familia')} className="block w-full rounded bg-amber-500 py-1 text-white font-medium">
+                </Button>
+                <Button variant="warning" onClick={() => marcar(s.id, 'cancelada', 'familia')} className="block w-full rounded py-1 font-medium">
                   Cancelada (familia)
-                </button>
-                <button onClick={() => marcar(s.id, 'no_asistio')} className="block w-full rounded bg-rose-600 py-1 text-white font-medium">
+                </Button>
+                <Button variant="danger" onClick={() => marcar(s.id, 'no_asistio')} className="block w-full rounded py-1 font-medium">
                   No asistió
-                </button>
+                </Button>
               </>
             )}
             {!esPasadaSinMarcar && s.estado === 'programada' && (
@@ -265,8 +266,8 @@ export default function AgendaClient({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
-        <div className="flex gap-2 text-sm">
+      <Panel className="space-y-4 p-4 sm:p-6">
+        <div className="flex flex-wrap gap-2 text-sm">
           <button
             onClick={() => setModo('recurrente')}
             className={`rounded-lg px-3 py-1.5 font-medium ${modo === 'recurrente' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'}`}
@@ -304,7 +305,7 @@ export default function AgendaClient({
           }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-3"
         >
-          <select name="alumno_id" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm">
+          <select name="alumno_id" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
             <option value="">Alumno...</option>
             {alumnos.map((a) => (
               <option key={a.id} value={a.id}>
@@ -314,7 +315,7 @@ export default function AgendaClient({
           </select>
 
           {miRol === 'clinica_admin' ? (
-            <select name="terapeuta_id" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm">
+            <select name="terapeuta_id" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm">
               <option value="">Terapeuta...</option>
               {terapeutas.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -328,8 +329,8 @@ export default function AgendaClient({
 
           {modo === 'recurrente' ? (
             <>
-              <input name="fecha_inicio" type="date" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+              <input name="fecha_inicio" type="date" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               <div className="sm:col-span-2 flex flex-wrap gap-2">
                 {DIAS_SEMANA.map((d) => (
                   <label key={d.value} className="flex items-center gap-1 rounded-lg border border-slate-300 px-2 py-1 text-sm">
@@ -340,33 +341,33 @@ export default function AgendaClient({
               </div>
               <div className="space-y-1">
                 <label className="text-sm text-slate-600">Duración (min)</label>
-                <input name="duracion_minutos" type="number" defaultValue="60" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+                <input name="duracion_minutos" type="number" defaultValue="60" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               </div>
               <div className="space-y-1">
                 <label className="text-sm text-slate-600">Nº de semanas</label>
-                <input name="numero_semanas" type="number" defaultValue="8" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+                <input name="numero_semanas" type="number" defaultValue="8" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
               </div>
             </>
           ) : (
             <>
-              <input name="fecha" type="date" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-              <input name="duracion_minutos" type="number" defaultValue="60" placeholder="Duración (min)" className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+              <input name="fecha" type="date" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="hora" type="time" required className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
+              <input name="duracion_minutos" type="number" defaultValue="60" placeholder="Duración (min)" className="rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:text-sm" />
             </>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isPending}
-            className="sm:col-span-2 rounded-lg bg-indigo-600 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+            className="sm:col-span-2 w-full py-3 text-base sm:py-2 sm:text-sm"
           >
             {isPending ? 'Creando...' : 'Programar'}
-          </button>
+          </Button>
         </form>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
         {mensajeExito && <p className="text-sm text-emerald-600">{mensajeExito}</p>}
-      </div>
+      </Panel>
 
       {pendientesCount > 0 && (
         <Link
@@ -392,10 +393,10 @@ export default function AgendaClient({
                   {new Date(s.fecha_hora).toLocaleString('es-ES', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => marcar(s.id, 'asistio')} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white">✓ Asistió</button>
-                  <button onClick={() => marcar(s.id, 'cancelada', 'terapeuta')} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white">Cancelada (terapeuta)</button>
-                  <button onClick={() => marcar(s.id, 'cancelada', 'familia')} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white">Cancelada (familia)</button>
-                  <button onClick={() => marcar(s.id, 'no_asistio')} className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white">No asistió</button>
+                  <Button variant="success" onClick={() => marcar(s.id, 'asistio')} className="px-3 py-1.5 text-xs">✓ Asistió</Button>
+                  <Button variant="warning" onClick={() => marcar(s.id, 'cancelada', 'terapeuta')} className="px-3 py-1.5 text-xs">Cancelada (terapeuta)</Button>
+                  <Button variant="warning" onClick={() => marcar(s.id, 'cancelada', 'familia')} className="px-3 py-1.5 text-xs">Cancelada (familia)</Button>
+                  <Button variant="danger" onClick={() => marcar(s.id, 'no_asistio')} className="px-3 py-1.5 text-xs">No asistió</Button>
                 </div>
               </div>
             ))}
@@ -404,14 +405,14 @@ export default function AgendaClient({
         </section>
       ) : (
         <>
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2 sm:justify-between">
             <Link
               href={`/dashboard/agenda?fecha=${sumarDias(lunes, -7)}`}
-              className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-200"
+              className="order-2 flex-1 rounded-lg bg-slate-100 px-3 py-1.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-200 sm:order-none sm:flex-none"
             >
               ← Semana anterior
             </Link>
-            <div className="text-center">
+            <div className="order-1 w-full text-center sm:order-none sm:w-auto">
               <p className="font-semibold text-slate-800">{formatearRangoSemana(lunes)}</p>
               <Link href="/dashboard/agenda" className="text-xs text-indigo-600 hover:underline">
                 Ir a esta semana
@@ -419,7 +420,7 @@ export default function AgendaClient({
             </div>
             <Link
               href={`/dashboard/agenda?fecha=${sumarDias(lunes, 7)}`}
-              className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-200"
+              className="order-3 flex-1 rounded-lg bg-slate-100 px-3 py-1.5 text-center text-sm font-medium text-slate-600 hover:bg-slate-200 sm:order-none sm:flex-none"
             >
               Semana siguiente →
             </Link>
@@ -454,21 +455,21 @@ export default function AgendaClient({
                     onChange={(e) => setNuevaHoraSerie(e.target.value)}
                     className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
                   />
-                  <button onClick={() => cambiarHora(serie.serieId)} disabled={!nuevaHoraSerie || isPending} className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50">
+                  <Button onClick={() => cambiarHora(serie.serieId)} disabled={!nuevaHoraSerie || isPending} className="px-3 py-1.5 text-xs">
                     Cambiar hora de todas las futuras
-                  </button>
-                  <button onClick={() => cancelarSerie(serie.serieId, serie.count)} disabled={isPending} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-400 disabled:opacity-50">
+                  </Button>
+                  <Button variant="warning" onClick={() => cancelarSerie(serie.serieId, serie.count)} disabled={isPending} className="px-3 py-1.5 text-xs">
                     Cancelar todas las futuras
-                  </button>
-                  <button onClick={() => eliminarSerie(serie.serieId, serie.count)} disabled={isPending} className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-50">
+                  </Button>
+                  <Button variant="danger" onClick={() => eliminarSerie(serie.serieId, serie.count)} disabled={isPending} className="px-3 py-1.5 text-xs">
                     Eliminar todas las futuras
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
           ))}
 
-          <div className={`grid grid-cols-1 gap-2 overflow-x-auto ${mostrarFinde ? 'sm:grid-cols-7' : 'sm:grid-cols-5'}`}>
+          <div className={`grid grid-cols-1 gap-2 overflow-x-auto sm:min-w-0 ${mostrarFinde ? 'sm:grid-cols-7' : 'sm:grid-cols-5'}`}>
             {columnas.map((col) => (
               <div
                 key={col.fecha}

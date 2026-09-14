@@ -77,7 +77,8 @@ export default async function ProgramaConductaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.tasa_por_minuto, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; tasa_por_minuto: number } => b.tasa_por_minuto !== null && ['linea_base', 'intervencion'].includes(b.fase))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.tasa_por_minuto, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
@@ -86,11 +87,11 @@ export default async function ProgramaConductaPage({
           <GraficoConducta
             puntos={puntos}
             etiquetaY="Ocurrencias/min"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
           />
         </div>
-        <TasaClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        <TasaClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }
@@ -101,7 +102,8 @@ export default async function ProgramaConductaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; porcentaje: number } => b.porcentaje !== null && ['linea_base', 'intervencion'].includes(b.fase))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
@@ -110,12 +112,12 @@ export default async function ProgramaConductaPage({
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% del tiempo"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
         </div>
-        <DuracionClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        <DuracionClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }
@@ -127,7 +129,8 @@ export default async function ProgramaConductaPage({
       .eq('programa_alumno_id', programaId)
       .order('fecha', { ascending: false })
 
-    const puntos = (bloques ?? []).map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; tipo_intervalo: 'parcial' | 'total' | 'momentaneo'; porcentaje: number } => b.porcentaje !== null && ['linea_base', 'intervencion'].includes(b.fase) && ['parcial', 'total', 'momentaneo'].includes(b.tipo_intervalo))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.porcentaje, fase: b.fase }))
 
     return (
       <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
@@ -136,12 +139,12 @@ export default async function ProgramaConductaPage({
           <GraficoConducta
             puntos={puntos}
             etiquetaY="% de intervalos"
-            direccionObjetivo={programa.direccion_objetivo as any}
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
             titulo={programa.nombre}
             dominioYFijo={[0, 100]}
           />
         </div>
-        <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloques ?? []} />
+        <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }

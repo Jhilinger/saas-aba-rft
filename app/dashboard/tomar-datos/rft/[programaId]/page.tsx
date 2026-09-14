@@ -50,10 +50,10 @@ export default async function TomarDatosRftPage({
     .order('grupo')
     .order('created_at')
 
-  const alumnoNombre = (programa.alumnos as any)?.nombre_anonimizado ?? ''
+  const alumnoNombre = programa.alumnos?.nombre_anonimizado ?? ''
 
   return (
-    <div className="mx-auto max-w-2xl p-8 space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
       <div>
         <Link
           href={`/dashboard/programas-rft/${programa.id}`}
@@ -61,7 +61,8 @@ export default async function TomarDatosRftPage({
         >
           ← Volver a {programa.nombre}
         </Link>
-        <h1 className="mt-2 text-xl font-bold text-slate-800">
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">Toma de datos RFT</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
           {alumnoNombre} — {programa.nombre}
         </h1>
       </div>
@@ -69,11 +70,11 @@ export default async function TomarDatosRftPage({
             <TomarDatosRftClient
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
-        clases={(clases as any) ?? []}
+        clases={clases ?? []}
         ensayosPorBloqueDefecto={programa.ensayos_por_bloque}
-        instrucciones={(programa.programas_base as any)?.instrucciones_terapeuta ?? null}
-        ayudasPosibles={(programa.programas_base as any)?.ayudas_posibles ?? null}
-        videoUrl={(programa.programas_base as any)?.video_url ?? null}
+        instrucciones={programa.programas_base?.instrucciones_terapeuta ?? null}
+        ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
+        videoUrl={programa.programas_base?.video_url ?? null}
         grupoInicial={grupo ?? null}
       />
     </div>

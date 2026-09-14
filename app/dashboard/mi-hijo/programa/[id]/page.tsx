@@ -3,6 +3,18 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import EvolucionChart from '../../../programas/[id]/evolucion-chart'
 import { obtenerEvolucionAba } from '../../../programas/[id]/evolucion-actions'
+import type { Tables } from '@/database.types'
+
+type ProgramaConAlumno = Pick<
+  Tables<'programas_alumno'>,
+  'id' | 'nombre' | 'tipo' | 'alumno_id' | 'porcentaje_dominio'
+> & {
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
+
+type ConjuntoConEstimulos = Pick<Tables<'conjuntos_estimulos_alumno'>, 'id' | 'nombre'> & {
+  estimulos_alumno: Pick<Tables<'estimulos_alumno'>, 'nombre'>[]
+}
 
 export default async function ProgramaFamiliaPage({
   params,
@@ -42,7 +54,7 @@ export default async function ProgramaFamiliaPage({
     .eq('programa_alumno_id', id)
     .order('orden')
 
-  const alumnoNombre = (programa.alumnos as any)?.nombre_anonimizado ?? ''
+  const alumnoNombre = (programa as unknown as ProgramaConAlumno).alumnos?.nombre_anonimizado ?? ''
 
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-8 space-y-4">
@@ -56,10 +68,10 @@ export default async function ProgramaFamiliaPage({
           conjuntos={datosEvolucion}
           porcentajeDominio={programa.porcentaje_dominio}
           titulo={`${alumnoNombre} — ${programa.nombre}`}
-          estimulosPorConjunto={(conjuntos ?? []).map((c: any) => ({
+          estimulosPorConjunto={((conjuntos ?? []) as unknown as ConjuntoConEstimulos[]).map((c) => ({
             id: c.id,
             nombre: c.nombre,
-            estimulos: c.estimulos_alumno.map((e: any) => e.nombre),
+            estimulos: c.estimulos_alumno.map((e) => e.nombre),
           }))}
         />
       </div>

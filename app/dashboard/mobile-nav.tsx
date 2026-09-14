@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { logout } from '../logout-action'
 import AbacontextIcon from '../abacontext-icon'
 import { useEnlacesEfectivos } from './use-enlaces-efectivos'
@@ -23,13 +24,12 @@ export default function MobileNav({
   rol: string
 }) {
   const [abierto, setAbierto] = useState(false)
+  const pathname = usePathname()
   const { enModoAlumno, alumnoNombre, volver, enlaces: enlacesEfectivos } = useEnlacesEfectivos(enlaces)
-  let grupoAnterior: string | undefined = undefined
-
   return (
     <>
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 md:hidden">
-                <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4 shadow-[0_1px_0_rgba(79,70,229,0.04)] md:hidden">
+        <div className="flex items-center gap-2">
           <AbacontextIcon className="w-6 h-6" />
           <div>
             <p className="text-sm font-bold text-slate-800">abacontext</p>
@@ -40,7 +40,7 @@ export default function MobileNav({
       </div>  
                 <button
           onClick={() => setAbierto(true)}
-          className="rounded-lg border border-slate-300 p-2 text-slate-700"
+          className="rounded-lg border border-slate-300 p-2 text-slate-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
           aria-label="Abrir menú"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -90,8 +90,8 @@ export default function MobileNav({
 
             <nav className="flex-1 space-y-1 overflow-y-auto">
               {enlacesEfectivos.map((e, i) => {
+                const grupoAnterior = i > 0 ? enlacesEfectivos[i - 1].grupo : undefined
                 const mostrarCabecera = e.grupo && e.grupo !== grupoAnterior
-                grupoAnterior = e.grupo
                 return (
                   <div key={e.href}>
                       {mostrarCabecera && (
@@ -102,7 +102,7 @@ export default function MobileNav({
                     <Link
                       href={e.href}
                       onClick={() => setAbierto(false)}
-                      className="block rounded-lg px-3 py-3 text-base font-medium text-slate-600 hover:bg-slate-100"
+                      className={`block rounded-lg px-3 py-3 text-base font-medium transition-colors ${pathname === e.href || pathname.startsWith(`${e.href}/`) ? 'bg-indigo-50 text-indigo-800' : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800'}`}
                     >
                       {e.label}
                     </Link>

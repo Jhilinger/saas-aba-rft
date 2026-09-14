@@ -126,7 +126,12 @@ export async function editarClinica(id: string, formData: FormData) {
   const precio_por_alumno = parseFloat(formData.get('precio_por_alumno') as string) || 0
   const logo = formData.get('logo') as File | null
 
-  const updateData: Record<string, any> = { nombre, precio_fijo_mensual, precio_por_alumno }
+  const updateData: {
+    nombre: string
+    precio_fijo_mensual: number
+    precio_por_alumno: number
+    logo_url?: string
+  } = { nombre, precio_fijo_mensual, precio_por_alumno }
 
   if (logo && logo.size > 0) {
     const extension = logo.name.split('.').pop()

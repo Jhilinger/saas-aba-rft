@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { crearFamiliar, desvincularFamiliarAlumno, vincularFamiliarAlumno } from './actions'
 import { useConfirm } from '../../providers/confirm-provider'
 import { useToast } from '../../providers/toast-provider'
+import { Button, Panel } from '../../ui'
 
 type Alumno = { id: string; nombre_anonimizado: string }
 type Familiar = { perfilId: string; nombre: string; email: string; alumnos: { id: string; nombre: string }[] }
@@ -82,7 +83,7 @@ export default function FamiliaTabla({
   }
   return (
     <div className="space-y-6">
-      <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+      <Panel className="space-y-4 p-4 sm:p-6">
         <h2 className="font-semibold text-slate-700">Invitar familiar</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
@@ -124,20 +125,20 @@ export default function FamiliaTabla({
           </div>
         </div>
 
-        <button
+        <Button
           onClick={invitar}
           disabled={isPending || !nombre.trim() || !email.trim() || alumnosSeleccionados.length === 0}
-          className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 text-base sm:text-sm"
         >
           Invitar familiar
-        </button>
+        </Button>
         {error && <p className="text-sm text-rose-600">{error}</p>}
-      </div>
+      </Panel>
 
       <div className="space-y-3">
         <h2 className="font-semibold text-slate-700">Familiares vinculados</h2>
         {familiares.map((f) => (
-          <div key={f.perfilId} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-2">
+          <Panel key={f.perfilId} className="p-4 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <p className="font-medium text-slate-800">{f.nombre}</p>
@@ -167,13 +168,13 @@ export default function FamiliaTabla({
                       </option>
                     ))}
                 </select>
-                <button
+                <Button
                   onClick={() => anadirAlumno(f.perfilId)}
                   disabled={!nuevoAlumnoId || isPending}
-                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs"
                 >
                   Añadir
-                </button>
+                </Button>
               </div>
             )}
 
@@ -193,7 +194,7 @@ export default function FamiliaTabla({
                 </span>
               ))}
             </div>
-          </div>
+          </Panel>
         ))}
         {familiares.length === 0 && (
           <p className="text-sm text-slate-400 text-center py-6">Sin familiares vinculados todavía.</p>

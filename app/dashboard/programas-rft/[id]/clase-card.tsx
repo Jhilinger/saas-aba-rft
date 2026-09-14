@@ -123,7 +123,11 @@ export default function ClaseCard({
               <button
                 onClick={() => {
                   startTransition(async () => {
-                    await eliminarEstimuloRft(e.id, programaAlumnoId)
+                    const res = await eliminarEstimuloRft(e.id, programaAlumnoId)
+                    if (res?.error) {
+                      toast(res.error, 'error')
+                      return
+                    }
                     router.refresh()
                   })
                 }}
@@ -143,7 +147,11 @@ export default function ClaseCard({
             e.preventDefault()
             if (!nombreEstimulo.trim()) return
             startTransition(async () => {
-              await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion)
+              const res = await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion)
+              if (res?.error) {
+                toast(res.error, 'error')
+                return
+              }
               setNombreEstimulo('')
               router.refresh()
             })
@@ -191,7 +199,11 @@ export default function ClaseCard({
                 <button
                   onClick={() => {
                     startTransition(async () => {
-                      await eliminarRelacionEntrenada(r.id, programaAlumnoId)
+                      const res = await eliminarRelacionEntrenada(r.id, programaAlumnoId)
+                      if (res?.error) {
+                        toast(res.error, 'error')
+                        return
+                      }
                       router.refresh()
                     })
                   }}

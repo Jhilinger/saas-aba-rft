@@ -1,6 +1,12 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import FamiliaTabla from './familia-tabla'
+import type { Tables } from '@/database.types'
+
+type VinculoFamiliar = Pick<Tables<'alumno_familia'>, 'perfil_id' | 'alumno_id'> & {
+  perfiles: Pick<Tables<'perfiles'>, 'nombre' | 'email'> | null
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
 
 export default async function FamiliaPage() {
   const supabase = await createClient()
@@ -14,7 +20,7 @@ export default async function FamiliaPage() {
     .eq('id', user.id)
     .single()
 
-  if (!perfil || !['superadmin', 'clinica_admin'].includes(perfil.rol)) {
+  if (!perfil || !['superadmin', 'clinica_admin'].includes(perfil.rol) || !perfil.clinica_id) {
     redirect('/dashboard')
   }
 
@@ -36,9 +42,9 @@ export default async function FamiliaPage() {
 
   const familiaresMap = new Map<string, { perfilId: string; nombre: string; email: string; alumnos: { id: string; nombre: string }[] }>()
 
-  for (const v of vinculos ?? []) {
-    const p = v.perfiles as any
-    const a = v.alumnos as any
+  for (const v of (vinculos ?? []) as unknown as VinculoFamiliar[]) {
+    const p = v.perfiles
+    const a = v.alumnos
     if (!p) continue
     if (!familiaresMap.has(v.perfil_id)) {
       familiaresMap.set(v.perfil_id, { perfilId: v.perfil_id, nombre: p.nombre, email: p.email, alumnos: [] })
@@ -47,8 +53,12 @@ export default async function FamiliaPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-8">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Familia</h1>
+    <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Perfiles</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Familia</h1>
+        <p className="mt-1 text-sm text-slate-500">Gestiona los accesos de las familias vinculadas a tus alumnos.</p>
+      </div>
 
       <FamiliaTabla alumnos={alumnos ?? []} familiares={[...familiaresMap.values()]} />
     </div>

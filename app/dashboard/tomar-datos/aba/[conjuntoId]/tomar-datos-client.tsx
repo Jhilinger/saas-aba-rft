@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueAba } from './actions'
 import VideoDiferido from '../../../video-diferido'
+import { useToast } from '../../../../providers/toast-provider'
 
 type Estimulo = { id: string; nombre: string }
 
@@ -31,7 +32,7 @@ function generarSecuencia(estimulos: Estimulo[], n: number): Estimulo[] {
   const remainder = n % k
   const barajados = [...estimulos].sort(() => Math.random() - 0.5)
 
-  let pool: Estimulo[] = []
+  const pool: Estimulo[] = []
   barajados.forEach((e, idx) => {
     const count = base + (idx < remainder ? 1 : 0)
     for (let i = 0; i < count; i++) pool.push(e)
@@ -85,6 +86,7 @@ export default function TomarDatosClient({
   const [isPending, startTransition] = useTransition()
   const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean } | null>(null)
   const router = useRouter()
+  const toast = useToast()
 
   const empezarBloque = () => {
     setSecuencia(generarSecuencia(estimulos, tamanoBloque))
@@ -113,7 +115,7 @@ export default function TomarDatosClient({
           notas
         )
         if (res.error) {
-          alert('Error: ' + res.error)
+          toast(res.error, 'error')
           return
         }
         setResultado({ porcentaje: res.porcentaje ?? 0, dominioLogrado: res.dominioLogrado ?? false })
@@ -214,7 +216,7 @@ export default function TomarDatosClient({
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between text-sm text-slate-500">
-        <span>
+        <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
         </span>
         {ensayos.length > 0 && (
@@ -222,6 +224,19 @@ export default function TomarDatosClient({
             Deshacer último
           </button>
         )}
+      </div>
+      <div
+        role="progressbar"
+        aria-label="Progreso del bloque"
+        aria-valuemin={0}
+        aria-valuemax={secuencia.length}
+        aria-valuenow={ensayos.length}
+        className="h-2 overflow-hidden rounded-full bg-indigo-100"
+      >
+        <div
+          className="h-full rounded-full bg-indigo-600 transition-[width] duration-300"
+          style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }}
+        />
       </div>
 
       {enLineaBase && (

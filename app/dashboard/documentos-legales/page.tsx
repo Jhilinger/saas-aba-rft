@@ -18,16 +18,20 @@ export default async function DocumentosLegalesPage() {
     redirect('/dashboard')
   }
 
+  const clinicaId = perfil.clinica_id
+  if (!clinicaId) redirect('/dashboard')
+
   const { data: tipos, error: errorTipos } = await supabase
     .from('tipos_documento_clinica')
     .select('id, titulo, contenido, activo, created_at')
-    .eq('clinica_id', perfil.clinica_id)
+    .eq('clinica_id', clinicaId)
     .order('created_at', { ascending: true })
 
   return (
-    <div className="mx-auto max-w-3xl p-4 sm:p-8 space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-8">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Documentos legales</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Centro</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Documentos legales</h1>
         <p className="text-sm text-slate-500">
           Redacta aquí el consentimiento informado, la protección de datos, los términos y
           condiciones, o cualquier otro documento que las familias deban firmar.

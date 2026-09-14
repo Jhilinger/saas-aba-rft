@@ -3,7 +3,9 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-async function getPerfilActual() {
+type PerfilClinica = { rol: string; clinica_id: string }
+
+async function getPerfilActual(): Promise<PerfilClinica | null> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -14,7 +16,8 @@ async function getPerfilActual() {
     .eq('id', user.id)
     .single()
 
-  return perfil
+  if (!perfil?.clinica_id) return null
+  return { rol: perfil.rol, clinica_id: perfil.clinica_id }
 }
 
 export async function crearTipoDocumento(titulo: string, contenido: string) {
@@ -83,7 +86,7 @@ export async function listarFirmasDeTipo(tipoDocumentoId: string) {
     .order('fecha_firma', { ascending: false })
 
   const conUrl = await Promise.all(
-    (firmas ?? []).map(async (f: any) => {
+    (firmas ?? []).map(async (f) => {
       const { data } = await supabase.storage.from('documentos-firmados').createSignedUrl(f.pdf_url, 60 * 10)
       return {
         id: f.id,

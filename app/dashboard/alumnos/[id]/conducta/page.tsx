@@ -2,6 +2,11 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import ConductaClient from './conducta-client'
 
+const FORMATOS = ['intervalo', 'duracion', 'tasa', 'abc'] as const
+type Formato = (typeof FORMATOS)[number]
+const DIRECCIONES = ['aumentar', 'reducir'] as const
+type Direccion = (typeof DIRECCIONES)[number]
+
 export default async function ConductaPage({
   params,
 }: {
@@ -33,5 +38,15 @@ export default async function ConductaPage({
     .eq('tipo', 'conducta')
     .order('created_at', { ascending: false })
 
-  return <ConductaClient alumnoId={alumnoId} programasIniciales={programas ?? []} />
+  const programasValidos = (programas ?? []).flatMap((programa) => {
+    if (!FORMATOS.includes(programa.formato_recogida as Formato)) return []
+    if (programa.direccion_objetivo !== null && !DIRECCIONES.includes(programa.direccion_objetivo as Direccion)) return []
+    return [{
+      ...programa,
+      formato_recogida: programa.formato_recogida as Formato,
+      direccion_objetivo: programa.direccion_objetivo as Direccion | null,
+    }]
+  })
+
+  return <ConductaClient alumnoId={alumnoId} programasIniciales={programasValidos} />
 }

@@ -2,6 +2,23 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import ConfirmarAsistencia from '../confirmar-asistencia'
 import HistorialAsistencia from '../historial-asistencia'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumno = {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> | null
+}
+
+type SesionPendiente = Pick<Tables<'sesiones_programadas'>, 'id' | 'fecha_hora' | 'cancelado_por'> & {
+  estado: Exclude<Tables<'sesiones_programadas'>['estado'], 'programada'>
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
+
+type SesionHistorial = Pick<
+  Tables<'sesiones_programadas'>,
+  'id' | 'fecha_hora' | 'estado' | 'cancelado_por' | 'confirmada_familia'
+> & {
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
 
 export default async function AsistenciaFamiliaPage() {
   const supabase = await createClient()
@@ -14,13 +31,15 @@ export default async function AsistenciaFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumno[])
+    .map((v) => v.alumnos)
+    .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> => Boolean(a))
 
   if (alumnos.length === 0) {
     return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
   }
 
-  const alumnoIds = alumnos.map((a: any) => a.id)
+  const alumnoIds = alumnos.map((a) => a.id)
 
   const { data: sesionesPendientes } = await supabase
     .from('sesiones_programadas')
@@ -30,7 +49,7 @@ export default async function AsistenciaFamiliaPage() {
     .eq('confirmada_familia', false)
     .order('fecha_hora', { ascending: false })
 
-  const pendientesFormateadas = (sesionesPendientes ?? []).map((s: any) => ({
+  const pendientesFormateadas = ((sesionesPendientes ?? []) as unknown as SesionPendiente[]).map((s) => ({
     id: s.id,
     fecha_hora: s.fecha_hora,
     estado: s.estado,
@@ -45,7 +64,7 @@ export default async function AsistenciaFamiliaPage() {
     .order('fecha_hora', { ascending: false })
     .limit(50)
 
-  const historialFormateado = (historial ?? []).map((s: any) => ({
+  const historialFormateado = ((historial ?? []) as unknown as SesionHistorial[]).map((s) => ({
     id: s.id,
     fecha_hora: s.fecha_hora,
     estado: s.estado,

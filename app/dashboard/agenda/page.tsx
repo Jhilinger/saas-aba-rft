@@ -1,6 +1,24 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import AgendaClient from './agenda-client'
+import type { Tables } from '@/database.types'
+
+type SesionAgenda = Pick<
+  Tables<'sesiones_programadas'>,
+  | 'id'
+  | 'fecha_hora'
+  | 'duracion_minutos'
+  | 'estado'
+  | 'cancelado_por'
+  | 'notas'
+  | 'confirmada_familia'
+  | 'alumno_id'
+  | 'terapeuta_id'
+  | 'serie_id'
+> & {
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  terapeuta?: Pick<Tables<'perfiles'>, 'nombre'> | null
+}
 
 function hoyISO() {
   const d = new Date()
@@ -52,8 +70,16 @@ export default async function AgendaPage({
 
   if (!perfil || !puedeGestionar) redirect('/dashboard')
 
-  let alumnos: any[] = []
-  if (perfil.rol === 'clinica_admin' || perfil.rol === 'superadmin') {
+  let alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'>[] = []
+  if (perfil.rol === 'superadmin') {
+    const { data } = await supabase
+      .from('alumnos')
+      .select('id, nombre_anonimizado')
+      .eq('activo', true)
+      .order('nombre_anonimizado')
+    alumnos = data ?? []
+  } else if (perfil.rol === 'clinica_admin') {
+    if (!perfil.clinica_id) redirect('/dashboard')
     const { data } = await supabase
       .from('alumnos')
       .select('id, nombre_anonimizado')
@@ -66,11 +92,12 @@ export default async function AgendaPage({
       .from('alumno_terapeuta')
       .select('alumnos(id, nombre_anonimizado)')
       .eq('terapeuta_id', perfil.id)
-    alumnos = (data ?? []).map((v: any) => v.alumnos).filter(Boolean)
+    alumnos = (data ?? []).map((v) => v.alumnos).filter(Boolean)
   }
 
-  let terapeutas: any[] = []
+  let terapeutas: Pick<Tables<'perfiles'>, 'id' | 'nombre'>[] = []
   if (perfil.rol === 'clinica_admin') {
+    if (!perfil.clinica_id) redirect('/dashboard')
     const { data } = await supabase
       .from('perfiles')
       .select('id, nombre')
@@ -96,7 +123,7 @@ export default async function AgendaPage({
 
   const { count: pendientesCount } = await queryConteo
 
-  let sesiones: any[] = []
+  let sesiones: SesionAgenda[] = []
 
   if (vista === 'pendientes') {
     let q = supabase
@@ -108,7 +135,7 @@ export default async function AgendaPage({
       .limit(100)
     q = esAdminOSuper ? q.in('alumno_id', alumnoIds) : q.eq('terapeuta_id', perfil.id)
     const { data } = await q
-    sesiones = data ?? []
+    sesiones = (data ?? []) as unknown as SesionAgenda[]
   } else {
     const inicio = new Date(lunes + 'T00:00:00').toISOString()
     const fin = new Date(domingo + 'T23:59:59.999').toISOString()
@@ -120,12 +147,16 @@ export default async function AgendaPage({
       .order('fecha_hora', { ascending: true })
     q = esAdminOSuper ? q.in('alumno_id', alumnoIds) : q.eq('terapeuta_id', perfil.id)
     const { data } = await q
-    sesiones = data ?? []
+    sesiones = (data ?? []) as unknown as SesionAgenda[]
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-4 sm:p-8 space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Agenda</h1>
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Organización</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Agenda</h1>
+        <p className="mt-1 text-sm text-slate-500">Programa sesiones y registra la asistencia del equipo.</p>
+      </div>
 
       <AgendaClient
         miPerfilId={perfil.id}

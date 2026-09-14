@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, type MouseEvent, type TouchEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import jsPDF from 'jspdf'
 import { createClient } from '@/utils/supabase/client'
 import { guardarFirmaDocumento } from './actions'
 import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Documento = {
   id: string
@@ -26,14 +27,17 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
   const toast = useToast()
   const router = useRouter()
 
-  const posicion = (e: any, canvas: HTMLCanvasElement) => {
+  const posicion = (
+    e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+    canvas: HTMLCanvasElement
+  ) => {
     const rect = canvas.getBoundingClientRect()
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
     return { x: clientX - rect.left, y: clientY - rect.top }
   }
 
-  const empezarTrazo = (e: any) => {
+  const empezarTrazo = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
     e.preventDefault()
     const canvas = canvasRef.current
     if (!canvas) return
@@ -44,7 +48,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
     ctx.moveTo(x, y)
   }
 
-  const dibujar = (e: any) => {
+  const dibujar = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
     if (!dibujandoRef.current) return
     e.preventDefault()
     const canvas = canvasRef.current
@@ -160,8 +164,8 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
       toast('Documento firmado correctamente', 'exito')
       setFirmando(null)
       router.refresh()
-    } catch (err: any) {
-      toast(err.message ?? 'Error al firmar', 'error')
+    } catch (err: unknown) {
+      toast(err instanceof Error ? err.message : 'Error al firmar', 'error')
     } finally {
       setSubiendo(false)
     }
@@ -210,20 +214,22 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
+          <Button
+            variant="primary"
             onClick={confirmarFirma}
             disabled={!haDibujado || subiendo || !nombreFirmante.trim() || !dniFirmante.trim()}
-            className="flex-1 rounded-lg bg-indigo-600 py-3 text-base font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+            className="flex-1 py-3 text-base"
           >
             {subiendo ? 'Guardando firma...' : 'Firmar y confirmar'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => setFirmando(null)}
             disabled={subiendo}
-            className="rounded-lg bg-slate-100 px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-200"
+            className="px-4 py-3 text-base font-medium"
           >
             Cancelar
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -237,7 +243,7 @@ export default function DocumentosClient({ datosPorAlumno }: { datosPorAlumno: A
             <h2 className="text-lg font-bold text-slate-800">{a.alumnoNombre}</h2>
           )}
           {a.documentos.map((d) => (
-            <div key={d.id} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+            <Panel key={d.id} className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-medium text-slate-800">{d.titulo}</p>
                 {d.firmado && (

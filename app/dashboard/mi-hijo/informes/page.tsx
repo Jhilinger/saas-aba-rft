@@ -1,6 +1,18 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import InformesFamilia from '../informes-familia'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumno = {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> | null
+}
+
+type InformeConAlumno = Pick<
+  Tables<'informes'>,
+  'id' | 'periodo_desde' | 'periodo_hasta' | 'contenido' | 'created_at' | 'alumno_id'
+> & {
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
 
 export default async function InformesFamiliaPage() {
   const supabase = await createClient()
@@ -13,13 +25,15 @@ export default async function InformesFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado, clinica_id)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumno[])
+    .map((v) => v.alumnos)
+    .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> => Boolean(a))
 
   if (alumnos.length === 0) {
     return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
   }
 
-  const alumnoIds = alumnos.map((a: any) => a.id)
+  const alumnoIds = alumnos.map((a) => a.id)
 
   const { data: clinicaDatos } = await supabase
     .from('clinicas')
@@ -34,7 +48,7 @@ export default async function InformesFamiliaPage() {
     .eq('destinatario', 'familia')
     .order('created_at', { ascending: false })
 
-  const informesFormateados = (informesData ?? []).map((i: any) => ({
+  const informesFormateados = ((informesData ?? []) as unknown as InformeConAlumno[]).map((i) => ({
     id: i.id,
     periodo_desde: i.periodo_desde,
     periodo_hasta: i.periodo_hasta,

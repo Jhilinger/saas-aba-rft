@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import DocumentosClient from './documentos-client'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumno = {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> | null
+}
 
 export default async function DocumentosFamiliaPage() {
   const supabase = await createClient()
@@ -21,7 +26,9 @@ export default async function DocumentosFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado, clinica_id)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumno[])
+    .map((v) => v.alumnos)
+    .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'clinica_id'> => Boolean(a))
 
   if (alumnos.length === 0) {
     return (
@@ -34,7 +41,7 @@ export default async function DocumentosFamiliaPage() {
   }
 
   const datosPorAlumno = await Promise.all(
-    alumnos.map(async (alumno: any) => {
+    alumnos.map(async (alumno) => {
       const { data: tipos } = await supabase
         .from('tipos_documento_clinica')
         .select('id, titulo, contenido')

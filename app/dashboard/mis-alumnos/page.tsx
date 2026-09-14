@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumnoTerapeuta = Pick<Tables<'alumno_terapeuta'>, 'es_principal'> & {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'fecha_nacimiento'> | null
+}
 
 export default async function MisAlumnosPage() {
   const supabase = await createClient()
@@ -29,27 +34,34 @@ export default async function MisAlumnosPage() {
     .select('es_principal, alumnos(id, nombre_anonimizado, fecha_nacimiento)')
     .eq('terapeuta_id', user.id)
 
-  const alumnos = (vinculos ?? [])
-    .map((v: any) => ({ ...v.alumnos, es_principal: v.es_principal }))
-    .filter((a) => a.id)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumnoTerapeuta[])
+    .map((v) => ({ ...v.alumnos, es_principal: v.es_principal }))
+    .filter(
+      (a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado' | 'fecha_nacimiento'> & { es_principal: boolean } =>
+        Boolean(a.id)
+    )
     .sort((a, b) => a.nombre_anonimizado.localeCompare(b.nombre_anonimizado))
 
   return (
-    <div className="mx-auto max-w-3xl p-4 sm:p-8 space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Mis Alumnos</h1>
+    <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Mi trabajo</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Mis alumnos</h1>
+        <p className="mt-1 text-sm text-slate-500">Accede rápidamente a los perfiles que tienes asignados.</p>
+      </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-sm min-w-[450px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
-            <tr>
+            <tr className="whitespace-nowrap">
               <th className="p-3">Alumno</th>
               <th className="p-3">Fecha nacimiento</th>
               <th className="p-3">Rol</th>
             </tr>
           </thead>
           <tbody>
-            {alumnos.map((a: any) => (
-              <tr key={a.id} className="border-b border-slate-100 last:border-0">
+            {alumnos.map((a) => (
+              <tr key={a.id} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-indigo-50/40">
                 <td className="p-3 font-medium text-slate-800">
                   <Link href={`/dashboard/alumnos/${a.id}`} className="hover:underline">
                     {a.nombre_anonimizado}

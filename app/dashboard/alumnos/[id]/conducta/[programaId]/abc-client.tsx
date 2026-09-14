@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { crearRegistroAbc, editarRegistroAbc, eliminarRegistroAbc } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
+import { Button, Panel } from '../../../../../ui'
 
 type Registro = {
   id: string
@@ -93,7 +94,7 @@ const borrar = async (id: string) => {
   }
     return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-3">
+      <Panel className="p-4 sm:p-6 space-y-3">
         <h2 className="font-semibold text-slate-700">Nuevo episodio</h2>
         <div>
           <label className="text-sm text-slate-600">Antecedente — ¿qué pasó justo antes?</label>
@@ -129,19 +130,19 @@ const borrar = async (id: string) => {
           rows={2}
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
-        <button
+        <Button
           onClick={guardar}
           disabled={isPending || !antecedente.trim() || !conducta.trim() || !consecuencia.trim()}
-          className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="w-full sm:w-auto py-3 sm:py-2 text-base sm:text-sm"
         >
           Guardar episodio
-        </button>
-      </div>
+        </Button>
+      </Panel>
 
             <div className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
         {registrosIniciales.map((r) => (
-          <div key={r.id} className="rounded-2xl border border-slate-200 bg-white p-4 space-y-1.5 text-sm">
+          <Panel className="p-4 space-y-1.5 text-sm">
             {editandoId === r.id ? (
               <div className="space-y-2">
                 <textarea

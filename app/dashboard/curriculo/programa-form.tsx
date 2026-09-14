@@ -1,20 +1,38 @@
 'use client'
 
 import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { crearPrograma } from './actions'
 import { useRouter } from 'next/navigation'
+import { useToast } from '../../providers/toast-provider'
+import { Button, Panel } from '../../ui'
+
+function BotonCrear() {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto px-4 py-3 sm:py-2 text-base sm:text-sm">
+      {pending ? 'Creando...' : 'Crear programa'}
+    </Button>
+  )
+}
 
 export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
   const [tipo, setTipo] = useState('aba_clasico')
   const router = useRouter()
+  const toast = useToast()
 
   return (
-    <form
+    <Panel
+      as="form"
       action={async (formData) => {
         const res = await crearPrograma(formData)
-        if (!res.error && res.id) router.push(`/dashboard/curriculo/${res.id}`)
+        if (res.error) {
+          toast(res.error, 'error')
+          return
+        }
+        if (res.id) router.push(`/dashboard/curriculo/${res.id}`)
       }}
-      className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
+      className="space-y-4 p-4 sm:p-6"
     >
       <h2 className="font-semibold text-slate-700">
         Nuevo programa {esGlobal ? '(global, para todas las clínicas)' : '(compartido con toda tu clínica)'}
@@ -136,9 +154,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         </div>
       </div>
 
-      <button type="submit" className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500">
-        Crear programa
-      </button>
-    </form>
+      <BotonCrear />
+    </Panel>
   )
 }

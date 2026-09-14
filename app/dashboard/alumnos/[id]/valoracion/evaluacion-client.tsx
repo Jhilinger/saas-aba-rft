@@ -4,6 +4,7 @@ import { useState, useMemo, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarValoracion, importarNoDominados } from './actions'
 import { useToast } from '../../../../providers/toast-provider'
+import { Button, Panel } from '../../../../ui'
 
 type Programa = { id: string; nombre: string; tipo: string; area: string | null; objetivo: string | null; orden: number }
 type Valoracion = { programa_base_id: string; valoracion: 'dominado' | 'parcial' | 'no' }
@@ -176,27 +177,30 @@ export default function EvaluacionClient({
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
+            <Button
+              variant="success"
               onClick={() => valorarContinuacion(programaActual.id, 'dominado')}
               disabled={isPending}
-              className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >
               Dominado
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="warning"
               onClick={() => valorarContinuacion(programaActual.id, 'parcial')}
               disabled={isPending}
-              className="flex-1 rounded-lg bg-amber-500 py-4 sm:py-3 text-base font-semibold text-white hover:bg-amber-400 disabled:opacity-50 active:scale-[0.98]"
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >
               Parcial
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="danger"
               onClick={() => valorarContinuacion(programaActual.id, 'no')}
               disabled={isPending}
-              className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >
               No
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -211,7 +215,7 @@ export default function EvaluacionClient({
 
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+        <Panel className="p-4 sm:p-6 space-y-4">
           <h2 className="font-semibold text-slate-800">
             {detenida ? 'Evaluación detenida automáticamente' : 'Evaluación completa'}
           </h2>
@@ -243,15 +247,11 @@ export default function EvaluacionClient({
           </div>
 
           {totalNoOParcial > 0 && (
-            <button
-              onClick={importar}
-              disabled={importando}
-              className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-            >
+            <Button onClick={importar} disabled={importando} className="w-full py-3">
               {importando
                 ? 'Importando...'
                 : `Importar al PEI como línea base (${totalNoOParcial} programas)`}
-            </button>
+            </Button>
           )}
 
           {pendientesRestantes > 0 && (
@@ -269,7 +269,7 @@ export default function EvaluacionClient({
               datos de línea base con ellos.
             </p>
           )}
-        </div>
+        </Panel>
       </div>
     )
   }
@@ -303,27 +303,30 @@ export default function EvaluacionClient({
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
+          <Button
+            variant="success"
             onClick={() => valorar(programaActual.id, 'dominado')}
             disabled={isPending}
-            className="flex-1 rounded-lg bg-emerald-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 active:scale-[0.98]"
+            className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
           >
             Dominado
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="warning"
             onClick={() => valorar(programaActual.id, 'parcial')}
             disabled={isPending}
-            className="flex-1 rounded-lg bg-amber-500 py-4 sm:py-3 text-base font-semibold text-white hover:bg-amber-400 disabled:opacity-50 active:scale-[0.98]"
+            className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
           >
             Parcial
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="danger"
             onClick={() => valorar(programaActual.id, 'no')}
             disabled={isPending}
-            className="flex-1 rounded-lg bg-rose-600 py-4 sm:py-3 text-base font-semibold text-white hover:bg-rose-500 disabled:opacity-50 active:scale-[0.98]"
+            className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
           >
             No
-          </button>
+          </Button>
         </div>
       </div>
 

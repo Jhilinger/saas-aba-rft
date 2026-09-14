@@ -50,7 +50,7 @@ export default async function AlumnoPage({
     <section className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
       <AsignarProgramaForm alumnoId={id} programasBase={programasBase ?? []} miPerfilId={perfil.id} />
-      <PeiTabla programas={(programas as any) ?? []} />
+      <PeiTabla programas={programas ?? []} />
     </section>
   )
 }

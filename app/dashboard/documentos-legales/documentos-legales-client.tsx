@@ -9,6 +9,7 @@ import {
   listarFirmasDeTipo,
 } from './actions'
 import { useToast } from '../../providers/toast-provider'
+import { Button, Panel } from '../../ui'
 
 type Tipo = { id: string; titulo: string; contenido: string; activo: boolean; created_at: string }
 type Firma = { id: string; alumnoNombre: string; firmadoPorNombre: string; fechaFirma: string; pdfUrl: string | null }
@@ -86,7 +87,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
   }
   return (
     <div className="space-y-6">
-      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+      <Panel className="space-y-3 p-4 sm:p-6">
         <h2 className="font-semibold text-slate-700">Nuevo documento</h2>
         <input
           value={nuevoTitulo}
@@ -101,18 +102,18 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
           rows={6}
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
         />
-        <button
+        <Button
           onClick={crear}
           disabled={isPending || !nuevoTitulo.trim() || !nuevoContenido.trim()}
-          className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 text-base sm:text-sm"
         >
           Crear documento
-        </button>
-      </div>
+        </Button>
+      </Panel>
 
       <div className="space-y-3">
         {tipos.map((t) => (
-          <div key={t.id} className={`rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 space-y-2 ${!t.activo ? 'opacity-60' : ''}`}>
+          <Panel key={t.id} className={`p-4 sm:p-5 space-y-2 ${!t.activo ? 'opacity-60' : ''}`}>
             {editandoId === t.id ? (
               <div className="space-y-2">
                 <input
@@ -184,7 +185,7 @@ export default function DocumentosLegalesClient({ tiposIniciales }: { tiposInici
                 )}
               </>
             )}
-          </div>
+          </Panel>
         ))}
         {tipos.length === 0 && <p className="text-center text-slate-400 py-6">Sin documentos creados todavía.</p>}
       </div>

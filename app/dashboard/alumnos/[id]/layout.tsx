@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
+import { Panel } from '../../../ui'
 
 export default async function AlumnoLayout({
   children,
@@ -33,11 +35,14 @@ export default async function AlumnoLayout({
   if (!alumno) notFound()
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">{alumno.nombre_anonimizado}</h1>
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
+      <Panel className="p-4 sm:p-5">
+        <Link href="/dashboard/alumnos" className="text-sm font-medium text-indigo-600 hover:underline">
+          ← Volver a alumnos
+        </Link>
+        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{alumno.nombre_anonimizado}</h1>
         <p className="text-sm text-slate-500">Nacimiento: {alumno.fecha_nacimiento}</p>
-      </div>
+      </Panel>
 
       {children}
     </div>

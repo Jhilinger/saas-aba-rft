@@ -138,7 +138,7 @@ export async function importarNoDominados(alumnoId: string) {
 
         if (nuevoConjunto && conjunto.estimulos_base?.length) {
           await supabase.from('estimulos_alumno').insert(
-            conjunto.estimulos_base.map((e: any) => ({
+            conjunto.estimulos_base.map((e) => ({
               conjunto_id: nuevoConjunto.id,
               nombre: e.nombre,
               descripcion: e.descripcion,

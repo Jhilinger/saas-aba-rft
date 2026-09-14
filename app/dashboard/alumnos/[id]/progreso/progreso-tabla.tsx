@@ -4,6 +4,7 @@
 
 import { useState, useMemo } from 'react'
 import { descargarCSV } from '@/utils/csv'
+import { Button, Panel } from '../../../../ui'
 
 type Fila = {
   id: string
@@ -132,18 +133,18 @@ export default function ProgresoTabla({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+        <Panel className="p-4 text-center">
           <p className="text-2xl font-bold text-emerald-600">{totales.dominado}</p>
           <p className="text-xs text-slate-500">Dominados</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+        </Panel>
+        <Panel className="p-4 text-center">
           <p className="text-2xl font-bold text-amber-600">{totales.adquisicion}</p>
           <p className="text-xs text-slate-500">En adquisición</p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
+        </Panel>
+        <Panel className="p-4 text-center">
           <p className="text-2xl font-bold text-slate-500">{totales.sin_ensenar}</p>
           <p className="text-xs text-slate-500">Sin enseñar</p>
-        </div>
+        </Panel>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -184,16 +185,17 @@ export default function ProgresoTabla({
       </div>
 
       <div className="flex justify-end">
-        <button
+        <Button
+          variant="secondary"
           onClick={exportar}
           disabled={ordenadas.length === 0}
-          className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40"
+          className="px-3 py-1.5 text-xs font-medium disabled:opacity-40"
         >
           Exportar CSV ({ordenadas.length})
-        </button>
+        </Button>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[550px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -240,27 +242,29 @@ export default function ProgresoTabla({
             {filasVisibles.length === 0 ? 'No hay programas en el currículo todavía.' : 'Ningún programa coincide con los filtros.'}
           </p>
         )}
-      </div>
-        
+      </Panel>
+
       {totalPaginas > 1 && (
         <div className="flex items-center justify-between text-sm text-slate-500">
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.max(1, p - 1))}
             disabled={paginaActual === 1}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             ← Anterior
-          </button>
+          </Button>
           <span>
             Página {paginaActual} de {totalPaginas} ({ordenadas.length} en total)
           </span>
-          <button
+          <Button
+            variant="secondary"
             onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
             disabled={paginaActual === totalPaginas}
-            className="rounded-lg bg-slate-100 px-3 py-1.5 font-medium text-slate-600 hover:bg-slate-200 disabled:opacity-40"
+            className="px-3 py-1.5 font-medium disabled:opacity-40"
           >
             Siguiente →
-          </button>
+          </Button>
         </div>
       )}
     </div>

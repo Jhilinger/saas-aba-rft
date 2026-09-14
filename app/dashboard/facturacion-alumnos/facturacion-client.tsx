@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { descargarCSV } from '@/utils/csv'
+import { Button, Panel } from '../../ui'
 
 type Sesion = {
   id: string
@@ -88,7 +89,7 @@ export default function FacturacionClient({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <select
             value={filtroAlumnoId}
@@ -119,13 +120,13 @@ export default function FacturacionClient({
         {!filtroAlumnoId && (
           <p className="text-sm text-slate-400">Selecciona un alumno para ver sus sesiones realizadas.</p>
         )}
-      </div>
+      </Panel>
             {filtroAlumnoId && (
         <>
           {(() => {
             const datos = datosFacturacion.find((d) => d.alumno_id === filtroAlumnoId)
             return (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
+              <Panel className="p-4 sm:p-6">
                 <h3 className="text-sm font-semibold text-slate-700 mb-2">Datos de facturación (aportados por la familia)</h3>
                 {datos ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
@@ -139,7 +140,7 @@ export default function FacturacionClient({
                 ) : (
                   <p className="text-sm text-slate-400">La familia todavía no ha aportado sus datos de facturación.</p>
                 )}
-              </div>
+              </Panel>
             )
           })()}
 
@@ -163,16 +164,17 @@ export default function FacturacionClient({
           </div>
 
           <div className="flex justify-end">
-            <button
+            <Button
+              variant="secondary"
               onClick={exportar}
               disabled={sesionesFiltradas.length === 0}
-              className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-40"
+              className="px-3 py-1.5 text-xs font-medium disabled:opacity-40"
             >
               Exportar CSV
-            </button>
+            </Button>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+          <Panel className="overflow-x-auto">
             <table className="w-full text-sm min-w-[450px]">
               <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
                 <tr>
@@ -208,7 +210,7 @@ export default function FacturacionClient({
                 Sin sesiones realizadas para este alumno en el período seleccionado.
               </p>
             )}
-          </div>
+          </Panel>
         </>
       )}
     </div>

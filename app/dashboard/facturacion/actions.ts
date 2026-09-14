@@ -20,6 +20,10 @@ export async function crearSesionPortal() {
     return { error: 'No autorizado' }
   }
 
+  if (!perfil.clinica_id) {
+    return { error: 'Tu cuenta no tiene una clínica asociada.' }
+  }
+
   const { data: clinica } = await supabase
     .from('clinicas')
     .select('stripe_customer_id, sin_facturacion')
@@ -36,7 +40,8 @@ export async function crearSesionPortal() {
       return_url: `${URL_BASE}/dashboard/facturacion`,
     })
     return { success: true, url: session.url }
-  } catch (err: any) {
-    return { error: 'Error abriendo el portal de facturación: ' + (err?.message ?? 'error desconocido') }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'error desconocido'
+    return { error: 'Error abriendo el portal de facturación: ' + message }
   }
 }

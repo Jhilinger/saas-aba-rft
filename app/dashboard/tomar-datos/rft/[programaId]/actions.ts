@@ -11,6 +11,10 @@ type EnsayoInput = {
   correcto: boolean
   ayuda: string
 }
+const FASES_VALIDAS = ['directo', 'entrenamiento', 'test_mutuo', 'test_combinatorio', 'transformacion_funciones'] as const
+type FaseRft = (typeof FASES_VALIDAS)[number]
+const AYUDAS_VALIDAS = ['independiente', 'verbal', 'verbal_parcial', 'gestual', 'visual', 'modelado', 'fisica_parcial', 'fisica_total', 'textual'] as const
+type AyudaRft = (typeof AYUDAS_VALIDAS)[number]
 
 // Fases donde tiene sentido reevaluar el dominio del grupo
 // (entrenamiento no cuenta como criterio de dominio, es donde se enseña)
@@ -37,6 +41,10 @@ export async function guardarBloqueRft(
   if (!user) return { error: 'No autenticado' }
 
   if (ensayos.length === 0) return { error: 'No hay ensayos que guardar' }
+  if (!FASES_VALIDAS.includes(fase as FaseRft)) return { error: 'Fase no válida' }
+  if (ensayos.some((ensayo) => !AYUDAS_VALIDAS.includes(ensayo.ayuda as AyudaRft))) {
+    return { error: 'Tipo de ayuda no válido' }
+  }
 
   const totalEnsayos = ensayos.length
   // Solo cuenta como acierto si fue correcto Y sin ayuda (independiente).
@@ -49,7 +57,7 @@ export async function guardarBloqueRft(
       programa_alumno_id: programaAlumnoId,
       terapeuta_id: user.id,
       grupo,
-      fase,
+      fase: fase as FaseRft,
       posicion_origen: posicionOrigen,
       posicion_destino: posicionDestino,
       num_comparativos: numComparativos,
@@ -72,7 +80,7 @@ export async function guardarBloqueRft(
       estimulo_destino_id: e.estimuloDestinoId,
       pregunta: e.pregunta ?? null,
       correcto: e.correcto,
-      ayuda: e.ayuda,
+      ayuda: e.ayuda as AyudaRft,
     }))
   )
 
@@ -115,7 +123,7 @@ export async function guardarBloqueRft(
       .select('dominado')
       .eq('programa_alumno_id', programaAlumnoId)
       .eq('grupo', grupo)
-      .eq('fase', fase)
+      .eq('fase', fase as FaseRft)
       .eq('posicion_origen', posicionOrigen)
       .eq('posicion_destino', posicionDestino)
       .maybeSingle()
@@ -125,7 +133,7 @@ export async function guardarBloqueRft(
     const { error: rpcError } = await supabase.rpc('actualizar_dominio_grupo_rft', {
       p_programa_alumno_id: programaAlumnoId,
       p_grupo: grupo,
-      p_fase: fase,
+      p_fase: fase as FaseRft,
       p_posicion_origen: posicionOrigen,
       p_posicion_destino: posicionDestino,
     })
@@ -137,7 +145,7 @@ export async function guardarBloqueRft(
       .select('dominado')
       .eq('programa_alumno_id', programaAlumnoId)
       .eq('grupo', grupo)
-      .eq('fase', fase)
+      .eq('fase', fase as FaseRft)
       .eq('posicion_origen', posicionOrigen)
       .eq('posicion_destino', posicionDestino)
       .maybeSingle()

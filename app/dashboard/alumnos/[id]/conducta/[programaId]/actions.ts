@@ -70,7 +70,7 @@ export async function eliminarRegistroAbc(registroId: string, alumnoId: string, 
   return { success: true }
 }
 
-async function obtenerFase(supabase: any, programaAlumnoId: string) {
+async function obtenerFase(supabase: Awaited<ReturnType<typeof createClient>>, programaAlumnoId: string) {
   const { data: programa } = await supabase
     .from('programas_alumno')
     .select('estado')

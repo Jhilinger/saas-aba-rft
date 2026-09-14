@@ -40,7 +40,11 @@ export default function ProgramaRowActions({
       <button
         onClick={() => {
           startTransition(async () => {
-            await togglePrograma(id, activo)
+            const res = await togglePrograma(id, activo)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
             router.refresh()
           })
         }}

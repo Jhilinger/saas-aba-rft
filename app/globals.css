@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f8f7;
+  --foreground: #17324d;
+  --brand-primary: #0f4c5c;
+  --brand-primary-dark: #0b3a47;
+  --brand-primary-soft: #e5f1f2;
+  --brand-accent: #e07a5f;
+  --brand-accent-soft: #fff0eb;
+  --surface: #ffffff;
+  --line: #e2e6f0;
 }
 
 @theme inline {
@@ -12,25 +19,71 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+  text-rendering: optimizeLegibility;
 }
+
+::selection {
+  background: #c7d2fe;
+  color: #1e1b4b;
+}
+
+@layer utilities {
+  .bg-indigo-600 { background-color: var(--brand-primary); }
+  .bg-indigo-500 { background-color: #176579; }
+  .bg-indigo-50 { background-color: var(--brand-primary-soft); }
+  .bg-indigo-100 { background-color: #cfe4e6; }
+  .text-indigo-600 { color: var(--brand-primary); }
+  .text-indigo-700 { color: var(--brand-primary-dark); }
+  .hover\:bg-indigo-500:hover { background-color: var(--brand-primary-dark); }
+  .hover\:text-indigo-800:hover { color: #082f3a; }
+  .hover\:border-indigo-300:hover { border-color: #8abac0; }
+  .ring-indigo-50 { --tw-ring-color: var(--brand-primary-soft); }
+  .bg-amber-500 { background-color: var(--brand-accent); }
+  .bg-amber-50 { background-color: var(--brand-accent-soft); }
+  .bg-amber-100 { background-color: #f9d8ce; }
+  .text-amber-600 { color: #c8644d; }
+  .text-amber-700 { color: #a94f3c; }
+  .text-amber-800 { color: #813c2f; }
+  .border-amber-200 { border-color: #f1b8a9; }
+  .border-amber-300 { border-color: #e9a18f; }
+  .hover\:bg-amber-400:hover { background-color: #d46d54; }
+  .hover\:bg-amber-50:hover { background-color: var(--brand-accent-soft); }
+  .hover\:bg-amber-100:hover { background-color: #f9d8ce; }
+}
+
+button,
+a,
 input,
 textarea,
 select {
-  color: #1e293b !important; /* slate-800, texto oscuro y legible */
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #fcd34d;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+textarea,
+select {
+  color: #1e293b !important;
+  background-color: var(--surface);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #94a3b8 !important; /* slate-400, para diferenciar placeholder de texto real */
+  color: #94a3b8 !important;
 }

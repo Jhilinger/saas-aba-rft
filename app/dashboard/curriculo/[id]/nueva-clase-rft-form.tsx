@@ -3,12 +3,15 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { crearClaseRftBase } from '../actions'
+import { useToast } from '../../../providers/toast-provider'
+import { Button } from '../../../ui'
 
 export default function NuevaClaseRftForm({ programaBaseId }: { programaBaseId: string }) {
   const [nombre, setNombre] = useState('')
   const [grupo, setGrupo] = useState('Grupo 1')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   return (
     <form
@@ -16,12 +19,16 @@ export default function NuevaClaseRftForm({ programaBaseId }: { programaBaseId: 
         e.preventDefault()
         if (!nombre.trim()) return
         startTransition(async () => {
-          await crearClaseRftBase(programaBaseId, nombre, grupo)
+          const res = await crearClaseRftBase(programaBaseId, nombre, grupo)
+          if (res?.error) {
+            toast(res.error, 'error')
+            return
+          }
           setNombre('')
           router.refresh()
         })
       }}
-      className="flex flex-col sm:flex-row gap-2 rounded-2xl border border-slate-200 bg-white p-4"
+      className="flex flex-col sm:flex-row gap-2 p-4"
     >
       <input
         value={nombre}
@@ -35,13 +42,9 @@ export default function NuevaClaseRftForm({ programaBaseId }: { programaBaseId: 
         placeholder="Grupo (ej. Grupo 1)"
         className="w-full sm:w-40 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
       />
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isPending} className="px-4 py-2 text-base sm:text-sm">
         Añadir clase
-      </button>
+      </Button>
     </form>
   )
 }

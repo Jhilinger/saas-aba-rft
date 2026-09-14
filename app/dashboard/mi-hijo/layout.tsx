@@ -15,5 +15,5 @@ export default async function MiHijoLayout({ children }: { children: React.React
 
   if (perfil?.rol !== 'familia') redirect('/dashboard')
 
-  return <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">{children}</div>
+  return <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">{children}</div>
 }

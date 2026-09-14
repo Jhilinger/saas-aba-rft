@@ -47,7 +47,7 @@ export default async function InformesAlumnoPage({
       alumnoId={id}
       nombreAlumno={alumno.nombre_anonimizado}
       nombreClinica={clinicaDatos?.nombre ?? 'Centro de terapia'}
-      informesIniciales={informesIniciales as any}
+      informesIniciales={informesIniciales}
         />
     </div>
   )

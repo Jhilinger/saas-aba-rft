@@ -8,10 +8,11 @@ export default async function RestablecerPasswordPage({
   const { error } = await searchParams
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-8">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-amber-100/80 blur-3xl" />
       <form
         action={actualizarPassword}
-        className="w-full max-w-sm space-y-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
+        className="relative w-full max-w-sm space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(30,41,59,0.10)] sm:p-8"
       >
         <h1 className="text-xl font-bold text-slate-800">Establece tu nueva contraseña</h1>
 

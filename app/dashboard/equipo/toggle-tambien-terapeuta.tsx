@@ -3,6 +3,8 @@
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toggleTambienTerapeuta } from './actions'
+import { useToast } from '../../providers/toast-provider'
+import { Panel } from '../../ui'
 
 export default function ToggleTambienTerapeuta({
   nombre,
@@ -13,9 +15,10 @@ export default function ToggleTambienTerapeuta({
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 flex items-center justify-between gap-4">
+    <Panel className="p-4 sm:p-5 flex items-center justify-between gap-4">
       <div>
         <p className="font-medium text-slate-800">¿También eres terapeuta, {nombre}?</p>
         <p className="text-sm text-slate-500">
@@ -25,7 +28,11 @@ export default function ToggleTambienTerapeuta({
       <button
         onClick={() => {
           startTransition(async () => {
-            await toggleTambienTerapeuta(activo)
+            const res = await toggleTambienTerapeuta(activo)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
             router.refresh()
           })
         }}
@@ -40,6 +47,6 @@ export default function ToggleTambienTerapeuta({
           }`}
         />
       </button>
-    </div>
+    </Panel>
   )
 }

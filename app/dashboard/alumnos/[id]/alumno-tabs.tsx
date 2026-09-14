@@ -44,7 +44,7 @@ export default function AlumnoTabs({
       <select
         value={tab}
         onChange={(e) => setTab(e.target.value as Clave)}
-        className="w-full sm:w-64 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base font-medium text-slate-700"
+        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base font-medium text-slate-700 shadow-sm sm:w-64"
       >
         {PESTAÑAS.map((p) => (
           <option key={p.key} value={p.key}>

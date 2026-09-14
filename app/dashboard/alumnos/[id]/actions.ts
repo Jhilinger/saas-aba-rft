@@ -5,6 +5,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 const URL_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 
 // Importa un programa (de Currículo base, Currículo clínica o Mis programas
 // — los 3 viven en la misma tabla programas_base): copia sus conjuntos y
@@ -77,7 +78,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
 
             if (nuevoConjunto && conjunto.estimulos_base?.length) {
         await supabase.from('estimulos_alumno').insert(
-          conjunto.estimulos_base.map((e: any) => ({
+          conjunto.estimulos_base.map((e) => ({
             conjunto_id: nuevoConjunto.id,
             nombre: e.nombre,
             descripcion: e.descripcion,
@@ -100,14 +101,14 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
           programa_alumno_id: programaAlumno.id,
           nombre: clase.nombre,
           grupo: clase.grupo,
-          tipo_relacion: base.tipo_relacion,
+          tipo_relacion: base.tipo_relacion ?? 'coordinacion',
         })
         .select('id')
         .single()
 
       if (nuevaClase && clase.estimulos_rft_base?.length) {
         await supabase.from('estimulos_rft').insert(
-          clase.estimulos_rft_base.map((e: any) => ({
+          clase.estimulos_rft_base.map((e) => ({
             clase_id: nuevaClase.id,
             etiqueta: e.etiqueta,
             nombre: e.nombre,
@@ -126,7 +127,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
 export async function crearProgramaPersonalizado(
   alumnoId: string,
   nombre: string,
-  tipo: string,
+  tipo: TipoPrograma,
   area: string
 ) {
   const supabase = await createClient()

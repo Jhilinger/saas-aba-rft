@@ -1,7 +1,17 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import AbacontextIcon from './abacontext-icon'
+import {
+  ClipboardList,
+  Activity,
+  CalendarDays,
+  Users,
+  FileSignature,
+  Receipt,
+  Star,
+} from 'lucide-react'
 
 function Nodo() {
   return (
@@ -23,75 +33,83 @@ export default async function Home() {
       titulo: 'PEI y evaluación inicial',
       texto:
         'Valora el punto de partida de cada alumno en Aprendizaje Directo y Relacional, y arma el plan de intervención con el currículo de tu clínica.',
+      Icono: ClipboardList,
     },
     {
       titulo: 'Registros de conducta',
       texto:
         'Intervalo, duración, tasa y registro ABC, con línea base propia y gráficos que reflejan si el objetivo es aumentar o reducir la conducta.',
+      Icono: Activity,
     },
     {
       titulo: 'Agenda semanal',
       texto:
         'Sesiones recurrentes, cuadrícula semanal, y un aviso siempre visible de lo que quedó pendiente de marcar.',
+      Icono: CalendarDays,
     },
     {
       titulo: 'Portal de familia',
       texto:
         'Progreso, asistencia, informes generados con IA, documentos con firma digital y datos de facturación, todo en un único acceso.',
+      Icono: Users,
     },
     {
       titulo: 'Documentos con firma',
       texto:
         'Consentimiento informado, protección de datos y lo que necesite tu clínica, firmado desde el móvil con validez real.',
+      Icono: FileSignature,
     },
     {
       titulo: 'Facturación integrada',
       texto:
         'Suscripción por alumno activo, portal de facturación propio, sin depender de una herramienta aparte.',
+      Icono: Receipt,
     },
     {
       titulo: 'Evaluación de preferencias',
       texto:
         'MSWO y MSW guiados paso a paso, con la jerarquía de preferencia calculada automáticamente al terminar.',
+      Icono: Star,
     },
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-8">
-        <div className="flex items-center gap-2">
+      <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-5 sm:px-8 sm:py-6">
+        <div className="flex min-w-0 items-center gap-2">
           <AbacontextIcon className="h-7 w-7" />
-          <span className="text-lg font-bold text-slate-800">abacontext</span>
+          <span className="truncate text-base font-bold tracking-tight text-slate-800 sm:text-lg">abacontext</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+          <Link href="/login" className="whitespace-nowrap text-xs font-medium text-slate-600 hover:text-slate-900 sm:text-sm">
             Iniciar sesión
           </Link>
           <Link
             href="/registro"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+            className="whitespace-nowrap rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 sm:px-4 sm:text-sm"
           >
             Crear cuenta
           </Link>
         </div>
       </header>
 
-      <section className="mx-auto max-w-4xl px-4 pt-12 pb-20 text-center sm:px-8 sm:pt-20">
-        <div className="mb-6 flex justify-center">
+      <section className="relative mx-auto max-w-4xl overflow-hidden px-4 pb-20 pt-12 text-center sm:px-8 sm:pb-24 sm:pt-20">
+        <div className="pointer-events-none absolute left-1/2 top-10 -z-0 h-44 w-44 -translate-x-1/2 rounded-full bg-amber-100/70 blur-3xl" />
+        <div className="relative z-10 mb-6 flex justify-center">
           <AbacontextIcon className="h-20 w-20" />
         </div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+              <h1 className="relative z-10 text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
           ABA, con el aprendizaje<br className="hidden sm:block" /> relacional integrado
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-base text-slate-500 sm:text-lg">
+        <p className="relative z-10 mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-500 sm:text-lg">
           Un mismo currículo, una misma toma de datos, para trabajar habilidades directas y
           relaciones — sin cambiar de herramienta. Agenda, familia y facturación, resueltas desde
           el primer día.
         </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <div className="relative z-10 mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/registro"
-            className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-base font-semibold text-white hover:bg-indigo-500 sm:w-auto"
+            className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 sm:w-auto"
           >
             Crea tu centro
           </Link>
@@ -107,7 +125,7 @@ export default async function Home() {
         <div className="mx-auto max-w-4xl px-4 py-16 sm:px-8">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">Lo habitual</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">Lo habitual</p>
               <p className="mt-2 text-lg text-slate-700">
                 Una herramienta para tomar datos, otra para la agenda, un Excel para facturar, y RFT
                 como una asignatura pendiente que nunca encuentra hueco.
@@ -132,7 +150,9 @@ export default async function Home() {
           {funcionalidades.map((f) => (
             <div key={f.titulo}>
               <div className="mb-3 flex items-center gap-2">
-                <Nodo />
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                  <f.Icono className="h-4 w-4" strokeWidth={2} />
+                </span>
                 <h3 className="font-semibold text-slate-800">{f.titulo}</h3>
               </div>
               <p className="text-sm leading-relaxed text-slate-500">{f.texto}</p>
@@ -145,21 +165,21 @@ export default async function Home() {
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-8">
           <h2 className="text-center text-2xl font-bold text-slate-900">Un acceso para cada persona</h2>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <p className="font-semibold text-slate-800">Administración</p>
               <p className="mt-2 text-sm text-slate-500">
                 Equipo, alumnos, familia, currículo, facturación y documentos legales, todo desde un
                 único panel.
               </p>
             </div>
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <p className="font-semibold text-slate-800">Terapeutas</p>
               <p className="mt-2 text-sm text-slate-500">
                 Toma de datos pensada para usarse en sesión, agenda semanal, y gráficos que se
                 construyen solos.
               </p>
             </div>
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
               <p className="font-semibold text-slate-800">Familias</p>
               <p className="mt-2 text-sm text-slate-500">
                 Progreso, asistencia, informes y firma de documentos, sin depender de que alguien se
@@ -172,9 +192,11 @@ export default async function Home() {
 
       <section className="mx-auto max-w-3xl px-4 py-20 sm:px-8">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-10">
-          <img
+          <Image
             src="/javier-hilinger.jpg"
             alt="Javier Hilinger"
+            width={160}
+            height={160}
             className="h-32 w-32 shrink-0 rounded-full object-cover ring-4 ring-indigo-50 sm:h-40 sm:w-40"
           />
           <div>
@@ -207,6 +229,9 @@ export default async function Home() {
         <div className="mt-8 rounded-2xl border border-slate-200 p-8">
           <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-400">/mes</span></p>
           <p className="mt-1 text-sm text-slate-500">+ 4€/mes por cada alumno activo</p>
+          <p className="mt-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
+            14 días de prueba gratis
+          </p>
           <ul className="mt-6 space-y-3 text-left text-sm text-slate-600">
             <li className="flex items-center gap-2"><Nodo /> Equipo y alumnos sin límite</li>
             <li className="flex items-center gap-2"><Nodo /> ABA y RFT incluidos</li>

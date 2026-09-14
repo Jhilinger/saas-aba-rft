@@ -1,6 +1,11 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import FacturacionClient from './facturacion-client'
+import type { Tables } from '@/database.types'
+
+type VinculoAlumno = {
+  alumnos: Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> | null
+}
 
 export default async function FacturacionFamiliaPage() {
   const supabase = await createClient()
@@ -13,13 +18,15 @@ export default async function FacturacionFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = ((vinculos ?? []) as unknown as VinculoAlumno[])
+    .map((v) => v.alumnos)
+    .filter((a): a is Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> => Boolean(a))
 
   if (alumnos.length === 0) {
     return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
   }
 
-  const alumnoIds = alumnos.map((a: any) => a.id)
+  const alumnoIds = alumnos.map((a) => a.id)
 
   const { data: datosExistentes } = await supabase
     .from('datos_facturacion_familia')
@@ -28,7 +35,7 @@ export default async function FacturacionFamiliaPage() {
 
   const datosPorAlumno = new Map((datosExistentes ?? []).map((d) => [d.alumno_id, d]))
 
-  const alumnosConDatos = alumnos.map((a: any) => ({
+  const alumnosConDatos = alumnos.map((a) => ({
     alumnoId: a.id,
     alumnoNombre: a.nombre_anonimizado,
     datos: datosPorAlumno.get(a.id) ?? null,

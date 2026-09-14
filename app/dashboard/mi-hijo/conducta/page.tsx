@@ -20,14 +20,14 @@ export default async function ConductaFamiliaPage() {
     .select('alumno_id, alumnos(id, nombre_anonimizado)')
     .eq('perfil_id', user.id)
 
-  const alumnos = (vinculos ?? []).map((v: any) => v.alumnos).filter(Boolean)
+  const alumnos = (vinculos ?? []).map((v) => v.alumnos).filter(Boolean)
 
   if (alumnos.length === 0) {
     return <p className="text-center text-slate-400 py-8">Sin alumnos vinculados todavía.</p>
   }
 
   const datosPorAlumno = await Promise.all(
-    alumnos.map(async (alumno: any) => {
+    alumnos.map(async (alumno) => {
       const { data: programas } = await supabase
         .from('programas_alumno')
         .select('id, nombre, formato_recogida, direccion_objetivo, estado')
@@ -41,9 +41,10 @@ export default async function ConductaFamiliaPage() {
   )
 
   return (
-    <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-8">
+    <div className="mx-auto max-w-3xl space-y-8 p-4 sm:p-8">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Registros de conducta</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Seguimiento</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Registros de conducta</h1>
         <p className="text-sm text-slate-500">
           Aquí puedes ver el progreso y, si el terapeuta lo permite, añadir tus propios registros
           desde casa.
@@ -57,7 +58,7 @@ export default async function ConductaFamiliaPage() {
             <Link
               key={p.id}
               href={`/dashboard/mi-hijo/conducta/${d.alumnoId}/${p.id}`}
-              className="block rounded-2xl border border-slate-200 bg-white p-4 hover:border-indigo-300"
+              className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30"
             >
               <p className="font-semibold text-slate-800">{p.nombre}</p>
               <p className="text-xs text-slate-500">

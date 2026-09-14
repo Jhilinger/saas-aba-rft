@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { editarAlumno } from './actions'
+import { useToast } from '../../../providers/toast-provider'
 
 type Alumno = {
   id: string
@@ -19,6 +20,7 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
   const [editando, setEditando] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   if (!editando) {
     return (
@@ -65,10 +67,12 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
         const fd = new FormData(e.currentTarget)
         startTransition(async () => {
           const res = await editarAlumno(alumno.id, fd)
-          if (!res.error) {
-            setEditando(false)
-            router.refresh()
+          if (res.error) {
+            toast(res.error, 'error')
+            return
           }
+          setEditando(false)
+          router.refresh()
         })
       }}
       className="space-y-4 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5"

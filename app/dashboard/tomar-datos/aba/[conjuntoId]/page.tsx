@@ -2,6 +2,18 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosClient from './tomar-datos-client'
+import type { Tables } from '@/database.types'
+
+type ProgramaAlumnoConRelaciones = Pick<
+  Tables<'programas_alumno'>,
+  'id' | 'nombre' | 'ensayos_por_bloque' | 'alumno_id'
+> & {
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  programas_base: Pick<
+    Tables<'programas_base'>,
+    'instrucciones_terapeuta' | 'ayudas_posibles' | 'video_url'
+  > | null
+}
 
 export default async function TomarDatosAbaPage({
   params,
@@ -40,11 +52,11 @@ export default async function TomarDatosAbaPage({
 
   if (!conjunto) notFound()
 
-  const programa = conjunto.programas_alumno as any
+  const programa = conjunto.programas_alumno as ProgramaAlumnoConRelaciones
   const alumnoNombre = programa?.alumnos?.nombre_anonimizado ?? ''
 
   return (
-    <div className="mx-auto max-w-2xl p-8 space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
       <div>
         <Link
           href={`/dashboard/programas/${programa.id}`}
@@ -52,7 +64,8 @@ export default async function TomarDatosAbaPage({
         >
           ← Volver a {programa.nombre}
         </Link>
-        <h1 className="mt-2 text-xl font-bold text-slate-800">
+        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">Toma de datos ABA</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
           {alumnoNombre} — {conjunto.nombre}
         </h1>
       </div>
@@ -61,12 +74,12 @@ export default async function TomarDatosAbaPage({
         conjuntoId={conjunto.id}
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
-        estimulos={conjunto.estimulos_alumno as any}
+        estimulos={conjunto.estimulos_alumno}
         ensayosPorBloque={programa.ensayos_por_bloque}
         instrucciones={programa.programas_base?.instrucciones_terapeuta ?? null}
         ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
         videoUrl={programa.programas_base?.video_url ?? null}
-        faseConjunto={conjunto.estado as any}
+        faseConjunto={conjunto.estado}
       />
     </div>
   )

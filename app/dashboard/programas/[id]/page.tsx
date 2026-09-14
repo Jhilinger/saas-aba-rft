@@ -1,6 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
 import EvolucionChart from './evolucion-chart'
@@ -8,8 +7,8 @@ import { obtenerEvolucionAba } from './evolucion-actions'
 import ProgramaAbaTabs from './programa-aba-tabs'
 import EstadoProgramaSelector from './estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
-
-const COLORES = ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed', '#0891b2']
+import { Breadcrumb } from '../../../ui'
+import type { Tables } from '@/database.types'
 
 export default async function ProgramaAlumnoPage({
   params,
@@ -52,26 +51,24 @@ export default async function ProgramaAlumnoPage({
 
   const { conjuntos: datosEvolucion } = await obtenerEvolucionAba(id)
 
-  const alumnoNombre = (programa.alumnos as any)?.nombre_anonimizado ?? ''
+  const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
+
+  const alumnoNombre = alumno?.nombre_anonimizado ?? ''
 
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
 
-  const enLineaBase = (conjuntos ?? []).filter((c: any) => c.estado === 'linea_base')
-  const enAdquisicion = (conjuntos ?? []).filter((c: any) => c.estado !== 'dominado' && c.estado !== 'linea_base')
-  const dominados = (conjuntos ?? []).filter((c: any) => c.estado === 'dominado')
+  const enLineaBase = (conjuntos ?? []).filter((c) => c.estado === 'linea_base')
+  const enAdquisicion = (conjuntos ?? []).filter((c) => c.estado !== 'dominado' && c.estado !== 'linea_base')
+  const dominados = (conjuntos ?? []).filter((c) => c.estado === 'dominado')
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       <div>
-        <Link
-          href={`/dashboard/alumnos/${programa.alumno_id}`}
-          className="text-sm text-indigo-600 hover:underline"
-        >
-          ← Volver a {alumnoNombre}
-        </Link>
-        <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
-        <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+        <Breadcrumb items={[{ label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}` }, { label: programa.nombre }]} />
+        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
           {programa.area && <span>{programa.area}</span>}
           <EstadoProgramaSelector
             programaAlumnoId={programa.id}
@@ -81,7 +78,7 @@ export default async function ProgramaAlumnoPage({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm space-y-3">
+      <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm sm:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <span className="text-slate-400">Ensayos por bloque</span>
@@ -119,10 +116,10 @@ export default async function ProgramaAlumnoPage({
             <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
           </div>
         )}
-        {(programa.programas_base as any)?.video_url && (
+        {programaBase?.video_url && (
           <div>
             <span className="text-slate-400">Vídeo de ejemplo</span>
-            <VideoDiferido url={(programa.programas_base as any).video_url} />
+            <VideoDiferido url={programaBase.video_url} />
           </div>
         )}
         {!tieneInfo && (
@@ -135,15 +132,15 @@ export default async function ProgramaAlumnoPage({
       <ProgramaAbaTabs
        evolucion={
           <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-5">
               <EvolucionChart
                 conjuntos={datosEvolucion}
                 porcentajeDominio={programa.porcentaje_dominio}
                 titulo={`${alumnoNombre} — ${programa.nombre}`}
-                estimulosPorConjunto={(conjuntos ?? []).map((c: any) => ({
+                estimulosPorConjunto={(conjuntos ?? []).map((c) => ({
                   id: c.id,
                   nombre: c.nombre,
-                  estimulos: c.estimulos_alumno.map((e: any) => e.nombre),
+                  estimulos: c.estimulos_alumno.map((e) => e.nombre),
                 }))}
               />
             </div>
@@ -159,7 +156,7 @@ export default async function ProgramaAlumnoPage({
                   Línea base ({enLineaBase.length})
                 </h2>
                 <div className="space-y-4">
-                  {enLineaBase.map((c: any) => (
+                  {enLineaBase.map((c) => (
                     <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id}/>
                   ))}
                 </div>
@@ -171,7 +168,7 @@ export default async function ProgramaAlumnoPage({
                 En adquisición ({enAdquisicion.length})
               </h2>
               <div className="space-y-4">
-                {enAdquisicion.map((c: any) => (
+                {enAdquisicion.map((c) => (
                   <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
                 ))}
                 {enAdquisicion.length === 0 && (
@@ -186,7 +183,7 @@ export default async function ProgramaAlumnoPage({
                   Dominados ({dominados.length})
                 </h2>
                 <div className="space-y-4">
-                  {dominados.map((c: any) => (
+                  {dominados.map((c) => (
                     <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
                   ))}
                 </div>

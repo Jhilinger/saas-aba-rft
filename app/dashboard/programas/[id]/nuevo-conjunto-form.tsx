@@ -3,11 +3,13 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { crearConjuntoAlumno } from './actions'
+import { useToast } from '../../../providers/toast-provider'
 
 export default function NuevoConjuntoForm({ programaAlumnoId }: { programaAlumnoId: string }) {
   const [nombre, setNombre] = useState('')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   return (
     <form
@@ -15,7 +17,11 @@ export default function NuevoConjuntoForm({ programaAlumnoId }: { programaAlumno
         e.preventDefault()
         if (!nombre.trim()) return
         startTransition(async () => {
-          await crearConjuntoAlumno(programaAlumnoId, nombre)
+          const res = await crearConjuntoAlumno(programaAlumnoId, nombre)
+          if (res?.error) {
+            toast(res.error, 'error')
+            return
+          }
           setNombre('')
           router.refresh()
         })

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import type { Tables } from '@/database.types'
 
 // --- CLASES ---
 
@@ -17,7 +18,12 @@ export async function crearClase(programaAlumnoId: string, nombre: string, grupo
     .eq('id', programaAlumnoId)
     .single()
 
-  const tipoRelacion = (programa?.programas_base as any)?.tipo_relacion ?? 'coordinacion'
+  const programaBase = programa?.programas_base as unknown as Pick<
+    Tables<'programas_base'>,
+    'tipo_relacion'
+  > | null
+
+  const tipoRelacion = programaBase?.tipo_relacion ?? 'coordinacion'
 
   const { error } = await supabase.from('clases_rft').insert({
     programa_alumno_id: programaAlumnoId,

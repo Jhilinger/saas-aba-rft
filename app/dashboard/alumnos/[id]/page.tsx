@@ -80,19 +80,20 @@ export default async function InicioAlumnoPage({
     .select('programa_base_id, programas_base(tipo)')
     .eq('alumno_id', alumnoId)
 
-  const evaluadosAba = (evaluaciones ?? []).filter((e: any) => e.programas_base?.tipo === 'aba_clasico').length
-  const evaluadosRft = (evaluaciones ?? []).filter((e: any) => e.programas_base?.tipo === 'rft').length
+  const evaluadosAba = (evaluaciones ?? []).filter((e) => e.programas_base?.tipo === 'aba_clasico').length
+  const evaluadosRft = (evaluaciones ?? []).filter((e) => e.programas_base?.tipo === 'rft').length
+  const terapeutaProximaSesion = proximaSesion?.terapeuta as { nombre: string } | null | undefined
     return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Inicio</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link href={`/dashboard/alumnos/${alumnoId}/pei`} className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-indigo-300">
+        <Link href={`/dashboard/alumnos/${alumnoId}/pei`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
           <p className="text-3xl font-bold text-indigo-600">{programasActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Programas activos en el PEI</p>
         </Link>
 
-        <Link href={`/dashboard/alumnos/${alumnoId}/conducta`} className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-indigo-300">
+        <Link href={`/dashboard/alumnos/${alumnoId}/conducta`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-amber-50/30">
           <p className="text-3xl font-bold text-amber-600">{conductaActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Registros de conducta activos</p>
         </Link>
@@ -117,14 +118,14 @@ export default async function InicioAlumnoPage({
                 hour: '2-digit',
                 minute: '2-digit',
               })}
-              {(proximaSesion.terapeuta as any)?.nombre && ` · ${(proximaSesion.terapeuta as any).nombre}`}
+              {terapeutaProximaSesion?.nombre && ` · ${terapeutaProximaSesion.nombre}`}
             </p>
           ) : (
             <p className="text-sm text-slate-400">Sin sesiones programadas</p>
           )}
         </div>
 
-        <Link href={`/dashboard/alumnos/${alumnoId}/informes`} className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-indigo-300">
+        <Link href={`/dashboard/alumnos/${alumnoId}/informes`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
           <p className="text-sm font-semibold text-slate-700 mb-1">Último informe</p>
           {ultimoInforme ? (
             <p className="text-sm text-slate-600">
@@ -137,7 +138,7 @@ export default async function InicioAlumnoPage({
           )}
         </Link>
 
-        <Link href={`/dashboard/alumnos/${alumnoId}/valoracion`} className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-indigo-300">
+        <Link href={`/dashboard/alumnos/${alumnoId}/valoracion`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
           <p className="text-sm font-semibold text-slate-700 mb-1">Evaluación inicial</p>
           <p className="text-sm text-slate-600">
             {evaluadosAba} programa{evaluadosAba !== 1 ? 's' : ''} ABA · {evaluadosRft} RFT evaluados

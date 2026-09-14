@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { actualizarEstadoPrograma } from './actions'
 import { useToast } from '../../../providers/toast-provider'
 
+type EstadoPrograma = Parameters<typeof actualizarEstadoPrograma>[2]
+
 const OPCIONES_HABILIDAD = [
   { value: 'adquisicion', label: 'En adquisición' },
   { value: 'mantenimiento', label: 'Mantenimiento' },
@@ -42,10 +44,10 @@ export default function EstadoProgramaSelector({
   const router = useRouter()
   const toast = useToast()
 
-  const cambiar = (nuevoEstado: string) => {
+  const cambiar = (nuevoEstado: EstadoPrograma) => {
     if (nuevoEstado === estadoActual) return
     startTransition(async () => {
-      const res = await actualizarEstadoPrograma(programaAlumnoId, alumnoId, nuevoEstado as any)
+      const res = await actualizarEstadoPrograma(programaAlumnoId, alumnoId, nuevoEstado)
       if (res?.error) {
         toast(res.error, 'error')
         return
@@ -58,7 +60,7 @@ export default function EstadoProgramaSelector({
   return (
     <select
       value={estadoActual}
-      onChange={(e) => cambiar(e.target.value)}
+      onChange={(e) => cambiar(e.target.value as EstadoPrograma)}
       disabled={isPending}
       className={`rounded-lg border px-2 py-1 text-xs font-medium ${COLOR[estadoActual] ?? 'text-slate-600 bg-slate-50 border-slate-200'} disabled:opacity-50`}
     >

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { crearSesionPortal } from './actions'
+import { Button } from '../../ui'
 
 export default function BotonPortal() {
   const [isPending, startTransition] = useTransition()
@@ -9,7 +10,7 @@ export default function BotonPortal() {
 
   return (
     <div className="space-y-2">
-      <button
+      <Button
         onClick={() => {
           setError(null)
           startTransition(async () => {
@@ -22,10 +23,10 @@ export default function BotonPortal() {
           })
         }}
         disabled={isPending}
-        className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+        className="px-4 py-3 sm:py-2 text-base sm:text-sm"
       >
         {isPending ? 'Abriendo portal...' : 'Gestionar facturación'}
-      </button>
+      </Button>
       {error && <p className="text-sm text-rose-600">{error}</p>}
     </div>
   )

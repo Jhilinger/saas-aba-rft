@@ -1,8 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import { crearTerapeuta } from './actions'
 import TerapeutasTabla from './terapeutas-tabla'
 import ToggleTambienTerapeuta from './toggle-tambien-terapeuta'
+import InvitarTerapeutaForm from './invitar-terapeuta-form'
 
 export default async function EquipoPage() {
   const supabase = await createClient()
@@ -20,49 +20,30 @@ export default async function EquipoPage() {
     redirect('/dashboard')
   }
 
+  const clinicaId = perfil.clinica_id
+  if (!clinicaId) redirect('/dashboard')
+
   const { data: terapeutasReales } = await supabase
     .from('perfiles')
     .select('id, nombre, email, activo')
-    .eq('clinica_id', perfil.clinica_id)
+    .eq('clinica_id', clinicaId)
     .eq('rol', 'terapeuta')
     .order('nombre')
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-8 sm:space-y-10">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Terapeutas</h1>
+    <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-8 sm:space-y-10">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Perfiles</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Terapeutas</h1>
+        <p className="mt-1 text-sm text-slate-500">Invita y organiza al equipo que trabaja en tu clínica.</p>
+      </div>
 
       {perfil.rol === 'clinica_admin' && (
         <ToggleTambienTerapeuta nombre={perfil.nombre} activo={perfil.tambien_terapeuta} />
       )}
 
       <section className="space-y-4">
-        <form
-                   action={async (formData) => {
-            'use server'
-            const resultado = await crearTerapeuta(formData)
-          }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
-        >
-          <input
-            name="nombre"
-            placeholder="Nombre"
-            required
-            className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
-            className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-          <button
-            type="submit"
-            className="sm:col-span-2 rounded-lg bg-indigo-600 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500"
-          >
-            Invitar terapeuta
-          </button>
-        </form>
+        <InvitarTerapeutaForm />
 
         <TerapeutasTabla terapeutas={terapeutasReales ?? []} />
       </section>

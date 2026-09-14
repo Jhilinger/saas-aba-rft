@@ -38,8 +38,12 @@ export default async function ClinicasPage() {
   }))
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6 sm:space-y-8">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Gestión de Clínicas</h1>
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Administración</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Gestión de clínicas</h1>
+        <p className="mt-1 text-sm text-slate-500">Administra centros, suscripciones y responsables de cuenta.</p>
+      </div>
 
       <CrearClinicaForm />
 

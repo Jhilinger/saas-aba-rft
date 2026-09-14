@@ -167,7 +167,11 @@ export default function ConjuntoCard({
           e.preventDefault()
           if (!nombre.trim()) return
           startTransition(async () => {
-            await crearEstimuloAlumno(conjunto.id, programaAlumnoId, nombre, descripcion)
+            const res = await crearEstimuloAlumno(conjunto.id, programaAlumnoId, nombre, descripcion)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
             setNombre('')
             setDescripcion('')
             router.refresh()

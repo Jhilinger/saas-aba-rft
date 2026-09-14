@@ -9,11 +9,13 @@ import {
 } from './actions'
 import { useConfirm } from '../../../../providers/confirm-provider'
 import { useToast } from '../../../../providers/toast-provider'
+import { Button, Panel } from '../../../../ui'
 
 type ResultadoMswo = { item: string; posicion: number }[]
 type ResultadoMsw = { item: string; vecesElegido: number; porcentaje: number }[]
+type ResultadoItem = { item: string; posicion?: number; vecesElegido?: number; porcentaje?: number }
 
-type Evaluacion = {
+export type Evaluacion = {
   id: string
   fecha: string
   tipo: 'mswo' | 'msw'
@@ -201,7 +203,11 @@ export default function EvaluacionPreferencia({
         tipo === 'mswo'
           ? (resultado as ResultadoMswo).slice(0, 3).map((r) => r.item)
           : (resultado as ResultadoMsw).slice(0, 3).map((r) => r.item)
-      await anadirMasPreferidosAlRegistro(alumnoId, top3)
+      const resTop3 = await anadirMasPreferidosAlRegistro(alumnoId, top3)
+      if (resTop3?.error) {
+        toast(resTop3.error, 'error')
+        return
+      }
       toast('Guardado y añadido al registro', 'exito')
       setResultado(null)
       setNotas('')
@@ -210,16 +216,16 @@ export default function EvaluacionPreferencia({
   }
     return (
     <section className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 space-y-4">
+      <Panel className="p-4 sm:p-6 space-y-4">
         <h2 className="font-semibold text-slate-700">Evaluación de preferencias (MSWO / MSW)</h2>
 
         {!mostrandoConfig && !enCurso && !resultado && (
-          <button
+          <Button
             onClick={() => setMostrandoConfig(true)}
-            className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500"
+            className="py-3 sm:py-2 text-base sm:text-sm"
           >
             + Nueva evaluación
-          </button>
+          </Button>
         )}
 
         {mostrandoConfig && (
@@ -263,12 +269,9 @@ export default function EvaluacionPreferencia({
             )}
 
             <div className="flex gap-3">
-              <button
-                onClick={empezar}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-              >
+              <Button onClick={empezar} className="py-2">
                 Empezar
-              </button>
+              </Button>
               <button onClick={() => setMostrandoConfig(false)} className="text-sm text-slate-500 hover:text-slate-700">
                 Cancelar
               </button>
@@ -323,7 +326,7 @@ export default function EvaluacionPreferencia({
           <div className="space-y-3">
             <p className="text-sm font-semibold text-slate-700">Resultado (de más a menos preferido)</p>
             <ol className="space-y-1">
-              {resultado.map((r: any, i: number) => (
+              {resultado.map((r: ResultadoItem, i: number) => (
                 <li key={r.item} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
                   <span>
                     {i + 1}. {r.item}
@@ -342,24 +345,16 @@ export default function EvaluacionPreferencia({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
             <div className="flex flex-wrap gap-3">
-              <button
-                onClick={guardar}
-                disabled={isPending}
-                className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
-              >
+              <Button variant="secondary" onClick={guardar} disabled={isPending} className="py-2 font-medium">
                 Guardar
-              </button>
-              <button
-                onClick={guardarYAnadirTop3}
-                disabled={isPending}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-              >
+              </Button>
+              <Button onClick={guardarYAnadirTop3} disabled={isPending} className="py-2">
                 Guardar y añadir los 3 más preferidos al registro
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </div>
+      </Panel>
 
       <div className="space-y-2">
         <h3 className="text-sm font-semibold text-slate-700">Historial de evaluaciones</h3>
@@ -370,7 +365,7 @@ export default function EvaluacionPreferencia({
                 {new Date(e.fecha).toLocaleDateString('es-ES')} ·{' '}
                 <span className="font-medium">{e.tipo === 'mswo' ? 'MSWO' : 'MSW'}</span>
                 {' · Top: '}
-                {(e.resultado as any[]).slice(0, 3).map((r) => r.item).join(', ')}
+                {e.resultado.slice(0, 3).map((r) => r.item).join(', ')}
               </p>
               <button onClick={() => borrarEvaluacion(e.id)} className="text-xs font-medium text-rose-500 hover:text-rose-700">
                 Eliminar

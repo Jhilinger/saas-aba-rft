@@ -55,8 +55,11 @@ export default async function AyudaPage() {
   const articulos = ARTICULOS_POR_ROL[perfil.rol] ?? []
 
   return (
-    <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
-      <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Ayuda</h1>
+    <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Soporte</p>
+        <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Ayuda</h1>
+      </div>
       <p className="text-sm text-slate-500">
         Estamos ampliando el manual poco a poco. Si no encuentras lo que buscas,
         escríbenos a soporte@abacontext.com.
@@ -67,7 +70,7 @@ export default async function AyudaPage() {
           <Link
             key={a.href}
             href={a.href}
-            className="block rounded-2xl border border-slate-200 bg-white p-5 hover:border-indigo-300"
+            className="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30"
           >
             <p className="font-semibold text-slate-800">{a.titulo}</p>
             <p className="mt-1 text-sm text-slate-500">{a.resumen}</p>

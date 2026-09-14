@@ -1,12 +1,12 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
 import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
 import NuevaClaseRftForm from './nueva-clase-rft-form'
 import ClaseRftBaseCard from './clase-rft-base-card'
+import { Breadcrumb, Panel } from '../../../ui'
 
 export default async function ProgramaDetallePage({
   params,
@@ -59,18 +59,16 @@ export default async function ProgramaDetallePage({
     .order('orden')
 
   return (
-    <div className="mx-auto max-w-4xl p-4 sm:p-8 space-y-6 sm:space-y-8">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
       <div>
-        <Link href="/dashboard/curriculo" className="text-sm text-indigo-600 hover:underline">
-          ← Volver al currículo
-        </Link>
-        <h1 className="mt-2 text-xl sm:text-2xl font-bold text-slate-800">{programa.nombre}</h1>
+        <Breadcrumb items={[{ label: 'Currículo', href: '/dashboard/curriculo' }, { label: programa.nombre }]} />
+        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
         <p className="text-sm text-slate-500">{programa.area}</p>
       </div>
 
-      <EditarProgramaForm programa={programa as any} />
+      <EditarProgramaForm programa={programa} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-sm">
+      <Panel className="grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-3 sm:p-5">
         <div className="sm:col-span-3">
           <span className="text-slate-400">Objetivo</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo || '—'}</p>
@@ -113,7 +111,7 @@ export default async function ProgramaDetallePage({
             {programa.bloques_para_dominio} bloques al {programa.porcentaje_dominio}%
           </p>
         </div>
-      </div>
+      </Panel>
 
             {programa.tipo === 'aba_clasico' && (
         <section className="space-y-4">
@@ -121,7 +119,7 @@ export default async function ProgramaDetallePage({
           <NuevoConjuntoForm programaBaseId={id} />
 
           <div className="space-y-4">
-            {conjuntos?.map((c: any) => (
+            {conjuntos?.map((c) => (
               <ConjuntoCard key={c.id} conjunto={c} programaBaseId={id} />
             ))}
           </div>
@@ -138,7 +136,7 @@ export default async function ProgramaDetallePage({
           <NuevaClaseRftForm programaBaseId={id} />
 
           <div className="space-y-4">
-            {clasesRft?.map((c: any) => (
+            {clasesRft?.map((c) => (
               <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} />
             ))}
           </div>

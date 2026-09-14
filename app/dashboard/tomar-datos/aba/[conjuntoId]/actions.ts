@@ -2,12 +2,14 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import type { Enums } from '@/database.types'
 
 type EnsayoInput = {
   estimuloId: string
   correcto: boolean
   ayuda: string
 }
+const AYUDAS_VALIDAS = ['independiente', 'verbal', 'verbal_parcial', 'gestual', 'visual', 'modelado', 'fisica_parcial', 'fisica_total', 'textual'] as const satisfies readonly Enums<'tipo_ayuda'>[]
 
 export async function guardarBloqueAba(
   conjuntoId: string,
@@ -21,6 +23,9 @@ export async function guardarBloqueAba(
   if (!user) return { error: 'No autenticado' }
 
   if (ensayos.length === 0) return { error: 'No hay ensayos que guardar' }
+  if (ensayos.some((ensayo) => !AYUDAS_VALIDAS.includes(ensayo.ayuda as Enums<'tipo_ayuda'>))) {
+    return { error: 'Tipo de ayuda no válido' }
+  }
 
   const { data: conjuntoAntes } = await supabase
     .from('conjuntos_estimulos_alumno')
@@ -56,7 +61,7 @@ export async function guardarBloqueAba(
       bloque_id: bloque.id,
       estimulo_id: e.estimuloId,
       correcto: e.correcto,
-      ayuda: e.ayuda,
+      ayuda: e.ayuda as Enums<'tipo_ayuda'>,
     }))
   )
 
@@ -120,7 +125,9 @@ async function recalcularDominioConjunto(conjuntoId: string) {
 
   if (!bloques) return
 
-  const soloIntervencion = bloques.filter((b) => b.fase === 'intervencion')
+  const soloIntervencion = bloques.filter(
+    (b): b is typeof b & { porcentaje: number } => b.fase === 'intervencion' && b.porcentaje !== null
+  )
 
   let dominado = false
   for (let i = 0; i <= soloIntervencion.length - programa.bloques_para_dominio; i++) {
@@ -162,7 +169,7 @@ export async function obtenerDetalleBloque(bloqueId: string) {
     .select('id, estimulo_id, correcto, ayuda, estimulos_alumno(nombre)')
     .eq('bloque_id', bloqueId)
 
-  return (detalle ?? []).map((d: any) => ({
+  return (detalle ?? []).map((d) => ({
     id: d.id,
     estimuloId: d.estimulo_id,
     estimuloNombre: d.estimulos_alumno?.nombre ?? '—',
@@ -182,6 +189,9 @@ export async function editarBloqueAba(
   const supabase = await createClient()
 
   if (ensayos.length === 0) return { error: 'No hay ensayos que guardar' }
+  if (ensayos.some((ensayo) => !AYUDAS_VALIDAS.includes(ensayo.ayuda as Enums<'tipo_ayuda'>))) {
+    return { error: 'Tipo de ayuda no válido' }
+  }
 
   const totalEnsayos = ensayos.length
   const aciertos = ensayos.filter((e) => e.correcto && e.ayuda === 'independiente').length
@@ -190,7 +200,7 @@ export async function editarBloqueAba(
   for (const e of ensayos) {
     const { error } = await supabase
       .from('ensayos_aba_detalle')
-      .update({ correcto: e.correcto, ayuda: e.ayuda })
+      .update({ correcto: e.correcto, ayuda: e.ayuda as Enums<'tipo_ayuda'> })
       .eq('id', e.id)
 
     if (error) return { error: error.message }

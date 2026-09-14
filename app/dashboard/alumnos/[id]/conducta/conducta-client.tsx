@@ -136,7 +136,7 @@ export default function ConductaClient({
             <label className="text-sm text-slate-600">Formato de recogida</label>
             <select
               value={formato}
-              onChange={(e) => setFormato(e.target.value as any)}
+              onChange={(e) => setFormato(e.target.value as 'intervalo' | 'duracion' | 'tasa' | 'abc')}
               className="w-full mt-1 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
             >
               <option value="intervalo">Intervalo (% de intervalos con conducta)</option>

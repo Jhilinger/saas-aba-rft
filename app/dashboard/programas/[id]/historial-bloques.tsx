@@ -64,7 +64,7 @@ export default function HistorialBloques({
     if (bloques === null) {
       setCargando(true)
       obtenerHistorialBloques(conjuntoId).then((res) => {
-        setBloques(res as any)
+        setBloques(res as Bloque[])
         setCargando(false)
       })
     }
@@ -74,7 +74,7 @@ export default function HistorialBloques({
     setEditandoId(bloque.id)
     setNotasEditando(bloque.notas ?? '')
     setFaseEditando(bloque.fase)
-    obtenerDetalleBloque(bloque.id).then((res) => setDetalle(res as any))
+    obtenerDetalleBloque(bloque.id).then((res) => setDetalle(res))
   }
 
   const cambiarEnsayo = (id: string, cambios: Partial<EnsayoDetalle>) => {

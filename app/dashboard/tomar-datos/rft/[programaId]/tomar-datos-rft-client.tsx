@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueRft } from './actions'
 import VideoDiferido from '../../../video-diferido'
+import { useToast } from '../../../../providers/toast-provider'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -77,6 +78,10 @@ function encontrarEstimulo(clase: Clase, posicion: string): Estimulo | undefined
   return clase.estimulos_rft.find((e) => e.posicion === posicion)
 }
 
+function ordenEstable(valor: string) {
+  return [...valor].reduce((total, caracter) => total + caracter.charCodeAt(0), 0)
+}
+
 export default function TomarDatosRftClient({
   programaAlumnoId,
   alumnoId,
@@ -109,6 +114,7 @@ export default function TomarDatosRftClient({
   const [isPending, startTransition] = useTransition()
   const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[] } | null>(null)
   const router = useRouter()
+  const toast = useToast()
 
   const grupos = [...new Set(clases.map((c) => c.grupo))]
   const clasesDelGrupo = clases.filter((c) => c.grupo === grupoSeleccionado)
@@ -124,7 +130,7 @@ export default function TomarDatosRftClient({
 
   const claseActualId = secuencia?.[ensayos.length]?.id
 
-  const comparativos = useMemo(() => {
+  const comparativos = (() => {
     if (!secuencia) return []
     const claseActual = secuencia[ensayos.length]
     if (!claseActual) return []
@@ -134,13 +140,13 @@ export default function TomarDatosRftClient({
         estimulo: encontrarEstimulo(c, posicionDestino)!,
         esCorrecto: c.id === claseActual.id,
       }))
-      .sort(() => Math.random() - 0.5)
+      .sort((a, b) => ordenEstable(`${claseActualId}-${a.claseId}`) - ordenEstable(`${claseActualId}-${b.claseId}`))
     // Solo recalculamos al cambiar de ensayo, no en cada tecla pulsada
-  }, [claseActualId, posicionDestino])
+  })()
 
   const empezarBloque = () => {
     if (clasesValidas.length < 2) {
-      alert('Necesitas al menos 2 clases con esas posiciones en este grupo para poder comparar.')
+      toast('Necesitas al menos 2 clases con esas posiciones en este grupo para poder comparar.', 'error')
       return
     }
     setSecuencia(generarSecuenciaClases(clasesValidas, tamanoBloque))
@@ -194,7 +200,7 @@ export default function TomarDatosRftClient({
           notas
         )
         if (res.error) {
-          alert('Error: ' + res.error)
+          toast(res.error, 'error')
           return
         }
         setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [] })
@@ -393,7 +399,7 @@ export default function TomarDatosRftClient({
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between text-sm text-slate-500">
-        <span>
+        <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
         </span>
         {ensayos.length > 0 && (
@@ -401,6 +407,19 @@ export default function TomarDatosRftClient({
             Deshacer último
           </button>
         )}
+      </div>
+      <div
+        role="progressbar"
+        aria-label="Progreso del bloque"
+        aria-valuemin={0}
+        aria-valuemax={secuencia.length}
+        aria-valuenow={ensayos.length}
+        className="h-2 overflow-hidden rounded-full bg-indigo-100"
+      >
+        <div
+          className="h-full rounded-full bg-indigo-600 transition-[width] duration-300"
+          style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }}
+        />
       </div>
 
             {(instrucciones || ayudasPosibles || videoUrl) && (

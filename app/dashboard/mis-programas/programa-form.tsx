@@ -1,19 +1,39 @@
 'use client'
 
 import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { crearPrograma } from '../curriculo/actions'
 import { useRouter } from 'next/navigation'
+import { useToast } from '../../providers/toast-provider'
+
+function BotonCrear() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+    >
+      {pending ? 'Creando...' : 'Crear programa'}
+    </button>
+  )
+}
 
 export default function ProgramaFormPrivado() {
   const [tipo, setTipo] = useState('aba_clasico')
   const router = useRouter()
+  const toast = useToast()
 
   return (
     <form
       action={async (formData) => {
         formData.set('visibilidad', 'privado')
         const res = await crearPrograma(formData)
-        if (!res.error && res.id) router.push(`/dashboard/curriculo/${res.id}`)
+        if (res.error) {
+          toast(res.error, 'error')
+          return
+        }
+        if (res.id) router.push(`/dashboard/curriculo/${res.id}`)
       }}
       className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6"
     >
@@ -125,9 +145,7 @@ export default function ProgramaFormPrivado() {
         </div>
       </div>
 
-      <button type="submit" className="w-full sm:w-auto rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500">
-        Crear programa
-      </button>
+      <BotonCrear />
     </form>
   )
 }

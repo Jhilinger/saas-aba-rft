@@ -3,6 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { vincularTerapeuta, desvincularTerapeuta, marcarTerapeutaPrincipal } from './actions'
+import { useToast } from '../../../providers/toast-provider'
+import { Button, Panel } from '../../../ui'
 
 type Terapeuta = { id: string; nombre: string; email: string }
 type Vinculo = { terapeuta_id: string; es_principal: boolean }
@@ -19,6 +21,7 @@ export default function TerapeutasSection({
   const [terapeutaId, setTerapeutaId] = useState('')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   const idsVinculados = new Set(vinculados.map((v) => v.terapeuta_id))
   const disponibles = terapeutasClinica.filter((t) => !idsVinculados.has(t.id))
@@ -30,7 +33,7 @@ export default function TerapeutasSection({
     <section className="space-y-4">
       <h2 className="text-base sm:text-lg font-semibold text-slate-700">Terapeutas</h2>
 
-      <div className="flex flex-col sm:flex-row gap-2 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+      <Panel className="flex flex-col sm:flex-row gap-2 p-4 sm:p-5">
         <select
           value={terapeutaId}
           onChange={(e) => setTerapeutaId(e.target.value)}
@@ -43,23 +46,27 @@ export default function TerapeutasSection({
             </option>
           ))}
         </select>
-        <button
+        <Button
           disabled={!terapeutaId || isPending}
           onClick={() => {
             startTransition(async () => {
               const esPrincipal = vinculados.length === 0
-              await vincularTerapeuta(alumnoId, terapeutaId, esPrincipal)
+              const res = await vincularTerapeuta(alumnoId, terapeutaId, esPrincipal)
+              if (res?.error) {
+                toast(res.error, 'error')
+                return
+              }
               setTerapeutaId('')
               router.refresh()
             })
           }}
-          className="rounded-lg bg-indigo-600 px-4 py-3 sm:py-2 text-base sm:text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+          className="py-3 sm:py-2 text-base sm:text-sm"
         >
           Vincular
-        </button>
-      </div>
+        </Button>
+      </Panel>
 
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-x-auto">
+      <Panel className="overflow-x-auto">
         <table className="w-full text-sm min-w-[480px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
@@ -83,7 +90,11 @@ export default function TerapeutasSection({
                     <button
                       onClick={() => {
                         startTransition(async () => {
-                          await marcarTerapeutaPrincipal(alumnoId, v.terapeuta_id)
+                          const res = await marcarTerapeutaPrincipal(alumnoId, v.terapeuta_id)
+                          if (res?.error) {
+                            toast(res.error, 'error')
+                            return
+                          }
                           router.refresh()
                         })
                       }}
@@ -97,7 +108,11 @@ export default function TerapeutasSection({
                   <button
                     onClick={() => {
                       startTransition(async () => {
-                        await desvincularTerapeuta(alumnoId, v.terapeuta_id)
+                        const res = await desvincularTerapeuta(alumnoId, v.terapeuta_id)
+                        if (res?.error) {
+                          toast(res.error, 'error')
+                          return
+                        }
                         router.refresh()
                       })
                     }}
@@ -113,7 +128,7 @@ export default function TerapeutasSection({
         {vinculados.length === 0 && (
           <p className="p-6 text-center text-slate-400">Sin terapeutas vinculados todavía.</p>
         )}
-      </div>
+      </Panel>
     </section>
   )
 }

@@ -1,6 +1,16 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import FacturacionClient from './facturacion-client'
+import type { Tables, Enums } from '@/database.types'
+
+type SesionFacturacion = Pick<
+  Tables<'sesiones_programadas'>,
+  'id' | 'fecha_hora' | 'cancelado_por' | 'confirmada_familia' | 'alumno_id'
+> & {
+  estado: Exclude<Enums<'estado_sesion'>, 'programada'>
+  alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  terapeuta: Pick<Tables<'perfiles'>, 'nombre'> | null
+}
 
 export default async function FacturacionAlumnosPage() {
   const supabase = await createClient()
@@ -18,10 +28,13 @@ export default async function FacturacionAlumnosPage() {
     redirect('/dashboard')
   }
 
+  const clinicaId = perfil.clinica_id
+  if (!clinicaId) redirect('/dashboard')
+
   const { data: alumnos } = await supabase
     .from('alumnos')
     .select('id, nombre_anonimizado')
-    .eq('clinica_id', perfil.clinica_id)
+    .eq('clinica_id', clinicaId)
     .eq('activo', true)
     .order('nombre_anonimizado')
 
@@ -52,8 +65,8 @@ export default async function FacturacionAlumnosPage() {
 
       <FacturacionClient
         alumnos={alumnos ?? []}
-        sesiones={(sesiones as any) ?? []}
-        datosFacturacion={(datosFacturacion as any) ?? []}
+        sesiones={(sesiones as SesionFacturacion[] | null) ?? []}
+        datosFacturacion={datosFacturacion ?? []}
       />
     </div>
   )

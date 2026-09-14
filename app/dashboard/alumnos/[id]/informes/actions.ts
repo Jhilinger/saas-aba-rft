@@ -95,7 +95,7 @@ export async function generarInforme(
   if (evaluacionesPref && evaluacionesPref.length > 0) {
     textoEvaluacionesPref = evaluacionesPref
       .map((e) => {
-        const top3 = (e.resultado as any[]).slice(0, 3).map((r) => r.item).join(', ')
+        const top3 = (e.resultado as { item: string }[]).slice(0, 3).map((r) => r.item).join(', ')
         return `${e.tipo === 'mswo' ? 'MSWO' : 'MSW'} el ${e.fecha.split('T')[0]}: más preferidos → ${top3}`
       })
       .join('; ')
@@ -335,8 +335,8 @@ ${datosPorArea}`
     const bloqueTexto = respuesta.content.find((b) => b.type === 'text')
     contenido = bloqueTexto && bloqueTexto.type === 'text' ? bloqueTexto.text : ''
     if (!contenido) return { error: 'La IA no devolvió contenido. Inténtalo de nuevo.' }
-  } catch (err: any) {
-    return { error: 'Error al generar el informe con IA: ' + (err?.message ?? 'error desconocido') }
+  } catch (err: unknown) {
+    return { error: 'Error al generar el informe con IA: ' + (err instanceof Error ? err.message : 'error desconocido') }
   }
 
   // --- Guardar informe ---

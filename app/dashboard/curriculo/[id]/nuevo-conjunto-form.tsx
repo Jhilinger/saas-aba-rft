@@ -3,11 +3,14 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { crearConjuntoBase } from '../actions'
+import { useToast } from '../../../providers/toast-provider'
+import { Button } from '../../../ui'
 
 export default function NuevoConjuntoForm({ programaBaseId }: { programaBaseId: string }) {
   const [nombre, setNombre] = useState('')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
 
   return (
     <form
@@ -15,7 +18,11 @@ export default function NuevoConjuntoForm({ programaBaseId }: { programaBaseId: 
         e.preventDefault()
         if (!nombre.trim()) return
         startTransition(async () => {
-          await crearConjuntoBase(programaBaseId, nombre)
+          const res = await crearConjuntoBase(programaBaseId, nombre)
+          if (res?.error) {
+            toast(res.error, 'error')
+            return
+          }
           setNombre('')
           router.refresh()
         })
@@ -28,13 +35,9 @@ export default function NuevoConjuntoForm({ programaBaseId }: { programaBaseId: 
         placeholder="Nombre del conjunto (ej. Conjunto 1: colores primarios)"
         className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
       />
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isPending} className="px-4 py-2">
         Añadir conjunto
-      </button>
+      </Button>
     </form>
   )
 }

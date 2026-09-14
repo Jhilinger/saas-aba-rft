@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import { confirmarAsistenciaFamilia } from '../agenda/actions'
+import { useToast } from '../../providers/toast-provider'
+import { Button } from '../../ui'
 
 type Sesion = {
   id: string
@@ -20,12 +22,17 @@ const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
 export default function ConfirmarAsistencia({ sesionesIniciales }: { sesionesIniciales: Sesion[] }) {
   const [sesiones, setSesiones] = useState(sesionesIniciales)
   const [isPending, startTransition] = useTransition()
+  const toast = useToast()
 
   if (sesiones.length === 0) return null
 
   const confirmar = (id: string) => {
     startTransition(async () => {
-      await confirmarAsistenciaFamilia(id)
+      const res = await confirmarAsistenciaFamilia(id)
+      if (res?.error) {
+        toast(res.error, 'error')
+        return
+      }
       setSesiones((prev) => prev.filter((s) => s.id !== id))
     })
   }
@@ -61,13 +68,14 @@ export default function ConfirmarAsistencia({ sesionesIniciales }: { sesionesIni
                 {ETIQUETA_ESTADO[s.estado].label}
                 {s.cancelado_por && ` (${s.cancelado_por})`}
               </span>
-              <button
+              <Button
+                variant="primary"
                 disabled={isPending}
                 onClick={() => confirmar(s.id)}
-                className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                className="px-3 py-1.5 text-xs"
               >
                 Confirmar
-              </button>
+              </Button>
             </div>
           </div>
         ))}

@@ -2,6 +2,29 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import type { Enums } from '@/database.types'
+
+const TIPOS_PROGRAMA = ['aba_clasico', 'rft', 'conducta'] as const satisfies readonly Enums<'tipo_programa'>[]
+const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
+const VISIBILIDADES = ['privado', 'clinica'] as const satisfies readonly Enums<'visibilidad_programa'>[]
+
+function parseTipoPrograma(value: FormDataEntryValue | null): Enums<'tipo_programa'> | null {
+  return typeof value === 'string' && TIPOS_PROGRAMA.includes(value as Enums<'tipo_programa'>)
+    ? value as Enums<'tipo_programa'>
+    : null
+}
+
+function parseTipoRelacion(value: FormDataEntryValue | null): Enums<'tipo_relacion_rft'> | null {
+  return typeof value === 'string' && TIPOS_RELACION.includes(value as Enums<'tipo_relacion_rft'>)
+    ? value as Enums<'tipo_relacion_rft'>
+    : null
+}
+
+function parseVisibilidad(value: FormDataEntryValue | null): Enums<'visibilidad_programa'> {
+  return typeof value === 'string' && VISIBILIDADES.includes(value as Enums<'visibilidad_programa'>)
+    ? value as Enums<'visibilidad_programa'>
+    : 'clinica'
+}
 
 function parseOrden(formData: FormData): number | null {
   const raw = formData.get('orden') as string
@@ -25,16 +48,17 @@ export async function crearPrograma(formData: FormData) {
   if (!perfil) return { error: 'Perfil no encontrado' }
 
   const esGlobal = perfil.rol === 'superadmin'
-  const tipo = formData.get('tipo') as string
+  const tipo = parseTipoPrograma(formData.get('tipo'))
+  if (!tipo) return { error: 'Tipo de programa no válido' }
   const orden = parseOrden(formData)
-  const visibilidad = esGlobal ? 'clinica' : ((formData.get('visibilidad') as string) || 'clinica')
+  const visibilidad = esGlobal ? 'clinica' : parseVisibilidad(formData.get('visibilidad'))
 
   const { data, error } = await supabase
     .from('programas_base')
     .insert({
       nombre: formData.get('nombre') as string,
       tipo,
-      tipo_relacion: tipo === 'rft' ? (formData.get('tipo_relacion') as string) : null,
+      tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
       area: formData.get('area') as string,
       objetivo: formData.get('objetivo') as string,
       materiales: formData.get('materiales') as string,
@@ -57,7 +81,7 @@ export async function crearPrograma(formData: FormData) {
     const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
       p_id: data.id,
       p_nuevo_orden: orden,
-      p_orden_anterior: null,
+      p_orden_anterior: 0,
     })
     if (rpcError) return { error: rpcError.message }
   }
@@ -133,7 +157,8 @@ export async function eliminarEstimuloBase(id: string, programaBaseId: string) {
 export async function editarPrograma(id: string, formData: FormData) {
   const supabase = await createClient()
 
-  const tipo = formData.get('tipo') as string
+  const tipo = parseTipoPrograma(formData.get('tipo'))
+  if (!tipo) return { error: 'Tipo de programa no válido' }
   const nuevoOrden = parseOrden(formData)
   const visibilidadForm = formData.get('visibilidad') as string | null
 
@@ -145,23 +170,36 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   const ordenAnterior = programaActual?.orden ?? null
 
-  const updateData: Record<string, any> = {
+  const updateData: {
+    nombre: string
+    area: string
+    objetivo: string
+    materiales: string
+    instrucciones_terapeuta: string
+    ayudas_posibles: string
+    ensayos_por_bloque: number
+    bloques_para_dominio: number
+    porcentaje_dominio: number
+    video_url: string | null
+    tipo_relacion: Enums<'tipo_relacion_rft'> | null
+    visibilidad?: Enums<'visibilidad_programa'>
+  } = {
     nombre: formData.get('nombre') as string,
     area: formData.get('area') as string,
     objetivo: formData.get('objetivo') as string,
     materiales: formData.get('materiales') as string,
     instrucciones_terapeuta: formData.get('instrucciones_terapeuta') as string,
     ayudas_posibles: formData.get('ayudas_posibles') as string,
-        ensayos_por_bloque: parseInt(formData.get('ensayos_por_bloque') as string) || 10,
+    ensayos_por_bloque: parseInt(formData.get('ensayos_por_bloque') as string) || 10,
     bloques_para_dominio: parseInt(formData.get('bloques_para_dominio') as string) || 3,
     porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
     video_url: (formData.get('video_url') as string)?.trim() || null,
-    tipo_relacion: tipo === 'rft' ? (formData.get('tipo_relacion') as string) : null,
+    tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
   }
 
   // La visibilidad solo tiene sentido en programas propios de una clínica
   if (programaActual?.clinica_id && visibilidadForm) {
-    updateData.visibilidad = visibilidadForm
+    updateData.visibilidad = parseVisibilidad(visibilidadForm)
   }
 
   const { error } = await supabase
@@ -174,8 +212,8 @@ export async function editarPrograma(id: string, formData: FormData) {
   if (nuevoOrden !== ordenAnterior) {
     const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
       p_id: id,
-      p_nuevo_orden: nuevoOrden,
-      p_orden_anterior: ordenAnterior,
+      p_nuevo_orden: nuevoOrden ?? 0,
+      p_orden_anterior: ordenAnterior ?? 0,
     })
     if (rpcError) return { error: rpcError.message }
   }
@@ -241,7 +279,7 @@ export async function clonarPrograma(id: string) {
 
       if (nuevoConjunto && conjunto.estimulos_base?.length) {
         await supabase.from('estimulos_base').insert(
-          conjunto.estimulos_base.map((e: any) => ({
+          conjunto.estimulos_base.map((e) => ({
             conjunto_id: nuevoConjunto.id,
             nombre: e.nombre,
             descripcion: e.descripcion,
@@ -266,7 +304,7 @@ export async function clonarPrograma(id: string) {
 
       if (nuevaClase && clase.estimulos_rft_base?.length) {
         await supabase.from('estimulos_rft_base').insert(
-          clase.estimulos_rft_base.map((e: any) => ({
+          clase.estimulos_rft_base.map((e) => ({
             clase_base_id: nuevaClase.id,
             etiqueta: e.etiqueta,
             nombre: e.nombre,

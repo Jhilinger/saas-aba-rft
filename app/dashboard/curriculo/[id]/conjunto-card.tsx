@@ -7,6 +7,8 @@ import {
   eliminarEstimuloBase,
   eliminarConjuntoBase,
 } from '../actions'
+import { useToast } from '../../../providers/toast-provider'
+import { useConfirm } from '../../../providers/confirm-provider'
 
 type Estimulo = { id: string; nombre: string; descripcion: string | null }
 type Conjunto = { id: string; nombre: string; estimulos_base: Estimulo[] }
@@ -22,16 +24,28 @@ export default function ConjuntoCard({
   const [descripcion, setDescripcion] = useState('')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const toast = useToast()
+  const confirmar = useConfirm()
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-800">{conjunto.nombre}</h3>
         <button
-          onClick={() => {
-            if (!confirm(`¿Eliminar "${conjunto.nombre}" y todos sus estímulos?`)) return
+          onClick={async () => {
+            const ok = await confirmar({
+              titulo: 'Eliminar conjunto',
+              mensaje: `¿Eliminar "${conjunto.nombre}" y todos sus estímulos? No se puede deshacer.`,
+              textoConfirmar: 'Eliminar',
+              peligroso: true,
+            })
+            if (!ok) return
             startTransition(async () => {
-              await eliminarConjuntoBase(conjunto.id, programaBaseId)
+              const res = await eliminarConjuntoBase(conjunto.id, programaBaseId)
+              if (res?.error) {
+                toast(res.error, 'error')
+                return
+              }
               router.refresh()
             })
           }}
@@ -54,7 +68,11 @@ export default function ConjuntoCard({
             <button
               onClick={() => {
                 startTransition(async () => {
-                  await eliminarEstimuloBase(e.id, programaBaseId)
+                  const res = await eliminarEstimuloBase(e.id, programaBaseId)
+                  if (res?.error) {
+                    toast(res.error, 'error')
+                    return
+                  }
                   router.refresh()
                 })
               }}
@@ -74,7 +92,11 @@ export default function ConjuntoCard({
           e.preventDefault()
           if (!nombre.trim()) return
           startTransition(async () => {
-            await crearEstimuloBase(conjunto.id, programaBaseId, nombre, descripcion)
+            const res = await crearEstimuloBase(conjunto.id, programaBaseId, nombre, descripcion)
+            if (res?.error) {
+              toast(res.error, 'error')
+              return
+            }
             setNombre('')
             setDescripcion('')
             router.refresh()
