@@ -38,6 +38,7 @@ export default function FamiliaTabla({
     startTransition(async () => {
       const res = await crearFamiliar(nombre.trim(), email.trim(), alumnosSeleccionados)
       if (res.error) {
+        setError(res.error)
         return
       }
       setNombre('')
