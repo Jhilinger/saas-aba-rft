@@ -3,6 +3,7 @@ import { stripe } from '@/utils/stripe'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { sincronizarAlumnosStripe } from '@/utils/stripe-sync'
 import Stripe from 'stripe'
+import * as Sentry from '@sentry/nextjs'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -31,6 +32,10 @@ export async function POST(req: NextRequest) {
 
       if (!metadata?.nombre_clinica || !metadata?.email_admin) {
         console.error('checkout.session.completed sin metadata esperada')
+        Sentry.captureMessage('Stripe checkout.session.completed sin metadata esperada', {
+          level: 'error',
+          extra: { sessionId: session.id },
+        })
         break
       }
 
@@ -70,6 +75,9 @@ export async function POST(req: NextRequest) {
 
       if (clinicaError || !clinica) {
         console.error('Error creando la clínica desde el webhook:', clinicaError)
+        Sentry.captureException(new Error('Error creando la clínica desde el webhook de Stripe'), {
+          extra: { sessionId: session.id, subscriptionId, dbError: clinicaError?.message },
+        })
         break
       }
 
@@ -85,6 +93,9 @@ export async function POST(req: NextRequest) {
         // Sin admin, la clínica queda inutilizable: la borramos para no
         // dejarla huérfana (el cliente habrá pagado, así que además de
         // esto conviene revisar el error y contactarle a mano)
+        Sentry.captureException(new Error('Error invitando al admin desde el webhook de Stripe — cliente pagó pero no se creó su cuenta'), {
+          extra: { sessionId: session.id, emailAdmin: metadata.email_admin, authError: authError?.message },
+        })
         await admin.from('clinicas').delete().eq('id', clinica.id)
         break
       }
@@ -99,6 +110,9 @@ export async function POST(req: NextRequest) {
 
       if (perfilError) {
         console.error('Error creando el perfil admin desde el webhook:', perfilError)
+        Sentry.captureException(new Error('Error creando el perfil admin desde el webhook de Stripe — cliente pagó pero no se creó su cuenta'), {
+          extra: { sessionId: session.id, emailAdmin: metadata.email_admin, dbError: perfilError.message },
+        })
         await admin.auth.admin.deleteUser(authUser.user.id)
         await admin.from('clinicas').delete().eq('id', clinica.id)
         break
