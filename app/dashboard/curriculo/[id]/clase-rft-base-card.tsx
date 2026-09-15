@@ -81,6 +81,7 @@ export default function ClaseRftBaseCard({
                   sin posición
                 </span>
               )}
+              {' '}— {e.nombre}
             </span>
             <button
               onClick={() => {
@@ -109,7 +110,7 @@ export default function ClaseRftBaseCard({
           e.preventDefault()
           if (!nombreEstimulo.trim()) return
           startTransition(async () => {
-            const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, '', posicion)
+            const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, posicion)
             if (res?.error) {
               toast(res.error, 'error')
               return

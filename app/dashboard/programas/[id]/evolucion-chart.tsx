@@ -83,23 +83,33 @@ export default function EvolucionChart({
     }, 300)
   }
   const { series, maxSesion, transiciones } = useMemo(() => {
-    const todos = conjuntos.flatMap((c) =>
-      c.bloques.map((b) => ({ ...b, conjuntoId: c.id }))
-    )
-    todos.sort((a, b) => new Date(a.fechaISO).getTime() - new Date(b.fechaISO).getTime())
+    // Los conjuntos se ordenan por la fecha de su primer bloque (cuándo se
+    // empezó a trabajar cada uno), no por la fecha de creación. Cada
+    // conjunto ocupa después un tramo consecutivo del eje X — su línea base
+    // y de intervención van una tras otra — en vez de intercalarse por
+    // fecha real con las de los demás conjuntos, que es lo que provocaba
+    // que, por ejemplo, el bloque 7 de un conjunto se solapara en el eje
+    // con los bloques 1-3 de otro.
+    const conjuntosOrdenados = [...conjuntos].sort((a, b) => {
+      const fechaA = a.bloques[0]?.fechaISO
+      const fechaB = b.bloques[0]?.fechaISO
+      if (!fechaA && !fechaB) return 0
+      if (!fechaA) return 1
+      if (!fechaB) return -1
+      return new Date(fechaA).getTime() - new Date(fechaB).getTime()
+    })
 
-    const conSesionGlobal = todos.map((b, i) => ({ ...b, sesionGlobal: i + 1 }))
-
-    const series = conjuntos.map((c, i) => {
-      const puntosConjunto = conSesionGlobal.filter((b) => b.conjuntoId === c.id)
+    let sesion = 0
+    const series = conjuntosOrdenados.map((c, i) => {
+      const puntosConjunto = c.bloques.map((b) => ({ ...b, sesion: ++sesion }))
 
       const puntosLineaBase = puntosConjunto
         .filter((b) => b.fase === 'linea_base')
-        .map((b) => ({ x: b.sesionGlobal, y: b.porcentaje }))
+        .map((b) => ({ x: b.sesion, y: b.porcentaje }))
 
       const puntosIntervencion = puntosConjunto
         .filter((b) => b.fase === 'intervencion')
-        .map((b) => ({ x: b.sesionGlobal, y: b.porcentaje }))
+        .map((b) => ({ x: b.sesion, y: b.porcentaje }))
 
       return {
         id: c.id,
@@ -115,7 +125,7 @@ export default function EvolucionChart({
       .filter((s) => s.puntosLineaBase.length > 0 && s.puntosIntervencion.length > 0)
       .map((s) => ({ x: s.puntosIntervencion[0].x, color: s.color, nombre: s.nombre }))
 
-    return { series, maxSesion: conSesionGlobal.length, transiciones }
+    return { series, maxSesion: sesion, transiciones }
   }, [conjuntos])
 
   const hayDatos = series.some((s) => s.puntosLineaBase.length > 0 || s.puntosIntervencion.length > 0)

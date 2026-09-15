@@ -1,8 +1,21 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { Tables } from '@/database.types'
+
+// Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
+// puede ver este programa antes de usar el cliente admin para el borrado en
+// cascada — así el admin client nunca actúa sobre un programa al que el
+// usuario no tendría acceso.
+async function puedeAccederPrograma(programaAlumnoId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+  const { data } = await supabase.from('programas_alumno').select('id').eq('id', programaAlumnoId).maybeSingle()
+  return !!data
+}
 
 // --- CLASES ---
 
@@ -47,7 +60,39 @@ export async function crearClase(programaAlumnoId: string, nombre: string, grupo
 export async function eliminarClase(id: string, programaAlumnoId: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('clases_rft').delete().eq('id', id)
+  if (error) {
+    // 23503 = violación de clave foránea: la clase tiene ensayos o
+    // relaciones entrenadas registradas
+    if (error.code === '23503') {
+      return { error: 'tiene_datos' }
+    }
+    return { error: error.message }
+  }
+  revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  return { success: true }
+}
+
+export async function eliminarClaseForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
+
+  // Los ensayos, relaciones entrenadas y bloques ya registrados son datos
+  // históricos de solo lectura para el terapeuta (no hay política RLS de
+  // borrado sobre ellos), así que el borrado forzado usa el cliente admin.
+  const admin = createAdminClient()
+
+  const { error: detalleError } = await admin.from('ensayos_rft_detalle').delete().eq('clase_id', id)
+  if (detalleError) return { error: detalleError.message }
+
+  const { error: relacionesError } = await admin.from('relaciones_entrenadas_rft').delete().eq('clase_id', id)
+  if (relacionesError) return { error: relacionesError.message }
+
+  const { error: estimulosError } = await admin.from('estimulos_rft').delete().eq('clase_id', id)
+  if (estimulosError) return { error: estimulosError.message }
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('clases_rft').delete().eq('id', id)
   if (error) return { error: error.message }
+
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   return { success: true }
 }
@@ -85,7 +130,51 @@ export async function crearEstimuloRft(
 export async function eliminarEstimuloRft(id: string, programaAlumnoId: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('estimulos_rft').delete().eq('id', id)
+  if (error) {
+    // 23503 = violación de clave foránea: el estímulo se usó en ensayos o
+    // en una relación entrenada
+    if (error.code === '23503') {
+      return { error: 'tiene_datos' }
+    }
+    return { error: error.message }
+  }
+  revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  return { success: true }
+}
+
+export async function eliminarEstimuloRftForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
+
+  const admin = createAdminClient()
+
+  const { error: detalleOrigenError } = await admin
+    .from('ensayos_rft_detalle')
+    .delete()
+    .eq('estimulo_origen_id', id)
+  if (detalleOrigenError) return { error: detalleOrigenError.message }
+
+  const { error: detalleDestinoError } = await admin
+    .from('ensayos_rft_detalle')
+    .delete()
+    .eq('estimulo_destino_id', id)
+  if (detalleDestinoError) return { error: detalleDestinoError.message }
+
+  const { error: relOrigenError } = await admin
+    .from('relaciones_entrenadas_rft')
+    .delete()
+    .eq('estimulo_origen_id', id)
+  if (relOrigenError) return { error: relOrigenError.message }
+
+  const { error: relDestinoError } = await admin
+    .from('relaciones_entrenadas_rft')
+    .delete()
+    .eq('estimulo_destino_id', id)
+  if (relDestinoError) return { error: relDestinoError.message }
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('estimulos_rft').delete().eq('id', id)
   if (error) return { error: error.message }
+
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   return { success: true }
 }
@@ -110,8 +199,12 @@ export async function crearRelacionEntrenada(
 }
 
 export async function eliminarRelacionEntrenada(id: string, programaAlumnoId: string) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('relaciones_entrenadas_rft').delete().eq('id', id)
+  if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
+
+  // Igual que los ensayos y bloques: no hay política RLS de borrado sobre
+  // esta tabla, así que se usa el cliente admin.
+  const admin = createAdminClient()
+  const { error } = await admin.from('relaciones_entrenadas_rft').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   return { success: true }

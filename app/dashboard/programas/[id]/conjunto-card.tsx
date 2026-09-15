@@ -7,6 +7,7 @@ import {
   eliminarEstimuloAlumno,
   eliminarEstimuloAlumnoForzado,
   eliminarConjuntoAlumno,
+  eliminarConjuntoAlumnoForzado,
   iniciarIntervencion,
 } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
@@ -95,6 +96,26 @@ export default function ConjuntoCard({
               if (!ok) return
               startTransition(async () => {
                 const res = await eliminarConjuntoAlumno(conjunto.id, programaAlumnoId)
+
+                if (res?.error === 'tiene_datos') {
+                  const confirmado = await confirmar({
+                    titulo: 'Conjunto con datos registrados',
+                    mensaje: `"${conjunto.nombre}" ya tiene bloques de ensayos registrados. Si lo eliminas, se perderán esos datos permanentemente. ¿Eliminar de todas formas?`,
+                    textoConfirmar: 'Eliminar de todas formas',
+                    peligroso: true,
+                  })
+                  if (confirmado) {
+                    const res2 = await eliminarConjuntoAlumnoForzado(conjunto.id, programaAlumnoId)
+                    if (res2?.error) {
+                      toast(res2.error, 'error')
+                      return
+                    }
+                    toast('Conjunto eliminado', 'exito')
+                    router.refresh()
+                  }
+                  return
+                }
+
                 if (res?.error) {
                   toast(res.error, 'error')
                   return

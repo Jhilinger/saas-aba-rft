@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation'
 import {
   crearEstimuloRft,
   eliminarEstimuloRft,
+  eliminarEstimuloRftForzado,
   eliminarClase,
+  eliminarClaseForzado,
   eliminarRelacionEntrenada,
 } from './actions'
 import { useConfirm } from '../../../providers/confirm-provider'
@@ -86,6 +88,26 @@ export default function ClaseCard({
             if (!ok) return
             startTransition(async () => {
               const res = await eliminarClase(clase.id, programaAlumnoId)
+
+              if (res?.error === 'tiene_datos') {
+                const confirmado = await confirmar({
+                  titulo: 'Clase con datos registrados',
+                  mensaje: `"${clase.nombre}" ya tiene ensayos o relaciones entrenadas registradas. Si la eliminas, se perderán esos datos permanentemente. ¿Eliminar de todas formas?`,
+                  textoConfirmar: 'Eliminar de todas formas',
+                  peligroso: true,
+                })
+                if (confirmado) {
+                  const res2 = await eliminarClaseForzado(clase.id, programaAlumnoId)
+                  if (res2?.error) {
+                    toast(res2.error, 'error')
+                    return
+                  }
+                  toast('Clase eliminada', 'exito')
+                  router.refresh()
+                }
+                return
+              }
+
               if (res?.error) {
                 toast(res.error, 'error')
                 return
@@ -125,10 +147,31 @@ export default function ClaseCard({
                 onClick={() => {
                   startTransition(async () => {
                     const res = await eliminarEstimuloRft(e.id, programaAlumnoId)
+
+                    if (res?.error === 'tiene_datos') {
+                      const confirmado = await confirmar({
+                        titulo: 'Estímulo con datos registrados',
+                        mensaje: `"${e.nombre}" ya se usó en ensayos o relaciones entrenadas. Si lo eliminas, se perderán esos datos permanentemente. ¿Eliminar de todas formas?`,
+                        textoConfirmar: 'Eliminar de todas formas',
+                        peligroso: true,
+                      })
+                      if (confirmado) {
+                        const res2 = await eliminarEstimuloRftForzado(e.id, programaAlumnoId)
+                        if (res2?.error) {
+                          toast(res2.error, 'error')
+                          return
+                        }
+                        toast('Estímulo eliminado', 'exito')
+                        router.refresh()
+                      }
+                      return
+                    }
+
                     if (res?.error) {
                       toast(res.error, 'error')
                       return
                     }
+                    toast('Estímulo eliminado', 'exito')
                     router.refresh()
                   })
                 }}

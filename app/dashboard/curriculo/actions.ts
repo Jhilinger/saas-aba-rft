@@ -346,11 +346,23 @@ export async function eliminarClaseRftBase(id: string, programaBaseId: string) {
 export async function crearEstimuloRftBase(
   claseBaseId: string,
   programaBaseId: string,
-  etiqueta: string,
   nombre: string,
   posicion: string
 ) {
   const supabase = await createClient()
+
+  // La etiqueta se genera sola: posición + número que lleve el nombre de la
+  // clase (ej. clase "Clase 1" + posición A → etiqueta "A1"), igual que al
+  // crear un estímulo RFT ya asignado a un alumno.
+  const { data: clase } = await supabase
+    .from('clases_rft_base')
+    .select('nombre')
+    .eq('id', claseBaseId)
+    .single()
+
+  const numero = clase?.nombre.match(/(\d+)\s*$/)?.[1] ?? ''
+  const etiqueta = posicion + numero
+
   const { error } = await supabase
     .from('estimulos_rft_base')
     .insert({ clase_base_id: claseBaseId, etiqueta, nombre, posicion })
