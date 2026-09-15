@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueRft } from './actions'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
+import { leerProgreso, guardarProgreso, borrarProgreso, esFalloDeRed } from '../../offline-sync'
+import { BannerSinConexion, PantallaGuardadoPendiente } from '../../estado-sincronizacion'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -114,8 +116,124 @@ export default function TomarDatosRftClient({
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
   const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[] } | null>(null)
+  const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
+  const [sinConexion, setSinConexion] = useState(false)
   const router = useRouter()
   const toast = useToast()
+
+  const claveProgreso = `rft:${programaAlumnoId}`
+
+  const intentarGuardar = useCallback(
+    (
+      listaEnsayos: EnsayoRft[],
+      notasActuales: string,
+      grupo: string,
+      faseActual: string,
+      origen: string,
+      destino: string,
+      numComparativos: number
+    ) => {
+      startTransition(async () => {
+        try {
+          const res = await guardarBloqueRft(
+            programaAlumnoId,
+            alumnoId,
+            grupo,
+            faseActual,
+            origen,
+            destino,
+            numComparativos,
+            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda }) => ({
+              claseId,
+              estimuloOrigenId,
+              estimuloDestinoId,
+              pregunta,
+              correcto,
+              ayuda,
+            })),
+            notasActuales
+          )
+          if (res.error) {
+            setEstadoGuardado('error')
+            toast(res.error, 'error')
+            return
+          }
+          borrarProgreso(claveProgreso)
+          setEstadoGuardado('idle')
+          setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [] })
+        } catch (e) {
+          if (esFalloDeRed(e)) {
+            setEstadoGuardado('pendiente')
+          } else {
+            setEstadoGuardado('error')
+            toast('No se pudo guardar el bloque', 'error')
+          }
+        }
+      })
+    },
+    [programaAlumnoId, alumnoId, claveProgreso, toast]
+  )
+
+  // Restaura un bloque en curso (o completo pero sin sincronizar todavía) si
+  // se recargó la página o se cerró tras un fallo de red.
+  useEffect(() => {
+    const guardado = leerProgreso<{
+      secuencia: Clase[]
+      ensayos: EnsayoRft[]
+      notas: string
+      grupoSeleccionado: string
+      fase: string
+      posicionOrigen: string
+      posicionDestino: string
+      tamanoBloque: number
+    }>(claveProgreso)
+    if (guardado) {
+      setGrupoSeleccionado(guardado.grupoSeleccionado)
+      setFase(guardado.fase)
+      setPosicionOrigen(guardado.posicionOrigen)
+      setPosicionDestino(guardado.posicionDestino)
+      setTamanoBloque(guardado.tamanoBloque)
+      setSecuencia(guardado.secuencia)
+      setEnsayos(guardado.ensayos)
+      setNotas(guardado.notas)
+      if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
+        const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
+        const numComparativos = clasesDelGrupoGuardado.filter(
+          (c) => encontrarEstimulo(c, guardado.posicionOrigen) && encontrarEstimulo(c, guardado.posicionDestino)
+        ).length
+        intentarGuardar(
+          guardado.ensayos,
+          guardado.notas,
+          guardado.grupoSeleccionado,
+          guardado.fase,
+          guardado.posicionOrigen,
+          guardado.posicionDestino,
+          numComparativos
+        )
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Reintenta solo en cuanto vuelva la conexión, y muestra un aviso mientras
+  // se está tomando el bloque sin conexión.
+  useEffect(() => {
+    const actualizarEstado = () => setSinConexion(!navigator.onLine)
+    actualizarEstado()
+    const onOnline = () => {
+      actualizarEstado()
+      if (estadoGuardado === 'pendiente' && grupoSeleccionado) {
+        intentarGuardar(ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, clasesValidas.length)
+      }
+    }
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', actualizarEstado)
+    return () => {
+      window.removeEventListener('online', onOnline)
+      window.removeEventListener('offline', actualizarEstado)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [estadoGuardado, ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, intentarGuardar])
 
   const grupos = [...new Set(clases.map((c) => c.grupo))]
   const clasesDelGrupo = clases.filter((c) => c.grupo === grupoSeleccionado)
@@ -154,6 +272,7 @@ export default function TomarDatosRftClient({
     setEnsayos([])
     setNotas('')
     setResultado(null)
+    setEstadoGuardado('idle')
   }
 
   const registrar = (correcto: boolean, ayuda: string, pregunta?: string) => {
@@ -181,35 +300,26 @@ export default function TomarDatosRftClient({
     setPreguntaActual('')
 
     if (nuevos.length === secuencia.length) {
-      startTransition(async () => {
-        const res = await guardarBloqueRft(
-          programaAlumnoId,
-          alumnoId,
-          grupoSeleccionado!,
-          fase,
-          posicionOrigen,
-          posicionDestino,
-          clasesValidas.length,
-          nuevos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda }) => ({
-            claseId,
-            estimuloOrigenId,
-            estimuloDestinoId,
-            pregunta,
-            correcto,
-            ayuda,
-          })),
-          notas
-        )
-        if (res.error) {
-          toast(res.error, 'error')
-          return
-        }
-        setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [] })
-      })
+      intentarGuardar(nuevos, notas, grupoSeleccionado!, fase, posicionOrigen, posicionDestino, clasesValidas.length)
     }
   }
 
   const deshacerUltimo = () => setEnsayos((prev) => prev.slice(0, -1))
+
+  // Guarda el progreso en el dispositivo según se registra cada ensayo
+  useEffect(() => {
+    if (!secuencia) return
+    guardarProgreso(claveProgreso, {
+      secuencia,
+      ensayos,
+      notas,
+      grupoSeleccionado,
+      fase,
+      posicionOrigen,
+      posicionDestino,
+      tamanoBloque,
+    })
+  }, [secuencia, ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, tamanoBloque, claveProgreso])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -231,6 +341,7 @@ export default function TomarDatosRftClient({
             onClick={() => {
               setResultado(null)
               setSecuencia(null)
+              setEstadoGuardado('idle')
             }}
             className="py-3 sm:py-2 text-base sm:text-sm"
           >
@@ -245,6 +356,19 @@ export default function TomarDatosRftClient({
           </Button>
         </div>
       </div>
+    )
+  }
+
+  if (estadoGuardado === 'pendiente' || estadoGuardado === 'error') {
+    return (
+      <PantallaGuardadoPendiente
+        tipo={estadoGuardado}
+        reintentando={isPending}
+        onReintentar={() =>
+          intentarGuardar(ensayos, notas, grupoSeleccionado!, fase, posicionOrigen, posicionDestino, clasesValidas.length)
+        }
+        onVolver={() => router.push(`/dashboard/programas-rft/${programaAlumnoId}`)}
+      />
     )
   }
 
@@ -273,6 +397,7 @@ export default function TomarDatosRftClient({
   if (!secuencia) {
     return (
       <Panel className="p-4 sm:p-6 space-y-4">
+        {sinConexion && <BannerSinConexion />}
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-slate-600">{grupoSeleccionado}</p>
           {!grupoInicial && (
@@ -400,6 +525,7 @@ export default function TomarDatosRftClient({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {sinConexion && <BannerSinConexion />}
       <div className="flex items-center justify-between text-sm text-slate-500">
         <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}

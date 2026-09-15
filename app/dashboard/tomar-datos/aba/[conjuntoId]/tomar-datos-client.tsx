@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueAba } from './actions'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
+import { leerProgreso, guardarProgreso, borrarProgreso, esFalloDeRed } from '../../offline-sync'
+import { BannerSinConexion, PantallaGuardadoPendiente } from '../../estado-sincronizacion'
 
 type Estimulo = { id: string; nombre: string }
 
@@ -78,6 +80,7 @@ export default function TomarDatosClient({
   faseConjunto: 'linea_base' | 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
 }) {
   const enLineaBase = faseConjunto === 'linea_base'
+  const claveProgreso = `aba:${conjuntoId}`
 
   const [tamanoBloque, setTamanoBloque] = useState<number>(ensayosPorBloque)
   const [secuencia, setSecuencia] = useState<Estimulo[] | null>(null)
@@ -86,14 +89,87 @@ export default function TomarDatosClient({
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
   const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean } | null>(null)
+  const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
+  const [sinConexion, setSinConexion] = useState(false)
   const router = useRouter()
   const toast = useToast()
+
+  const intentarGuardar = useCallback(
+    (listaEnsayos: EnsayoRegistrado[], notasActuales: string) => {
+      startTransition(async () => {
+        try {
+          const res = await guardarBloqueAba(
+            conjuntoId,
+            programaAlumnoId,
+            alumnoId,
+            listaEnsayos.map(({ estimuloId, correcto, ayuda }) => ({ estimuloId, correcto, ayuda })),
+            notasActuales
+          )
+          if (res.error) {
+            setEstadoGuardado('error')
+            toast(res.error, 'error')
+            return
+          }
+          borrarProgreso(claveProgreso)
+          setEstadoGuardado('idle')
+          setResultado({ porcentaje: res.porcentaje ?? 0, dominioLogrado: res.dominioLogrado ?? false })
+        } catch (e) {
+          if (esFalloDeRed(e)) {
+            setEstadoGuardado('pendiente')
+          } else {
+            setEstadoGuardado('error')
+            toast('No se pudo guardar el bloque', 'error')
+          }
+        }
+      })
+    },
+    [conjuntoId, programaAlumnoId, alumnoId, claveProgreso, toast]
+  )
+
+  // Restaura un bloque en curso (o completo pero sin sincronizar todavía) si
+  // se recargó la página o se cerró tras un fallo de red.
+  useEffect(() => {
+    const guardado = leerProgreso<{
+      secuencia: Estimulo[]
+      ensayos: EnsayoRegistrado[]
+      notas: string
+      tamanoBloque: number
+    }>(claveProgreso)
+    if (guardado) {
+      setSecuencia(guardado.secuencia)
+      setEnsayos(guardado.ensayos)
+      setNotas(guardado.notas)
+      setTamanoBloque(guardado.tamanoBloque)
+      if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
+        intentarGuardar(guardado.ensayos, guardado.notas)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Reintenta solo en cuanto vuelva la conexión, y muestra un aviso mientras
+  // se está tomando el bloque sin conexión.
+  useEffect(() => {
+    const actualizarEstado = () => setSinConexion(!navigator.onLine)
+    actualizarEstado()
+    const onOnline = () => {
+      actualizarEstado()
+      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas)
+    }
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', actualizarEstado)
+    return () => {
+      window.removeEventListener('online', onOnline)
+      window.removeEventListener('offline', actualizarEstado)
+    }
+  }, [estadoGuardado, ensayos, notas, intentarGuardar])
 
   const empezarBloque = () => {
     setSecuencia(generarSecuencia(estimulos, tamanoBloque))
     setEnsayos([])
     setNotas('')
     setResultado(null)
+    setEstadoGuardado('idle')
   }
 
   const registrar = (correcto: boolean, ayuda: string) => {
@@ -107,26 +183,20 @@ export default function TomarDatosClient({
     setMostrandoAyudas(false)
 
     if (nuevos.length === secuencia.length) {
-      startTransition(async () => {
-        const res = await guardarBloqueAba(
-          conjuntoId,
-          programaAlumnoId,
-          alumnoId,
-          nuevos.map(({ estimuloId, correcto, ayuda }) => ({ estimuloId, correcto, ayuda })),
-          notas
-        )
-        if (res.error) {
-          toast(res.error, 'error')
-          return
-        }
-        setResultado({ porcentaje: res.porcentaje ?? 0, dominioLogrado: res.dominioLogrado ?? false })
-      })
+      intentarGuardar(nuevos, notas)
     }
   }
 
   const deshacerUltimo = () => {
     setEnsayos((prev) => prev.slice(0, -1))
   }
+
+  // Guarda el progreso en el dispositivo según se registra cada ensayo
+  useEffect(() => {
+    if (!secuencia) return
+    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque })
+  }, [secuencia, ensayos, notas, tamanoBloque, claveProgreso])
+
   if (resultado) {
     return (
       <div className={`rounded-2xl border p-4 sm:p-6 text-center space-y-3 ${
@@ -154,6 +224,7 @@ export default function TomarDatosClient({
             onClick={() => {
               setResultado(null)
               setSecuencia(null)
+              setEstadoGuardado('idle')
             }}
             className="py-3 sm:py-2 text-base sm:text-sm"
           >
@@ -171,9 +242,21 @@ export default function TomarDatosClient({
     )
   }
 
+  if (estadoGuardado === 'pendiente' || estadoGuardado === 'error') {
+    return (
+      <PantallaGuardadoPendiente
+        tipo={estadoGuardado}
+        reintentando={isPending}
+        onReintentar={() => intentarGuardar(ensayos, notas)}
+        onVolver={() => router.push(`/dashboard/programas/${programaAlumnoId}`)}
+      />
+    )
+  }
+
   if (!secuencia) {
     return (
       <Panel className="p-4 sm:p-6 space-y-4">
+        {sinConexion && <BannerSinConexion />}
         {enLineaBase && (
           <div className="rounded-lg bg-sky-50 border border-sky-200 p-3 text-sm text-sky-800">
             Estás en fase de <strong>línea base</strong>: no se evalúa el criterio de dominio ni se registran ayudas, solo el nivel de partida sin intervención.
@@ -217,6 +300,7 @@ export default function TomarDatosClient({
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {sinConexion && <BannerSinConexion />}
       <div className="flex items-center justify-between text-sm text-slate-500">
         <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
