@@ -5,6 +5,8 @@ import ConjuntoCard from './conjunto-card'
 import EvolucionChart from './evolucion-chart'
 import { obtenerEvolucionAba } from './evolucion-actions'
 import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
+import SondasLista from '../../sondas-lista'
+import ObservacionesPendientes from './observaciones-pendientes'
 import ProgramaAbaTabs from './programa-aba-tabs'
 import EstadoProgramaSelector from './estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
@@ -50,7 +52,14 @@ export default async function ProgramaAlumnoPage({
     .eq('programa_alumno_id', id)
     .order('orden')
 
-  const { conjuntos: datosEvolucion, distribucionAyudas } = await obtenerEvolucionAba(id)
+  const { conjuntos: datosEvolucion, distribucionAyudas, sondas } = await obtenerEvolucionAba(id)
+
+  const { data: observacionesPendientes } = await supabase
+    .from('observaciones_familia')
+    .select('id, texto, consiguio, fecha_evento, created_at, perfiles!observaciones_familia_perfil_id_fkey(nombre)')
+    .eq('programa_alumno_id', id)
+    .eq('estado', 'pendiente')
+    .order('created_at', { ascending: false })
 
   const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
   const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
@@ -130,6 +139,22 @@ export default async function ProgramaAlumnoPage({
           </p>
         )}
       </Panel>
+      {observacionesPendientes && observacionesPendientes.length > 0 && (
+        <ObservacionesPendientes
+          observaciones={observacionesPendientes.map((o) => ({
+            id: o.id,
+            texto: o.texto,
+            consiguio: o.consiguio,
+            fechaEvento: o.fecha_evento,
+            autorNombre: o.perfiles?.nombre ?? 'Familia',
+          }))}
+          conjuntosElegibles={(conjuntos ?? [])
+            .filter((c) => c.estado === 'dominado' || c.estado === 'mantenimiento')
+            .map((c) => ({ id: c.id, nombre: c.nombre }))}
+          programaAlumnoId={id}
+          alumnoId={programa.alumno_id}
+        />
+      )}
       <ProgramaAbaTabs
        evolucion={
           <div className="space-y-4">
@@ -147,6 +172,10 @@ export default async function ProgramaAlumnoPage({
             </Panel>
             <Panel className="p-3 sm:p-5">
               <DistribucionAyudasChart distribucion={distribucionAyudas} titulo="Distribución de ayudas" />
+            </Panel>
+            <Panel className="p-3 sm:p-5">
+              <p className="mb-2 text-sm font-semibold text-slate-700">Sondas de generalización y mantenimiento</p>
+              <SondasLista sondas={sondas} />
             </Panel>
           </div>
         }

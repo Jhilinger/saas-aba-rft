@@ -10,13 +10,16 @@ type EnsayoInput = {
   ayuda: string
 }
 const AYUDAS_VALIDAS = ['independiente', 'verbal', 'verbal_parcial', 'gestual', 'visual', 'modelado', 'fisica_parcial', 'fisica_total', 'textual'] as const satisfies readonly Enums<'tipo_ayuda'>[]
+const TIPOS_SONDA = ['generalizacion', 'mantenimiento'] as const
+type TipoSonda = (typeof TIPOS_SONDA)[number]
 
 export async function guardarBloqueAba(
   conjuntoId: string,
   programaAlumnoId: string,
   alumnoId: string,
   ensayos: EnsayoInput[],
-  notas?: string
+  notas?: string,
+  tipoSonda?: TipoSonda
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -33,8 +36,17 @@ export async function guardarBloqueAba(
     .eq('id', conjuntoId)
     .single()
 
+  // Las sondas de generalización/mantenimiento solo tienen sentido sobre un
+  // conjunto ya dominado — y no deben interferir con el cálculo de dominio
+  // (el trigger de la base de datos no distingue por fase, así que solo se
+  // permiten aquí, donde no hay dominio pendiente de calcular).
+  const esSondaValida =
+    tipoSonda &&
+    TIPOS_SONDA.includes(tipoSonda) &&
+    (conjuntoAntes?.estado === 'dominado' || conjuntoAntes?.estado === 'mantenimiento')
+
   const enLineaBase = conjuntoAntes?.estado === 'linea_base'
-  const fase = enLineaBase ? 'linea_base' : 'intervencion'
+  const fase = esSondaValida ? tipoSonda : enLineaBase ? 'linea_base' : 'intervencion'
 
   const totalEnsayos = ensayos.length
   const aciertos = ensayos.filter((e) => e.correcto && e.ayuda === 'independiente').length
@@ -69,7 +81,10 @@ export async function guardarBloqueAba(
 
   let dominioLogrado = false
 
-  if (enLineaBase) {
+  if (esSondaValida) {
+    // No toca el estado del conjunto: es una comprobación puntual, no forma
+    // parte de la fase de adquisición.
+  } else if (enLineaBase) {
     await supabase
       .from('conjuntos_estimulos_alumno')
       .update({ estado: 'linea_base' })

@@ -1171,6 +1171,80 @@ export type Database = {
           },
         ]
       }
+      observaciones_familia: {
+        Row: {
+          bloque_id: string | null
+          consiguio: boolean | null
+          created_at: string
+          estado: string
+          fecha_evento: string
+          id: string
+          perfil_id: string
+          programa_alumno_id: string
+          respuesta_terapeuta: string | null
+          revisado_en: string | null
+          revisado_por: string | null
+          texto: string
+        }
+        Insert: {
+          bloque_id?: string | null
+          consiguio?: boolean | null
+          created_at?: string
+          estado?: string
+          fecha_evento?: string
+          id?: string
+          perfil_id: string
+          programa_alumno_id: string
+          respuesta_terapeuta?: string | null
+          revisado_en?: string | null
+          revisado_por?: string | null
+          texto: string
+        }
+        Update: {
+          bloque_id?: string | null
+          consiguio?: boolean | null
+          created_at?: string
+          estado?: string
+          fecha_evento?: string
+          id?: string
+          perfil_id?: string
+          programa_alumno_id?: string
+          respuesta_terapeuta?: string | null
+          revisado_en?: string | null
+          revisado_por?: string | null
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observaciones_familia_bloque_id_fkey"
+            columns: ["bloque_id"]
+            isOneToOne: false
+            referencedRelation: "bloques_ensayo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observaciones_familia_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observaciones_familia_programa_alumno_id_fkey"
+            columns: ["programa_alumno_id"]
+            isOneToOne: false
+            referencedRelation: "programas_alumno"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observaciones_familia_revisado_por_fkey"
+            columns: ["revisado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           activo: boolean

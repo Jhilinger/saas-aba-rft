@@ -80,22 +80,29 @@ export default function TomarDatosClient({
   faseConjunto: 'linea_base' | 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
 }) {
   const enLineaBase = faseConjunto === 'linea_base'
+  const puedeSonda = faseConjunto === 'dominado' || faseConjunto === 'mantenimiento'
   const claveProgreso = `aba:${conjuntoId}`
 
   const [tamanoBloque, setTamanoBloque] = useState<number>(ensayosPorBloque)
+  const [tipoSonda, setTipoSonda] = useState<'normal' | 'generalizacion' | 'mantenimiento'>('normal')
+  const [contexto, setContexto] = useState('')
+  // Igual que en línea base: en una sonda no se dan ayudas, se comprueba si
+  // el alumno lo hace por sí mismo en el nuevo contexto o tras el tiempo.
+  const enSonda = tipoSonda !== 'normal'
+  const sinAyudas = enLineaBase || enSonda
   const [secuencia, setSecuencia] = useState<Estimulo[] | null>(null)
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
   const [ensayos, setEnsayos] = useState<EnsayoRegistrado[]>([])
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
-  const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean } | null>(null)
+  const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean; tipoSonda: string } | null>(null)
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
   const router = useRouter()
   const toast = useToast()
 
   const intentarGuardar = useCallback(
-    (listaEnsayos: EnsayoRegistrado[], notasActuales: string) => {
+    (listaEnsayos: EnsayoRegistrado[], notasActuales: string, sondaActual: 'normal' | 'generalizacion' | 'mantenimiento') => {
       startTransition(async () => {
         try {
           const res = await guardarBloqueAba(
@@ -103,7 +110,8 @@ export default function TomarDatosClient({
             programaAlumnoId,
             alumnoId,
             listaEnsayos.map(({ estimuloId, correcto, ayuda }) => ({ estimuloId, correcto, ayuda })),
-            notasActuales
+            notasActuales,
+            sondaActual === 'normal' ? undefined : sondaActual
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -112,7 +120,7 @@ export default function TomarDatosClient({
           }
           borrarProgreso(claveProgreso)
           setEstadoGuardado('idle')
-          setResultado({ porcentaje: res.porcentaje ?? 0, dominioLogrado: res.dominioLogrado ?? false })
+          setResultado({ porcentaje: res.porcentaje ?? 0, dominioLogrado: res.dominioLogrado ?? false, tipoSonda: sondaActual })
         } catch (e) {
           if (esFalloDeRed(e)) {
             setEstadoGuardado('pendiente')
@@ -134,14 +142,16 @@ export default function TomarDatosClient({
       ensayos: EnsayoRegistrado[]
       notas: string
       tamanoBloque: number
+      tipoSonda: 'normal' | 'generalizacion' | 'mantenimiento'
     }>(claveProgreso)
     if (guardado) {
       setSecuencia(guardado.secuencia)
       setEnsayos(guardado.ensayos)
       setNotas(guardado.notas)
       setTamanoBloque(guardado.tamanoBloque)
+      setTipoSonda(guardado.tipoSonda ?? 'normal')
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
-        intentarGuardar(guardado.ensayos, guardado.notas)
+        intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal')
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,7 +164,7 @@ export default function TomarDatosClient({
     actualizarEstado()
     const onOnline = () => {
       actualizarEstado()
-      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas)
+      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas, tipoSonda)
     }
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', actualizarEstado)
@@ -162,12 +172,12 @@ export default function TomarDatosClient({
       window.removeEventListener('online', onOnline)
       window.removeEventListener('offline', actualizarEstado)
     }
-  }, [estadoGuardado, ensayos, notas, intentarGuardar])
+  }, [estadoGuardado, ensayos, notas, tipoSonda, intentarGuardar])
 
   const empezarBloque = () => {
     setSecuencia(generarSecuencia(estimulos, tamanoBloque))
     setEnsayos([])
-    setNotas('')
+    setNotas(tipoSonda === 'generalizacion' && contexto.trim() ? `Contexto: ${contexto.trim()}` : '')
     setResultado(null)
     setEstadoGuardado('idle')
   }
@@ -183,7 +193,7 @@ export default function TomarDatosClient({
     setMostrandoAyudas(false)
 
     if (nuevos.length === secuencia.length) {
-      intentarGuardar(nuevos, notas)
+      intentarGuardar(nuevos, notas, tipoSonda)
     }
   }
 
@@ -194,8 +204,8 @@ export default function TomarDatosClient({
   // Guarda el progreso en el dispositivo según se registra cada ensayo
   useEffect(() => {
     if (!secuencia) return
-    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque })
-  }, [secuencia, ensayos, notas, tamanoBloque, claveProgreso])
+    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda })
+  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, claveProgreso])
 
   if (resultado) {
     return (
@@ -212,9 +222,13 @@ export default function TomarDatosClient({
         }`}>
           {resultado.dominioLogrado
             ? '¡Dominio conseguido! Este conjunto acaba de superar el criterio'
-            : enLineaBase
-              ? `Bloque de línea base guardado — ${resultado.porcentaje}% de acierto`
-              : `Bloque guardado — ${resultado.porcentaje}% de acierto independiente`}
+            : resultado.tipoSonda === 'generalizacion'
+              ? `Sonda de generalización guardada — ${resultado.porcentaje}% de acierto`
+              : resultado.tipoSonda === 'mantenimiento'
+                ? `Sonda de mantenimiento guardada — ${resultado.porcentaje}% de acierto`
+                : enLineaBase
+                  ? `Bloque de línea base guardado — ${resultado.porcentaje}% de acierto`
+                  : `Bloque guardado — ${resultado.porcentaje}% de acierto independiente`}
         </p>
         {resultado.dominioLogrado && (
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
@@ -225,6 +239,7 @@ export default function TomarDatosClient({
               setResultado(null)
               setSecuencia(null)
               setEstadoGuardado('idle')
+              setContexto('')
             }}
             className="py-3 sm:py-2 text-base sm:text-sm"
           >
@@ -247,7 +262,7 @@ export default function TomarDatosClient({
       <PantallaGuardadoPendiente
         tipo={estadoGuardado}
         reintentando={isPending}
-        onReintentar={() => intentarGuardar(ensayos, notas)}
+        onReintentar={() => intentarGuardar(ensayos, notas, tipoSonda)}
         onVolver={() => router.push(`/dashboard/programas/${programaAlumnoId}`)}
       />
     )
@@ -262,9 +277,47 @@ export default function TomarDatosClient({
             Estás en fase de <strong>línea base</strong>: no se evalúa el criterio de dominio ni se registran ayudas, solo el nivel de partida sin intervención.
           </div>
         )}
+
+        {puedeSonda && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-slate-600">Tipo de sesión</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: 'normal', label: 'Seguimiento normal' },
+                { value: 'mantenimiento', label: 'Sonda de mantenimiento' },
+                { value: 'generalizacion', label: 'Sonda de generalización' },
+              ].map((t) => (
+                <button
+                  key={t.value}
+                  onClick={() => {
+                    const v = t.value as typeof tipoSonda
+                    setTipoSonda(v)
+                    setTamanoBloque(v === 'normal' ? ensayosPorBloque : 3)
+                  }}
+                  className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                    tipoSonda === t.value
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            {tipoSonda === 'generalizacion' && (
+              <input
+                value={contexto}
+                onChange={(e) => setContexto(e.target.value)}
+                placeholder="Contexto (opcional): con quién, dónde..."
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            )}
+          </div>
+        )}
+
         <p className="text-sm font-medium text-slate-600">Tamaño del bloque</p>
         <div className="flex gap-2">
-          {[10, 20].map((n) => (
+          {(tipoSonda === 'normal' ? [10, 20] : [1, 3, 5]).map((n) => (
             <button
               key={n}
               onClick={() => setTamanoBloque(n)}
@@ -274,7 +327,7 @@ export default function TomarDatosClient({
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {n} ensayos
+              {n} ensayo{n === 1 ? '' : 's'}
             </button>
           ))}
         </div>
@@ -331,6 +384,14 @@ export default function TomarDatosClient({
         </div>
       )}
 
+      {enSonda && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+          {tipoSonda === 'generalizacion' ? 'Sonda de generalización' : 'Sonda de mantenimiento'} — sin
+          ayudas, no afecta al criterio de dominio.
+          {contexto.trim() && <> Contexto: {contexto.trim()}.</>}
+        </div>
+      )}
+
             {(instrucciones || ayudasPosibles || videoUrl) && (
         <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
           {instrucciones && (
@@ -339,7 +400,7 @@ export default function TomarDatosClient({
               <p className="whitespace-pre-wrap">{instrucciones}</p>
             </div>
           )}
-          {!enLineaBase && ayudasPosibles && (
+          {!sinAyudas && ayudasPosibles && (
             <div>
               <strong>Ayudas sugeridas:</strong>
               <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
@@ -357,7 +418,7 @@ export default function TomarDatosClient({
       <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
         <p className="text-xl sm:text-2xl font-bold text-slate-800">{estimuloActual.nombre}</p>
 
-        {enLineaBase ? (
+        {sinAyudas ? (
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
               variant="success"

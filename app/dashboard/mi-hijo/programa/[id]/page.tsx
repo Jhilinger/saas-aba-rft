@@ -4,6 +4,9 @@ import Link from 'next/link'
 import EvolucionChart from '../../../programas/[id]/evolucion-chart'
 import { obtenerEvolucionAba } from '../../../programas/[id]/evolucion-actions'
 import DistribucionAyudasChart from '../../../distribucion-ayudas-chart'
+import SondasLista from '../../../sondas-lista'
+import NuevaObservacionForm from './nueva-observacion-form'
+import HistorialObservaciones from './historial-observaciones'
 import type { Tables } from '@/database.types'
 import { Panel } from '../../../../ui'
 
@@ -48,13 +51,19 @@ export default async function ProgramaFamiliaPage({
 
   if (!vinculo) redirect('/dashboard/mi-hijo')
 
-  const { conjuntos: datosEvolucion, distribucionAyudas } = await obtenerEvolucionAba(id)
+  const { conjuntos: datosEvolucion, distribucionAyudas, sondas } = await obtenerEvolucionAba(id)
 
   const { data: conjuntos } = await supabase
     .from('conjuntos_estimulos_alumno')
     .select('id, nombre, estimulos_alumno(nombre)')
     .eq('programa_alumno_id', id)
     .order('orden')
+
+  const { data: misObservaciones } = await supabase
+    .from('observaciones_familia')
+    .select('id, texto, consiguio, fecha_evento, estado, respuesta_terapeuta')
+    .eq('programa_alumno_id', id)
+    .order('created_at', { ascending: false })
 
   const alumnoNombre = (programa as unknown as ProgramaConAlumno).alumnos?.nombre_anonimizado ?? ''
 
@@ -79,6 +88,24 @@ export default async function ProgramaFamiliaPage({
       </Panel>
       <Panel className="p-3 sm:p-5">
         <DistribucionAyudasChart distribucion={distribucionAyudas} titulo="Distribución de ayudas" />
+      </Panel>
+      <Panel className="p-3 sm:p-5">
+        <p className="mb-2 text-sm font-semibold text-slate-700">Sondas de generalización y mantenimiento</p>
+        <SondasLista sondas={sondas} />
+      </Panel>
+
+      <Panel className="p-3 sm:p-5 space-y-4">
+        <NuevaObservacionForm programaAlumnoId={id} />
+        <HistorialObservaciones
+          observaciones={(misObservaciones ?? []).map((o) => ({
+            id: o.id,
+            texto: o.texto,
+            consiguio: o.consiguio,
+            fechaEvento: o.fecha_evento,
+            estado: o.estado as 'pendiente' | 'confirmada' | 'descartada',
+            respuestaTerapeuta: o.respuesta_terapeuta,
+          }))}
+        />
       </Panel>
     </div>
   )

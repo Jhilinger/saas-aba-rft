@@ -12,7 +12,7 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
     .eq('programa_alumno_id', programaAlumnoId)
     .order('orden')
 
-  if (!conjuntos || conjuntos.length === 0) return { conjuntos: [], distribucionAyudas: [] }
+  if (!conjuntos || conjuntos.length === 0) return { conjuntos: [], distribucionAyudas: [], sondas: [] }
 
   const resultado = await Promise.all(
     conjuntos.map(async (c) => {
@@ -56,5 +56,24 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
       ).data ?? []
     : []
 
-  return { conjuntos: resultado, distribucionAyudas: calcularDistribucionAyudas(ensayos) }
+  // Sondas de generalización y mantenimiento: se muestran aparte del gráfico
+  // principal (son puntuales, no una serie continua de sesiones).
+  const { data: bloquesSonda } = await supabase
+    .from('bloques_ensayo')
+    .select('id, fecha, porcentaje, fase, notas, conjunto_id')
+    .in('conjunto_id', conjuntos.map((c) => c.id))
+    .in('fase', ['generalizacion', 'mantenimiento'])
+    .order('fecha', { ascending: false })
+
+  const nombrePorConjunto = new Map(conjuntos.map((c) => [c.id, c.nombre]))
+  const sondas = (bloquesSonda ?? []).map((b) => ({
+    id: b.id,
+    fecha: new Date(b.fecha).toLocaleDateString('es-ES'),
+    tipo: b.fase as 'generalizacion' | 'mantenimiento',
+    contexto: b.notas,
+    porcentaje: Number(b.porcentaje),
+    conjuntoNombre: nombrePorConjunto.get(b.conjunto_id) ?? '—',
+  }))
+
+  return { conjuntos: resultado, distribucionAyudas: calcularDistribucionAyudas(ensayos), sondas }
 }
