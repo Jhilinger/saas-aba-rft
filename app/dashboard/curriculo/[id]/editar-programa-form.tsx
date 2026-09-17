@@ -21,11 +21,23 @@ type Programa = {
   tipo_relacion: string | null
   orden: number | null
   video_url: string | null
+  formato_recogida: string
+  direccion_objetivo: string | null
 }
+
+const FORMATOS_REGISTRO = [
+  { value: 'ensayo_discreto', label: 'Ensayo discreto (DTT) — % de acierto' },
+  { value: 'tasa', label: 'Tasa / frecuencia' },
+  { value: 'duracion', label: 'Duración' },
+  { value: 'intervalo', label: 'Intervalo' },
+  { value: 'latencia', label: 'Latencia' },
+  { value: 'abc', label: 'Registro ABC' },
+]
 
 export default function EditarProgramaForm({ programa }: { programa: Programa }) {
   const [editando, setEditando] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [formatoRecogida, setFormatoRecogida] = useState(programa.formato_recogida)
   const router = useRouter()
   const toast = useToast()
 
@@ -92,6 +104,41 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
           />
         </div>
 
+        {programa.tipo === 'aba_clasico' && (
+          <>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Tipo de registro</label>
+              <select
+                name="formato_recogida"
+                value={formatoRecogida}
+                onChange={(e) => setFormatoRecogida(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              >
+                {FORMATOS_REGISTRO.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {formatoRecogida !== 'ensayo_discreto' && formatoRecogida !== 'abc' && (
+              <div className="space-y-1">
+                <label className="text-sm text-slate-600">Dirección del objetivo</label>
+                <select
+                  name="direccion_objetivo"
+                  defaultValue={programa.direccion_objetivo ?? 'aumentar'}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                >
+                  <option value="aumentar">Aumentar la conducta</option>
+                  <option value="reducir">Reducir la conducta</option>
+                </select>
+              </div>
+            )}
+          </>
+        )}
+
         {programa.tipo === 'rft' && (
           <div className="sm:col-span-2 space-y-1">
             <label className="text-sm text-slate-600">Tipo de relación</label>
@@ -152,34 +199,38 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Ensayos por bloque</label>
-          <input
-            name="ensayos_por_bloque"
-            type="number"
-            defaultValue={programa.ensayos_por_bloque}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Bloques para dominio</label>
-          <input
-            name="bloques_para_dominio"
-            type="number"
-            defaultValue={programa.bloques_para_dominio}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
-                <div className="space-y-1">
-          <label className="text-sm text-slate-600">% de dominio</label>
-          <input
-            name="porcentaje_dominio"
-            type="number"
-            step="0.01"
-            defaultValue={programa.porcentaje_dominio}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
+        {(programa.tipo !== 'aba_clasico' || formatoRecogida === 'ensayo_discreto') && (
+          <>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Ensayos por bloque</label>
+              <input
+                name="ensayos_por_bloque"
+                type="number"
+                defaultValue={programa.ensayos_por_bloque}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Bloques para dominio</label>
+              <input
+                name="bloques_para_dominio"
+                type="number"
+                defaultValue={programa.bloques_para_dominio}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">% de dominio</label>
+              <input
+                name="porcentaje_dominio"
+                type="number"
+                step="0.01"
+                defaultValue={programa.porcentaje_dominio}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            </div>
+          </>
+        )}
 
         <div className="sm:col-span-2 space-y-1">
           <label className="text-sm text-slate-600">Vídeo de ejemplo (opcional)</label>

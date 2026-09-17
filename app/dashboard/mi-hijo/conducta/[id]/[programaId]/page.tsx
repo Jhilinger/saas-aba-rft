@@ -5,6 +5,7 @@ import AbcClient from '../../../../alumnos/[id]/conducta/[programaId]/abc-client
 import TasaClient from '../../../../alumnos/[id]/conducta/[programaId]/tasa-client'
 import DuracionClient from '../../../../alumnos/[id]/conducta/[programaId]/duracion-client'
 import IntervaloClient from '../../../../alumnos/[id]/conducta/[programaId]/intervalo-client'
+import LatenciaClient from '../../../../alumnos/[id]/conducta/[programaId]/latencia-client'
 import GraficoConducta from '../../../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
 import { Panel } from '../../../../../ui'
 
@@ -138,6 +139,32 @@ export default async function ProgramaConductaFamiliaPage({
           />
         </Panel>
         <IntervaloClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
+      </div>
+    )
+  }
+
+  if (programa.formato_recogida === 'latencia') {
+    const { data: bloques } = await supabase
+      .from('bloques_latencia')
+      .select('id, fecha, fase, numero_ensayos, latencia_total_segundos, latencia_media_segundos, notas')
+      .eq('programa_alumno_id', programaId)
+      .order('fecha', { ascending: false })
+
+    const bloquesValidos = (bloques ?? []).filter((b): b is typeof b & { fase: 'linea_base' | 'intervencion'; latencia_media_segundos: number } => b.latencia_media_segundos !== null && ['linea_base', 'intervencion'].includes(b.fase))
+    const puntos = bloquesValidos.map((b) => ({ fecha: b.fecha, valor: b.latencia_media_segundos, fase: b.fase }))
+
+    return (
+      <div className="mx-auto max-w-2xl p-4 sm:p-8 space-y-6">
+        {cabecera}
+        <Panel className="p-3 sm:p-5">
+          <GraficoConducta
+            puntos={puntos}
+            etiquetaY="Latencia media (s)"
+            direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null}
+            titulo={programa.nombre}
+          />
+        </Panel>
+        <LatenciaClient programaAlumnoId={programaId} bloquesIniciales={bloquesValidos} />
       </div>
     )
   }

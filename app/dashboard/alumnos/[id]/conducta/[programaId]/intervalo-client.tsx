@@ -28,12 +28,14 @@ const ETIQUETA_TIPO: Record<string, string> = {
 export default function IntervaloClient({
   programaAlumnoId,
   bloquesIniciales,
+  alumnoId: alumnoIdProp,
 }: {
   programaAlumnoId: string
   bloquesIniciales: Bloque[]
+  alumnoId?: string
 }) {
   const params = useParams()
-  const alumnoId = params.id as string
+  const alumnoId = alumnoIdProp ?? (params.id as string)
 
   // Configuración
   const [duracionIntervalo, setDuracionIntervalo] = useState(30)

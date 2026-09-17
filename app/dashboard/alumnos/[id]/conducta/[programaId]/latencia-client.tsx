@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { guardarBloqueTasa, editarBloqueTasa, eliminarBloqueTasa } from './actions'
+import { guardarBloqueLatencia, editarBloqueLatencia, eliminarBloqueLatencia } from './actions'
 import { useConfirm } from '../../../../../providers/confirm-provider'
 import { useToast } from '../../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../../ui'
@@ -11,19 +11,19 @@ type Bloque = {
   id: string
   fecha: string
   fase: 'linea_base' | 'intervencion'
-  duracion_observacion_segundos: number
-  numero_ocurrencias: number
-  tasa_por_minuto: number
+  numero_ensayos: number
+  latencia_total_segundos: number
+  latencia_media_segundos: number
   notas: string | null
 }
 
 function formatearSegundos(s: number) {
   const m = Math.floor(s / 60)
-  const seg = s % 60
-  return `${m}:${seg.toString().padStart(2, '0')}`
+  const seg = (s % 60).toFixed(1)
+  return m > 0 ? `${m}:${seg.padStart(4, '0')}` : `${seg}s`
 }
 
-export default function TasaClient({
+export default function LatenciaClient({
   programaAlumnoId,
   bloquesIniciales,
   alumnoId: alumnoIdProp,
@@ -34,15 +34,18 @@ export default function TasaClient({
 }) {
   const params = useParams()
   const alumnoId = alumnoIdProp ?? (params.id as string)
-  const [observando, setObservando] = useState(false)
-  const [segundos, setSegundos] = useState(0)
-  const [ocurrencias, setOcurrencias] = useState(0)
+
+  const [bloqueActivo, setBloqueActivo] = useState(false)
+  const [ensayoActivo, setEnsayoActivo] = useState(false)
+  const [segundosEnsayo, setSegundosEnsayo] = useState(0)
+  const [numeroEnsayos, setNumeroEnsayos] = useState(0)
+  const [latenciaTotal, setLatenciaTotal] = useState(0)
   const [notas, setNotas] = useState('')
-  const [resultado, setResultado] = useState<{ segundos: number; ocurrencias: number } | null>(null)
+  const [resultado, setResultado] = useState<{ numeroEnsayos: number; latenciaTotal: number } | null>(null)
   const [isPending, startTransition] = useTransition()
   const [editandoId, setEditandoId] = useState<string | null>(null)
-  const [editSegundos, setEditSegundos] = useState(0)
-  const [editOcurrencias, setEditOcurrencias] = useState(0)
+  const [editEnsayos, setEditEnsayos] = useState(0)
+  const [editLatencia, setEditLatencia] = useState(0)
   const [editNotas, setEditNotas] = useState('')
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const router = useRouter()
@@ -50,32 +53,50 @@ export default function TasaClient({
   const toast = useToast()
 
   useEffect(() => {
-    if (observando) {
-      intervalRef.current = setInterval(() => setSegundos((s) => s + 1), 1000)
+    if (ensayoActivo) {
+      intervalRef.current = setInterval(() => setSegundosEnsayo((s) => s + 0.1), 100)
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current)
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [observando])
+  }, [ensayoActivo])
 
-  const empezar = () => {
-    setSegundos(0)
-    setOcurrencias(0)
+  const iniciarBloque = () => {
+    setNumeroEnsayos(0)
+    setLatenciaTotal(0)
     setResultado(null)
-    setObservando(true)
+    setBloqueActivo(true)
   }
 
-  const detener = () => {
-    setObservando(false)
-    setResultado({ segundos, ocurrencias })
+  const iniciarEnsayo = () => {
+    setSegundosEnsayo(0)
+    setEnsayoActivo(true)
+  }
+
+  const registrarRespuesta = () => {
+    setEnsayoActivo(false)
+    setLatenciaTotal((l) => l + segundosEnsayo)
+    setNumeroEnsayos((n) => n + 1)
+  }
+
+  const finalizarBloque = () => {
+    setEnsayoActivo(false)
+    setBloqueActivo(false)
+    setResultado({ numeroEnsayos, latenciaTotal })
   }
 
   const guardar = () => {
-    if (!resultado) return
+    if (!resultado || resultado.numeroEnsayos === 0) return
     startTransition(async () => {
-      const res = await guardarBloqueTasa(programaAlumnoId, alumnoId, resultado.segundos, resultado.ocurrencias, notas)
+      const res = await guardarBloqueLatencia(
+        programaAlumnoId,
+        alumnoId,
+        resultado.numeroEnsayos,
+        Math.round(resultado.latenciaTotal * 10) / 10,
+        notas
+      )
       if (res.error) {
         toast(res.error, 'error')
         return
@@ -86,16 +107,17 @@ export default function TasaClient({
       router.refresh()
     })
   }
-    const empezarEdicion = (b: Bloque) => {
+
+  const empezarEdicion = (b: Bloque) => {
     setEditandoId(b.id)
-    setEditSegundos(b.duracion_observacion_segundos)
-    setEditOcurrencias(b.numero_ocurrencias)
+    setEditEnsayos(b.numero_ensayos)
+    setEditLatencia(b.latencia_total_segundos)
     setEditNotas(b.notas ?? '')
   }
 
   const guardarEdicion = () => {
     startTransition(async () => {
-      const res = await editarBloqueTasa(editandoId!, alumnoId, programaAlumnoId, editSegundos, editOcurrencias, editNotas)
+      const res = await editarBloqueLatencia(editandoId!, alumnoId, programaAlumnoId, editEnsayos, editLatencia, editNotas)
       if (res.error) {
         toast(res.error, 'error')
         return
@@ -105,16 +127,17 @@ export default function TasaClient({
       router.refresh()
     })
   }
+
   const borrar = async (id: string) => {
     const ok = await confirmar({
       titulo: 'Eliminar bloque',
-      mensaje: '¿Eliminar este bloque de tasa? No se puede deshacer.',
+      mensaje: '¿Eliminar este bloque de latencia? No se puede deshacer.',
       textoConfirmar: 'Eliminar',
       peligroso: true,
     })
     if (!ok) return
     startTransition(async () => {
-      const res = await eliminarBloqueTasa(id, alumnoId, programaAlumnoId)
+      const res = await eliminarBloqueLatencia(id, alumnoId, programaAlumnoId)
       if (res?.error) {
         toast(res.error, 'error')
         return
@@ -123,46 +146,70 @@ export default function TasaClient({
       router.refresh()
     })
   }
-    return (
+
+  return (
     <div className="space-y-6">
       <Panel className="p-4 sm:p-6 space-y-4 text-center">
-        {!observando && !resultado && (
-          <Button onClick={empezar} className="w-full py-4 text-lg">
-            Iniciar observación
+        {!bloqueActivo && !resultado && (
+          <Button onClick={iniciarBloque} className="w-full py-4 text-lg">
+            Iniciar bloque
           </Button>
         )}
 
-        {observando && (
+        {bloqueActivo && (
           <>
-            <p className="text-4xl font-mono font-bold text-slate-800">{formatearSegundos(segundos)}</p>
-            <p className="text-5xl font-bold text-indigo-600">{ocurrencias}</p>
-            <div className="flex gap-3">
-              <Button
-                variant="success"
-                onClick={() => setOcurrencias((o) => o + 1)}
-                className="flex-1 py-6 text-2xl font-bold active:scale-95"
-              >
-                +1
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => setOcurrencias((o) => Math.max(0, o - 1))}
-                className="px-5 text-lg"
-              >
-                −1
-              </Button>
+            <div className="flex justify-around text-sm text-slate-500">
+              <div>
+                <p className="text-xs">Ensayos</p>
+                <p className="text-2xl font-bold text-indigo-600">{numeroEnsayos}</p>
+              </div>
+              <div>
+                <p className="text-xs">Latencia acumulada</p>
+                <p className="text-2xl font-mono font-bold text-slate-800">{formatearSegundos(latenciaTotal)}</p>
+              </div>
             </div>
-            <Button variant="danger" onClick={detener} className="w-full py-3 text-base">
-              Detener observación
-            </Button>
+
+            {ensayoActivo ? (
+              <>
+                <p className="text-4xl font-mono font-bold text-rose-600">{formatearSegundos(segundosEnsayo)}</p>
+                <Button
+                  variant="danger"
+                  onClick={registrarRespuesta}
+                  className="w-full py-5 text-xl font-bold active:scale-95"
+                >
+                  Respondió
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="warning"
+                onClick={iniciarEnsayo}
+                className="w-full py-5 text-xl font-bold active:scale-95"
+              >
+                Dar instrucción / iniciar ensayo
+              </Button>
+            )}
+
+            <button
+              onClick={finalizarBloque}
+              disabled={ensayoActivo}
+              className="w-full rounded-lg bg-slate-700 py-3 text-base font-semibold text-white hover:bg-slate-600 disabled:opacity-50"
+            >
+              Finalizar bloque
+            </button>
           </>
         )}
 
         {resultado && (
           <div className="space-y-3">
             <p className="text-slate-600">
-              {resultado.ocurrencias} ocurrencias en {formatearSegundos(resultado.segundos)} —{' '}
-              <strong>{((resultado.ocurrencias / Math.max(resultado.segundos, 1)) * 60).toFixed(2)} / min</strong>
+              {resultado.numeroEnsayos} ensayo{resultado.numeroEnsayos !== 1 ? 's' : ''}
+              {resultado.numeroEnsayos > 0 && (
+                <>
+                  {' '}— latencia media:{' '}
+                  <strong>{formatearSegundos(resultado.latenciaTotal / resultado.numeroEnsayos)}</strong>
+                </>
+              )}
             </p>
             <textarea
               value={notas}
@@ -172,7 +219,7 @@ export default function TasaClient({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             />
             <div className="flex gap-3">
-              <Button onClick={guardar} disabled={isPending} className="flex-1 py-3 text-base">
+              <Button onClick={guardar} disabled={isPending || resultado.numeroEnsayos === 0} className="flex-1 py-3 text-base">
                 Guardar bloque
               </Button>
               <Button
@@ -187,7 +234,7 @@ export default function TasaClient({
         )}
       </Panel>
 
-            <div className="space-y-2">
+      <div className="space-y-2">
         <h2 className="text-sm font-semibold text-slate-700">Historial</h2>
         {bloquesIniciales.map((b) => (
           <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm space-y-2">
@@ -195,20 +242,21 @@ export default function TasaClient({
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-xs text-slate-500">Segundos observados</label>
+                    <label className="text-xs text-slate-500">Nº ensayos</label>
                     <input
                       type="number"
-                      value={editSegundos}
-                      onChange={(e) => setEditSegundos(parseInt(e.target.value) || 0)}
+                      value={editEnsayos}
+                      onChange={(e) => setEditEnsayos(parseInt(e.target.value) || 0)}
                       className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-slate-500">Ocurrencias</label>
+                    <label className="text-xs text-slate-500">Latencia total (seg)</label>
                     <input
                       type="number"
-                      value={editOcurrencias}
-                      onChange={(e) => setEditOcurrencias(parseInt(e.target.value) || 0)}
+                      step="0.1"
+                      value={editLatencia}
+                      onChange={(e) => setEditLatencia(parseFloat(e.target.value) || 0)}
                       className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
                     />
                   </div>
@@ -233,11 +281,11 @@ export default function TasaClient({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-slate-700">
-                    {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_ocurrencias} en{' '}
-                    {formatearSegundos(b.duracion_observacion_segundos)}
+                    {new Date(b.fecha).toLocaleDateString('es-ES')} — {b.numero_ensayos} ensayo
+                    {b.numero_ensayos !== 1 ? 's' : ''}
                     {b.fase === 'linea_base' && ' · Línea base'}
                   </p>
-                  <p className="text-xs text-slate-500">{b.tasa_por_minuto} / min</p>
+                  <p className="text-xs text-slate-500">Latencia media: {formatearSegundos(b.latencia_media_segundos)}</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => empezarEdicion(b)} className="text-xs font-medium text-indigo-600 hover:text-indigo-800">

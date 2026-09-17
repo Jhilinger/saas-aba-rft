@@ -7,6 +7,25 @@ import type { Enums } from '@/database.types'
 const TIPOS_PROGRAMA = ['aba_clasico', 'rft', 'conducta'] as const satisfies readonly Enums<'tipo_programa'>[]
 const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
 const VISIBILIDADES = ['privado', 'clinica'] as const satisfies readonly Enums<'visibilidad_programa'>[]
+const FORMATOS_RECOGIDA = ['ensayo_discreto', 'intervalo', 'duracion', 'tasa', 'abc', 'latencia'] as const
+const DIRECCIONES_OBJETIVO = ['aumentar', 'reducir'] as const
+
+function parseFormatoRecogida(tipo: Enums<'tipo_programa'>, value: FormDataEntryValue | null): string {
+  if (tipo !== 'aba_clasico') return 'ensayo_discreto'
+  return typeof value === 'string' && (FORMATOS_RECOGIDA as readonly string[]).includes(value)
+    ? value
+    : 'ensayo_discreto'
+}
+
+function parseDireccionObjetivo(
+  formatoRecogida: string,
+  value: FormDataEntryValue | null
+): 'aumentar' | 'reducir' | null {
+  if (formatoRecogida === 'ensayo_discreto' || formatoRecogida === 'abc') return null
+  return typeof value === 'string' && (DIRECCIONES_OBJETIVO as readonly string[]).includes(value)
+    ? (value as 'aumentar' | 'reducir')
+    : 'aumentar'
+}
 
 function parseTipoPrograma(value: FormDataEntryValue | null): Enums<'tipo_programa'> | null {
   return typeof value === 'string' && TIPOS_PROGRAMA.includes(value as Enums<'tipo_programa'>)
@@ -52,6 +71,8 @@ export async function crearPrograma(formData: FormData) {
   if (!tipo) return { error: 'Tipo de programa no válido' }
   const orden = parseOrden(formData)
   const visibilidad = esGlobal ? 'clinica' : parseVisibilidad(formData.get('visibilidad'))
+  const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
+  const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
 
   const { data, error } = await supabase
     .from('programas_base')
@@ -68,6 +89,8 @@ export async function crearPrograma(formData: FormData) {
       bloques_para_dominio: parseInt(formData.get('bloques_para_dominio') as string) || 3,
       porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
       video_url: (formData.get('video_url') as string)?.trim() || null,
+      formato_recogida: formatoRecogida,
+      direccion_objetivo: direccionObjetivo,
       creado_por: user.id,
       clinica_id: esGlobal ? null : perfil.clinica_id,
       visibilidad,
@@ -173,6 +196,8 @@ export async function editarPrograma(id: string, formData: FormData) {
     .single()
 
   const ordenAnterior = programaActual?.orden ?? null
+  const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
+  const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
 
   const updateData: {
     nombre: string
@@ -186,6 +211,8 @@ export async function editarPrograma(id: string, formData: FormData) {
     porcentaje_dominio: number
     video_url: string | null
     tipo_relacion: Enums<'tipo_relacion_rft'> | null
+    formato_recogida: string
+    direccion_objetivo: string | null
     visibilidad?: Enums<'visibilidad_programa'>
   } = {
     nombre: formData.get('nombre') as string,
@@ -199,6 +226,8 @@ export async function editarPrograma(id: string, formData: FormData) {
     porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
     video_url: (formData.get('video_url') as string)?.trim() || null,
     tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
+    formato_recogida: formatoRecogida,
+    direccion_objetivo: direccionObjetivo,
   }
 
   // La visibilidad solo tiene sentido en programas propios de una clínica
@@ -258,6 +287,8 @@ export async function clonarPrograma(id: string) {
       bloques_para_dominio: original.bloques_para_dominio,
       porcentaje_dominio: original.porcentaje_dominio,
       video_url: original.video_url,
+      formato_recogida: original.formato_recogida,
+      direccion_objetivo: original.direccion_objetivo,
       orden: null,
       clinica_id: original.clinica_id,
       visibilidad: original.visibilidad,

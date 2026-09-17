@@ -3,6 +3,20 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
+// Estos componentes de registro (ABC, tasa, duración, intervalo, latencia) se
+// reutilizan en 4 rutas distintas: la página de conducta del terapeuta, la
+// de la familia, y las páginas de programa ABA (terapeuta y familia) cuando
+// un programa aba_clasico usa un formato_recogida distinto de
+// ensayo_discreto. Revalidamos las 4 para que el refresco de caché funcione
+// venga de donde venga la acción (router.refresh() ya refresca la ruta
+// actual igualmente, esto es solo para no dejar cachés ajenas obsoletas).
+function revalidarRegistroConducta(alumnoId: string, programaAlumnoId: string) {
+  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/mi-hijo/conducta/${alumnoId}/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/mi-hijo/programa/${programaAlumnoId}`)
+}
+
 export async function crearRegistroAbc(
   programaAlumnoId: string,
   alumnoId: string,
@@ -27,7 +41,7 @@ export async function crearRegistroAbc(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -55,7 +69,7 @@ export async function editarRegistroAbc(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -66,7 +80,7 @@ export async function eliminarRegistroAbc(registroId: string, alumnoId: string, 
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -103,7 +117,7 @@ export async function guardarBloqueTasa(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -128,7 +142,7 @@ export async function editarBloqueTasa(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -139,7 +153,7 @@ export async function eliminarBloqueTasa(bloqueId: string, alumnoId: string, pro
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -169,7 +183,7 @@ export async function guardarBloqueDuracion(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -196,7 +210,7 @@ export async function editarBloqueDuracion(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -207,7 +221,7 @@ export async function eliminarBloqueDuracion(bloqueId: string, alumnoId: string,
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -239,7 +253,7 @@ export async function guardarBloqueIntervalo(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -268,7 +282,7 @@ export async function editarBloqueIntervalo(
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }
 
@@ -279,6 +293,70 @@ export async function eliminarBloqueIntervalo(bloqueId: string, alumnoId: string
 
   if (error) return { error: error.message }
 
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
+  return { success: true }
+}
+
+export async function guardarBloqueLatencia(
+  programaAlumnoId: string,
+  alumnoId: string,
+  numeroEnsayos: number,
+  latenciaTotalSegundos: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const fase = await obtenerFase(supabase, programaAlumnoId)
+
+  const { error } = await supabase.from('bloques_latencia').insert({
+    programa_alumno_id: programaAlumnoId,
+    terapeuta_id: user.id,
+    fase,
+    numero_ensayos: numeroEnsayos,
+    latencia_total_segundos: latenciaTotalSegundos,
+    notas: notas?.trim() || null,
+  })
+
+  if (error) return { error: error.message }
+
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
+  return { success: true }
+}
+
+export async function editarBloqueLatencia(
+  bloqueId: string,
+  alumnoId: string,
+  programaAlumnoId: string,
+  numeroEnsayos: number,
+  latenciaTotalSegundos: number,
+  notas?: string
+) {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('bloques_latencia')
+    .update({
+      numero_ensayos: numeroEnsayos,
+      latencia_total_segundos: latenciaTotalSegundos,
+      notas: notas?.trim() || null,
+    })
+    .eq('id', bloqueId)
+
+  if (error) return { error: error.message }
+
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
+  return { success: true }
+}
+
+export async function eliminarBloqueLatencia(bloqueId: string, alumnoId: string, programaAlumnoId: string) {
+  const supabase = await createClient()
+
+  const { error } = await supabase.from('bloques_latencia').delete().eq('id', bloqueId)
+
+  if (error) return { error: error.message }
+
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
   return { success: true }
 }

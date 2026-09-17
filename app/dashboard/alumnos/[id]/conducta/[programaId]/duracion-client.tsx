@@ -27,12 +27,14 @@ function formatearSegundos(s: number) {
 export default function DuracionClient({
   programaAlumnoId,
   bloquesIniciales,
+  alumnoId: alumnoIdProp,
 }: {
   programaAlumnoId: string
   bloquesIniciales: Bloque[]
+  alumnoId?: string
 }) {
   const params = useParams()
-  const alumnoId = params.id as string
+  const alumnoId = alumnoIdProp ?? (params.id as string)
 
   const [sesionActiva, setSesionActiva] = useState(false)
   const [segundosSesion, setSegundosSesion] = useState(0)

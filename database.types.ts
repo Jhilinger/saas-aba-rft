@@ -355,6 +355,57 @@ export type Database = {
           },
         ]
       }
+      bloques_latencia: {
+        Row: {
+          fase: string
+          fecha: string
+          id: string
+          latencia_media_segundos: number | null
+          latencia_total_segundos: number
+          notas: string | null
+          numero_ensayos: number
+          programa_alumno_id: string
+          terapeuta_id: string | null
+        }
+        Insert: {
+          fase?: string
+          fecha?: string
+          id?: string
+          latencia_media_segundos?: number | null
+          latencia_total_segundos: number
+          notas?: string | null
+          numero_ensayos: number
+          programa_alumno_id: string
+          terapeuta_id?: string | null
+        }
+        Update: {
+          fase?: string
+          fecha?: string
+          id?: string
+          latencia_media_segundos?: number | null
+          latencia_total_segundos?: number
+          notas?: string | null
+          numero_ensayos?: number
+          programa_alumno_id?: string
+          terapeuta_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bloques_latencia_programa_alumno_id_fkey"
+            columns: ["programa_alumno_id"]
+            isOneToOne: false
+            referencedRelation: "programas_alumno"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bloques_latencia_terapeuta_id_fkey"
+            columns: ["terapeuta_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bloques_tasa: {
         Row: {
           duracion_observacion_segundos: number
@@ -1438,7 +1489,9 @@ export type Database = {
           creado_por: string
           created_at: string
           criterio_dominio: string | null
+          direccion_objetivo: string | null
           ensayos_por_bloque: number
+          formato_recogida: string
           id: string
           instrucciones_terapeuta: string | null
           materiales: string | null
@@ -1460,7 +1513,9 @@ export type Database = {
           creado_por: string
           created_at?: string
           criterio_dominio?: string | null
+          direccion_objetivo?: string | null
           ensayos_por_bloque?: number
+          formato_recogida?: string
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null
@@ -1484,7 +1539,9 @@ export type Database = {
           creado_por?: string
           created_at?: string
           criterio_dominio?: string | null
+          direccion_objetivo?: string | null
           ensayos_por_bloque?: number
+          formato_recogida?: string
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null

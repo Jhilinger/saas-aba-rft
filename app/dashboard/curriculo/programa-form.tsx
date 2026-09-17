@@ -16,8 +16,18 @@ function BotonCrear() {
   )
 }
 
+const FORMATOS_REGISTRO = [
+  { value: 'ensayo_discreto', label: 'Ensayo discreto (DTT) — % de acierto' },
+  { value: 'tasa', label: 'Tasa / frecuencia' },
+  { value: 'duracion', label: 'Duración' },
+  { value: 'intervalo', label: 'Intervalo' },
+  { value: 'latencia', label: 'Latencia' },
+  { value: 'abc', label: 'Registro ABC' },
+]
+
 export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
   const [tipo, setTipo] = useState('aba_clasico')
+  const [formatoRecogida, setFormatoRecogida] = useState('ensayo_discreto')
   const router = useRouter()
   const toast = useToast()
 
@@ -67,6 +77,40 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
             <option value="rft">Aprendizaje Relacional</option>
           </select>
         </div>
+
+        {tipo === 'aba_clasico' && (
+          <>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Tipo de registro</label>
+              <select
+                name="formato_recogida"
+                value={formatoRecogida}
+                onChange={(e) => setFormatoRecogida(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              >
+                {FORMATOS_REGISTRO.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {formatoRecogida !== 'ensayo_discreto' && formatoRecogida !== 'abc' && (
+              <div className="space-y-1">
+                <label className="text-sm text-slate-600">Dirección del objetivo</label>
+                <select
+                  name="direccion_objetivo"
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                >
+                  <option value="aumentar">Aumentar la conducta</option>
+                  <option value="reducir">Reducir la conducta</option>
+                </select>
+              </div>
+            )}
+          </>
+        )}
 
         {tipo === 'rft' && (
           <div className="sm:col-span-2 space-y-1">
@@ -128,20 +172,24 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Ensayos por bloque</label>
-          <input name="ensayos_por_bloque" type="number" defaultValue="10" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-        </div>
+        {(tipo !== 'aba_clasico' || formatoRecogida === 'ensayo_discreto') && (
+          <>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Ensayos por bloque</label>
+              <input name="ensayos_por_bloque" type="number" defaultValue="10" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+            </div>
 
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Bloques consecutivos para dominio</label>
-          <input name="bloques_para_dominio" type="number" defaultValue="3" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-        </div>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Bloques consecutivos para dominio</label>
+              <input name="bloques_para_dominio" type="number" defaultValue="3" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+            </div>
 
-                <div className="space-y-1">
-          <label className="text-sm text-slate-600">% de acierto para dominio</label>
-          <input name="porcentaje_dominio" type="number" step="0.01" defaultValue="90" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-        </div>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">% de acierto para dominio</label>
+              <input name="porcentaje_dominio" type="number" step="0.01" defaultValue="90" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
+            </div>
+          </>
+        )}
 
         <div className="sm:col-span-2 space-y-1">
           <label className="text-sm text-slate-600">Vídeo de ejemplo (opcional)</label>

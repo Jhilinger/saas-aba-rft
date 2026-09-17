@@ -19,12 +19,14 @@ type Registro = {
 export default function AbcClient({
   programaAlumnoId,
   registrosIniciales,
+  alumnoId: alumnoIdProp,
 }: {
   programaAlumnoId: string
   registrosIniciales: Registro[]
+  alumnoId?: string
 }) {
   const params = useParams()
-  const alumnoId = params.id as string
+  const alumnoId = alumnoIdProp ?? (params.id as string)
   const [antecedente, setAntecedente] = useState('')
   const [conducta, setConducta] = useState('')
   const [consecuencia, setConsecuencia] = useState('')
