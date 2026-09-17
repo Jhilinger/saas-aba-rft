@@ -40,7 +40,7 @@ const METODO = [
   {
     paso: '2',
     titulo: 'Enseñar',
-    texto: 'Ensayo a ensayo, con el currículo de siempre — ABA, paso a paso.',
+    texto: 'Ensayo a ensayo, al ritmo de cada alumno — con el currículo de siempre.',
     color: '#aa5541',
     fondo: 'var(--brand-accent-soft)',
   },
@@ -70,7 +70,7 @@ const PERFILES = [
 
 const BLOQUES_FUNCIONALIDAD = [
   {
-    eyebrow: 'El método',
+    eyebrow: 'El enfoque',
     titulo: 'La base de cada plan',
     items: [
       {
@@ -172,13 +172,13 @@ export default async function Home() {
               <Nodo /> Basado en ABA y aprendizaje relacional (RFT)
             </p>
             <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Enseñar con método.<br />
-              <span style={{ color: '#aa5541' }}>Aprender con evidencia.</span>
+              Enseñar y aprender<br />
+              <span style={{ color: '#aa5541' }}>desde la evidencia.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
-              Una misma herramienta guiada, desde la evaluación hasta el progreso real — para
-              terapeutas ABA, logopedas, psicólogos, educadores y familias que enseñan de forma
-              estructurada y quieren verlo funcionar, no solo intuirlo.
+              Un enfoque guiado y flexible — no una plantilla rígida — que se adapta a cada alumno,
+              desde la evaluación hasta el progreso real. Para terapeutas ABA, logopedas,
+              psicólogos, educadores y familias que enseñan con evidencia, no por intuición.
             </p>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <Link
@@ -195,11 +195,11 @@ export default async function Home() {
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="mt-4 text-xs text-slate-600">14 días de prueba gratis · sin tarjeta</p>
+            <p className="mt-4 text-xs text-slate-600">14 días de prueba gratis</p>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-600">El método, en cuatro pasos</p>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-600">El enfoque, en cuatro pasos</p>
             <div className="space-y-0">
               {METODO.map((m, i) => (
                 <div key={m.paso} className="flex gap-3">
@@ -250,8 +250,8 @@ export default async function Home() {
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Lo habitual</p>
               <p className="mt-2 text-lg text-slate-700">
-                Cada profesional con su método suelto, los datos en sitios distintos, y lo relacional
-                como una asignatura pendiente que nunca encuentra hueco.
+                Protocolos rígidos que no se adaptan al alumno, cada profesional con su propio
+                enfoque, y lo relacional como una asignatura pendiente que nunca encuentra hueco.
               </p>
             </div>
             <div>
@@ -259,8 +259,9 @@ export default async function Home() {
                 Con Abacontext
               </p>
               <p className="mt-2 text-lg text-slate-700">
-                Terapeuta, familia y el resto del equipo siguiendo el mismo plan, con datos que se
-                entienden sin que nadie tenga que traducirlos.
+                Un enfoque que se ajusta a cada alumno sin perder el rigor — terapeuta, familia y el
+                resto del equipo siguiendo el mismo plan, con datos que se entienden sin que nadie
+                tenga que traducirlos.
               </p>
             </div>
           </div>
@@ -272,7 +273,7 @@ export default async function Home() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Una herramienta, todo el recorrido</h2>
           <p className="mt-3 text-base text-slate-600">
-            No es una lista de funciones sueltas — es el mismo método, sostenido de principio a fin.
+            No es una lista de funciones sueltas — es el mismo enfoque, sostenido de principio a fin.
           </p>
         </div>
 
