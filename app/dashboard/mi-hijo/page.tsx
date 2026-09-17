@@ -58,8 +58,13 @@ export default async function ProgresoFamiliaPage() {
           area: p.area || 'General',
           orden: p.orden ?? 999999,
           estado: simplificar(importado?.estado ?? null),
-          graficoHref:
-            importado && p.tipo === 'aba_clasico' ? `/dashboard/mi-hijo/programa/${importado.id}` : null,
+          graficoHref: !importado
+            ? null
+            : p.tipo === 'aba_clasico'
+              ? `/dashboard/mi-hijo/programa/${importado.id}`
+              : p.tipo === 'rft'
+                ? `/dashboard/mi-hijo/programa-rft/${importado.id}`
+                : null,
         }
       })
 
