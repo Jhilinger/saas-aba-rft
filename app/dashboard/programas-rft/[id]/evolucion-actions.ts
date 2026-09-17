@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { calcularDistribucionAyudas, type DistribucionAyuda } from '../../ayuda-tipos'
 
 export async function obtenerEvolucionRft(programaAlumnoId: string) {
   const supabase = await createClient()
@@ -46,5 +47,28 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
     })
   }
 
-  return { porFase }
+  // Distribución de tipos de ayuda usados en la fase de Entrenamiento, por
+  // grupo — en las fases de test no tiene sentido (se responde de forma
+  // independiente por definición).
+  const { data: bloquesEntrenamiento } = await supabase
+    .from('bloques_ensayo_rft')
+    .select('grupo, ensayos_rft_detalle(ayuda)')
+    .eq('programa_alumno_id', programaAlumnoId)
+    .eq('fase', 'entrenamiento')
+
+  const ensayosPorGrupo: Record<string, { ayuda: string | null }[]> = {}
+  for (const b of bloquesEntrenamiento ?? []) {
+    if (!b.grupo) continue
+    if (!ensayosPorGrupo[b.grupo]) ensayosPorGrupo[b.grupo] = []
+    ensayosPorGrupo[b.grupo].push(...b.ensayos_rft_detalle)
+  }
+
+  const distribucionPorGrupo: Record<string, DistribucionAyuda[]> = {}
+  for (const grupo of Object.keys(ensayosPorGrupo)) {
+    distribucionPorGrupo[grupo] = calcularDistribucionAyudas(
+      ensayosPorGrupo[grupo] as { ayuda: import('@/database.types').Enums<'tipo_ayuda'> | null }[]
+    )
+  }
+
+  return { porFase, distribucionPorGrupo }
 }

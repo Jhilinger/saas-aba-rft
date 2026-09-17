@@ -5,6 +5,8 @@ import Link from 'next/link'
 import NuevaClaseForm from './nueva-clase-form'
 import ClaseCard from './clase-card'
 import EvolucionRftChart from './evolucion-rft-chart'
+import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
+import type { DistribucionAyuda } from '../../ayuda-tipos'
 import { Panel } from '../../../ui'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
@@ -43,6 +45,7 @@ export default function ProgramaRftClient({
   clases,
   testsPorClase,
   porFase,
+  distribucionPorGrupo,
   dominioFases,
   porcentajeDominio,
 }: {
@@ -51,6 +54,7 @@ export default function ProgramaRftClient({
   clases: Clase[]
   testsPorClase: Record<string, any[]>
   porFase: PorFase
+  distribucionPorGrupo: Record<string, DistribucionAyuda[]>
   dominioFases: DominioFase[]
   porcentajeDominio: number
 }) {
@@ -215,6 +219,13 @@ export default function ProgramaRftClient({
             )}
 
             <EvolucionRftChart porFase={porFaseFiltrado} porcentajeDominio={porcentajeDominio} />
+
+            <Panel className="p-4 sm:p-5">
+              <DistribucionAyudasChart
+                distribucion={distribucionPorGrupo[grupoSeleccionado] ?? []}
+                titulo={`Distribución de ayudas en Entrenamiento — ${grupoSeleccionado}`}
+              />
+            </Panel>
           </div>
         )
       ) : (

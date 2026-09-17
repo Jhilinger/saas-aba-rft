@@ -4,6 +4,7 @@ import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
 import EvolucionChart from './evolucion-chart'
 import { obtenerEvolucionAba } from './evolucion-actions'
+import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import ProgramaAbaTabs from './programa-aba-tabs'
 import EstadoProgramaSelector from './estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
@@ -49,7 +50,7 @@ export default async function ProgramaAlumnoPage({
     .eq('programa_alumno_id', id)
     .order('orden')
 
-  const { conjuntos: datosEvolucion } = await obtenerEvolucionAba(id)
+  const { conjuntos: datosEvolucion, distribucionAyudas } = await obtenerEvolucionAba(id)
 
   const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
   const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
@@ -143,6 +144,9 @@ export default async function ProgramaAlumnoPage({
                   estimulos: c.estimulos_alumno.map((e) => e.nombre),
                 }))}
               />
+            </Panel>
+            <Panel className="p-3 sm:p-5">
+              <DistribucionAyudasChart distribucion={distribucionAyudas} titulo="Distribución de ayudas" />
             </Panel>
           </div>
         }

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { calcularDistribucionAyudas } from '../../ayuda-tipos'
 
 export async function obtenerEvolucionAba(programaAlumnoId: string) {
   const supabase = await createClient()
@@ -11,7 +12,7 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
     .eq('programa_alumno_id', programaAlumnoId)
     .order('orden')
 
-  if (!conjuntos || conjuntos.length === 0) return { conjuntos: [] }
+  if (!conjuntos || conjuntos.length === 0) return { conjuntos: [], distribucionAyudas: [] }
 
   const resultado = await Promise.all(
     conjuntos.map(async (c) => {
@@ -38,5 +39,22 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
     })
   )
 
-  return { conjuntos: resultado }
+  // Distribución de tipos de ayuda usados en todo el programa (todos los
+  // conjuntos juntos), para el donut de "cuánta ayuda hizo falta".
+  const { data: bloquesTodos } = await supabase
+    .from('bloques_ensayo')
+    .select('id')
+    .in('conjunto_id', conjuntos.map((c) => c.id))
+
+  const bloqueIds = (bloquesTodos ?? []).map((b) => b.id)
+  const ensayos = bloqueIds.length
+    ? (
+        await supabase
+          .from('ensayos_aba_detalle')
+          .select('ayuda')
+          .in('bloque_id', bloqueIds)
+      ).data ?? []
+    : []
+
+  return { conjuntos: resultado, distribucionAyudas: calcularDistribucionAyudas(ensayos) }
 }

@@ -56,7 +56,7 @@ export default async function ProgramaRftPage({
     .order('grupo')
     .order('created_at', { ascending: false })
 
-  const { porFase } = await obtenerEvolucionRft(id)
+  const { porFase, distribucionPorGrupo } = await obtenerEvolucionRft(id)
 
   const { data: bloquesTest } = await supabase
     .from('bloques_ensayo_rft')
@@ -163,6 +163,7 @@ export default async function ProgramaRftPage({
         clases={clases ?? []}
         testsPorClase={testsPorClase}
         porFase={porFase}
+        distribucionPorGrupo={distribucionPorGrupo}
         dominioFases={dominioFases ?? []}
         porcentajeDominio={programa.porcentaje_dominio}
       />

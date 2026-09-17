@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import EvolucionChart from '../../../programas/[id]/evolucion-chart'
 import { obtenerEvolucionAba } from '../../../programas/[id]/evolucion-actions'
+import DistribucionAyudasChart from '../../../distribucion-ayudas-chart'
 import type { Tables } from '@/database.types'
 import { Panel } from '../../../../ui'
 
@@ -47,7 +48,7 @@ export default async function ProgramaFamiliaPage({
 
   if (!vinculo) redirect('/dashboard/mi-hijo')
 
-  const { conjuntos: datosEvolucion } = await obtenerEvolucionAba(id)
+  const { conjuntos: datosEvolucion, distribucionAyudas } = await obtenerEvolucionAba(id)
 
   const { data: conjuntos } = await supabase
     .from('conjuntos_estimulos_alumno')
@@ -75,6 +76,9 @@ export default async function ProgramaFamiliaPage({
             estimulos: c.estimulos_alumno.map((e) => e.nombre),
           }))}
         />
+      </Panel>
+      <Panel className="p-3 sm:p-5">
+        <DistribucionAyudasChart distribucion={distribucionAyudas} titulo="Distribución de ayudas" />
       </Panel>
     </div>
   )
