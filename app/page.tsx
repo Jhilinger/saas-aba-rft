@@ -18,6 +18,8 @@ import {
   GraduationCap,
   Home as HomeIcon,
   WifiOff,
+  Monitor,
+  Tablet,
 } from 'lucide-react'
 
 function Nodo() {
@@ -307,6 +309,47 @@ export default async function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Responsive: un dispositivo para cada momento */}
+      <section style={{ backgroundColor: 'var(--brand-primary-soft)' }}>
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Un dispositivo para cada momento</h2>
+            <p className="mt-3 text-base text-slate-600">
+              Totalmente responsive — pensada para cómo se trabaja de verdad, no solo para que se
+              vea bien en cualquier pantalla.
+            </p>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-lg"
+                style={{ backgroundColor: 'var(--brand-primary-soft)', color: 'var(--brand-primary)' }}
+              >
+                <Monitor className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <h3 className="mt-4 font-semibold text-slate-800">Diseña el aprendizaje en el ordenador</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                PEI, currículo, evaluaciones e informes, con toda la pantalla que necesitas para
+                planificar con calma.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-lg"
+                style={{ backgroundColor: 'var(--brand-accent-soft)', color: '#aa5541' }}
+              >
+                <Tablet className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <h3 className="mt-4 font-semibold text-slate-800">Toma los datos en el móvil o la tablet</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                Pensada para usarse con una mano durante la sesión — y sin perder nada si se corta
+                la conexión a mitad de bloque.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
