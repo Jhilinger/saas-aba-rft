@@ -78,11 +78,15 @@ export async function crearPrograma(formData: FormData) {
   if (error) return { error: error.message }
 
   if (orden !== null && data) {
+    // p_orden_anterior debe ir null (no 0): un programa recién creado nunca
+    // tuvo un orden previo, y la función SQL solo entra en la rama de
+    // "insertar y hacer hueco" cuando ve null — con 0 entra en la rama de
+    // "mover", que resta 1 a los que ya estaban entre 1 y el nuevo orden.
     const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
       p_id: data.id,
       p_nuevo_orden: orden,
-      p_orden_anterior: 0,
-    })
+      p_orden_anterior: null,
+    } as unknown as { p_id: string; p_nuevo_orden: number; p_orden_anterior: number })
     if (rpcError) return { error: rpcError.message }
   }
 
@@ -210,11 +214,15 @@ export async function editarPrograma(id: string, formData: FormData) {
   if (error) return { error: error.message }
 
   if (nuevoOrden !== ordenAnterior) {
+    // Igual que en crearPrograma: null hay que dejarlo tal cual, no
+    // convertirlo en 0 — si no, "quitar el orden" (nuevoOrden null) se trata
+    // como "mover a la posición 0" y el programa se queda con orden = 0 en
+    // vez de sin orden.
     const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
       p_id: id,
-      p_nuevo_orden: nuevoOrden ?? 0,
-      p_orden_anterior: ordenAnterior ?? 0,
-    })
+      p_nuevo_orden: nuevoOrden,
+      p_orden_anterior: ordenAnterior,
+    } as unknown as { p_id: string; p_nuevo_orden: number; p_orden_anterior: number })
     if (rpcError) return { error: rpcError.message }
   }
 
