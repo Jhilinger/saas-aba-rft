@@ -6,6 +6,8 @@ import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
 import NuevaClaseRftForm from './nueva-clase-rft-form'
 import ClaseRftBaseCard from './clase-rft-base-card'
+import NuevoPasoBaseForm from './nuevo-paso-base-form'
+import PasoBaseCard from './paso-base-card'
 import { Breadcrumb, Panel } from '../../../ui'
 
 export default async function ProgramaDetallePage({
@@ -32,7 +34,7 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo'
+      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena'
     )
     .eq('id', id)
     .single()
@@ -55,6 +57,12 @@ export default async function ProgramaDetallePage({
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
     .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion)')
+    .eq('programa_base_id', id)
+    .order('orden')
+
+  const { data: pasosTarea } = await supabase
+    .from('pasos_tarea_base')
+    .select('id, nombre, descripcion, orden')
     .eq('programa_base_id', id)
     .order('orden')
 
@@ -113,7 +121,7 @@ export default async function ProgramaDetallePage({
         </div>
       </Panel>
 
-            {programa.tipo === 'aba_clasico' && (
+            {programa.tipo === 'aba_clasico' && programa.formato_recogida === 'ensayo_discreto' && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Conjuntos de estímulos (plantilla)</h2>
           <NuevoConjuntoForm programaBaseId={id} />
@@ -126,6 +134,26 @@ export default async function ProgramaDetallePage({
 
           {(!conjuntos || conjuntos.length === 0) && (
             <p className="text-center text-slate-500">Sin conjuntos de estímulos todavía.</p>
+          )}
+        </section>
+      )}
+
+      {programa.tipo === 'aba_clasico' && programa.formato_recogida === 'analisis_tareas' && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-slate-700">Pasos de la tarea (plantilla)</h2>
+          <p className="text-sm text-slate-500">
+            Orden {programa.direccion_cadena === 'atras' ? '— se enseñará empezando por el último paso' : '— se enseñará empezando por el primer paso'}.
+          </p>
+          <NuevoPasoBaseForm programaBaseId={id} />
+
+          <div className="space-y-2">
+            {pasosTarea?.map((p) => (
+              <PasoBaseCard key={p.id} paso={p} programaBaseId={id} />
+            ))}
+          </div>
+
+          {(!pasosTarea || pasosTarea.length === 0) && (
+            <p className="text-center text-slate-500">Sin pasos todavía.</p>
           )}
         </section>
       )}

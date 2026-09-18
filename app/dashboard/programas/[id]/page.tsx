@@ -16,6 +16,8 @@ import DuracionClient from '../../alumnos/[id]/conducta/[programaId]/duracion-cl
 import IntervaloClient from '../../alumnos/[id]/conducta/[programaId]/intervalo-client'
 import LatenciaClient from '../../alumnos/[id]/conducta/[programaId]/latencia-client'
 import GraficoConducta from '../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
+import PasosTareaPanel from './pasos-tarea-panel'
+import AnalisisTareasClient from './analisis-tareas-client'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Tables } from '@/database.types'
 
@@ -43,7 +45,7 @@ export default async function ProgramaAlumnoPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, formato_recogida, direccion_objetivo, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -209,6 +211,53 @@ export default async function ProgramaAlumnoPage({
               <GraficoConducta puntos={puntos} etiquetaY="Latencia media (s)" direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null} titulo={programa.nombre} />
             </Panel>
             <LatenciaClient programaAlumnoId={id} bloquesIniciales={bloquesValidos} alumnoId={programa.alumno_id} />
+          </>
+        )
+      }
+
+      if (programa.formato_recogida === 'analisis_tareas') {
+        const { data: pasos } = await supabase
+          .from('pasos_tarea_alumno')
+          .select('id, nombre, descripcion, orden, estado')
+          .eq('programa_alumno_id', id)
+          .order('orden')
+
+        const pasosOrdenados = pasos ?? []
+        const pasoObjetivo =
+          programa.direccion_cadena === 'atras'
+            ? [...pasosOrdenados].reverse().find((p) => p.estado !== 'dominado')
+            : pasosOrdenados.find((p) => p.estado !== 'dominado')
+
+        const { data: bloques } = await supabase
+          .from('bloques_analisis_tareas')
+          .select('id, fecha, notas, resultados_paso_bloque(independiente)')
+          .eq('programa_alumno_id', id)
+          .order('fecha', { ascending: false })
+
+        const bloquesResumen = (bloques ?? []).map((b) => ({
+          id: b.id,
+          fecha: b.fecha,
+          notas: b.notas,
+          total: b.resultados_paso_bloque.length,
+          independientes: b.resultados_paso_bloque.filter((r) => r.independiente).length,
+        }))
+
+        const puntos = [...bloquesResumen]
+          .filter((b) => b.total > 0)
+          .reverse()
+          .map((b) => ({ fecha: b.fecha, valor: Math.round((b.independientes / b.total) * 100), fase: 'intervencion' as const }))
+
+        return (
+          <>
+            <PasosTareaPanel pasos={pasosOrdenados} programaAlumnoId={id} pasoObjetivoId={pasoObjetivo?.id ?? null} />
+            <Panel className="p-3 sm:p-5">
+              <GraficoConducta puntos={puntos} etiquetaY="% de pasos independientes" direccionObjetivo="aumentar" titulo={programa.nombre} dominioYFijo={[0, 100]} />
+            </Panel>
+            <AnalisisTareasClient
+              programaAlumnoId={id}
+              pasos={pasosOrdenados.map((p) => ({ id: p.id, nombre: p.nombre, orden: p.orden }))}
+              bloquesIniciales={bloquesResumen}
+            />
           </>
         )
       }

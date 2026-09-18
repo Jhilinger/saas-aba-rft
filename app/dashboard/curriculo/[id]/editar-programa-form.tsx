@@ -23,6 +23,7 @@ type Programa = {
   video_url: string | null
   formato_recogida: string
   direccion_objetivo: string | null
+  direccion_cadena: string | null
 }
 
 const FORMATOS_REGISTRO = [
@@ -32,6 +33,7 @@ const FORMATOS_REGISTRO = [
   { value: 'intervalo', label: 'Intervalo' },
   { value: 'latencia', label: 'Latencia' },
   { value: 'abc', label: 'Registro ABC' },
+  { value: 'analisis_tareas', label: 'Análisis de tareas (encadenamiento)' },
 ]
 
 export default function EditarProgramaForm({ programa }: { programa: Programa }) {
@@ -122,7 +124,7 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
               </select>
             </div>
 
-            {formatoRecogida !== 'ensayo_discreto' && formatoRecogida !== 'abc' && (
+            {formatoRecogida !== 'ensayo_discreto' && formatoRecogida !== 'abc' && formatoRecogida !== 'analisis_tareas' && (
               <div className="space-y-1">
                 <label className="text-sm text-slate-600">Dirección del objetivo</label>
                 <select
@@ -133,6 +135,21 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
                 >
                   <option value="aumentar">Aumentar la conducta</option>
                   <option value="reducir">Reducir la conducta</option>
+                </select>
+              </div>
+            )}
+
+            {formatoRecogida === 'analisis_tareas' && (
+              <div className="space-y-1">
+                <label className="text-sm text-slate-600">Dirección de la cadena</label>
+                <select
+                  name="direccion_cadena"
+                  defaultValue={programa.direccion_cadena ?? 'adelante'}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                >
+                  <option value="adelante">Encadenamiento hacia adelante (se enseña el 1er paso primero)</option>
+                  <option value="atras">Encadenamiento hacia atrás (se enseña el último paso primero)</option>
                 </select>
               </div>
             )}

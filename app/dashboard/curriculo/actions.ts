@@ -7,8 +7,9 @@ import type { Enums } from '@/database.types'
 const TIPOS_PROGRAMA = ['aba_clasico', 'rft', 'conducta'] as const satisfies readonly Enums<'tipo_programa'>[]
 const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
 const VISIBILIDADES = ['privado', 'clinica'] as const satisfies readonly Enums<'visibilidad_programa'>[]
-const FORMATOS_RECOGIDA = ['ensayo_discreto', 'intervalo', 'duracion', 'tasa', 'abc', 'latencia'] as const
+const FORMATOS_RECOGIDA = ['ensayo_discreto', 'intervalo', 'duracion', 'tasa', 'abc', 'latencia', 'analisis_tareas'] as const
 const DIRECCIONES_OBJETIVO = ['aumentar', 'reducir'] as const
+const DIRECCIONES_CADENA = ['adelante', 'atras'] as const
 
 function parseFormatoRecogida(tipo: Enums<'tipo_programa'>, value: FormDataEntryValue | null): string {
   if (tipo !== 'aba_clasico') return 'ensayo_discreto'
@@ -21,10 +22,20 @@ function parseDireccionObjetivo(
   formatoRecogida: string,
   value: FormDataEntryValue | null
 ): 'aumentar' | 'reducir' | null {
-  if (formatoRecogida === 'ensayo_discreto' || formatoRecogida === 'abc') return null
+  if (formatoRecogida === 'ensayo_discreto' || formatoRecogida === 'abc' || formatoRecogida === 'analisis_tareas') return null
   return typeof value === 'string' && (DIRECCIONES_OBJETIVO as readonly string[]).includes(value)
     ? (value as 'aumentar' | 'reducir')
     : 'aumentar'
+}
+
+function parseDireccionCadena(
+  formatoRecogida: string,
+  value: FormDataEntryValue | null
+): 'adelante' | 'atras' | null {
+  if (formatoRecogida !== 'analisis_tareas') return null
+  return typeof value === 'string' && (DIRECCIONES_CADENA as readonly string[]).includes(value)
+    ? (value as 'adelante' | 'atras')
+    : 'adelante'
 }
 
 function parseTipoPrograma(value: FormDataEntryValue | null): Enums<'tipo_programa'> | null {
@@ -73,6 +84,7 @@ export async function crearPrograma(formData: FormData) {
   const visibilidad = esGlobal ? 'clinica' : parseVisibilidad(formData.get('visibilidad'))
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
+  const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
 
   const { data, error } = await supabase
     .from('programas_base')
@@ -91,6 +103,7 @@ export async function crearPrograma(formData: FormData) {
       video_url: (formData.get('video_url') as string)?.trim() || null,
       formato_recogida: formatoRecogida,
       direccion_objetivo: direccionObjetivo,
+      direccion_cadena: direccionCadena,
       creado_por: user.id,
       clinica_id: esGlobal ? null : perfil.clinica_id,
       visibilidad,
@@ -198,6 +211,7 @@ export async function editarPrograma(id: string, formData: FormData) {
   const ordenAnterior = programaActual?.orden ?? null
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
+  const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
 
   const updateData: {
     nombre: string
@@ -213,6 +227,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     tipo_relacion: Enums<'tipo_relacion_rft'> | null
     formato_recogida: string
     direccion_objetivo: string | null
+    direccion_cadena: string | null
     visibilidad?: Enums<'visibilidad_programa'>
   } = {
     nombre: formData.get('nombre') as string,
@@ -228,6 +243,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
     formato_recogida: formatoRecogida,
     direccion_objetivo: direccionObjetivo,
+    direccion_cadena: direccionCadena,
   }
 
   // La visibilidad solo tiene sentido en programas propios de una clínica
@@ -289,6 +305,7 @@ export async function clonarPrograma(id: string) {
       video_url: original.video_url,
       formato_recogida: original.formato_recogida,
       direccion_objetivo: original.direccion_objetivo,
+      direccion_cadena: original.direccion_cadena,
       orden: null,
       clinica_id: original.clinica_id,
       visibilidad: original.visibilidad,
@@ -323,6 +340,25 @@ export async function clonarPrograma(id: string) {
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+          }))
+        )
+      }
+    }
+
+    if (original.formato_recogida === 'analisis_tareas') {
+      const { data: pasos } = await supabase
+        .from('pasos_tarea_base')
+        .select('nombre, descripcion, orden')
+        .eq('programa_base_id', id)
+        .order('orden')
+
+      if (pasos?.length) {
+        await supabase.from('pasos_tarea_base').insert(
+          pasos.map((p) => ({
+            programa_base_id: nuevo.id,
+            nombre: p.nombre,
+            descripcion: p.descripcion,
+            orden: p.orden,
           }))
         )
       }
@@ -413,6 +449,37 @@ export async function crearEstimuloRftBase(
 export async function eliminarEstimuloRftBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
   const { error } = await supabase.from('estimulos_rft_base').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
+}
+
+// --- PASOS DE ANÁLISIS DE TAREAS (plantilla, solo programas aba_clasico con formato_recogida = analisis_tareas) ---
+
+export async function crearPasoBase(programaBaseId: string, nombre: string, descripcion: string) {
+  const supabase = await createClient()
+
+  if (!nombre.trim()) return { error: 'El nombre del paso es obligatorio' }
+
+  const { count } = await supabase
+    .from('pasos_tarea_base')
+    .select('id', { count: 'exact', head: true })
+    .eq('programa_base_id', programaBaseId)
+
+  const { error } = await supabase.from('pasos_tarea_base').insert({
+    programa_base_id: programaBaseId,
+    nombre: nombre.trim(),
+    descripcion: descripcion.trim() || null,
+    orden: (count ?? 0) + 1,
+  })
+  if (error) return { error: error.message }
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
+}
+
+export async function eliminarPasoBase(id: string, programaBaseId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('pasos_tarea_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
   return { success: true }

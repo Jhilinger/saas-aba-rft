@@ -130,6 +130,45 @@ export type Database = {
           },
         ]
       }
+      bloques_analisis_tareas: {
+        Row: {
+          fecha: string
+          id: string
+          notas: string | null
+          programa_alumno_id: string
+          terapeuta_id: string
+        }
+        Insert: {
+          fecha?: string
+          id?: string
+          notas?: string | null
+          programa_alumno_id: string
+          terapeuta_id: string
+        }
+        Update: {
+          fecha?: string
+          id?: string
+          notas?: string | null
+          programa_alumno_id?: string
+          terapeuta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bloques_analisis_tareas_programa_alumno_id_fkey"
+            columns: ["programa_alumno_id"]
+            isOneToOne: false
+            referencedRelation: "programas_alumno"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bloques_analisis_tareas_terapeuta_id_fkey"
+            columns: ["terapeuta_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bloques_duracion: {
         Row: {
           duracion_sesion_segundos: number
@@ -1296,6 +1335,89 @@ export type Database = {
           },
         ]
       }
+      pasos_tarea_alumno: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          estado: Database["public"]["Enums"]["estado_programa_alumno"]
+          id: string
+          nombre: string
+          orden: number
+          paso_base_id: string | null
+          programa_alumno_id: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          id?: string
+          nombre: string
+          orden?: number
+          paso_base_id?: string | null
+          programa_alumno_id: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          id?: string
+          nombre?: string
+          orden?: number
+          paso_base_id?: string | null
+          programa_alumno_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pasos_tarea_alumno_paso_base_id_fkey"
+            columns: ["paso_base_id"]
+            isOneToOne: false
+            referencedRelation: "pasos_tarea_base"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pasos_tarea_alumno_programa_alumno_id_fkey"
+            columns: ["programa_alumno_id"]
+            isOneToOne: false
+            referencedRelation: "programas_alumno"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pasos_tarea_base: {
+        Row: {
+          created_at: string
+          descripcion: string | null
+          id: string
+          nombre: string
+          orden: number
+          programa_base_id: string
+        }
+        Insert: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          orden?: number
+          programa_base_id: string
+        }
+        Update: {
+          created_at?: string
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          orden?: number
+          programa_base_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pasos_tarea_base_programa_base_id_fkey"
+            columns: ["programa_base_id"]
+            isOneToOne: false
+            referencedRelation: "programas_base"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfiles: {
         Row: {
           activo: boolean
@@ -1389,6 +1511,7 @@ export type Database = {
           ayudas_posibles: string | null
           bloques_para_dominio: number
           created_at: string
+          direccion_cadena: string | null
           direccion_objetivo: string | null
           ensayos_por_bloque: number
           estado: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -1413,6 +1536,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           created_at?: string
+          direccion_cadena?: string | null
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -1437,6 +1561,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           created_at?: string
+          direccion_cadena?: string | null
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -1489,6 +1614,7 @@ export type Database = {
           creado_por: string
           created_at: string
           criterio_dominio: string | null
+          direccion_cadena: string | null
           direccion_objetivo: string | null
           ensayos_por_bloque: number
           formato_recogida: string
@@ -1513,6 +1639,7 @@ export type Database = {
           creado_por: string
           created_at?: string
           criterio_dominio?: string | null
+          direccion_cadena?: string | null
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           formato_recogida?: string
@@ -1539,6 +1666,7 @@ export type Database = {
           creado_por?: string
           created_at?: string
           criterio_dominio?: string | null
+          direccion_cadena?: string | null
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           formato_recogida?: string
@@ -1663,6 +1791,42 @@ export type Database = {
             columns: ["estimulo_origen_id"]
             isOneToOne: false
             referencedRelation: "estimulos_rft"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resultados_paso_bloque: {
+        Row: {
+          bloque_id: string
+          id: string
+          independiente: boolean
+          paso_id: string
+        }
+        Insert: {
+          bloque_id: string
+          id?: string
+          independiente: boolean
+          paso_id: string
+        }
+        Update: {
+          bloque_id?: string
+          id?: string
+          independiente?: boolean
+          paso_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resultados_paso_bloque_bloque_id_fkey"
+            columns: ["bloque_id"]
+            isOneToOne: false
+            referencedRelation: "bloques_analisis_tareas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resultados_paso_bloque_paso_id_fkey"
+            columns: ["paso_id"]
+            isOneToOne: false
+            referencedRelation: "pasos_tarea_alumno"
             referencedColumns: ["id"]
           },
         ]

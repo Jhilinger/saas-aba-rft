@@ -19,9 +19,17 @@ import { Panel } from '../../../../ui'
 
 type ProgramaConAlumno = Pick<
   Tables<'programas_alumno'>,
-  'id' | 'nombre' | 'tipo' | 'alumno_id' | 'porcentaje_dominio' | 'formato_recogida' | 'direccion_objetivo'
+  'id' | 'nombre' | 'tipo' | 'alumno_id' | 'porcentaje_dominio' | 'formato_recogida' | 'direccion_objetivo' | 'direccion_cadena'
 > & {
   alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+}
+
+const ETIQUETA_ESTADO_PASO: Record<string, string> = {
+  linea_base: 'Línea base',
+  adquisicion: 'En enseñanza',
+  mantenimiento: 'Mantenimiento',
+  dominado: 'Dominado',
+  pausado: 'Pausado',
 }
 
 type ConjuntoConEstimulos = Pick<Tables<'conjuntos_estimulos_alumno'>, 'id' | 'nombre'> & {
@@ -41,7 +49,7 @@ export default async function ProgramaFamiliaPage({
 
   const { data: programa } = await supabase
     .from('programas_alumno')
-    .select('id, nombre, tipo, alumno_id, porcentaje_dominio, formato_recogida, direccion_objetivo, alumnos(nombre_anonimizado)')
+    .select('id, nombre, tipo, alumno_id, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, alumnos(nombre_anonimizado)')
     .eq('id', id)
     .single()
 
@@ -141,6 +149,71 @@ export default async function ProgramaFamiliaPage({
             <GraficoConducta puntos={puntos} etiquetaY="Latencia media (s)" direccionObjetivo={programa.direccion_objetivo as 'aumentar' | 'reducir' | null} titulo={programa.nombre} />
           </Panel>
           <LatenciaClient programaAlumnoId={id} bloquesIniciales={bloquesValidos} alumnoId={programa.alumno_id} />
+        </>
+      )
+    } else if (programa.formato_recogida === 'analisis_tareas') {
+      const { data: pasos } = await supabase
+        .from('pasos_tarea_alumno')
+        .select('id, nombre, descripcion, orden, estado')
+        .eq('programa_alumno_id', id)
+        .order('orden')
+
+      const { data: bloques } = await supabase
+        .from('bloques_analisis_tareas')
+        .select('id, fecha, notas, resultados_paso_bloque(independiente)')
+        .eq('programa_alumno_id', id)
+        .order('fecha', { ascending: false })
+
+      const bloquesResumen = (bloques ?? []).map((b) => ({
+        id: b.id,
+        fecha: b.fecha,
+        notas: b.notas,
+        total: b.resultados_paso_bloque.length,
+        independientes: b.resultados_paso_bloque.filter((r) => r.independiente).length,
+      }))
+
+      const puntos = [...bloquesResumen]
+        .filter((b) => b.total > 0)
+        .reverse()
+        .map((b) => ({ fecha: b.fecha, valor: Math.round((b.independientes / b.total) * 100), fase: 'intervencion' as const }))
+
+      cuerpo = (
+        <>
+          <Panel className="p-3 sm:p-5 space-y-2">
+            <p className="text-sm font-semibold text-slate-700">Pasos de la cadena</p>
+            <div className="space-y-2">
+              {(pasos ?? []).map((p) => (
+                <div key={p.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
+                  <div>
+                    <span className="text-xs font-semibold text-slate-400">Paso {p.orden}</span>{' '}
+                    <span className="text-slate-800">{p.nombre}</span>
+                  </div>
+                  <span className="text-xs font-medium text-slate-500">{ETIQUETA_ESTADO_PASO[p.estado] ?? p.estado}</span>
+                </div>
+              ))}
+              {(!pasos || pasos.length === 0) && <p className="text-sm text-slate-500 text-center py-2">Sin pasos todavía.</p>}
+            </div>
+          </Panel>
+          <Panel className="p-3 sm:p-5">
+            <GraficoConducta puntos={puntos} etiquetaY="% de pasos independientes" direccionObjetivo="aumentar" titulo={programa.nombre} dominioYFijo={[0, 100]} />
+          </Panel>
+          <Panel className="p-3 sm:p-5 space-y-2">
+            <p className="text-sm font-semibold text-slate-700">Historial de sondeos</p>
+            <div className="space-y-2">
+              {bloquesResumen.map((b) => (
+                <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-700">{new Date(b.fecha).toLocaleDateString('es-ES')}</span>
+                    <span className="text-xs font-semibold text-slate-600">
+                      {b.independientes}/{b.total} pasos ({b.total > 0 ? Math.round((b.independientes / b.total) * 100) : 0}%)
+                    </span>
+                  </div>
+                  {b.notas && <p className="mt-1 text-xs text-slate-500">{b.notas}</p>}
+                </div>
+              ))}
+              {bloquesResumen.length === 0 && <p className="text-center text-slate-500 py-4">Sin sondeos todavía.</p>}
+            </div>
+          </Panel>
         </>
       )
     }

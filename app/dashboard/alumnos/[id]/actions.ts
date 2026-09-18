@@ -16,7 +16,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
     const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, tipo_relacion, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, formato_recogida, direccion_objetivo'
+      'nombre, tipo, tipo_relacion, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, formato_recogida, direccion_objetivo, direccion_cadena'
     )
     .eq('id', programaBaseId)
     .single()
@@ -42,6 +42,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
       orden: base.orden,
       formato_recogida: base.formato_recogida,
       direccion_objetivo: base.direccion_objetivo,
+      direccion_cadena: base.direccion_cadena,
     })
     .select('id')
     .single()
@@ -83,6 +84,26 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+          }))
+        )
+      }
+    }
+
+    if (base.formato_recogida === 'analisis_tareas') {
+      const { data: pasosBase } = await supabase
+        .from('pasos_tarea_base')
+        .select('id, nombre, descripcion, orden')
+        .eq('programa_base_id', programaBaseId)
+        .order('orden')
+
+      if (pasosBase?.length) {
+        await supabase.from('pasos_tarea_alumno').insert(
+          pasosBase.map((p) => ({
+            programa_alumno_id: programaAlumno.id,
+            paso_base_id: p.id,
+            nombre: p.nombre,
+            descripcion: p.descripcion,
+            orden: p.orden,
           }))
         )
       }
