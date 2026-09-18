@@ -48,10 +48,10 @@ export default function GuiaFamiliaPage() {
           <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Registros de conducta compartidos</h2>
           <p>
             Si el equipo terapéutico decide compartir contigo algún registro de conducta concreto
-            (por ejemplo, para hacer seguimiento de una conducta también en casa), lo verás en{' '}
-            <strong>Registros de conducta</strong>. Ahí podrás ver el progreso y, si te lo permiten,
-            añadir tú misma/o observaciones desde casa, con las mismas herramientas que usa el
-            equipo (cronómetro, contador, o el registro narrativo ABC según el caso).
+            (por ejemplo, para hacer seguimiento de una conducta también en casa), lo verás junto
+            al resto de programas en <strong>Progreso</strong>. Ahí podrás ver el progreso y, si te
+            lo permiten, añadir tú misma/o observaciones desde casa, con las mismas herramientas
+            que usa el equipo (cronómetro, contador, o el registro narrativo ABC según el caso).
           </p>
         </section>
 

@@ -49,7 +49,7 @@ export default async function ProgramaFamiliaPage({
 
   const { data: programa } = await supabase
     .from('programas_alumno')
-    .select('id, nombre, tipo, alumno_id, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, alumnos(nombre_anonimizado)')
+    .select('id, nombre, tipo, alumno_id, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, visible_familia, alumnos(nombre_anonimizado)')
     .eq('id', id)
     .single()
 
@@ -67,6 +67,12 @@ export default async function ProgramaFamiliaPage({
   if (!vinculo) redirect('/dashboard/mi-hijo')
 
   const alumnoNombre = (programa as unknown as ProgramaConAlumno).alumnos?.nombre_anonimizado ?? ''
+
+  // Los programas ABA "clásicos" (ensayo discreto) siempre son visibles para
+  // la familia; los que usan un formato de registro de conducta (tasa,
+  // duración, intervalo, ABC, latencia, análisis de tareas) son opt-in — el
+  // equipo decide compartirlos, igual que antes con "Registros de conducta".
+  if (programa.formato_recogida !== 'ensayo_discreto' && !programa.visible_familia) notFound()
 
   if (programa.formato_recogida !== 'ensayo_discreto') {
     const cabecera = (

@@ -39,13 +39,6 @@ export default async function InicioAlumnoPage({
     .in('tipo', ['aba_clasico', 'rft'])
     .neq('estado', 'pausado')
 
-  const { count: conductaActivos } = await supabase
-    .from('programas_alumno')
-    .select('id', { count: 'exact', head: true })
-    .eq('alumno_id', alumnoId)
-    .eq('tipo', 'conducta')
-    .not('estado', 'in', '(dominado,pausado)')
-
   const { data: sesionesMes } = await supabase
     .from('sesiones_programadas')
     .select('estado')
@@ -103,11 +96,6 @@ export default async function InicioAlumnoPage({
         <Link href={`/dashboard/alumnos/${alumnoId}/pei`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/30">
           <p className="text-3xl font-bold text-indigo-600">{programasActivos ?? 0}</p>
           <p className="text-sm text-slate-500">Programas activos en el PEI</p>
-        </Link>
-
-        <Link href={`/dashboard/alumnos/${alumnoId}/conducta`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-indigo-300 hover:bg-amber-50/30">
-          <p className="text-3xl font-bold text-amber-600">{conductaActivos ?? 0}</p>
-          <p className="text-sm text-slate-500">Registros de conducta activos</p>
         </Link>
 
         <Panel className="p-5">

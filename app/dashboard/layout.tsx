@@ -55,7 +55,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/mi-hijo', label: 'Progreso' },
       { href: '/dashboard/mi-hijo/asistencia', label: 'Asistencia' },
       { href: '/dashboard/mi-hijo/informes', label: 'Informes' },
-      { href: '/dashboard/mi-hijo/conducta', label: 'Registros de conducta' },
       { href: '/dashboard/mi-hijo/documentos', label: 'Documentos' },
       { href: '/dashboard/mi-hijo/facturacion', label: 'Facturación' },
       { href: '/dashboard/ayuda', label: 'Ayuda' }

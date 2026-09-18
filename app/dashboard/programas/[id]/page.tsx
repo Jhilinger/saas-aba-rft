@@ -18,6 +18,7 @@ import LatenciaClient from '../../alumnos/[id]/conducta/[programaId]/latencia-cl
 import GraficoConducta from '../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
 import PasosTareaPanel from './pasos-tarea-panel'
 import AnalisisTareasClient from './analisis-tareas-client'
+import ToggleVisibleFamilia from './toggle-visible-familia'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Tables } from '@/database.types'
 
@@ -45,7 +46,7 @@ export default async function ProgramaAlumnoPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, formato_recogida, direccion_objetivo, direccion_cadena, visible_familia, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -128,6 +129,13 @@ export default async function ProgramaAlumnoPage({
           estadoActual={programa.estado}
           variante={programa.formato_recogida === 'ensayo_discreto' ? 'habilidad' : 'conducta'}
         />
+        {programa.formato_recogida !== 'ensayo_discreto' && (
+          <ToggleVisibleFamilia
+            programaAlumnoId={programa.id}
+            alumnoId={programa.alumno_id}
+            visibleFamilia={programa.visible_familia}
+          />
+        )}
       </div>
     </div>
   )

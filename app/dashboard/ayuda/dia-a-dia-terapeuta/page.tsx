@@ -47,22 +47,27 @@ export default function DiaADiaTerapeutaPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Registros de conducta</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Medir una conducta en vez de enseñar una habilidad</h2>
           <p>
             Cuando el objetivo no es enseñar una habilidad sino medir una conducta concreta (una
-            rabieta, el tiempo en tarea...), usa <strong>Registros de conducta</strong> en vez del
-            PEI. Hay 4 formatos, según lo que mejor encaje con la conducta que quieres medir:
+            rabieta, el tiempo en tarea...), crea el programa igual que cualquier otro de
+            Aprendizaje Directo (desde Currículo o Mis programas, sin necesidad de compartirlo con
+            toda la clínica) y elige su <strong>tipo de registro</strong>. Hay varios formatos,
+            según lo que mejor encaje con la conducta que quieres medir:
           </p>
           <ul className="mt-2 list-disc space-y-2 pl-5">
             <li><strong>Tasa</strong>: cuenta cuántas veces ocurre algo, con un cronómetro de fondo.</li>
             <li><strong>Duración</strong>: cronometra cuánto dura la conducta durante la sesión.</li>
             <li><strong>Intervalo</strong>: divide la sesión en trozos de tiempo iguales, y marca si hubo conducta en cada uno.</li>
+            <li><strong>Latencia</strong>: cronometra cuánto tarda en responder desde que se da la instrucción.</li>
             <li><strong>ABC</strong>: un registro narrativo de qué pasó antes, durante y después — útil para entender por qué ocurre una conducta.</li>
+            <li><strong>Análisis de tareas</strong>: para conductas encadenadas en pasos (lavarse las manos, vestirse...), con sondeos de toda la cadena.</li>
           </ul>
           <p className="mt-2">
-            Al crear un registro nuevo, eliges si el objetivo es que la conducta{' '}
+            Al crear el programa, eliges si el objetivo es que la conducta{' '}
             <strong>aumente</strong> o <strong>disminuya</strong> — esto cambia cómo se interpreta
-            el gráfico después.
+            el gráfico después. Una vez importado al PEI del alumno, la toma de datos aparece
+            directamente en la página del programa, igual que el resto.
           </p>
         </section>
 
@@ -81,17 +86,17 @@ export default function DiaADiaTerapeutaPage() {
           <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Consulta el progreso</h2>
           <p>
             En <strong>Progreso</strong>, dentro de la ficha del alumno, tienes una tabla con todos
-            los programas (PEI y Registros de conducta) y su estado actual, con filtros por tipo y
-            estado. Desde ahí puedes acceder al gráfico de evolución de cualquier programa concreto,
-            con línea base diferenciada de la intervención y la línea de tendencia.
+            los programas del PEI y su estado actual, con filtros por tipo y estado. Desde ahí
+            puedes acceder al gráfico de evolución de cualquier programa concreto, con línea base
+            diferenciada de la intervención y la línea de tendencia.
           </p>
         </section>
 
         <section>
           <h2 className="mb-2 text-lg font-semibold text-slate-900">Resumen</h2>
           <p>
-            Tu flujo típico de sesión: revisa la Agenda → entra en el alumno → toma datos en PEI o
-            Registros de conducta según toque → marca la sesión como asistida al terminar. El
+            Tu flujo típico de sesión: revisa la Agenda → entra en el alumno → toma datos en el PEI
+            → marca la sesión como asistida al terminar. El
             Progreso y los gráficos se construyen solos a partir de los datos que vayas registrando.
           </p>
         </section>

@@ -133,7 +133,7 @@ export async function generarInforme(
   }
 
   for (const programa of programas ?? []) {
-    if (programa.tipo === 'aba_clasico') {
+    if (programa.tipo === 'aba_clasico' && programa.formato_recogida === 'ensayo_discreto') {
       const { data: conjuntos } = await supabase
         .from('conjuntos_estimulos_alumno')
         .select('id, nombre, estado')
@@ -194,7 +194,40 @@ export async function generarInforme(
           (notas ? `Notas del terapeuta:\n${notas}\n` : '')
         )
       }
-    } else if (programa.tipo === 'conducta') {
+    } else if (programa.tipo === 'aba_clasico' && programa.formato_recogida === 'analisis_tareas') {
+      const { data: pasos } = await supabase
+        .from('pasos_tarea_alumno')
+        .select('id, nombre, orden, estado')
+        .eq('programa_alumno_id', programa.id)
+        .order('orden')
+
+      const { data: bloques } = await supabase
+        .from('bloques_analisis_tareas')
+        .select('fecha, notas, resultados_paso_bloque(independiente)')
+        .eq('programa_alumno_id', programa.id)
+        .gte('fecha', periodoDesde)
+        .lt('fecha', periodoHasta + 'T23:59:59.999')
+        .order('fecha', { ascending: true })
+
+      if (bloques && bloques.length > 0) {
+        const sondeos = bloques
+          .map((b) => {
+            const total = b.resultados_paso_bloque.length
+            const independientes = b.resultados_paso_bloque.filter((r) => r.independiente).length
+            return `${b.fecha.split('T')[0]}: ${independientes}/${total} pasos independientes`
+          })
+          .join(', ')
+        const estadoPasos = (pasos ?? []).map((p) => `${p.orden}. ${p.nombre} (${p.estado})`).join('; ')
+        const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
+
+        anadirAArea(
+          programa.area,
+          `Análisis de tareas "${programa.nombre}" (encadenamiento) — Estado de los pasos: ${estadoPasos}\n` +
+          `Sondeos del período: ${sondeos}\n` +
+          (notas ? `Notas del terapeuta:\n${notas}\n` : '')
+        )
+      }
+    } else if (programa.tipo === 'aba_clasico') {
       const direccion = programa.direccion_objetivo === 'reducir' ? 'reducir' : 'aumentar'
       const notaDireccion = `Objetivo: ${direccion === 'reducir' ? 'DISMINUIR' : 'AUMENTAR'} esta conducta — si el % baja/sube en el sentido de "${direccion}", es progreso positivo.`
 
@@ -211,7 +244,7 @@ export async function generarInforme(
           const valores = bloques.map((b) => `${b.tasa_por_minuto}/min`).join(', ')
           const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
           anadirAArea(
-            'Conducta',
+            programa.area,
             `Registro de conducta "${programa.nombre}" (Tasa). ${notaDireccion}\n` +
             `Valores del período: ${valores}\n` +
             (notas ? `Notas del terapeuta:\n${notas}\n` : '')
@@ -230,7 +263,7 @@ export async function generarInforme(
           const valores = bloques.map((b) => `${b.porcentaje}%`).join(', ')
           const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
           anadirAArea(
-            'Conducta',
+            programa.area,
             `Registro de conducta "${programa.nombre}" (Duración, % del tiempo de sesión). ${notaDireccion}\n` +
             `Valores del período: ${valores}\n` +
             (notas ? `Notas del terapeuta:\n${notas}\n` : '')
@@ -249,8 +282,27 @@ export async function generarInforme(
           const valores = bloques.map((b) => `${b.porcentaje}%`).join(', ')
           const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
           anadirAArea(
-            'Conducta',
+            programa.area,
             `Registro de conducta "${programa.nombre}" (Intervalo, % de intervalos con conducta). ${notaDireccion}\n` +
+            `Valores del período: ${valores}\n` +
+            (notas ? `Notas del terapeuta:\n${notas}\n` : '')
+          )
+        }
+      } else if (programa.formato_recogida === 'latencia') {
+        const { data: bloques } = await supabase
+          .from('bloques_latencia')
+          .select('fecha, latencia_media_segundos, notas')
+          .eq('programa_alumno_id', programa.id)
+          .gte('fecha', periodoDesde)
+          .lt('fecha', periodoHasta + 'T23:59:59.999')
+          .order('fecha', { ascending: true })
+
+        if (bloques && bloques.length > 0) {
+          const valores = bloques.map((b) => `${b.latencia_media_segundos}s`).join(', ')
+          const notas = bloques.filter((b) => b.notas).map((b) => `- ${b.notas}`).join('\n')
+          anadirAArea(
+            programa.area,
+            `Registro de conducta "${programa.nombre}" (Latencia media de respuesta). ${notaDireccion}\n` +
             `Valores del período: ${valores}\n` +
             (notas ? `Notas del terapeuta:\n${notas}\n` : '')
           )
@@ -269,7 +321,7 @@ export async function generarInforme(
             .map((r) => `Antecedente: ${r.antecedente}. Conducta: ${r.conducta}. Consecuencia: ${r.consecuencia}.`)
             .join('\n')
           anadirAArea(
-            'Conducta',
+            programa.area,
             `Registro narrativo ABC "${programa.nombre}" — ${registros.length} episodio(s) registrado(s) en el período:\n${episodios}`
           )
         }
@@ -302,7 +354,7 @@ FORMATO OBLIGATORIO:
 - Extensión objetivo: entre 300 y 500 palabras en total.
 - Estructura exacta:
   1. Título "INTRODUCCIÓN" — 2-3 frases situando el período y el alumno. Si hay reforzadores/preferencias conocidos, puedes mencionarlos brevemente aquí como contexto (ej. "durante las sesiones se han utilizado sus reforzadores habituales, como..."), sin dedicarles una sección propia. Si hay datos de asistencia, menciona aquí también de forma breve cuántas sesiones hubo y cuántas se asistieron.
-  2. Un apartado por cada ÁREA de trabajo (usa el nombre del área, ya en mayúsculas, como título). DENTRO de cada área, combina TODOS los programas de esa área en un único párrafo fluido y natural — NO crees un sub-apartado ni un título separado para cada programa individual, intégralos en el mismo relato. El área "CONDUCTA" (si existe) sigue esta misma regla: combina todos los registros de conducta del período en un relato fluido.
+  2. Un apartado por cada ÁREA de trabajo (usa el nombre del área, ya en mayúsculas, como título). DENTRO de cada área, combina TODOS los programas de esa área en un único párrafo fluido y natural — NO crees un sub-apartado ni un título separado para cada programa individual, intégralos en el mismo relato.
   3. Título "RESUMEN" — 1-2 frases de cierre general.
 
 REGLAS DE CONTENIDO:
@@ -311,7 +363,7 @@ REGLAS DE CONTENIDO:
 - Integra las notas del terapeuta de forma natural en el relato, no las cites literalmente entre comillas.
 - Los reforzadores/preferencias son solo contexto de fondo, no un progreso a describir — menciónalos como mucho una vez, brevemente.
 - La asistencia es un dato objetivo a mencionar brevemente en la introducción, sin interpretarla (no valores si es "buena" o "mala" asistencia, solo indica las cifras).
-- Para los registros de CONDUCTA: presta mucha atención a si el objetivo es "aumentar" o "reducir" (te lo indico explícitamente en cada registro) — nunca describas una bajada de porcentaje como "empeoramiento" si el objetivo era precisamente reducir esa conducta, y viceversa.
+- Cuando un registro indique explícitamente el objetivo ("aumentar" o "reducir"): presta mucha atención a esa dirección — nunca describas una bajada de porcentaje como "empeoramiento" si el objetivo era precisamente reducir esa conducta, y viceversa.
 
 DATOS DEL ALUMNO:
 - Iniciales: ${alumno.nombre_anonimizado}

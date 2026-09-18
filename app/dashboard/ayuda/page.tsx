@@ -31,7 +31,7 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
     {
       href: '/dashboard/ayuda/dia-a-dia-terapeuta',
       titulo: 'Tu día a día como terapeuta',
-      resumen: 'Agenda, toma de datos en el PEI, Registros de conducta, preferencias, y progreso.',
+      resumen: 'Agenda, toma de datos en el PEI, preferencias, y progreso.',
     },
   ],
     familia: [

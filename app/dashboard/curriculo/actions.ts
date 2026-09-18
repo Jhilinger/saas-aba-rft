@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { Enums } from '@/database.types'
 
-const TIPOS_PROGRAMA = ['aba_clasico', 'rft', 'conducta'] as const satisfies readonly Enums<'tipo_programa'>[]
+const TIPOS_PROGRAMA = ['aba_clasico', 'rft'] as const satisfies readonly Enums<'tipo_programa'>[]
 const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
 const VISIBILIDADES = ['privado', 'clinica'] as const satisfies readonly Enums<'visibilidad_programa'>[]
 const FORMATOS_RECOGIDA = ['ensayo_discreto', 'intervalo', 'duracion', 'tasa', 'abc', 'latencia', 'analisis_tareas'] as const
@@ -39,7 +39,7 @@ function parseDireccionCadena(
 }
 
 function parseTipoPrograma(value: FormDataEntryValue | null): Enums<'tipo_programa'> | null {
-  return typeof value === 'string' && TIPOS_PROGRAMA.includes(value as Enums<'tipo_programa'>)
+  return typeof value === 'string' && (TIPOS_PROGRAMA as readonly string[]).includes(value)
     ? value as Enums<'tipo_programa'>
     : null
 }

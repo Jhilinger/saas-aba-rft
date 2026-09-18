@@ -4,17 +4,24 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 // Estos componentes de registro (ABC, tasa, duración, intervalo, latencia) se
-// reutilizan en 4 rutas distintas: la página de conducta del terapeuta, la
-// de la familia, y las páginas de programa ABA (terapeuta y familia) cuando
-// un programa aba_clasico usa un formato_recogida distinto de
-// ensayo_discreto. Revalidamos las 4 para que el refresco de caché funcione
-// venga de donde venga la acción (router.refresh() ya refresca la ruta
-// actual igualmente, esto es solo para no dejar cachés ajenas obsoletas).
+// usan en la página de programa ABA (terapeuta y familia) para cualquier
+// programa aba_clasico con formato_recogida distinto de ensayo_discreto.
+// router.refresh() ya refresca la ruta actual; esto solo evita dejar
+// cachés obsoletas de la otra vista (terapeuta vs familia) del mismo programa.
 function revalidarRegistroConducta(alumnoId: string, programaAlumnoId: string) {
-  revalidatePath(`/dashboard/alumnos/${alumnoId}/conducta/${programaAlumnoId}`)
-  revalidatePath(`/dashboard/mi-hijo/conducta/${alumnoId}/${programaAlumnoId}`)
   revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   revalidatePath(`/dashboard/mi-hijo/programa/${programaAlumnoId}`)
+}
+
+export async function toggleVisibleFamiliaPrograma(programaAlumnoId: string, alumnoId: string, valor: boolean) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('programas_alumno')
+    .update({ visible_familia: valor })
+    .eq('id', programaAlumnoId)
+  if (error) return { error: error.message }
+  revalidarRegistroConducta(alumnoId, programaAlumnoId)
+  return { success: true }
 }
 
 export async function crearRegistroAbc(

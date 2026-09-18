@@ -43,11 +43,13 @@ export default async function ProgresoFamiliaPage() {
 
       const { data: importados } = await supabase
         .from('programas_alumno')
-        .select('id, programa_base_id, estado')
+        .select('id, programa_base_id, estado, nombre, area, tipo, formato_recogida, visible_familia, orden')
         .eq('alumno_id', alumno.id)
-        .not('programa_base_id', 'is', null)
+        .in('tipo', ['aba_clasico', 'rft'])
 
-      const importadoPorBase = new Map((importados ?? []).map((p) => [p.programa_base_id, p]))
+      const importadoPorBase = new Map(
+        (importados ?? []).filter((p) => p.programa_base_id).map((p) => [p.programa_base_id, p])
+      )
 
       const filas = (curriculo ?? []).map((p) => {
         const importado = importadoPorBase.get(p.id)
@@ -68,7 +70,30 @@ export default async function ProgresoFamiliaPage() {
         }
       })
 
-      return { alumnoId: alumno.id, alumnoNombre: alumno.nombre_anonimizado, filas }
+      // Programas importados de una plantilla privada ("Mis programas", no
+      // visible en el catálogo de la clínica) o creados sin plantilla: no
+      // salen en el bucle anterior porque su programa_base_id no está en
+      // `curriculo`. Los añadimos aparte, respetando "visible para la
+      // familia" cuando el formato no es ensayo discreto (igual que en la
+      // página del propio programa).
+      const idsBaseEnCurriculo = new Set((curriculo ?? []).map((p) => p.id))
+      const filasSueltas = (importados ?? [])
+        .filter((p) => !p.programa_base_id || !idsBaseEnCurriculo.has(p.programa_base_id))
+        .filter((p) => p.tipo === 'rft' || p.formato_recogida === 'ensayo_discreto' || p.visible_familia)
+        .map((p) => ({
+          id: p.id,
+          nombre: p.nombre,
+          tipo: p.tipo,
+          area: p.area || 'General',
+          orden: p.orden ?? 999999,
+          estado: simplificar(p.estado),
+          graficoHref:
+            p.tipo === 'aba_clasico'
+              ? `/dashboard/mi-hijo/programa/${p.id}`
+              : `/dashboard/mi-hijo/programa-rft/${p.id}`,
+        }))
+
+      return { alumnoId: alumno.id, alumnoNombre: alumno.nombre_anonimizado, filas: [...filas, ...filasSueltas] }
     })
   )
 
