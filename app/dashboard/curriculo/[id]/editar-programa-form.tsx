@@ -41,6 +41,7 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
   const [editando, setEditando] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [formatoRecogida, setFormatoRecogida] = useState(programa.formato_recogida)
+  const [nivelRft, setNivelRft] = useState(programa.nivel_rft ?? 'combinatorio')
   const router = useRouter()
   const toast = useToast()
 
@@ -160,35 +161,39 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
         {programa.tipo === 'rft' && (
           <>
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Tipo de relación</label>
-              <select
-                name="tipo_relacion"
-                defaultValue={programa.tipo_relacion ?? 'coordinacion'}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-              >
-                <option value="coordinacion">Coordinación</option>
-                <option value="distincion">Distinción</option>
-                <option value="oposicion">Oposición</option>
-                <option value="comparacion">Comparación</option>
-                <option value="jerarquia">Jerarquía</option>
-                <option value="temporal">Temporal</option>
-                <option value="causal">Causal</option>
-                <option value="deictica">Deíctico</option>
-              </select>
-            </div>
-
-            <div className="space-y-1">
               <label className="text-sm text-slate-600">Nivel</label>
               <select
                 name="nivel_rft"
-                defaultValue={programa.nivel_rft ?? 'combinatorio'}
+                value={nivelRft}
+                onChange={(e) => setNivelRft(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
               >
                 <option value="abstraccion">Abstracción de clave relacional (1 miembro, solo entrenamiento)</option>
                 <option value="mutuo">Vínculo mutuo (2 miembros: A, B)</option>
                 <option value="combinatorio">Vínculo combinatorio (3-5 miembros: A-E)</option>
+                <option value="relacion_relaciones">Relacionar relaciones (razonamiento analógico)</option>
               </select>
             </div>
+
+            {nivelRft !== 'relacion_relaciones' && (
+              <div className="space-y-1">
+                <label className="text-sm text-slate-600">Tipo de relación</label>
+                <select
+                  name="tipo_relacion"
+                  defaultValue={programa.tipo_relacion ?? 'coordinacion'}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                >
+                  <option value="coordinacion">Coordinación</option>
+                  <option value="distincion">Distinción</option>
+                  <option value="oposicion">Oposición</option>
+                  <option value="comparacion">Comparación</option>
+                  <option value="jerarquia">Jerarquía</option>
+                  <option value="temporal">Temporal</option>
+                  <option value="causal">Causal</option>
+                  <option value="deictica">Deíctico</option>
+                </select>
+              </div>
+            )}
           </>
         )}
 

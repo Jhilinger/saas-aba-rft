@@ -1,8 +1,13 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
 import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
+import { obtenerEvolucionAnalogias } from './analogias-actions'
+import AnalogiasPanel from './analogias-panel'
 import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selector'
+import GraficoConducta from '../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
+import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import VideoDiferido from '../../video-diferido'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
@@ -47,6 +52,130 @@ export default async function ProgramaRftPage({
   if (!programa) notFound()
   if (programa.tipo !== 'rft') redirect(`/dashboard/alumnos/${programa.alumno_id}`)
 
+  const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
+  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
+  const alumnoNombre = alumno?.nombre_anonimizado ?? ''
+  const tieneInfo =
+    programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
+
+  const cabecera = (
+    <div>
+      <Breadcrumb items={[{ label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}` }, { label: programa.nombre }]} />
+      <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+        {programa.area && <span>{programa.area}</span>}
+        <EstadoProgramaSelector
+          programaAlumnoId={programa.id}
+          alumnoId={programa.alumno_id}
+          estadoActual={programa.estado}
+          variante={programa.nivel_rft === 'relacion_relaciones' ? 'conducta' : 'habilidad'}
+        />
+      </div>
+    </div>
+  )
+
+  const infoPanel = (
+    <Panel className="space-y-3 p-4 text-sm sm:p-5">
+      {programa.nivel_rft !== 'relacion_relaciones' && (
+        <div>
+          <span className="text-slate-500">% de acierto para dominio</span>
+          <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
+        </div>
+      )}
+
+      {programa.objetivo && (
+        <div>
+          <span className="text-slate-500">Objetivo / habilidad</span>
+          <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo}</p>
+        </div>
+      )}
+      {programa.materiales && (
+        <div>
+          <span className="text-slate-500">Materiales</span>
+          <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales}</p>
+        </div>
+      )}
+      {programa.instrucciones_terapeuta && (
+        <div>
+          <span className="text-slate-500">Instrucciones para el terapeuta</span>
+          <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
+        </div>
+      )}
+      {programa.ayudas_posibles && (
+        <div>
+          <span className="text-slate-500">Ayudas posibles</span>
+          <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
+        </div>
+      )}
+      {programaBase?.video_url && (
+        <div>
+          <span className="text-slate-500">Vídeo de ejemplo</span>
+          <VideoDiferido url={programaBase.video_url} />
+        </div>
+      )}
+      {!tieneInfo && (
+        <p className="text-xs text-slate-500 italic">
+          Este programa no tiene objetivo/materiales/instrucciones registrados (probablemente se
+          importó antes de que añadiéramos esta información).
+        </p>
+      )}
+    </Panel>
+  )
+
+  if (programa.nivel_rft === 'relacion_relaciones') {
+    const { data: analogias } = await supabase
+      .from('analogias_alumno')
+      .select('id, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion')
+      .eq('programa_alumno_id', id)
+      .order('orden')
+
+    const { data: bloques } = await supabase
+      .from('bloques_analogias')
+      .select('id, fecha, fase, total_ensayos, aciertos, porcentaje, notas')
+      .eq('programa_alumno_id', id)
+      .order('fecha', { ascending: false })
+
+    const { puntos, distribucion } = await obtenerEvolucionAnalogias(id)
+
+    return (
+      <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
+        {cabecera}
+        {infoPanel}
+        <div className="flex justify-end">
+          <Link
+            href={`/dashboard/tomar-datos/rft/${id}`}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+          >
+            Tomar datos
+          </Link>
+        </div>
+        <Panel className="p-3 sm:p-5">
+          <GraficoConducta puntos={puntos} etiquetaY="% de acierto" direccionObjetivo="aumentar" titulo={programa.nombre} dominioYFijo={[0, 100]} />
+        </Panel>
+        <Panel className="p-4 sm:p-5">
+          <DistribucionAyudasChart distribucion={distribucion} titulo="Distribución de ayudas" />
+        </Panel>
+        <AnalogiasPanel analogias={analogias ?? []} programaAlumnoId={id} />
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-slate-700">Historial de bloques</h2>
+          {(bloques ?? []).map((b) => (
+            <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-700">{new Date(b.fecha).toLocaleDateString('es-ES')}</span>
+                <span className="text-xs font-semibold text-slate-600">
+                  {b.aciertos}/{b.total_ensayos} ({b.porcentaje ?? 0}%)
+                  {b.fase !== 'intervencion' && ` · ${b.fase}`}
+                </span>
+              </div>
+              {b.notas && <p className="mt-1 text-xs text-slate-500">{b.notas}</p>}
+            </div>
+          ))}
+          {(!bloques || bloques.length === 0) && <p className="text-center text-slate-500 py-4">Sin bloques todavía.</p>}
+        </div>
+      </div>
+    )
+  }
+
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
@@ -89,73 +218,12 @@ export default async function ProgramaRftPage({
     .select('grupo, fase, posicion_origen, posicion_destino, dominado, updated_at')
     .eq('programa_alumno_id', id)
 
-  const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
-  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
-
-  const alumnoNombre = alumno?.nombre_anonimizado ?? ''
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]
-
-  const tieneInfo =
-    programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
-      <div>
-        <Breadcrumb items={[{ label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}` }, { label: programa.nombre }]} />
-        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-          {programa.area && <span>{programa.area}</span>}
-          <EstadoProgramaSelector
-            programaAlumnoId={programa.id}
-            alumnoId={programa.alumno_id}
-            estadoActual={programa.estado}
-          />
-        </div>
-      </div>
-
-      <Panel className="space-y-3 p-4 text-sm sm:p-5">
-        <div>
-          <span className="text-slate-500">% de acierto para dominio</span>
-          <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
-        </div>
-
-        {programa.objetivo && (
-          <div>
-            <span className="text-slate-500">Objetivo / habilidad</span>
-            <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo}</p>
-          </div>
-        )}
-        {programa.materiales && (
-          <div>
-            <span className="text-slate-500">Materiales</span>
-            <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales}</p>
-          </div>
-        )}
-        {programa.instrucciones_terapeuta && (
-          <div>
-            <span className="text-slate-500">Instrucciones para el terapeuta</span>
-            <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
-          </div>
-        )}
-                {programa.ayudas_posibles && (
-          <div>
-            <span className="text-slate-500">Ayudas posibles</span>
-            <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
-          </div>
-        )}
-        {programaBase?.video_url && (
-          <div>
-            <span className="text-slate-500">Vídeo de ejemplo</span>
-            <VideoDiferido url={programaBase.video_url} />
-          </div>
-        )}
-        {!tieneInfo && (
-          <p className="text-xs text-slate-500 italic">
-            Este programa no tiene objetivo/materiales/instrucciones registrados (probablemente se
-            importó antes de que añadiéramos esta información).
-          </p>
-        )}
-      </Panel>
+      {cabecera}
+      {infoPanel}
 
       <ProgramaRftClient
         programaAlumnoId={id}

@@ -8,6 +8,8 @@ import NuevaClaseRftForm from './nueva-clase-rft-form'
 import ClaseRftBaseCard from './clase-rft-base-card'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
+import NuevaAnalogiaBaseForm from './nueva-analogia-base-form'
+import AnalogiaBaseCard from './analogia-base-card'
 import { Breadcrumb, Panel } from '../../../ui'
 
 export default async function ProgramaDetallePage({
@@ -66,6 +68,12 @@ export default async function ProgramaDetallePage({
     .eq('programa_base_id', id)
     .order('orden')
 
+  const { data: analogias } = await supabase
+    .from('analogias_base')
+    .select('id, nombre, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion, orden')
+    .eq('programa_base_id', id)
+    .order('orden')
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
       <div>
@@ -103,7 +111,7 @@ export default async function ProgramaDetallePage({
             <VideoDiferido url={programa.video_url} />
           </div>
         )}
-        {programa.tipo === 'rft' && (
+        {programa.tipo === 'rft' && programa.nivel_rft !== 'relacion_relaciones' && (
           <div className="sm:col-span-3">
             <span className="text-slate-500">Tipo de relación</span>
             <p className="text-slate-700">{programa.tipo_relacion}</p>
@@ -158,7 +166,7 @@ export default async function ProgramaDetallePage({
         </section>
       )}
 
-      {programa.tipo === 'rft' && (
+      {programa.tipo === 'rft' && programa.nivel_rft !== 'relacion_relaciones' && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Clases (plantilla)</h2>
           <NuevaClaseRftForm programaBaseId={id} />
@@ -171,6 +179,26 @@ export default async function ProgramaDetallePage({
 
           {(!clasesRft || clasesRft.length === 0) && (
             <p className="text-center text-slate-500">Sin clases todavía.</p>
+          )}
+        </section>
+      )}
+
+      {programa.tipo === 'rft' && programa.nivel_rft === 'relacion_relaciones' && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-slate-700">Analogías (plantilla)</h2>
+          <p className="text-sm text-slate-500">
+            Cada analogía compara la relación de un primer par de términos con la de un segundo par.
+          </p>
+          <NuevaAnalogiaBaseForm programaBaseId={id} />
+
+          <div className="space-y-2">
+            {analogias?.map((a) => (
+              <AnalogiaBaseCard key={a.id} analogia={a} programaBaseId={id} />
+            ))}
+          </div>
+
+          {(!analogias || analogias.length === 0) && (
+            <p className="text-center text-slate-500">Sin analogías todavía.</p>
           )}
         </section>
       )}

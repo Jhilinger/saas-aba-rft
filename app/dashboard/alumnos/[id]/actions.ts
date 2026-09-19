@@ -139,6 +139,31 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
         )
       }
     }
+
+    if (base.nivel_rft === 'relacion_relaciones') {
+      const { data: analogiasBase } = await supabase
+        .from('analogias_base')
+        .select('id, nombre, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion, orden')
+        .eq('programa_base_id', programaBaseId)
+        .order('orden')
+
+      if (analogiasBase?.length) {
+        await supabase.from('analogias_alumno').insert(
+          analogiasBase.map((a) => ({
+            programa_alumno_id: programaAlumno.id,
+            analogia_base_id: a.id,
+            nombre: a.nombre,
+            par1_termino_a: a.par1_termino_a,
+            par1_termino_b: a.par1_termino_b,
+            par1_relacion: a.par1_relacion,
+            par2_termino_a: a.par2_termino_a,
+            par2_termino_b: a.par2_termino_b,
+            par2_relacion: a.par2_relacion,
+            orden: a.orden,
+          }))
+        )
+      }
+    }
   }
 
   revalidatePath(`/dashboard/alumnos/${alumnoId}`)
