@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { FASES_QUE_REQUIEREN_CONEXION, construirGrafoEntrenado, estanConectadas } from './relaciones-rft'
+import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 
 type EnsayoInput = {
   claseId: string
@@ -49,6 +50,23 @@ export async function guardarBloqueRft(
   if (!FASES_VALIDAS.includes(fase as FaseRft)) return { error: 'Fase no válida' }
   if (ensayos.some((ensayo) => !AYUDAS_VALIDAS.includes(ensayo.ayuda as AyudaRft))) {
     return { error: 'Tipo de ayuda no válido' }
+  }
+
+  // El nivel del programa (abstracción/mutuo/combinatorio) limita qué fases
+  // tienen sentido — ej. no hay test combinatorio posible con clases de 2
+  // miembros. Las sondas (generalizacion/mantenimiento) se dejan pasar
+  // siempre: si la combinación llegó a dominarse, ya pasó este filtro
+  // cuando se registró como test.
+  if (fase !== 'generalizacion' && fase !== 'mantenimiento') {
+    const { data: programa } = await supabase
+      .from('programas_alumno')
+      .select('nivel_rft')
+      .eq('id', programaAlumnoId)
+      .single()
+    const nivel = coerceNivelRft(programa?.nivel_rft)
+    if (!FASES_POR_NIVEL[nivel].includes(fase)) {
+      return { error: `Un programa de ${NOMBRE_NIVEL_RFT[nivel]} no admite la fase "${fase}"` }
+    }
   }
 
   // Un test de vínculo mutuo/combinatorio o de transformación de funciones

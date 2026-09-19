@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { Tables } from '@/database.types'
+import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
 // Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
 // puede ver este programa antes de usar el cliente admin para el borrado en
@@ -107,6 +108,26 @@ export async function crearEstimuloRft(
   posicion: string
 ) {
   const supabase = await createClient()
+
+  const { data: programa } = await supabase
+    .from('programas_alumno')
+    .select('nivel_rft')
+    .eq('id', programaAlumnoId)
+    .single()
+  const nivel = coerceNivelRft(programa?.nivel_rft)
+
+  if (!POSICIONES_POR_NIVEL[nivel].includes(posicion)) {
+    return { error: `En ${NOMBRE_NIVEL_RFT[nivel]} solo se admiten las posiciones: ${POSICIONES_POR_NIVEL[nivel].join(', ')}` }
+  }
+
+  const { count } = await supabase
+    .from('estimulos_rft')
+    .select('id', { count: 'exact', head: true })
+    .eq('clase_id', claseId)
+
+  if ((count ?? 0) >= MAX_MIEMBROS_POR_NIVEL[nivel]) {
+    return { error: `${NOMBRE_NIVEL_RFT[nivel]} admite como máximo ${MAX_MIEMBROS_POR_NIVEL[nivel]} miembro(s) por clase` }
+  }
 
   // La etiqueta se genera sola: posición + número que lleve el nombre de la clase
   // (ej. clase "Clase 1" + posición A → etiqueta "A1")

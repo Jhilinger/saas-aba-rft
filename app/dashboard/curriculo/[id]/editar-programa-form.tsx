@@ -24,6 +24,7 @@ type Programa = {
   formato_recogida: string
   direccion_objetivo: string | null
   direccion_cadena: string | null
+  nivel_rft: string | null
 }
 
 const FORMATOS_REGISTRO = [
@@ -157,23 +158,38 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
         )}
 
         {programa.tipo === 'rft' && (
-          <div className="sm:col-span-2 space-y-1">
-            <label className="text-sm text-slate-600">Tipo de relación</label>
-            <select
-              name="tipo_relacion"
-              defaultValue={programa.tipo_relacion ?? 'coordinacion'}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-            >
-              <option value="coordinacion">Coordinación</option>
-              <option value="distincion">Distinción</option>
-              <option value="oposicion">Oposición</option>
-              <option value="comparacion">Comparación</option>
-              <option value="jerarquia">Jerarquía</option>
-              <option value="temporal">Temporal</option>
-              <option value="causal">Causal</option>
-              <option value="deictica">Deíctico</option>
-            </select>
-          </div>
+          <>
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Tipo de relación</label>
+              <select
+                name="tipo_relacion"
+                defaultValue={programa.tipo_relacion ?? 'coordinacion'}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              >
+                <option value="coordinacion">Coordinación</option>
+                <option value="distincion">Distinción</option>
+                <option value="oposicion">Oposición</option>
+                <option value="comparacion">Comparación</option>
+                <option value="jerarquia">Jerarquía</option>
+                <option value="temporal">Temporal</option>
+                <option value="causal">Causal</option>
+                <option value="deictica">Deíctico</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm text-slate-600">Nivel</label>
+              <select
+                name="nivel_rft"
+                defaultValue={programa.nivel_rft ?? 'combinatorio'}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              >
+                <option value="abstraccion">Abstracción de clave relacional (1 miembro, solo entrenamiento)</option>
+                <option value="mutuo">Vínculo mutuo (2 miembros: A, B)</option>
+                <option value="combinatorio">Vínculo combinatorio (3-5 miembros: A-E)</option>
+              </select>
+            </div>
+          </>
         )}
 
         <div className="sm:col-span-2 space-y-1">

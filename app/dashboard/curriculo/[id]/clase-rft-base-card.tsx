@@ -10,6 +10,7 @@ import {
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
+import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft_base: Estimulo[] }
@@ -17,12 +18,19 @@ type Clase = { id: string; nombre: string; grupo: string; estimulos_rft_base: Es
 export default function ClaseRftBaseCard({
   clase,
   programaBaseId,
+  nivelRft,
 }: {
   clase: Clase
   programaBaseId: string
+  nivelRft: string | null
 }) {
+  const nivel = coerceNivelRft(nivelRft)
+  const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
+  const maxMiembros = MAX_MIEMBROS_POR_NIVEL[nivel]
+  const enElLimite = clase.estimulos_rft_base.length >= maxMiembros
+
   const [nombreEstimulo, setNombreEstimulo] = useState('')
-  const [posicion, setPosicion] = useState('A')
+  const [posicion, setPosicion] = useState(posicionesPermitidas[0])
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const confirmar = useConfirm()
@@ -105,48 +113,54 @@ export default function ClaseRftBaseCard({
         )}
       </ul>
 
-            <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!nombreEstimulo.trim()) return
-          startTransition(async () => {
-            const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, posicion)
-            if (res?.error) {
-              toast(res.error, 'error')
-              return
-            }
-            setNombreEstimulo('')
-            router.refresh()
-          })
-        }}
-        className="flex gap-2"
-      >
-        <select
-          value={posicion}
-          onChange={(e) => setPosicion(e.target.value)}
-          className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            {enElLimite ? (
+        <p className="text-xs text-slate-500 italic">
+          {NOMBRE_NIVEL_RFT[nivel]} admite como máximo {maxMiembros} miembro(s) por clase.
+        </p>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (!nombreEstimulo.trim()) return
+            startTransition(async () => {
+              const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, posicion)
+              if (res?.error) {
+                toast(res.error, 'error')
+                return
+              }
+              setNombreEstimulo('')
+              router.refresh()
+            })
+          }}
+          className="flex gap-2"
         >
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
-          <option value="E">E</option>
-        </select>
-        <input
-          value={nombreEstimulo}
-          onChange={(e) => setNombreEstimulo(e.target.value)}
-          placeholder="Nombre del estímulo"
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-        />
-        <Button
-          type="submit"
-          variant="secondary"
-          disabled={isPending}
-          className="px-3 py-1.5 font-medium"
-        >
-          Añadir
-        </Button>
-      </form>
+          <select
+            value={posicion}
+            onChange={(e) => setPosicion(e.target.value)}
+            className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+          >
+            {posicionesPermitidas.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+          <input
+            value={nombreEstimulo}
+            onChange={(e) => setNombreEstimulo(e.target.value)}
+            placeholder="Nombre del estímulo"
+            className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+          />
+          <Button
+            type="submit"
+            variant="secondary"
+            disabled={isPending}
+            className="px-3 py-1.5 font-medium"
+          >
+            Añadir
+          </Button>
+        </form>
+      )}
     </Panel>
   )
 }

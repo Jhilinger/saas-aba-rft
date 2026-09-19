@@ -34,7 +34,7 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena'
+      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft'
     )
     .eq('id', id)
     .single()
@@ -165,7 +165,7 @@ export default async function ProgramaDetallePage({
 
           <div className="space-y-4">
             {clasesRft?.map((c) => (
-              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} />
+              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} />
             ))}
           </div>
 

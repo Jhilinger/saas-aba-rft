@@ -16,7 +16,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
     const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, tipo_relacion, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, formato_recogida, direccion_objetivo, direccion_cadena'
+      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, formato_recogida, direccion_objetivo, direccion_cadena'
     )
     .eq('id', programaBaseId)
     .single()
@@ -43,6 +43,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
       formato_recogida: base.formato_recogida,
       direccion_objetivo: base.direccion_objetivo,
       direccion_cadena: base.direccion_cadena,
+      nivel_rft: base.nivel_rft,
     })
     .select('id')
     .single()

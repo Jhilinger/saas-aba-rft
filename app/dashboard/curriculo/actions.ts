@@ -3,6 +3,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { Enums } from '@/database.types'
+import {
+  NIVELES_RFT,
+  coerceNivelRft,
+  POSICIONES_POR_NIVEL,
+  MAX_MIEMBROS_POR_NIVEL,
+  NOMBRE_NIVEL_RFT,
+  type NivelRft,
+} from '../niveles-rft'
 
 const TIPOS_PROGRAMA = ['aba_clasico', 'rft'] as const satisfies readonly Enums<'tipo_programa'>[]
 const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
@@ -42,6 +50,13 @@ function parseTipoPrograma(value: FormDataEntryValue | null): Enums<'tipo_progra
   return typeof value === 'string' && (TIPOS_PROGRAMA as readonly string[]).includes(value)
     ? value as Enums<'tipo_programa'>
     : null
+}
+
+function parseNivelRft(tipo: Enums<'tipo_programa'>, value: FormDataEntryValue | null): NivelRft | null {
+  if (tipo !== 'rft') return null
+  return typeof value === 'string' && (NIVELES_RFT as readonly string[]).includes(value)
+    ? (value as NivelRft)
+    : 'combinatorio'
 }
 
 function parseTipoRelacion(value: FormDataEntryValue | null): Enums<'tipo_relacion_rft'> | null {
@@ -85,6 +100,7 @@ export async function crearPrograma(formData: FormData) {
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
   const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
+  const nivelRft = parseNivelRft(tipo, formData.get('nivel_rft'))
 
   const { data, error } = await supabase
     .from('programas_base')
@@ -92,6 +108,7 @@ export async function crearPrograma(formData: FormData) {
       nombre: formData.get('nombre') as string,
       tipo,
       tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
+      nivel_rft: nivelRft,
       area: formData.get('area') as string,
       objetivo: formData.get('objetivo') as string,
       materiales: formData.get('materiales') as string,
@@ -212,6 +229,7 @@ export async function editarPrograma(id: string, formData: FormData) {
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
   const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
+  const nivelRft = parseNivelRft(tipo, formData.get('nivel_rft'))
 
   const updateData: {
     nombre: string
@@ -225,6 +243,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     porcentaje_dominio: number
     video_url: string | null
     tipo_relacion: Enums<'tipo_relacion_rft'> | null
+    nivel_rft: string | null
     formato_recogida: string
     direccion_objetivo: string | null
     direccion_cadena: string | null
@@ -241,6 +260,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     porcentaje_dominio: parseFloat(formData.get('porcentaje_dominio') as string) || 90,
     video_url: (formData.get('video_url') as string)?.trim() || null,
     tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
+    nivel_rft: nivelRft,
     formato_recogida: formatoRecogida,
     direccion_objetivo: direccionObjetivo,
     direccion_cadena: direccionCadena,
@@ -294,6 +314,7 @@ export async function clonarPrograma(id: string) {
       nombre: `${original.nombre} (copia)`,
       tipo: original.tipo,
       tipo_relacion: original.tipo_relacion,
+      nivel_rft: original.nivel_rft,
       area: original.area,
       objetivo: original.objetivo,
       materiales: original.materiales,
@@ -425,6 +446,26 @@ export async function crearEstimuloRftBase(
   posicion: string
 ) {
   const supabase = await createClient()
+
+  const { data: programaBase } = await supabase
+    .from('programas_base')
+    .select('nivel_rft')
+    .eq('id', programaBaseId)
+    .single()
+  const nivel = coerceNivelRft(programaBase?.nivel_rft)
+
+  if (!POSICIONES_POR_NIVEL[nivel].includes(posicion)) {
+    return { error: `En ${NOMBRE_NIVEL_RFT[nivel]} solo se admiten las posiciones: ${POSICIONES_POR_NIVEL[nivel].join(', ')}` }
+  }
+
+  const { count } = await supabase
+    .from('estimulos_rft_base')
+    .select('id', { count: 'exact', head: true })
+    .eq('clase_base_id', claseBaseId)
+
+  if ((count ?? 0) >= MAX_MIEMBROS_POR_NIVEL[nivel]) {
+    return { error: `${NOMBRE_NIVEL_RFT[nivel]} admite como máximo ${MAX_MIEMBROS_POR_NIVEL[nivel]} miembro(s) por clase` }
+  }
 
   // La etiqueta se genera sola: posición + número que lleve el nombre de la
   // clase (ej. clase "Clase 1" + posición A → etiqueta "A1"), igual que al

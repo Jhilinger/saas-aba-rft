@@ -15,6 +15,7 @@ import {
   relacionesDominadasTexto,
   type ParEntrenado,
 } from './relaciones-rft'
+import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -32,7 +33,7 @@ type EnsayoRft = {
   ayuda: string
 }
 
-const FASES = [
+const FASES_TODAS = [
   { value: 'entrenamiento', label: 'Entrenamiento' },
   { value: 'test_mutuo', label: 'Test de vínculo mutuo' },
   { value: 'test_combinatorio', label: 'Test de vínculo combinatorio' },
@@ -103,6 +104,7 @@ export default function TomarDatosRftClient({
   videoUrl,
   grupoInicial,
   dominioFases,
+  nivelRft,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -113,7 +115,11 @@ export default function TomarDatosRftClient({
   videoUrl: string | null
   grupoInicial?: string | null
   dominioFases: DominioFase[]
+  nivelRft: string | null
 }) {
+  const nivel = coerceNivelRft(nivelRft)
+  const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
+
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<string | null>(grupoInicial ?? null)
   const [fase, setFase] = useState('entrenamiento')
   const [posicionOrigen, setPosicionOrigen] = useState('')
@@ -445,7 +451,10 @@ export default function TomarDatosRftClient({
       <Panel className="p-4 sm:p-6 space-y-4">
         {sinConexion && <BannerSinConexion />}
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-slate-600">{grupoSeleccionado}</p>
+          <div>
+            <p className="text-sm font-medium text-slate-600">{grupoSeleccionado}</p>
+            <p className="text-xs text-slate-400">Nivel: {NOMBRE_NIVEL_RFT[nivel]}</p>
+          </div>
           {!grupoInicial && (
             <button
               onClick={() => setGrupoSeleccionado(null)}

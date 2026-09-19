@@ -1521,6 +1521,7 @@ export type Database = {
           id: string
           instrucciones_terapeuta: string | null
           materiales: string | null
+          nivel_rft: string | null
           nombre: string
           objetivo: string | null
           orden: number | null
@@ -1546,6 +1547,7 @@ export type Database = {
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null
+          nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
           orden?: number | null
@@ -1571,6 +1573,7 @@ export type Database = {
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null
+          nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
           orden?: number | null
@@ -1621,6 +1624,7 @@ export type Database = {
           id: string
           instrucciones_terapeuta: string | null
           materiales: string | null
+          nivel_rft: string | null
           nombre: string
           objetivo: string | null
           orden: number | null
@@ -1646,6 +1650,7 @@ export type Database = {
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null
+          nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
           orden?: number | null
@@ -1673,6 +1678,7 @@ export type Database = {
           id?: string
           instrucciones_terapeuta?: string | null
           materiales?: string | null
+          nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
           orden?: number | null

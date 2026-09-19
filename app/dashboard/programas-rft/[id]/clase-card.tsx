@@ -13,6 +13,7 @@ import {
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
+import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = {
@@ -42,19 +43,28 @@ const NOMBRES_FASE: Record<string, string> = {
   test_combinatorio: 'Test combinatorio',
   directo: 'Directo',
   transformacion_funciones: 'Transformación de funciones',
+  generalizacion: 'Sonda de generalización',
+  mantenimiento: 'Sonda de mantenimiento',
 }
 
 export default function ClaseCard({
   clase,
   programaAlumnoId,
   testsRealizados = [],
+  nivelRft,
 }: {
   clase: Clase
   programaAlumnoId: string
   testsRealizados?: TestRealizado[]
+  nivelRft: string | null
 }) {
+  const nivel = coerceNivelRft(nivelRft)
+  const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
+  const maxMiembros = MAX_MIEMBROS_POR_NIVEL[nivel]
+  const enElLimite = clase.estimulos_rft.length >= maxMiembros
+
   const [nombreEstimulo, setNombreEstimulo] = useState('')
-  const [posicion, setPosicion] = useState('A')
+  const [posicion, setPosicion] = useState(posicionesPermitidas[0])
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const confirmar = useConfirm()
@@ -186,43 +196,49 @@ export default function ClaseCard({
           )}
         </ul>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!nombreEstimulo.trim()) return
-            startTransition(async () => {
-              const res = await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion)
-              if (res?.error) {
-                toast(res.error, 'error')
-                return
-              }
-              setNombreEstimulo('')
-              router.refresh()
-            })
-          }}
-          className="mt-2 flex gap-2"
-        >
-          <select
-            value={posicion}
-            onChange={(e) => setPosicion(e.target.value)}
-            className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+        {enElLimite ? (
+          <p className="mt-2 text-xs text-slate-500 italic">
+            {NOMBRE_NIVEL_RFT[nivel]} admite como máximo {maxMiembros} miembro(s) por clase.
+          </p>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!nombreEstimulo.trim()) return
+              startTransition(async () => {
+                const res = await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion)
+                if (res?.error) {
+                  toast(res.error, 'error')
+                  return
+                }
+                setNombreEstimulo('')
+                router.refresh()
+              })
+            }}
+            className="mt-2 flex gap-2"
           >
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-          </select>
-          <input
-            value={nombreEstimulo}
-            onChange={(e) => setNombreEstimulo(e.target.value)}
-            placeholder="Nombre del estímulo"
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-          />
-          <Button type="submit" disabled={isPending} className="py-1.5">
-            Añadir
-          </Button>
-        </form>
+            <select
+              value={posicion}
+              onChange={(e) => setPosicion(e.target.value)}
+              className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            >
+              {posicionesPermitidas.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <input
+              value={nombreEstimulo}
+              onChange={(e) => setNombreEstimulo(e.target.value)}
+              placeholder="Nombre del estímulo"
+              className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+            />
+            <Button type="submit" disabled={isPending} className="py-1.5">
+              Añadir
+            </Button>
+          </form>
+        )}
       </div>
 
       {/* Relaciones entrenadas y testeadas: informativo, se rellena solo al tomar datos */}

@@ -50,6 +50,7 @@ export default function ProgramaRftClient({
   distribucionPorGrupo,
   dominioFases,
   porcentajeDominio,
+  nivelRft,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -59,6 +60,7 @@ export default function ProgramaRftClient({
   distribucionPorGrupo: Record<string, DistribucionAyuda[]>
   dominioFases: DominioFase[]
   porcentajeDominio: number
+  nivelRft: string | null
 }) {
   const [tab, setTab] = useState<'evolucion' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -245,6 +247,7 @@ export default function ProgramaRftClient({
                 clase={c}
                 programaAlumnoId={programaAlumnoId}
                 testsRealizados={testsPorClase[c.id] ?? []}
+                nivelRft={nivelRft}
               />
             ))}
           </div>
