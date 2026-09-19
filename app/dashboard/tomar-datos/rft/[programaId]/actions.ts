@@ -11,7 +11,11 @@ type EnsayoInput = {
   correcto: boolean
   ayuda: string
 }
-const FASES_VALIDAS = ['directo', 'entrenamiento', 'test_mutuo', 'test_combinatorio', 'transformacion_funciones'] as const
+// "directo" existe en el enum de la base de datos pero nunca ha sido
+// seleccionable desde la interfaz (no encaja con el flujo de comparación
+// tipo match-to-sample que usan el resto de fases) — se deja fuera de la
+// lista de fases válidas para que la API tampoco lo acepte.
+const FASES_VALIDAS = ['entrenamiento', 'test_mutuo', 'test_combinatorio', 'transformacion_funciones', 'generalizacion', 'mantenimiento'] as const
 type FaseRft = (typeof FASES_VALIDAS)[number]
 const AYUDAS_VALIDAS = ['independiente', 'verbal', 'verbal_parcial', 'gestual', 'visual', 'modelado', 'fisica_parcial', 'fisica_total', 'textual'] as const
 type AyudaRft = (typeof AYUDAS_VALIDAS)[number]

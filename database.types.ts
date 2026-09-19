@@ -2049,6 +2049,8 @@ export type Database = {
         | "test_mutuo"
         | "test_combinatorio"
         | "transformacion_funciones"
+        | "generalizacion"
+        | "mantenimiento"
       naturaleza_relacion:
         | "entrenada"
         | "derivada_mutua"
@@ -2218,6 +2220,8 @@ export const Constants = {
         "test_mutuo",
         "test_combinatorio",
         "transformacion_funciones",
+        "generalizacion",
+        "mantenimiento",
       ],
       naturaleza_relacion: [
         "entrenada",

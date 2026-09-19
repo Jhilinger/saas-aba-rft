@@ -50,6 +50,13 @@ export default async function TomarDatosRftPage({
     .order('grupo')
     .order('created_at')
 
+  const { data: dominioFases } = await supabase
+    .from('dominio_rft_fases')
+    .select('grupo, fase, posicion_origen, posicion_destino, dominado')
+    .eq('programa_alumno_id', programaId)
+    .eq('dominado', true)
+    .in('fase', ['test_mutuo', 'test_combinatorio', 'transformacion_funciones'])
+
   const alumnoNombre = programa.alumnos?.nombre_anonimizado ?? ''
 
   return (
@@ -76,6 +83,7 @@ export default async function TomarDatosRftPage({
         ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
         videoUrl={programa.programas_base?.video_url ?? null}
         grupoInicial={grupo ?? null}
+        combosDominados={(dominioFases ?? []).map((d) => `${d.grupo}__${d.posicion_origen}__${d.posicion_destino}`)}
       />
     </div>
   )

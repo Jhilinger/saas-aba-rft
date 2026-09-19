@@ -94,6 +94,7 @@ export default function TomarDatosRftClient({
   ayudasPosibles,
   videoUrl,
   grupoInicial,
+  combosDominados,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -103,11 +104,13 @@ export default function TomarDatosRftClient({
   ayudasPosibles: string | null
   videoUrl: string | null
   grupoInicial?: string | null
+  combosDominados: string[]
 }) {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<string | null>(grupoInicial ?? null)
   const [fase, setFase] = useState('entrenamiento')
   const [posicionOrigen, setPosicionOrigen] = useState('')
   const [posicionDestino, setPosicionDestino] = useState('')
+  const [tipoSonda, setTipoSonda] = useState<'normal' | 'generalizacion' | 'mantenimiento'>('normal')
   const [tamanoBloque, setTamanoBloque] = useState(ensayosPorBloqueDefecto)
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
@@ -122,6 +125,29 @@ export default function TomarDatosRftClient({
   const toast = useToast()
 
   const claveProgreso = `rft:${programaAlumnoId}`
+
+  const grupos = [...new Set(clases.map((c) => c.grupo))]
+  const clasesDelGrupo = clases.filter((c) => c.grupo === grupoSeleccionado)
+  const posicionesDisponibles = [
+    ...new Set(
+      clasesDelGrupo.flatMap((c) => c.estimulos_rft.map((e) => e.posicion).filter(Boolean) as string[])
+    ),
+  ].sort()
+
+  const clasesValidas = clasesDelGrupo.filter(
+    (c) => encontrarEstimulo(c, posicionOrigen) && encontrarEstimulo(c, posicionDestino)
+  )
+  const clasesSinPosiciones = clasesDelGrupo.length - clasesValidas.length
+
+  // Solo se puede registrar una sonda de generalización/mantenimiento sobre
+  // una combinación grupo+posiciones que ya haya demostrado dominio en
+  // alguna fase de test — si no, no hay nada que "mantener" todavía.
+  const puedeSonda =
+    !!grupoSeleccionado &&
+    !!posicionOrigen &&
+    !!posicionDestino &&
+    combosDominados.includes(`${grupoSeleccionado}__${posicionOrigen}__${posicionDestino}`)
+  const faseEfectiva = puedeSonda && tipoSonda !== 'normal' ? tipoSonda : fase
 
   const intentarGuardar = useCallback(
     (
@@ -223,7 +249,7 @@ export default function TomarDatosRftClient({
     const onOnline = () => {
       actualizarEstado()
       if (estadoGuardado === 'pendiente' && grupoSeleccionado) {
-        intentarGuardar(ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, clasesValidas.length)
+        intentarGuardar(ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
       }
     }
     window.addEventListener('online', onOnline)
@@ -233,19 +259,7 @@ export default function TomarDatosRftClient({
       window.removeEventListener('offline', actualizarEstado)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estadoGuardado, ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, intentarGuardar])
-
-  const grupos = [...new Set(clases.map((c) => c.grupo))]
-  const clasesDelGrupo = clases.filter((c) => c.grupo === grupoSeleccionado)
-  const posicionesDisponibles = [
-    ...new Set(
-      clasesDelGrupo.flatMap((c) => c.estimulos_rft.map((e) => e.posicion).filter(Boolean) as string[])
-    ),
-  ].sort()
-
-  const clasesValidas = clasesDelGrupo.filter(
-    (c) => encontrarEstimulo(c, posicionOrigen) && encontrarEstimulo(c, posicionDestino)
-  )
+  }, [estadoGuardado, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, intentarGuardar])
 
   const claseActualId = secuencia?.[ensayos.length]?.id
 
@@ -300,7 +314,7 @@ export default function TomarDatosRftClient({
     setPreguntaActual('')
 
     if (nuevos.length === secuencia.length) {
-      intentarGuardar(nuevos, notas, grupoSeleccionado!, fase, posicionOrigen, posicionDestino, clasesValidas.length)
+      intentarGuardar(nuevos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
     }
   }
 
@@ -314,12 +328,12 @@ export default function TomarDatosRftClient({
       ensayos,
       notas,
       grupoSeleccionado,
-      fase,
+      fase: faseEfectiva,
       posicionOrigen,
       posicionDestino,
       tamanoBloque,
     })
-  }, [secuencia, ensayos, notas, grupoSeleccionado, fase, posicionOrigen, posicionDestino, tamanoBloque, claveProgreso])
+  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, claveProgreso])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -365,7 +379,7 @@ export default function TomarDatosRftClient({
         tipo={estadoGuardado}
         reintentando={isPending}
         onReintentar={() =>
-          intentarGuardar(ensayos, notas, grupoSeleccionado!, fase, posicionOrigen, posicionDestino, clasesValidas.length)
+          intentarGuardar(ensayos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
         }
         onVolver={() => router.push(`/dashboard/programas-rft/${programaAlumnoId}`)}
       />
@@ -476,7 +490,40 @@ export default function TomarDatosRftClient({
           <p className="text-xs text-slate-500">
             {clasesValidas.length} clase(s) del grupo tienen ambas posiciones — se usarán como
             comparativos entre sí.
+            {clasesSinPosiciones > 0 && (
+              <span className="block mt-1 font-medium text-amber-700">
+                ⚠ {clasesSinPosiciones} clase(s) de "{grupoSeleccionado}" no tienen las posiciones{' '}
+                {posicionOrigen} y/o {posicionDestino} y se quedan fuera de este bloque — revisa si
+                les falta esa posición o está mal etiquetada.
+              </span>
+            )}
           </p>
+        )}
+
+        {puedeSonda && (
+          <div className="space-y-1">
+            <p className="text-sm text-slate-600">Tipo de bloque</p>
+            <div className="flex gap-2">
+              {(['normal', 'mantenimiento', 'generalizacion'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTipoSonda(t)}
+                  className={`flex-1 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium ${
+                    tipoSonda === t ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {t === 'normal' ? 'Normal' : t === 'mantenimiento' ? 'Sonda de mantenimiento' : 'Sonda de generalización'}
+                </button>
+              ))}
+            </div>
+            {tipoSonda !== 'normal' && (
+              <p className="text-xs text-slate-500 bg-slate-50 rounded-lg p-2">
+                Esta combinación ya está dominada — este bloque se guardará como sonda de{' '}
+                {tipoSonda === 'mantenimiento' ? 'mantenimiento' : 'generalización'} y no afecta al
+                cálculo de dominio.
+              </p>
+            )}
+          </div>
         )}
 
         <div className="space-y-1">

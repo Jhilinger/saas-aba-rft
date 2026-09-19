@@ -25,6 +25,8 @@ const NOMBRES_FASE: Record<string, string> = {
   test_combinatorio: 'Test de vínculo combinatorio',
   directo: 'Directo (abstracción de marco)',
   transformacion_funciones: 'Transformación de funciones',
+  generalizacion: 'Sonda de generalización',
+  mantenimiento: 'Sonda de mantenimiento',
 }
 
 function GraficoFase({

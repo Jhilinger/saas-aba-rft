@@ -22,6 +22,8 @@ const NOMBRES_FASE: Record<string, string> = {
   test_mutuo: 'Test de vínculo mutuo',
   test_combinatorio: 'Test de vínculo combinatorio',
   transformacion_funciones: 'Transformación de funciones',
+  generalizacion: 'Sonda de generalización',
+  mantenimiento: 'Sonda de mantenimiento',
 }
 
 export default function EvolucionRftFamilia({
