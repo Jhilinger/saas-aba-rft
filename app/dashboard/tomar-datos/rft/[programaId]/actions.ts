@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { FASES_QUE_REQUIEREN_CONEXION, construirGrafoEntrenado, estanConectadas } from './relaciones-rft'
 
 type EnsayoInput = {
   claseId: string
@@ -48,6 +49,28 @@ export async function guardarBloqueRft(
   if (!FASES_VALIDAS.includes(fase as FaseRft)) return { error: 'Fase no válida' }
   if (ensayos.some((ensayo) => !AYUDAS_VALIDAS.includes(ensayo.ayuda as AyudaRft))) {
     return { error: 'Tipo de ayuda no válido' }
+  }
+
+  // Un test de vínculo mutuo/combinatorio o de transformación de funciones
+  // solo es válido si ya se domina en entrenamiento una cadena de
+  // relaciones que conecte esas dos posiciones (comprobación de refuerzo:
+  // el cliente ya bloquea esto en la interfaz, pero se repite aquí porque
+  // esta acción decide qué cuenta como dato real).
+  if ((FASES_QUE_REQUIEREN_CONEXION as readonly string[]).includes(fase)) {
+    const { data: entrenamientosDominados } = await supabase
+      .from('dominio_rft_fases')
+      .select('grupo, posicion_origen, posicion_destino')
+      .eq('programa_alumno_id', programaAlumnoId)
+      .eq('grupo', grupo)
+      .eq('fase', 'entrenamiento')
+      .eq('dominado', true)
+
+    const grafo = construirGrafoEntrenado(entrenamientosDominados ?? [], grupo)
+    if (!estanConectadas(grafo, posicionOrigen, posicionDestino)) {
+      return {
+        error: `Todavía no se puede probar ${posicionOrigen}→${posicionDestino}: hace falta dominar antes en entrenamiento una cadena de relaciones que las conecte.`,
+      }
+    }
   }
 
   const totalEnsayos = ensayos.length

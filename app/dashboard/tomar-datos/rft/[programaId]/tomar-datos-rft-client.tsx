@@ -8,9 +8,17 @@ import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
 import { leerProgreso, guardarProgreso, borrarProgreso, esFalloDeRed } from '../../offline-sync'
 import { BannerSinConexion, PantallaGuardadoPendiente } from '../../estado-sincronizacion'
+import {
+  FASES_QUE_REQUIEREN_CONEXION,
+  construirGrafoEntrenado,
+  estanConectadas,
+  relacionesDominadasTexto,
+  type ParEntrenado,
+} from './relaciones-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
+type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
 type EnsayoRft = {
   claseId: string
@@ -94,7 +102,7 @@ export default function TomarDatosRftClient({
   ayudasPosibles,
   videoUrl,
   grupoInicial,
-  combosDominados,
+  dominioFases,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -104,7 +112,7 @@ export default function TomarDatosRftClient({
   ayudasPosibles: string | null
   videoUrl: string | null
   grupoInicial?: string | null
-  combosDominados: string[]
+  dominioFases: DominioFase[]
 }) {
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<string | null>(grupoInicial ?? null)
   const [fase, setFase] = useState('entrenamiento')
@@ -139,6 +147,13 @@ export default function TomarDatosRftClient({
   )
   const clasesSinPosiciones = clasesDelGrupo.length - clasesValidas.length
 
+  const entrenamientosDominados: ParEntrenado[] = dominioFases
+    .filter((d) => d.fase === 'entrenamiento')
+    .map((d) => ({ grupo: d.grupo, posicion_origen: d.posicion_origen, posicion_destino: d.posicion_destino }))
+  const combosDominados = dominioFases
+    .filter((d) => d.fase !== 'entrenamiento')
+    .map((d) => `${d.grupo}__${d.posicion_origen}__${d.posicion_destino}`)
+
   // Solo se puede registrar una sonda de generalización/mantenimiento sobre
   // una combinación grupo+posiciones que ya haya demostrado dominio en
   // alguna fase de test — si no, no hay nada que "mantener" todavía.
@@ -148,6 +163,19 @@ export default function TomarDatosRftClient({
     !!posicionDestino &&
     combosDominados.includes(`${grupoSeleccionado}__${posicionOrigen}__${posicionDestino}`)
   const faseEfectiva = puedeSonda && tipoSonda !== 'normal' ? tipoSonda : fase
+
+  // Un test de vínculo mutuo/combinatorio (o transformación de funciones)
+  // solo tiene sentido una vez dominada en entrenamiento una cadena de
+  // relaciones que conecte las dos posiciones elegidas — si no, no se
+  // estaría probando nada emergente.
+  const requiereConexion =
+    grupoSeleccionado !== null && (FASES_QUE_REQUIEREN_CONEXION as readonly string[]).includes(fase)
+  const grafoEntrenado = grupoSeleccionado ? construirGrafoEntrenado(entrenamientosDominados, grupoSeleccionado) : new Map()
+  const conectadas =
+    !requiereConexion || (!!posicionOrigen && !!posicionDestino && estanConectadas(grafoEntrenado, posicionOrigen, posicionDestino))
+  const relacionesYaDominadas = grupoSeleccionado
+    ? relacionesDominadasTexto(entrenamientosDominados, grupoSeleccionado)
+    : []
 
   const intentarGuardar = useCallback(
     (
@@ -280,6 +308,10 @@ export default function TomarDatosRftClient({
   const empezarBloque = () => {
     if (clasesValidas.length < 2) {
       toast('Necesitas al menos 2 clases con esas posiciones en este grupo para poder comparar.', 'error')
+      return
+    }
+    if (!conectadas) {
+      toast('Antes hay que dominar en entrenamiento una cadena de relaciones que conecte esas posiciones.', 'error')
       return
     }
     setSecuencia(generarSecuenciaClases(clasesValidas, tamanoBloque))
@@ -500,6 +532,17 @@ export default function TomarDatosRftClient({
           </p>
         )}
 
+        {requiereConexion && posicionOrigen && posicionDestino && !conectadas && (
+          <p className="text-xs font-medium text-rose-700 bg-rose-50 rounded-lg p-2">
+            ⚠ Todavía no se puede probar {posicionOrigen}→{posicionDestino}: hace falta dominar antes
+            en entrenamiento una cadena de relaciones que conecte {posicionOrigen} con{' '}
+            {posicionDestino}.{' '}
+            {relacionesYaDominadas.length > 0
+              ? `Relaciones ya dominadas en "${grupoSeleccionado}": ${relacionesYaDominadas.join(', ')}.`
+              : `Todavía no hay ninguna relación dominada en entrenamiento en este grupo.`}
+          </p>
+        )}
+
         {puedeSonda && (
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Tipo de bloque</p>
@@ -547,7 +590,7 @@ export default function TomarDatosRftClient({
 
         <button
           onClick={empezarBloque}
-          disabled={!posicionOrigen || !posicionDestino}
+          disabled={!posicionOrigen || !posicionDestino || !conectadas}
           className="w-full rounded-lg bg-slate-800 py-4 sm:py-3 text-base font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
         >
           Generar secuencia y empezar
