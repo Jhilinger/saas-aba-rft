@@ -1,13 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
-import { obtenerEvolucionAnalogias } from './analogias-actions'
-import AnalogiasPanel from './analogias-panel'
 import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selector'
-import GraficoConducta from '../../alumnos/[id]/conducta/[programaId]/grafico-conducta'
-import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import VideoDiferido from '../../video-diferido'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
@@ -68,7 +63,6 @@ export default async function ProgramaRftPage({
           programaAlumnoId={programa.id}
           alumnoId={programa.alumno_id}
           estadoActual={programa.estado}
-          variante={programa.nivel_rft === 'relacion_relaciones' ? 'conducta' : 'habilidad'}
         />
       </div>
     </div>
@@ -76,12 +70,10 @@ export default async function ProgramaRftPage({
 
   const infoPanel = (
     <Panel className="space-y-3 p-4 text-sm sm:p-5">
-      {programa.nivel_rft !== 'relacion_relaciones' && (
-        <div>
-          <span className="text-slate-500">% de acierto para dominio</span>
-          <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
-        </div>
-      )}
+      <div>
+        <span className="text-slate-500">% de acierto para dominio</span>
+        <p className="text-slate-700">{programa.porcentaje_dominio}%</p>
+      </div>
 
       {programa.objetivo && (
         <div>
@@ -122,64 +114,10 @@ export default async function ProgramaRftPage({
     </Panel>
   )
 
-  if (programa.nivel_rft === 'relacion_relaciones') {
-    const { data: analogias } = await supabase
-      .from('analogias_alumno')
-      .select('id, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion')
-      .eq('programa_alumno_id', id)
-      .order('orden')
-
-    const { data: bloques } = await supabase
-      .from('bloques_analogias')
-      .select('id, fecha, fase, total_ensayos, aciertos, porcentaje, notas')
-      .eq('programa_alumno_id', id)
-      .order('fecha', { ascending: false })
-
-    const { puntos, distribucion } = await obtenerEvolucionAnalogias(id)
-
-    return (
-      <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
-        {cabecera}
-        {infoPanel}
-        <div className="flex justify-end">
-          <Link
-            href={`/dashboard/tomar-datos/rft/${id}`}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
-          >
-            Tomar datos
-          </Link>
-        </div>
-        <Panel className="p-3 sm:p-5">
-          <GraficoConducta puntos={puntos} etiquetaY="% de acierto" direccionObjetivo="aumentar" titulo={programa.nombre} dominioYFijo={[0, 100]} />
-        </Panel>
-        <Panel className="p-4 sm:p-5">
-          <DistribucionAyudasChart distribucion={distribucion} titulo="Distribución de ayudas" />
-        </Panel>
-        <AnalogiasPanel analogias={analogias ?? []} programaAlumnoId={id} />
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-slate-700">Historial de bloques</h2>
-          {(bloques ?? []).map((b) => (
-            <div key={b.id} className="rounded-lg border border-slate-200 bg-white p-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-700">{new Date(b.fecha).toLocaleDateString('es-ES')}</span>
-                <span className="text-xs font-semibold text-slate-600">
-                  {b.aciertos}/{b.total_ensayos} ({b.porcentaje ?? 0}%)
-                  {b.fase !== 'intervencion' && ` · ${b.fase}`}
-                </span>
-              </div>
-              {b.notas && <p className="mt-1 text-xs text-slate-500">{b.notas}</p>}
-            </div>
-          ))}
-          {(!bloques || bloques.length === 0) && <p className="text-center text-slate-500 py-4">Sin bloques todavía.</p>}
-        </div>
-      </div>
-    )
-  }
-
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, estimulos_rft(id, etiqueta, nombre, posicion), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, estimulos_rft(id, etiqueta, nombre, posicion, elemento), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')

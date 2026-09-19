@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosRftClient from './tomar-datos-rft-client'
-import TomarDatosAnalogiasClient from './tomar-datos-analogias-client'
+import TomarDatosPatronClient from './tomar-datos-patron-client'
 
 export default async function TomarDatosRftPage({
   params,
@@ -46,16 +46,20 @@ export default async function TomarDatosRftPage({
 
   const alumnoNombre = programa.alumnos?.nombre_anonimizado ?? ''
 
+  const { data: clases } = await supabase
+    .from('clases_rft')
+    .select('id, nombre, grupo, estimulos_rft(id, nombre, posicion, elemento)')
+    .eq('programa_alumno_id', programaId)
+    .order('grupo')
+    .order('created_at')
+
+  const { data: dominioFases } = await supabase
+    .from('dominio_rft_fases')
+    .select('grupo, fase, posicion_origen, posicion_destino')
+    .eq('programa_alumno_id', programaId)
+    .eq('dominado', true)
+
   if (programa.nivel_rft === 'relacion_relaciones') {
-    const { data: analogias } = await supabase
-      .from('analogias_alumno')
-      .select('id, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion')
-      .eq('programa_alumno_id', programaId)
-      .order('orden')
-
-    const faseActual = programa.estado === 'linea_base' ? 'linea_base' : 'intervencion'
-    const puedeSonda = programa.estado === 'dominado' || programa.estado === 'mantenimiento'
-
     return (
       <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
         <div>
@@ -67,28 +71,20 @@ export default async function TomarDatosRftPage({
             {alumnoNombre} — {programa.nombre}
           </h1>
         </div>
-        <TomarDatosAnalogiasClient
+        <TomarDatosPatronClient
           programaAlumnoId={programa.id}
-          analogias={analogias ?? []}
-          faseActual={faseActual}
-          puedeSonda={puedeSonda}
+          alumnoId={programa.alumno_id}
+          clases={clases ?? []}
+          ensayosPorBloqueDefecto={programa.ensayos_por_bloque}
+          instrucciones={programa.programas_base?.instrucciones_terapeuta ?? null}
+          ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
+          videoUrl={programa.programas_base?.video_url ?? null}
+          grupoInicial={grupo ?? null}
+          dominioFases={dominioFases ?? []}
         />
       </div>
     )
   }
-
-  const { data: clases } = await supabase
-    .from('clases_rft')
-    .select('id, nombre, grupo, estimulos_rft(id, nombre, posicion)')
-    .eq('programa_alumno_id', programaId)
-    .order('grupo')
-    .order('created_at')
-
-  const { data: dominioFases } = await supabase
-    .from('dominio_rft_fases')
-    .select('grupo, fase, posicion_origen, posicion_destino')
-    .eq('programa_alumno_id', programaId)
-    .eq('dominado', true)
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">

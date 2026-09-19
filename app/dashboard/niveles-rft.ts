@@ -11,13 +11,20 @@
 //   funciones. No hay vínculo combinatorio posible con solo 2 miembros.
 // - Vínculo combinatorio: clases de 3 o más miembros (A-E). Todas las fases
 //   están disponibles.
-// - Relacionar relaciones (razonamiento analógico): no usa clases ni
-//   estímulos con posición — usa "analogías" (2 pares de términos, cada uno
-//   con su propia relación) y un juicio igual/distinta relación. Por eso no
-//   participa de MAX_MIEMBROS_POR_NIVEL/POSICIONES_POR_NIVEL/FASES_POR_NIVEL
-//   (se documentan como no aplicables ahí), tiene su propio conjunto de
-//   tablas (analogias_base/alumno, bloques_analogias) y sus propias
-//   pantallas de autoría y toma de datos.
+// - Relacionar relaciones (razonamiento analógico — igualación a la muestra
+//   relacional): también usa clases_rft/estimulos_rft (hasta 5 miembros,
+//   posiciones A-E), pero cada estímulo lleva además un "elemento" — dos
+//   estímulos de la misma clase con el mismo elemento cuentan como "el
+//   mismo" para calcular el patrón de la clase (cuántos coinciden entre sí,
+//   ver patron-rft.ts). Dos clases "combinan" cuando tienen el mismo patrón,
+//   sea cual sea el contenido concreto. Solo entrenamiento y test de vínculo
+//   mutuo tienen sentido aquí (la relación "mismo patrón" es simétrica por
+//   construcción, no hay una fase combinatoria ni de transformación).
+//   La toma de datos es distinta al resto de RFT (se compara la clase
+//   entera, no un estímulo por posición), así que tiene su propia pantalla,
+//   pero reutiliza guardarBloqueRft sin cambios: fase = entrenamiento |
+//   test_mutuo, posición origen = "igual" | "diferente" (qué se pregunta),
+//   posición destino = "na" (no aplica).
 
 export const NIVELES_RFT = ['abstraccion', 'mutuo', 'combinatorio', 'relacion_relaciones'] as const
 export type NivelRft = (typeof NIVELES_RFT)[number]
@@ -26,39 +33,45 @@ export const NOMBRE_NIVEL_RFT: Record<NivelRft, string> = {
   abstraccion: 'Abstracción de clave relacional',
   mutuo: 'Vínculo mutuo',
   combinatorio: 'Vínculo combinatorio',
-  relacion_relaciones: 'Relacionar relaciones (razonamiento analógico)',
+  relacion_relaciones: 'Relacionar relaciones (igualación a la muestra relacional)',
 }
 
-// No aplicable a relacion_relaciones (no usa clases/estímulos) — se deja en
-// 0 y el código de clases/estímulos nunca se ejecuta para ese nivel.
 export const MAX_MIEMBROS_POR_NIVEL: Record<NivelRft, number> = {
   abstraccion: 1,
   mutuo: 2,
   combinatorio: 5,
-  relacion_relaciones: 0,
+  relacion_relaciones: 5,
 }
 
 export const POSICIONES_POR_NIVEL: Record<NivelRft, string[]> = {
   abstraccion: ['A'],
   mutuo: ['A', 'B'],
   combinatorio: ['A', 'B', 'C', 'D', 'E'],
-  relacion_relaciones: [],
+  relacion_relaciones: ['A', 'B', 'C', 'D', 'E'],
 }
 
 // Fases de datos (bloques_ensayo_rft.fase) permitidas por nivel — no incluye
 // "generalizacion"/"mantenimiento" (sondas), que se permiten siempre que la
 // combinación ya esté dominada, independientemente del nivel: si se llegó a
 // dominar, ya pasó por este filtro cuando se registró como test.
-// relacion_relaciones no usa fase_rft en absoluto (usa su propio
-// bloques_analogias.fase, con el mismo vocabulario que un registro de
-// conducta: linea_base/intervencion/generalizacion/mantenimiento).
 export const FASES_POR_NIVEL: Record<NivelRft, readonly string[]> = {
   abstraccion: ['entrenamiento'],
   mutuo: ['entrenamiento', 'test_mutuo', 'transformacion_funciones'],
   combinatorio: ['entrenamiento', 'test_mutuo', 'test_combinatorio', 'transformacion_funciones'],
-  relacion_relaciones: [],
+  relacion_relaciones: ['entrenamiento', 'test_mutuo'],
 }
 
 export function coerceNivelRft(value: string | null | undefined): NivelRft {
   return (NIVELES_RFT as readonly string[]).includes(value ?? '') ? (value as NivelRft) : 'combinatorio'
+}
+
+// Etiqueta legible para una combinación fase+posiciones ya guardada (se usa
+// en los listados de "dominio por fase" y en el historial de tests). Para
+// relacion_relaciones, posición destino siempre es "na" (no aplica) y la
+// origen es "igual"/"diferente" — se muestra sin la flecha en ese caso.
+export function etiquetaCombinacionRft(posicionOrigen: string, posicionDestino: string): string {
+  if (posicionDestino === 'na') {
+    return posicionOrigen === 'igual' ? '¿Cuál es igual?' : posicionOrigen === 'diferente' ? '¿Cuál es diferente?' : posicionOrigen
+  }
+  return `${posicionOrigen}→${posicionDestino}`
 }

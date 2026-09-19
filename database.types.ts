@@ -130,116 +130,6 @@ export type Database = {
           },
         ]
       }
-      analogias_alumno: {
-        Row: {
-          analogia_base_id: string | null
-          created_at: string
-          id: string
-          nombre: string
-          orden: number
-          par1_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a: string
-          par1_termino_b: string
-          par2_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a: string
-          par2_termino_b: string
-          programa_alumno_id: string
-        }
-        Insert: {
-          analogia_base_id?: string | null
-          created_at?: string
-          id?: string
-          nombre?: string
-          orden?: number
-          par1_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a: string
-          par1_termino_b: string
-          par2_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a: string
-          par2_termino_b: string
-          programa_alumno_id: string
-        }
-        Update: {
-          analogia_base_id?: string | null
-          created_at?: string
-          id?: string
-          nombre?: string
-          orden?: number
-          par1_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a?: string
-          par1_termino_b?: string
-          par2_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a?: string
-          par2_termino_b?: string
-          programa_alumno_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "analogias_alumno_analogia_base_id_fkey"
-            columns: ["analogia_base_id"]
-            isOneToOne: false
-            referencedRelation: "analogias_base"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "analogias_alumno_programa_alumno_id_fkey"
-            columns: ["programa_alumno_id"]
-            isOneToOne: false
-            referencedRelation: "programas_alumno"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      analogias_base: {
-        Row: {
-          created_at: string
-          id: string
-          nombre: string
-          orden: number
-          par1_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a: string
-          par1_termino_b: string
-          par2_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a: string
-          par2_termino_b: string
-          programa_base_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          nombre?: string
-          orden?: number
-          par1_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a: string
-          par1_termino_b: string
-          par2_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a: string
-          par2_termino_b: string
-          programa_base_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          nombre?: string
-          orden?: number
-          par1_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par1_termino_a?: string
-          par1_termino_b?: string
-          par2_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
-          par2_termino_a?: string
-          par2_termino_b?: string
-          programa_base_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "analogias_base_programa_base_id_fkey"
-            columns: ["programa_base_id"]
-            isOneToOne: false
-            referencedRelation: "programas_base"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       bloques_analisis_tareas: {
         Row: {
           fecha: string
@@ -272,57 +162,6 @@ export type Database = {
           },
           {
             foreignKeyName: "bloques_analisis_tareas_terapeuta_id_fkey"
-            columns: ["terapeuta_id"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      bloques_analogias: {
-        Row: {
-          aciertos: number
-          fase: string
-          fecha: string
-          id: string
-          notas: string | null
-          porcentaje: number | null
-          programa_alumno_id: string
-          terapeuta_id: string
-          total_ensayos: number
-        }
-        Insert: {
-          aciertos?: number
-          fase?: string
-          fecha?: string
-          id?: string
-          notas?: string | null
-          porcentaje?: number | null
-          programa_alumno_id: string
-          terapeuta_id: string
-          total_ensayos?: number
-        }
-        Update: {
-          aciertos?: number
-          fase?: string
-          fecha?: string
-          id?: string
-          notas?: string | null
-          porcentaje?: number | null
-          programa_alumno_id?: string
-          terapeuta_id?: string
-          total_ensayos?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bloques_analogias_programa_alumno_id_fkey"
-            columns: ["programa_alumno_id"]
-            isOneToOne: false
-            referencedRelation: "programas_alumno"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "bloques_analogias_terapeuta_id_fkey"
             columns: ["terapeuta_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
@@ -1056,48 +895,6 @@ export type Database = {
           },
         ]
       }
-      ensayos_analogias_detalle: {
-        Row: {
-          analogia_id: string
-          ayuda: Database["public"]["Enums"]["tipo_ayuda"]
-          bloque_id: string
-          correcto: boolean
-          id: string
-          respuesta_dada: string
-        }
-        Insert: {
-          analogia_id: string
-          ayuda?: Database["public"]["Enums"]["tipo_ayuda"]
-          bloque_id: string
-          correcto: boolean
-          id?: string
-          respuesta_dada: string
-        }
-        Update: {
-          analogia_id?: string
-          ayuda?: Database["public"]["Enums"]["tipo_ayuda"]
-          bloque_id?: string
-          correcto?: boolean
-          id?: string
-          respuesta_dada?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ensayos_analogias_detalle_analogia_id_fkey"
-            columns: ["analogia_id"]
-            isOneToOne: false
-            referencedRelation: "analogias_alumno"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ensayos_analogias_detalle_bloque_id_fkey"
-            columns: ["bloque_id"]
-            isOneToOne: false
-            referencedRelation: "bloques_analogias"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ensayos_rft_detalle: {
         Row: {
           ayuda: Database["public"]["Enums"]["tipo_ayuda"]
@@ -1241,6 +1038,7 @@ export type Database = {
         Row: {
           clase_id: string
           descripcion: string | null
+          elemento: string | null
           etiqueta: string
           id: string
           nombre: string
@@ -1250,6 +1048,7 @@ export type Database = {
         Insert: {
           clase_id: string
           descripcion?: string | null
+          elemento?: string | null
           etiqueta: string
           id?: string
           nombre: string
@@ -1259,6 +1058,7 @@ export type Database = {
         Update: {
           clase_id?: string
           descripcion?: string | null
+          elemento?: string | null
           etiqueta?: string
           id?: string
           nombre?: string
@@ -1278,6 +1078,7 @@ export type Database = {
       estimulos_rft_base: {
         Row: {
           clase_base_id: string
+          elemento: string | null
           etiqueta: string
           id: string
           nombre: string
@@ -1286,6 +1087,7 @@ export type Database = {
         }
         Insert: {
           clase_base_id: string
+          elemento?: string | null
           etiqueta: string
           id?: string
           nombre: string
@@ -1294,6 +1096,7 @@ export type Database = {
         }
         Update: {
           clase_base_id?: string
+          elemento?: string | null
           etiqueta?: string
           id?: string
           nombre?: string

@@ -13,9 +13,10 @@ import {
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
-import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
+import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT, etiquetaCombinacionRft } from '../../niveles-rft'
+import { calcularPatron, formatearPatron } from '../../patron-rft'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; elemento: string | null }
 type Relacion = {
   id: string
   estimulo_origen_id: string
@@ -63,7 +64,10 @@ export default function ClaseCard({
   const maxMiembros = MAX_MIEMBROS_POR_NIVEL[nivel]
   const enElLimite = clase.estimulos_rft.length >= maxMiembros
 
+  const esPatron = nivel === 'relacion_relaciones'
+
   const [nombreEstimulo, setNombreEstimulo] = useState('')
+  const [elemento, setElemento] = useState('')
   const [posicion, setPosicion] = useState(posicionesPermitidas[0])
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -72,6 +76,8 @@ export default function ClaseCard({
 
   const nombreEstimuloPorId = (id: string) =>
     clase.estimulos_rft.find((e) => e.id === id)?.etiqueta ?? '?'
+
+  const patron = esPatron ? calcularPatron(clase.estimulos_rft) : null
 
   return (
     <Panel className="p-5 space-y-4">
@@ -83,9 +89,15 @@ export default function ClaseCard({
               {clase.grupo}
             </span>
           </h3>
-          <span className="text-xs text-slate-500">
-            {clase.tipo_relacion}
-          </span>
+          {esPatron ? (
+            patron && patron.length > 0 && (
+              <span className="inline-block mt-1 rounded-full bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                Patrón: {formatearPatron(patron)}
+              </span>
+            )
+          ) : (
+            <span className="text-xs text-slate-500">{clase.tipo_relacion}</span>
+          )}
         </div>
         <button
           onClick={async () => {
@@ -152,6 +164,17 @@ export default function ClaseCard({
                   </span>
                 )}
                 {' '}— {e.nombre}
+                {esPatron && (
+                  e.elemento ? (
+                    <span className="ml-1 rounded bg-purple-100 px-1.5 py-0.5 text-xs text-purple-700">
+                      elemento {e.elemento}
+                    </span>
+                  ) : (
+                    <span className="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700">
+                      sin elemento
+                    </span>
+                  )
+                )}
               </span>
               <button
                 onClick={() => {
@@ -206,12 +229,13 @@ export default function ClaseCard({
               e.preventDefault()
               if (!nombreEstimulo.trim()) return
               startTransition(async () => {
-                const res = await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion)
+                const res = await crearEstimuloRft(clase.id, programaAlumnoId, nombreEstimulo, '', posicion, elemento || undefined)
                 if (res?.error) {
                   toast(res.error, 'error')
                   return
                 }
                 setNombreEstimulo('')
+                setElemento('')
                 router.refresh()
               })
             }}
@@ -234,6 +258,14 @@ export default function ClaseCard({
               placeholder="Nombre del estímulo"
               className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
             />
+            {esPatron && (
+              <input
+                value={elemento}
+                onChange={(e) => setElemento(e.target.value)}
+                placeholder="Elemento (ej. X)"
+                className="w-28 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
+              />
+            )}
             <Button type="submit" disabled={isPending} className="py-1.5">
               Añadir
             </Button>
@@ -241,7 +273,10 @@ export default function ClaseCard({
         )}
       </div>
 
-      {/* Relaciones entrenadas y testeadas: informativo, se rellena solo al tomar datos */}
+      {/* Relaciones entrenadas y testeadas: informativo, se rellena solo al tomar datos.
+          Para "relacionar relaciones" no aplica (se compara la clase entera, no
+          un estímulo con otro), así que se omite. */}
+      {!esPatron && (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <p className="mb-1 text-xs font-medium text-slate-500">Relaciones entrenadas</p>
@@ -285,7 +320,7 @@ export default function ClaseCard({
                 className="flex items-center justify-between rounded-lg bg-purple-50 px-3 py-2 text-sm"
               >
                 <span className="text-purple-800">
-                  {NOMBRES_FASE[t.fase] ?? t.fase}: {t.posicionOrigen}→{t.posicionDestino}
+                  {NOMBRES_FASE[t.fase] ?? t.fase}: {etiquetaCombinacionRft(t.posicionOrigen, t.posicionDestino)}
                 </span>
                 <span
                   className={t.porcentaje >= 90 ? 'text-emerald-700 font-medium' : 'text-slate-500'}
@@ -300,6 +335,7 @@ export default function ClaseCard({
           </ul>
         </div>
       </div>
+      )}
     </Panel>
   )
 }

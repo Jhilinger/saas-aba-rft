@@ -105,7 +105,8 @@ export async function crearEstimuloRft(
   programaAlumnoId: string,
   nombre: string,
   descripcion: string,
-  posicion: string
+  posicion: string,
+  elemento?: string
 ) {
   const supabase = await createClient()
 
@@ -142,7 +143,7 @@ export async function crearEstimuloRft(
 
   const { error } = await supabase
     .from('estimulos_rft')
-    .insert({ clase_id: claseId, etiqueta, nombre, descripcion, posicion })
+    .insert({ clase_id: claseId, etiqueta, nombre, descripcion, posicion, elemento: elemento?.trim() || null })
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   return { success: true }

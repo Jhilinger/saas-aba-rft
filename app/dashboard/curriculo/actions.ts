@@ -443,7 +443,8 @@ export async function crearEstimuloRftBase(
   claseBaseId: string,
   programaBaseId: string,
   nombre: string,
-  posicion: string
+  posicion: string,
+  elemento?: string
 ) {
   const supabase = await createClient()
 
@@ -481,7 +482,7 @@ export async function crearEstimuloRftBase(
 
   const { error } = await supabase
     .from('estimulos_rft_base')
-    .insert({ clase_base_id: claseBaseId, etiqueta, nombre, posicion })
+    .insert({ clase_base_id: claseBaseId, etiqueta, nombre, posicion, elemento: elemento?.trim() || null })
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
   return { success: true }
@@ -526,62 +527,3 @@ export async function eliminarPasoBase(id: string, programaBaseId: string) {
   return { success: true }
 }
 
-// --- ANALOGÍAS (plantilla, solo programas RFT con nivel_rft = relacion_relaciones) ---
-
-function parseTipoRelacionRequerido(value: FormDataEntryValue | null): Enums<'tipo_relacion_rft'> | null {
-  return typeof value === 'string' && (TIPOS_RELACION as readonly string[]).includes(value)
-    ? (value as Enums<'tipo_relacion_rft'>)
-    : null
-}
-
-export async function crearAnalogiaBase(
-  programaBaseId: string,
-  datos: {
-    par1TerminoA: string
-    par1TerminoB: string
-    par1Relacion: string
-    par2TerminoA: string
-    par2TerminoB: string
-    par2Relacion: string
-  }
-) {
-  const supabase = await createClient()
-
-  const par1Relacion = parseTipoRelacionRequerido(datos.par1Relacion)
-  const par2Relacion = parseTipoRelacionRequerido(datos.par2Relacion)
-  if (
-    !datos.par1TerminoA.trim() || !datos.par1TerminoB.trim() ||
-    !datos.par2TerminoA.trim() || !datos.par2TerminoB.trim() ||
-    !par1Relacion || !par2Relacion
-  ) {
-    return { error: 'Rellena los 4 términos y las 2 relaciones' }
-  }
-
-  const { count } = await supabase
-    .from('analogias_base')
-    .select('id', { count: 'exact', head: true })
-    .eq('programa_base_id', programaBaseId)
-
-  const { error } = await supabase.from('analogias_base').insert({
-    programa_base_id: programaBaseId,
-    nombre: `Analogía ${(count ?? 0) + 1}`,
-    par1_termino_a: datos.par1TerminoA.trim(),
-    par1_termino_b: datos.par1TerminoB.trim(),
-    par1_relacion: par1Relacion,
-    par2_termino_a: datos.par2TerminoA.trim(),
-    par2_termino_b: datos.par2TerminoB.trim(),
-    par2_relacion: par2Relacion,
-    orden: (count ?? 0) + 1,
-  })
-  if (error) return { error: error.message }
-  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
-  return { success: true }
-}
-
-export async function eliminarAnalogiaBase(id: string, programaBaseId: string) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('analogias_base').delete().eq('id', id)
-  if (error) return { error: error.message }
-  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
-  return { success: true }
-}

@@ -8,8 +8,6 @@ import NuevaClaseRftForm from './nueva-clase-rft-form'
 import ClaseRftBaseCard from './clase-rft-base-card'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
-import NuevaAnalogiaBaseForm from './nueva-analogia-base-form'
-import AnalogiaBaseCard from './analogia-base-card'
 import { Breadcrumb, Panel } from '../../../ui'
 
 export default async function ProgramaDetallePage({
@@ -58,19 +56,13 @@ export default async function ProgramaDetallePage({
 
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
-    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion)')
+    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion, elemento)')
     .eq('programa_base_id', id)
     .order('orden')
 
   const { data: pasosTarea } = await supabase
     .from('pasos_tarea_base')
     .select('id, nombre, descripcion, orden')
-    .eq('programa_base_id', id)
-    .order('orden')
-
-  const { data: analogias } = await supabase
-    .from('analogias_base')
-    .select('id, nombre, par1_termino_a, par1_termino_b, par1_relacion, par2_termino_a, par2_termino_b, par2_relacion, orden')
     .eq('programa_base_id', id)
     .order('orden')
 
@@ -166,9 +158,16 @@ export default async function ProgramaDetallePage({
         </section>
       )}
 
-      {programa.tipo === 'rft' && programa.nivel_rft !== 'relacion_relaciones' && (
+      {programa.tipo === 'rft' && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Clases (plantilla)</h2>
+          {programa.nivel_rft === 'relacion_relaciones' && (
+            <p className="text-sm text-slate-500">
+              Cada clase es un grupo de estímulos. Marca con el mismo "elemento" los que sean el mismo
+              dentro de la clase (ej. dos círculos comparten elemento aunque se llamen distinto) — el
+              patrón (cuántos coinciden) se calcula solo, y dos clases combinan cuando tienen el mismo patrón.
+            </p>
+          )}
           <NuevaClaseRftForm programaBaseId={id} />
 
           <div className="space-y-4">
@@ -179,26 +178,6 @@ export default async function ProgramaDetallePage({
 
           {(!clasesRft || clasesRft.length === 0) && (
             <p className="text-center text-slate-500">Sin clases todavía.</p>
-          )}
-        </section>
-      )}
-
-      {programa.tipo === 'rft' && programa.nivel_rft === 'relacion_relaciones' && (
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-slate-700">Analogías (plantilla)</h2>
-          <p className="text-sm text-slate-500">
-            Cada analogía compara la relación de un primer par de términos con la de un segundo par.
-          </p>
-          <NuevaAnalogiaBaseForm programaBaseId={id} />
-
-          <div className="space-y-2">
-            {analogias?.map((a) => (
-              <AnalogiaBaseCard key={a.id} analogia={a} programaBaseId={id} />
-            ))}
-          </div>
-
-          {(!analogias || analogias.length === 0) && (
-            <p className="text-center text-slate-500">Sin analogías todavía.</p>
           )}
         </section>
       )}
