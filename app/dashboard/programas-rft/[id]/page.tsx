@@ -153,7 +153,7 @@ export default async function ProgramaRftPage({
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')
-    .select('grupo, fase, posicion_origen, posicion_destino, dominado, updated_at')
+    .select('grupo, fase, posicion_origen, posicion_destino, dominado, via_entrenamiento, updated_at')
     .eq('programa_alumno_id', id)
 
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]

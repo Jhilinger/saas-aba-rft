@@ -53,7 +53,7 @@ export default async function ProgramaRftFamiliaPage({
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')
-    .select('grupo, fase, posicion_origen, posicion_destino, dominado')
+    .select('grupo, fase, posicion_origen, posicion_destino, dominado, via_entrenamiento')
     .eq('programa_alumno_id', id)
 
   const alumnoNombre = (programa as unknown as ProgramaConAlumno).alumnos?.nombre_anonimizado ?? ''

@@ -161,6 +161,7 @@ export async function guardarBloqueRft(
   // de fase+posiciones. La celebración se basa en si ESTA combinación
   // concreta acaba de pasar a dominada (independiente de otras fases).
   let clasesDominadasAhora: string[] = []
+  let derivado = false
 
   if (FASES_QUE_EVALUAN_DOMINIO.includes(fase)) {
     const { data: antes } = await supabase
@@ -187,7 +188,7 @@ export async function guardarBloqueRft(
 
     const { data: despues } = await supabase
       .from('dominio_rft_fases')
-      .select('dominado')
+      .select('dominado, via_entrenamiento')
       .eq('programa_alumno_id', programaAlumnoId)
       .eq('grupo', grupo)
       .eq('fase', fase as FaseRft)
@@ -204,6 +205,7 @@ export async function guardarBloqueRft(
         .select('nombre')
         .in('id', clasesUnicas)
       clasesDominadasAhora = (clases ?? []).map((c) => c.nombre)
+      derivado = fase !== 'entrenamiento' && !despues?.via_entrenamiento
     }
   }
 
@@ -214,5 +216,6 @@ export async function guardarBloqueRft(
     success: true,
     porcentaje: Math.round((aciertos / totalEnsayos) * 100),
     clasesDominadasAhora,
+    derivado,
   }
 }

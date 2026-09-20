@@ -132,7 +132,7 @@ export default function TomarDatosRftClient({
   const [preguntaActual, setPreguntaActual] = useState('')
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
-  const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[] } | null>(null)
+  const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[]; derivado: boolean } | null>(null)
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
   const router = useRouter()
@@ -220,7 +220,7 @@ export default function TomarDatosRftClient({
           }
           borrarProgreso(claveProgreso)
           setEstadoGuardado('idle')
-          setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [] })
+          setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [], derivado: res.derivado ?? false })
         } catch (e) {
           if (esFalloDeRed(e)) {
             setEstadoGuardado('pendiente')
@@ -382,7 +382,9 @@ export default function TomarDatosRftClient({
         {hayDominio && <p className="text-2xl">🎉</p>}
         <p className={`text-base sm:text-lg font-semibold ${hayDominio ? 'text-amber-800' : 'text-emerald-800'}`}>
           {hayDominio
-            ? `¡Dominio conseguido en ${resultado.clasesDominadasAhora.join(', ')}!`
+            ? resultado.derivado
+              ? `¡Derivado en ${resultado.clasesDominadasAhora.join(', ')}! (superado en un solo bloque, sin ayudas)`
+              : `¡Dominio conseguido en ${resultado.clasesDominadasAhora.join(', ')}!`
             : `Bloque guardado — ${resultado.porcentaje}% de acierto`}
         </p>
         {hayDominio && (
@@ -482,11 +484,11 @@ export default function TomarDatosRftClient({
             {fase === 'entrenamiento' &&
               'Elige la posición que enseñas como muestra (Origen) y con la que se relaciona (Destino). Ej.: para entrenar A→B, Origen=A, Destino=B. Para abstracción de clave relacional, usa la MISMA posición en ambos (ej. A→A).'}
             {fase === 'test_mutuo' &&
-              'Usa la posición INVERSA a la que entrenaste. Ej.: si entrenaste A→B, aquí Origen=B, Destino=A.'}
+              'Usa la posición INVERSA a la que entrenaste. Ej.: si entrenaste A→B, aquí Origen=B, Destino=A. Se evalúa en un solo bloque: si lo supera sin ayudas, se considera DERIVADO. Si no, repite el test marcando "Correcto con ayuda" cuando haga falta — a partir de ahí se le exige el mismo criterio que a un entrenamiento para darlo por DOMINADO.'}
             {fase === 'test_combinatorio' &&
-              'Usa las posiciones que NO entrenaste directamente, pero que deberían emerger. Ej.: si entrenaste A→B y B→C, aquí Origen=A, Destino=C (o al revés).'}
+              'Usa las posiciones que NO entrenaste directamente, pero que deberían emerger. Ej.: si entrenaste A→B y B→C, aquí Origen=A, Destino=C (o al revés). Se evalúa en un solo bloque: si lo supera sin ayudas, se considera DERIVADO. Si no, repite el test marcando "Correcto con ayuda" cuando haga falta — a partir de ahí se le exige el mismo criterio que a un entrenamiento para darlo por DOMINADO.'}
             {fase === 'transformacion_funciones' &&
-              'Origen = posición conocida (con significado real). Destino = posición desconocida, sobre la que preguntas.'}
+              'Origen = posición conocida (con significado real). Destino = posición desconocida, sobre la que preguntas. Se evalúa en un solo bloque: si lo supera sin ayudas, se considera DERIVADO. Si no, repite marcando "Correcto con ayuda" cuando haga falta — a partir de ahí se le exige el mismo criterio que a un entrenamiento para darlo por DOMINADO.'}
           </p>
         </div>
 
@@ -620,7 +622,6 @@ export default function TomarDatosRftClient({
 
   const origenActual = encontrarEstimulo(claseActual, posicionOrigen)!
   const esTransformacion = fase === 'transformacion_funciones'
-  const esEntrenamiento = fase === 'entrenamiento'
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -700,24 +701,59 @@ export default function TomarDatosRftClient({
               rows={2}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
             />
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                variant="success"
-                onClick={() => registrar(true, 'independiente', preguntaActual)}
-                disabled={isPending}
-                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-              >
-                ✓ Correcto
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => registrar(false, 'independiente', preguntaActual)}
-                disabled={isPending}
-                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-              >
-                ✗ Incorrecto
-              </Button>
-            </div>
+
+            {!mostrandoAyudas && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="success"
+                  onClick={() => registrar(true, 'independiente', preguntaActual)}
+                  disabled={isPending}
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+                >
+                  ✓ Correcto sin ayuda
+                </Button>
+                <Button
+                  variant="warning"
+                  onClick={() => setMostrandoAyudas(true)}
+                  disabled={isPending}
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+                >
+                  ✓ Correcto con ayuda
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => registrar(false, 'independiente', preguntaActual)}
+                  disabled={isPending}
+                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+                >
+                  ✗ Incorrecto
+                </Button>
+              </div>
+            )}
+
+            {mostrandoAyudas && (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
+                  {AYUDAS.map((a) => (
+                    <button
+                      key={a.value}
+                      onClick={() => registrar(true, a.value, preguntaActual)}
+                      disabled={isPending}
+                      className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setMostrandoAyudas(false)}
+                  className="text-sm text-slate-500 hover:text-slate-600 py-2"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <>
@@ -740,7 +776,7 @@ export default function TomarDatosRftClient({
               ))}
             </div>
 
-            {esEntrenamiento && !mostrandoAyudas && (
+            {!mostrandoAyudas && (
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   variant="success"
@@ -769,7 +805,7 @@ export default function TomarDatosRftClient({
               </div>
             )}
 
-            {esEntrenamiento && mostrandoAyudas && (
+            {mostrandoAyudas && (
               <div className="space-y-3">
                 <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
@@ -793,26 +829,6 @@ export default function TomarDatosRftClient({
               </div>
             )}
 
-            {!esEntrenamiento && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="success"
-                  onClick={() => registrar(true, 'independiente')}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✓ Correcto
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => registrar(false, 'independiente')}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✗ Incorrecto
-                </Button>
-              </div>
-            )}
           </>
         )}
       </div>

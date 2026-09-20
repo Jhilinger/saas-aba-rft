@@ -824,6 +824,7 @@ export type Database = {
           posicion_origen: string
           programa_alumno_id: string
           updated_at: string
+          via_entrenamiento: boolean
         }
         Insert: {
           dominado?: boolean
@@ -833,6 +834,7 @@ export type Database = {
           posicion_origen: string
           programa_alumno_id: string
           updated_at?: string
+          via_entrenamiento?: boolean
         }
         Update: {
           dominado?: boolean
@@ -842,6 +844,7 @@ export type Database = {
           posicion_origen?: string
           programa_alumno_id?: string
           updated_at?: string
+          via_entrenamiento?: boolean
         }
         Relationships: [
           {

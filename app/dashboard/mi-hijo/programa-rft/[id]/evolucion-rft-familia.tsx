@@ -15,6 +15,7 @@ type DominioFase = {
   posicion_origen: string
   posicion_destino: string
   dominado: boolean
+  via_entrenamiento: boolean
 }
 
 const NOMBRES_FASE: Record<string, string> = {
@@ -83,7 +84,14 @@ export default function EvolucionRftFamilia({
                 <span className="text-slate-600">
                   {NOMBRES_FASE[d.fase] ?? d.fase}: {d.posicion_origen}→{d.posicion_destino}
                 </span>
-                {d.dominado ? (
+                {d.dominado && d.fase !== 'entrenamiento' && !d.via_entrenamiento ? (
+                  <span
+                    className="self-start sm:self-auto rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 whitespace-nowrap"
+                    title="Superó el test en un solo bloque, sin ayudas: relación emergente sin enseñanza directa"
+                  >
+                    ✓ Derivado
+                  </span>
+                ) : d.dominado ? (
                   <span className="self-start sm:self-auto rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 whitespace-nowrap">
                     ✓ Dominado
                   </span>
