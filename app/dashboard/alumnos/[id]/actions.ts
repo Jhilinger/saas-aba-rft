@@ -177,6 +177,15 @@ export async function crearProgramaPersonalizado(
 export async function vincularTerapeuta(alumnoId: string, terapeutaId: string, esPrincipal: boolean) {
   const supabase = await createClient()
 
+  const { count } = await supabase
+    .from('alumno_terapeuta')
+    .select('alumno_id', { count: 'exact', head: true })
+    .eq('alumno_id', alumnoId)
+
+  if ((count ?? 0) >= 2) {
+    return { error: 'Este alumno ya tiene 2 terapeutas vinculados (el máximo: principal + otro). Desvincula uno antes de añadir otro.' }
+  }
+
   if (esPrincipal) {
     await supabase
       .from('alumno_terapeuta')

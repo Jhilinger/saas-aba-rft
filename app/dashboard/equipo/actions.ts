@@ -36,6 +36,34 @@ export async function crearTerapeuta(formData: FormData) {
     return { error: `Ya existe una cuenta con el email "${email}".` }
   }
 
+  // Tope de terapeutas por clínica: 2 base (principal + otro) + 1 más por
+  // cada 5 alumnos activos, para que el nº de asientos gratuitos crezca con
+  // el tamaño real (de pago) de la clínica en vez de quedar ilimitado.
+  // El superadmin (la propia plataforma) queda exento.
+  if (perfilActual.rol === 'clinica_admin' && perfilActual.clinica_id) {
+    const clinicaId = perfilActual.clinica_id
+    const [{ count: terapeutasActivos }, { count: alumnosActivos }] = await Promise.all([
+      admin
+        .from('perfiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('clinica_id', clinicaId)
+        .eq('rol', 'terapeuta')
+        .eq('activo', true),
+      admin
+        .from('alumnos')
+        .select('id', { count: 'exact', head: true })
+        .eq('clinica_id', clinicaId)
+        .eq('activo', true),
+    ])
+
+    const limite = 2 + Math.floor((alumnosActivos ?? 0) / 5)
+    if ((terapeutasActivos ?? 0) >= limite) {
+      return {
+        error: `Has alcanzado el límite de terapeutas para tu número de alumnos (${limite}). Contacta con soporte para ampliarlo.`,
+      }
+    }
+  }
+
       const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${URL_BASE}/login`,
   })

@@ -39,6 +39,15 @@ export async function crearFamiliar(nombre: string, email: string, alumnoIds: st
     return { error: `Ya existe una cuenta con el email "${email}".` }
   }
 
+  const { data: yaVinculados } = await admin
+    .from('alumno_familia')
+    .select('alumno_id')
+    .in('alumno_id', alumnoIds)
+
+  if (yaVinculados && yaVinculados.length > 0) {
+    return { error: 'Uno de los alumnos seleccionados ya tiene una familia vinculada (máximo 1 por alumno).' }
+  }
+
  const { data: authUser, error: authError } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${URL_BASE}/login`,
   })
@@ -80,7 +89,18 @@ export async function vincularFamiliarAlumno(perfilId: string, alumnoId: string)
     return { error: 'No autorizado' }
   }
 
-  const { error } = await createAdminClient()
+  const admin = createAdminClient()
+
+  const { count } = await admin
+    .from('alumno_familia')
+    .select('alumno_id', { count: 'exact', head: true })
+    .eq('alumno_id', alumnoId)
+
+  if ((count ?? 0) >= 1) {
+    return { error: 'Este alumno ya tiene una familia vinculada (máximo 1 por alumno).' }
+  }
+
+  const { error } = await admin
     .from('alumno_familia')
     .insert({ alumno_id: alumnoId, perfil_id: perfilId })
 
