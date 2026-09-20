@@ -78,43 +78,43 @@ export default async function ProgramaDetallePage({
 
       <Panel className="grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-3 sm:p-5">
         <div className="sm:col-span-3">
-          <span className="text-slate-500">Objetivo</span>
+          <span className="font-semibold text-slate-700">Objetivo</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo || '—'}</p>
         </div>
         <div className="sm:col-span-3">
-          <span className="text-slate-500">Materiales</span>
+          <span className="font-semibold text-slate-700">Materiales</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales || '—'}</p>
         </div>
         <div className="sm:col-span-3">
-          <span className="text-slate-500">Instrucciones para el terapeuta</span>
+          <span className="font-semibold text-slate-700">Instrucciones para el terapeuta</span>
           <p className="text-slate-700 whitespace-pre-wrap">
             {programa.instrucciones_terapeuta || '—'}
           </p>
         </div>
         <div className="sm:col-span-3">
-          <span className="text-slate-500">Ayudas posibles</span>
+          <span className="font-semibold text-slate-700">Ayudas posibles</span>
           <p className="text-slate-700 whitespace-pre-wrap">
             {programa.ayudas_posibles || '—'}
           </p>
         </div>
         {programa.video_url && (
           <div className="sm:col-span-3">
-            <span className="text-slate-500">Vídeo de ejemplo</span>
+            <span className="font-semibold text-slate-700">Vídeo de ejemplo</span>
             <VideoDiferido url={programa.video_url} />
           </div>
         )}
         {programa.tipo === 'rft' && programa.nivel_rft !== 'relacion_relaciones' && (
           <div className="sm:col-span-3">
-            <span className="text-slate-500">Tipo de relación</span>
+            <span className="font-semibold text-slate-700">Tipo de relación</span>
             <p className="text-slate-700">{programa.tipo_relacion}</p>
           </div>
         )}
         <div>
-          <span className="text-slate-500">Ensayos por bloque</span>
+          <span className="font-semibold text-slate-700">Ensayos por bloque</span>
           <p className="text-slate-700">{programa.ensayos_por_bloque}</p>
         </div>
         <div>
-          <span className="text-slate-500">Criterio de dominio</span>
+          <span className="font-semibold text-slate-700">Criterio de dominio</span>
           <p className="text-slate-700">
             {programa.bloques_para_dominio} bloques al {programa.porcentaje_dominio}%
           </p>

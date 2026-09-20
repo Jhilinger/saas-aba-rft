@@ -52,12 +52,12 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Nombre del programa</label>
+          <label className="text-sm font-semibold text-slate-700">Nombre del programa</label>
           <input name="nombre" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Orden</label>
+          <label className="text-sm font-semibold text-slate-700">Orden</label>
           <input
             name="orden"
             type="number"
@@ -67,7 +67,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Tipo</label>
+          <label className="text-sm font-semibold text-slate-700">Tipo</label>
           <select
             name="tipo"
             required
@@ -83,7 +83,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         {tipo === 'aba_clasico' && (
           <>
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Tipo de registro</label>
+              <label className="text-sm font-semibold text-slate-700">Tipo de registro</label>
               <select
                 name="formato_recogida"
                 value={formatoRecogida}
@@ -100,7 +100,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
 
             {formatoRecogida !== 'ensayo_discreto' && formatoRecogida !== 'abc' && formatoRecogida !== 'analisis_tareas' && (
               <div className="space-y-1">
-                <label className="text-sm text-slate-600">Dirección del objetivo</label>
+                <label className="text-sm font-semibold text-slate-700">Dirección del objetivo</label>
                 <select
                   name="direccion_objetivo"
                   required
@@ -114,7 +114,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
 
             {formatoRecogida === 'analisis_tareas' && (
               <div className="space-y-1">
-                <label className="text-sm text-slate-600">Dirección de la cadena</label>
+                <label className="text-sm font-semibold text-slate-700">Dirección de la cadena</label>
                 <select
                   name="direccion_cadena"
                   required
@@ -132,7 +132,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         {tipo === 'rft' && (
           <>
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Nivel</label>
+              <label className="text-sm font-semibold text-slate-700">Nivel</label>
               <select
                 name="nivel_rft"
                 required
@@ -149,7 +149,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
 
             {nivelRft !== 'relacion_relaciones' && (
               <div className="space-y-1">
-                <label className="text-sm text-slate-600">Tipo de relación</label>
+                <label className="text-sm font-semibold text-slate-700">Tipo de relación</label>
                 <select
                   name="tipo_relacion"
                   required
@@ -170,12 +170,12 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         )}
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Área</label>
+          <label className="text-sm font-semibold text-slate-700">Área</label>
           <input name="area" required placeholder="ej. Lenguaje receptivo" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
         <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Objetivo / habilidad</label>
+          <label className="text-sm font-semibold text-slate-700">Objetivo / habilidad</label>
           <textarea
             name="objetivo"
             rows={2}
@@ -185,7 +185,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         </div>
 
         <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Materiales</label>
+          <label className="text-sm font-semibold text-slate-700">Materiales</label>
           <textarea
             name="materiales"
             rows={2}
@@ -195,12 +195,12 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         </div>
 
         <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Instrucciones para el terapeuta</label>
+          <label className="text-sm font-semibold text-slate-700">Instrucciones para el terapeuta</label>
           <textarea name="instrucciones_terapeuta" rows={3} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
         <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Ayudas posibles</label>
+          <label className="text-sm font-semibold text-slate-700">Ayudas posibles</label>
           <textarea
             name="ayudas_posibles"
             rows={2}
@@ -212,24 +212,24 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         {(tipo !== 'aba_clasico' || formatoRecogida === 'ensayo_discreto') && (
           <>
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Ensayos por bloque</label>
+              <label className="text-sm font-semibold text-slate-700">Ensayos por bloque</label>
               <input name="ensayos_por_bloque" type="number" defaultValue="10" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">Bloques consecutivos para dominio</label>
+              <label className="text-sm font-semibold text-slate-700">Bloques consecutivos para dominio</label>
               <input name="bloques_para_dominio" type="number" defaultValue="3" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm text-slate-600">% de acierto para dominio</label>
+              <label className="text-sm font-semibold text-slate-700">% de acierto para dominio</label>
               <input name="porcentaje_dominio" type="number" step="0.01" defaultValue="90" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
             </div>
           </>
         )}
 
         <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Vídeo de ejemplo (opcional)</label>
+          <label className="text-sm font-semibold text-slate-700">Vídeo de ejemplo (opcional)</label>
           <input
             name="video_url"
             type="url"

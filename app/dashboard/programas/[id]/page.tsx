@@ -66,11 +66,11 @@ export default async function ProgramaAlumnoPage({
       {programa.formato_recogida === 'ensayo_discreto' && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <span className="text-slate-500">Ensayos por bloque</span>
+            <span className="font-semibold text-slate-700">Ensayos por bloque</span>
             <p className="text-slate-700">{programa.ensayos_por_bloque}</p>
           </div>
           <div>
-            <span className="text-slate-500">Criterio de dominio</span>
+            <span className="font-semibold text-slate-700">Criterio de dominio</span>
             <p className="text-slate-700">
               {programa.bloques_para_dominio} bloques al {programa.porcentaje_dominio}%
             </p>
@@ -80,31 +80,31 @@ export default async function ProgramaAlumnoPage({
 
       {programa.objetivo && (
         <div>
-          <span className="text-slate-500">Objetivo / habilidad</span>
+          <span className="font-semibold text-slate-700">Objetivo / habilidad</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo}</p>
         </div>
       )}
       {programa.materiales && (
         <div>
-          <span className="text-slate-500">Materiales</span>
+          <span className="font-semibold text-slate-700">Materiales</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales}</p>
         </div>
       )}
       {programa.instrucciones_terapeuta && (
         <div>
-          <span className="text-slate-500">Instrucciones para el terapeuta</span>
+          <span className="font-semibold text-slate-700">Instrucciones para el terapeuta</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.instrucciones_terapeuta}</p>
         </div>
       )}
       {programa.ayudas_posibles && (
         <div>
-          <span className="text-slate-500">Ayudas posibles</span>
+          <span className="font-semibold text-slate-700">Ayudas posibles</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.ayudas_posibles}</p>
         </div>
       )}
       {programaBase?.video_url && (
         <div>
-          <span className="text-slate-500">Vídeo de ejemplo</span>
+          <span className="font-semibold text-slate-700">Vídeo de ejemplo</span>
           <VideoDiferido url={programaBase.video_url} />
         </div>
       )}
