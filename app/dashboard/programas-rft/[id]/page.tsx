@@ -117,7 +117,7 @@ export default async function ProgramaRftPage({
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, estimulos_rft(id, etiqueta, nombre, posicion, elemento), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, estimulos_rft(id, etiqueta, nombre, posicion), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')

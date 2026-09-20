@@ -11,9 +11,8 @@ import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
-import { calcularPatron, formatearPatron } from '../../patron-rft'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; elemento: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft_base: Estimulo[] }
 
 export default function ClaseRftBaseCard({
@@ -29,11 +28,8 @@ export default function ClaseRftBaseCard({
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
   const maxMiembros = MAX_MIEMBROS_POR_NIVEL[nivel]
   const enElLimite = clase.estimulos_rft_base.length >= maxMiembros
-  const esPatron = nivel === 'relacion_relaciones'
-  const patron = esPatron ? calcularPatron(clase.estimulos_rft_base) : null
 
   const [nombreEstimulo, setNombreEstimulo] = useState('')
-  const [elemento, setElemento] = useState('')
   const [posicion, setPosicion] = useState(posicionesPermitidas[0])
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -50,11 +46,6 @@ export default function ClaseRftBaseCard({
               {clase.grupo}
             </span>
           </h3>
-          {esPatron && patron && patron.length > 0 && (
-            <span className="inline-block mt-1 rounded-full bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700">
-              Patrón: {formatearPatron(patron)}
-            </span>
-          )}
         </div>
         <button
           onClick={async () => {
@@ -99,17 +90,6 @@ export default function ClaseRftBaseCard({
                 </span>
               )}
               {' '}— {e.nombre}
-              {esPatron && (
-                e.elemento ? (
-                  <span className="ml-1 rounded bg-purple-100 px-1.5 py-0.5 text-xs text-purple-700">
-                    elemento {e.elemento}
-                  </span>
-                ) : (
-                  <span className="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-700">
-                    sin elemento
-                  </span>
-                )
-              )}
             </span>
             <button
               onClick={() => {
@@ -143,13 +123,12 @@ export default function ClaseRftBaseCard({
             e.preventDefault()
             if (!nombreEstimulo.trim()) return
             startTransition(async () => {
-              const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, posicion, elemento || undefined)
+              const res = await crearEstimuloRftBase(clase.id, programaBaseId, nombreEstimulo, posicion)
               if (res?.error) {
                 toast(res.error, 'error')
                 return
               }
               setNombreEstimulo('')
-              setElemento('')
               router.refresh()
             })
           }}
@@ -172,14 +151,6 @@ export default function ClaseRftBaseCard({
             placeholder="Nombre del estímulo"
             className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
           />
-          {esPatron && (
-            <input
-              value={elemento}
-              onChange={(e) => setElemento(e.target.value)}
-              placeholder="Elemento (ej. X)"
-              className="w-28 rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-            />
-          )}
           <Button
             type="submit"
             variant="secondary"

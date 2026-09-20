@@ -4,7 +4,6 @@ import { useState } from 'react'
 import EvolucionRftChart from '../../../programas-rft/[id]/evolucion-rft-chart'
 import DistribucionAyudasChart from '../../../distribucion-ayudas-chart'
 import type { DistribucionAyuda } from '../../../ayuda-tipos'
-import { etiquetaCombinacionRft } from '../../../niveles-rft'
 import { Panel } from '../../../../ui'
 
 type Punto = { fecha: string; porcentaje: number }
@@ -82,7 +81,7 @@ export default function EvolucionRftFamilia({
                 className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 rounded-lg bg-slate-50 px-3 py-2 text-sm"
               >
                 <span className="text-slate-600">
-                  {NOMBRES_FASE[d.fase] ?? d.fase}: {etiquetaCombinacionRft(d.posicion_origen, d.posicion_destino)}
+                  {NOMBRES_FASE[d.fase] ?? d.fase}: {d.posicion_origen}→{d.posicion_destino}
                 </span>
                 {d.dominado ? (
                   <span className="self-start sm:self-auto rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 whitespace-nowrap">

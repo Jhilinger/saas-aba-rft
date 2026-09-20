@@ -56,7 +56,7 @@ export default async function ProgramaDetallePage({
 
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
-    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion, elemento)')
+    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion)')
     .eq('programa_base_id', id)
     .order('orden')
 
@@ -163,9 +163,10 @@ export default async function ProgramaDetallePage({
           <h2 className="text-lg font-semibold text-slate-700">Clases (plantilla)</h2>
           {programa.nivel_rft === 'relacion_relaciones' && (
             <p className="text-sm text-slate-500">
-              Cada clase es un grupo de estímulos. Marca con el mismo "elemento" los que sean el mismo
-              dentro de la clase (ej. dos círculos comparten elemento aunque se llamen distinto) — el
-              patrón (cuántos coinciden) se calcula solo, y dos clases combinan cuando tienen el mismo patrón.
+              Cada clase tiene 2 miembros (A y B). Escribe directamente en cada estímulo el contenido
+              de la relación que quieras enseñar o probar (ej. A1 "frío-calor", B1 "guapo-feo") — el
+              sistema no interpreta la relación, así que documenta en las instrucciones del programa
+              qué clases combinan entre sí y por qué.
             </p>
           )}
           <NuevaClaseRftForm programaBaseId={id} />
