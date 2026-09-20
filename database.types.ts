@@ -1038,7 +1038,6 @@ export type Database = {
         Row: {
           clase_id: string
           descripcion: string | null
-          elemento: string | null
           etiqueta: string
           id: string
           nombre: string
@@ -1048,7 +1047,6 @@ export type Database = {
         Insert: {
           clase_id: string
           descripcion?: string | null
-          elemento?: string | null
           etiqueta: string
           id?: string
           nombre: string
@@ -1058,7 +1056,6 @@ export type Database = {
         Update: {
           clase_id?: string
           descripcion?: string | null
-          elemento?: string | null
           etiqueta?: string
           id?: string
           nombre?: string
@@ -1078,7 +1075,6 @@ export type Database = {
       estimulos_rft_base: {
         Row: {
           clase_base_id: string
-          elemento: string | null
           etiqueta: string
           id: string
           nombre: string
@@ -1087,7 +1083,6 @@ export type Database = {
         }
         Insert: {
           clase_base_id: string
-          elemento?: string | null
           etiqueta: string
           id?: string
           nombre: string
@@ -1096,7 +1091,6 @@ export type Database = {
         }
         Update: {
           clase_base_id?: string
-          elemento?: string | null
           etiqueta?: string
           id?: string
           nombre?: string
