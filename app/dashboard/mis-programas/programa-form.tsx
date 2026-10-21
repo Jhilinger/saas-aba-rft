@@ -6,6 +6,8 @@ import { crearPrograma } from '../curriculo/actions'
 import { useRouter } from 'next/navigation'
 import { useToast } from '../../providers/toast-provider'
 import { Button, Panel } from '../../ui'
+import CamposDominio from '../curriculo/campos-dominio'
+import type { EstructuraCurriculo } from '../curriculo/estructura'
 
 function BotonCrear() {
   const { pending } = useFormStatus()
@@ -16,7 +18,7 @@ function BotonCrear() {
   )
 }
 
-export default function ProgramaFormPrivado() {
+export default function ProgramaFormPrivado({ estructura }: { estructura: EstructuraCurriculo }) {
   const [tipo, setTipo] = useState('aba_clasico')
   const router = useRouter()
   const toast = useToast()
@@ -43,15 +45,7 @@ export default function ProgramaFormPrivado() {
           <input name="nombre" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Orden</label>
-          <input
-            name="orden"
-            type="number"
-            placeholder="ej. 1 (opcional)"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
+        <CamposDominio estructura={estructura} conPosicion={false} />
 
         <div className="space-y-1">
           <label className="text-sm font-semibold text-slate-700">Tipo</label>
@@ -86,11 +80,6 @@ export default function ProgramaFormPrivado() {
             </select>
           </div>
         )}
-
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Área</label>
-          <input name="area" required placeholder="ej. Lenguaje receptivo" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-        </div>
 
         <div className="sm:col-span-2 space-y-1">
           <label className="text-sm font-semibold text-slate-700">Objetivo / habilidad</label>

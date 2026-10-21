@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import ProgramaForm from './programa-form'
 import CurriculoTabla from './curriculo-tabla'
 import CurriculoTabs from './curriculo-tabs'
+import { cargarEstructuraCurriculo } from './estructura'
 
 export default async function CurriculoPage() {
   const supabase = await createClient()
@@ -24,8 +25,7 @@ export default async function CurriculoPage() {
 
   let query = supabase
     .from('programas_base')
-    .select('id, nombre, tipo, tipo_relacion, area, activo, orden, clinica_id, visibilidad, creado_por, created_at')
-    .order('created_at', { ascending: false })
+    .select('id, nombre, tipo, tipo_relacion, dominio_id, activo, orden, clinica_id, visibilidad, creado_por')
 
   if (perfil.rol === 'superadmin') {
     query = query.is('clinica_id', null)
@@ -35,7 +35,7 @@ export default async function CurriculoPage() {
     query = query.eq('clinica_id', clinicaId).eq('visibilidad', 'clinica')
   }
 
-  const { data: programas, error } = await query
+  const [{ data: programas, error }, estructura] = await Promise.all([query, cargarEstructuraCurriculo(supabase)])
 
   const titulo = perfil.rol === 'superadmin' ? 'Currículo Base (global)' : 'Currículo de la clínica'
 
@@ -51,11 +51,12 @@ export default async function CurriculoPage() {
         tabla={
           <CurriculoTabla
             programas={programas ?? []}
+            estructura={estructura}
             miPerfilId={perfil.id}
             miRol={perfil.rol}
           />
         }
-        formulario={<ProgramaForm esGlobal={perfil.rol === 'superadmin'} />}
+        formulario={<ProgramaForm esGlobal={perfil.rol === 'superadmin'} estructura={estructura} />}
       />
 
       {error && (

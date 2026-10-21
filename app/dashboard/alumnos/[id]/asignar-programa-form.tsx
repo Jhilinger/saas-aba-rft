@@ -10,7 +10,7 @@ type ProgramaBase = {
   nombre: string
   tipo: string
   area: string
-  orden: number | null
+  codigo: string | null
   clinica_id: string | null
   visibilidad: string
   creado_por: string
@@ -56,7 +56,12 @@ export default function AsignarProgramaForm({
 
   const programasFiltrados = useMemo(() => {
     return listaDeFuente.filter((p) => {
-      if (filtroTexto && !p.nombre.toLowerCase().includes(filtroTexto.toLowerCase())) return false
+      if (
+        filtroTexto &&
+        !p.nombre.toLowerCase().includes(filtroTexto.toLowerCase()) &&
+        !(p.codigo ?? '').startsWith(filtroTexto.trim())
+      )
+        return false
       if (filtroArea && p.area !== filtroArea) return false
       if (filtroTipo && p.tipo !== filtroTipo) return false
       return true
@@ -91,7 +96,7 @@ export default function AsignarProgramaForm({
           <input
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
-            placeholder="Buscar por nombre..."
+            placeholder="Buscar por nombre o código..."
             className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
           <select
@@ -99,7 +104,7 @@ export default function AsignarProgramaForm({
             onChange={(e) => setFiltroArea(e.target.value)}
             className="rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           >
-            <option value="">Todas las áreas</option>
+            <option value="">Todos los dominios</option>
             {areas.map((a) => (
               <option key={a} value={a}>
                 {a}
@@ -134,8 +139,8 @@ export default function AsignarProgramaForm({
             <option value="">Selecciona un programa...</option>
             {programasFiltrados.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.orden !== null ? `#${p.orden} — ` : ''}
-                {p.nombre} ({p.tipo === 'rft' ? 'Relacional' : 'Directo'} · {p.area})
+                {p.codigo ? `${p.codigo} — ` : ''}
+                {p.nombre} ({p.tipo === 'rft' ? 'Relacional' : 'Directo'})
               </option>
             ))}
           </select>

@@ -6,6 +6,8 @@ import { crearPrograma } from './actions'
 import { useRouter } from 'next/navigation'
 import { useToast } from '../../providers/toast-provider'
 import { Button, Panel } from '../../ui'
+import CamposDominio from './campos-dominio'
+import type { EstructuraCurriculo } from './estructura'
 
 function BotonCrear() {
   const { pending } = useFormStatus()
@@ -26,7 +28,7 @@ const FORMATOS_REGISTRO = [
   { value: 'analisis_tareas', label: 'Análisis de tareas (encadenamiento)' },
 ]
 
-export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
+export default function ProgramaForm({ esGlobal, estructura }: { esGlobal: boolean; estructura: EstructuraCurriculo }) {
   const [tipo, setTipo] = useState('aba_clasico')
   const [formatoRecogida, setFormatoRecogida] = useState('ensayo_discreto')
   const [nivelRft, setNivelRft] = useState('combinatorio')
@@ -56,15 +58,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
           <input name="nombre" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Orden</label>
-          <input
-            name="orden"
-            type="number"
-            placeholder="ej. 1 (opcional)"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
+        <CamposDominio estructura={estructura} />
 
         <div className="space-y-1">
           <label className="text-sm font-semibold text-slate-700">Tipo</label>
@@ -132,7 +126,7 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
         {tipo === 'rft' && (
           <>
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Nivel</label>
+              <label className="text-sm font-semibold text-slate-700">Tipo de tarea relacional</label>
               <select
                 name="nivel_rft"
                 required
@@ -168,11 +162,6 @@ export default function ProgramaForm({ esGlobal }: { esGlobal: boolean }) {
             )}
           </>
         )}
-
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Área</label>
-          <input name="area" required placeholder="ej. Lenguaje receptivo" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
-        </div>
 
         <div className="sm:col-span-2 space-y-1">
           <label className="text-sm font-semibold text-slate-700">Objetivo / habilidad</label>

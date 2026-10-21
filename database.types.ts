@@ -856,6 +856,38 @@ export type Database = {
           },
         ]
       }
+      dominios_curriculo: {
+        Row: {
+          codigo: string | null
+          id: string
+          nivel: number
+          nombre: string
+          numero: number
+        }
+        Insert: {
+          codigo?: string | null
+          id?: string
+          nivel: number
+          nombre: string
+          numero: number
+        }
+        Update: {
+          codigo?: string | null
+          id?: string
+          nivel?: number
+          nombre?: string
+          numero?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dominios_curriculo_nivel_fkey"
+            columns: ["nivel"]
+            isOneToOne: false
+            referencedRelation: "niveles_curriculo"
+            referencedColumns: ["numero"]
+          },
+        ]
+      }
       ensayos_aba_detalle: {
         Row: {
           ayuda: Database["public"]["Enums"]["tipo_ayuda"]
@@ -1264,6 +1296,21 @@ export type Database = {
           },
         ]
       }
+      niveles_curriculo: {
+        Row: {
+          nombre: string
+          numero: number
+        }
+        Insert: {
+          nombre: string
+          numero: number
+        }
+        Update: {
+          nombre?: string
+          numero?: number
+        }
+        Relationships: []
+      }
       observaciones_familia: {
         Row: {
           bloque_id: string | null
@@ -1622,6 +1669,7 @@ export type Database = {
           criterio_dominio: string | null
           direccion_cadena: string | null
           direccion_objetivo: string | null
+          dominio_id: string | null
           ensayos_por_bloque: number
           formato_recogida: string
           id: string
@@ -1648,6 +1696,7 @@ export type Database = {
           criterio_dominio?: string | null
           direccion_cadena?: string | null
           direccion_objetivo?: string | null
+          dominio_id?: string | null
           ensayos_por_bloque?: number
           formato_recogida?: string
           id?: string
@@ -1676,6 +1725,7 @@ export type Database = {
           criterio_dominio?: string | null
           direccion_cadena?: string | null
           direccion_objetivo?: string | null
+          dominio_id?: string | null
           ensayos_por_bloque?: number
           formato_recogida?: string
           id?: string
@@ -1706,6 +1756,13 @@ export type Database = {
             columns: ["creado_por"]
             isOneToOne: false
             referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "programas_base_dominio_id_fkey"
+            columns: ["dominio_id"]
+            isOneToOne: false
+            referencedRelation: "dominios_curriculo"
             referencedColumns: ["id"]
           },
         ]
@@ -2040,6 +2097,10 @@ export type Database = {
       auth_rol: {
         Args: never
         Returns: Database["public"]["Enums"]["rol_usuario"]
+      }
+      colocar_programa_curriculo: {
+        Args: { p_dominio_id: string; p_id: string; p_posicion: number }
+        Returns: undefined
       }
     }
     Enums: {

@@ -9,6 +9,7 @@ import ClaseRftBaseCard from './clase-rft-base-card'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
 import { Breadcrumb, Panel } from '../../../ui'
+import { cargarEstructuraCurriculo, crearCodificador } from '../estructura'
 
 export default async function ProgramaDetallePage({
   params,
@@ -34,12 +35,15 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft'
+      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft'
     )
     .eq('id', id)
     .single()
 
   if (!programa) notFound()
+
+  const estructura = await cargarEstructuraCurriculo(supabase)
+  const codigo = crearCodificador(estructura).codigo(programa)
 
   const puedeVer =
     perfil.rol === 'superadmin' ||
@@ -70,11 +74,14 @@ export default async function ProgramaDetallePage({
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
       <div>
         <Breadcrumb items={[{ label: 'Currículo', href: '/dashboard/curriculo' }, { label: programa.nombre }]} />
-        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
+        <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
+          {codigo && <span className="mr-2 font-mono text-indigo-600">{codigo}</span>}
+          {programa.nombre}
+        </h1>
         <p className="text-sm text-slate-500">{programa.area}</p>
       </div>
 
-      <EditarProgramaForm programa={programa} />
+      <EditarProgramaForm programa={programa} estructura={estructura} />
 
       <Panel className="grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-3 sm:p-5">
         <div className="sm:col-span-3">

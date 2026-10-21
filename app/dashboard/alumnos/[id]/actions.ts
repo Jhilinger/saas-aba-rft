@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cargarEstructuraCurriculo, crearCodificador } from '../../curriculo/estructura'
 
 type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 
@@ -16,12 +17,15 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
     const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, formato_recogida, direccion_objetivo, direccion_cadena'
+      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id, formato_recogida, direccion_objetivo, direccion_cadena'
     )
     .eq('id', programaBaseId)
     .single()
 
   if (baseError || !base) return { error: 'Programa base no encontrado' }
+
+  // orden en el alumno = clave global del currículo (nivel, dominio, posición)
+  const ordenGlobal = crearCodificador(await cargarEstructuraCurriculo(supabase)).ordenGlobal(base)
 
   const { data: programaAlumno, error: insertError } = await supabase
     .from('programas_alumno')
@@ -39,7 +43,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string)
       ensayos_por_bloque: base.ensayos_por_bloque,
       bloques_para_dominio: base.bloques_para_dominio,
       porcentaje_dominio: base.porcentaje_dominio,
-      orden: base.orden,
+      orden: ordenGlobal,
       formato_recogida: base.formato_recogida,
       direccion_objetivo: base.direccion_objetivo,
       direccion_cadena: base.direccion_cadena,

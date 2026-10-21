@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import EvaluacionClient from './evaluacion-client'
+import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 
 const VALORACIONES = ['dominado', 'parcial', 'no'] as const
 type Valoracion = (typeof VALORACIONES)[number]
@@ -37,21 +38,29 @@ export default async function ValoracionPage({
 
   const filtroClinica = `clinica_id.is.null,and(clinica_id.eq.${alumno.clinica_id},visibilidad.eq.clinica)`
 
-  const { data: programasAba } = await supabase
-    .from('programas_base')
-    .select('id, nombre, tipo, area, objetivo, orden')
-    .eq('activo', true)
-    .eq('tipo', 'aba_clasico')
-    .or(filtroClinica)
-    .order('orden', { ascending: true, nullsFirst: false })
+  const [{ data: programasBase }, estructura] = await Promise.all([
+    supabase
+      .from('programas_base')
+      .select('id, nombre, tipo, area, objetivo, orden, dominio_id, clinica_id')
+      .eq('activo', true)
+      .or(filtroClinica),
+    cargarEstructuraCurriculo(supabase),
+  ])
 
-  const { data: programasRft } = await supabase
-    .from('programas_base')
-    .select('id, nombre, tipo, area, objetivo, orden')
-    .eq('activo', true)
-    .eq('tipo', 'rft')
-    .or(filtroClinica)
-    .order('orden', { ascending: true, nullsFirst: false })
+  // Se recorren en el orden del currículo (nivel → dominio → posición);
+  // los que no tienen posición quedan fuera de la valoración
+  const codificador = crearCodificador(estructura)
+  const enOrdenCurriculo = (tipo: string) =>
+    (programasBase ?? [])
+      .filter((p) => p.tipo === tipo)
+      .map(({ dominio_id, clinica_id, ...p }) => ({
+        ...p,
+        orden: codificador.ordenGlobal({ dominio_id, clinica_id, orden: p.orden }),
+      }))
+      .filter((p): p is typeof p & { orden: number } => p.orden !== null)
+      .sort((a, b) => a.orden - b.orden)
+  const programasAba = enOrdenCurriculo('aba_clasico')
+  const programasRft = enOrdenCurriculo('rft')
 
   const { data: valoraciones } = await supabase
     .from('evaluaciones_iniciales')
@@ -70,14 +79,14 @@ export default async function ValoracionPage({
       aba={
         <EvaluacionClient
           alumnoId={alumnoId}
-          programas={(programasAba ?? []).filter((p): p is typeof p & { orden: number } => p.orden !== null)}
+          programas={programasAba}
           valoracionesIniciales={valoracionesValidas}
         />
       }
       rft={
         <EvaluacionClient
           alumnoId={alumnoId}
-          programas={(programasRft ?? []).filter((p): p is typeof p & { orden: number } => p.orden !== null)}
+          programas={programasRft}
           valoracionesIniciales={valoracionesValidas}
           rachaLimite={1}
           totalLimite={1}

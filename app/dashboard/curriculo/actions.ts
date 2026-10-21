@@ -71,11 +71,32 @@ function parseVisibilidad(value: FormDataEntryValue | null): Enums<'visibilidad_
     : 'clinica'
 }
 
-function parseOrden(formData: FormData): number | null {
-  const raw = formData.get('orden') as string
+// Posición dentro del dominio (1-based). Vacío = al final del dominio.
+function parsePosicion(formData: FormData): number | null {
+  const raw = formData.get('posicion') as string
   if (!raw || raw.trim() === '') return null
   const n = parseInt(raw, 10)
   return Number.isNaN(n) ? null : n
+}
+
+function parseDominio(formData: FormData): string | null {
+  const raw = formData.get('dominio_id')
+  return typeof raw === 'string' && raw.trim() !== '' ? raw : null
+}
+
+// Coloca el programa en su dominio/posición (renumera el resto del dominio)
+async function colocarEnCurriculo(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  id: string,
+  dominioId: string | null,
+  posicion: number | null
+) {
+  const { error } = await supabase.rpc('colocar_programa_curriculo', {
+    p_id: id,
+    p_dominio_id: dominioId,
+    p_posicion: posicion,
+  } as unknown as { p_id: string; p_dominio_id: string; p_posicion: number })
+  return error
 }
 
 export async function crearPrograma(formData: FormData) {
@@ -95,7 +116,9 @@ export async function crearPrograma(formData: FormData) {
   const esGlobal = perfil.rol === 'superadmin'
   const tipo = parseTipoPrograma(formData.get('tipo'))
   if (!tipo) return { error: 'Tipo de programa no válido' }
-  const orden = parseOrden(formData)
+  const dominioId = parseDominio(formData)
+  if (!dominioId) return { error: 'Elige el dominio del programa' }
+  const posicion = parsePosicion(formData)
   const visibilidad = esGlobal ? 'clinica' : parseVisibilidad(formData.get('visibilidad'))
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
@@ -109,7 +132,8 @@ export async function crearPrograma(formData: FormData) {
       tipo,
       tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
       nivel_rft: nivelRft,
-      area: formData.get('area') as string,
+      dominio_id: dominioId,
+      area: '', // lo rellena el trigger a partir del dominio
       objetivo: formData.get('objetivo') as string,
       materiales: formData.get('materiales') as string,
       instrucciones_terapeuta: formData.get('instrucciones_terapeuta') as string,
@@ -130,21 +154,35 @@ export async function crearPrograma(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  if (orden !== null && data) {
-    // p_orden_anterior debe ir null (no 0): un programa recién creado nunca
-    // tuvo un orden previo, y la función SQL solo entra en la rama de
-    // "insertar y hacer hueco" cuando ve null — con 0 entra en la rama de
-    // "mover", que resta 1 a los que ya estaban entre 1 y el nuevo orden.
-    const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
-      p_id: data.id,
-      p_nuevo_orden: orden,
-      p_orden_anterior: null,
-    } as unknown as { p_id: string; p_nuevo_orden: number; p_orden_anterior: number })
+  // Los privados no tienen posición en el currículo (solo dominio)
+  if (visibilidad === 'clinica') {
+    const rpcError = await colocarEnCurriculo(supabase, data.id, dominioId, posicion)
     if (rpcError) return { error: rpcError.message }
   }
 
   revalidatePath('/dashboard/curriculo')
   return { success: true, id: data.id }
+}
+
+// Sube (-1) o baja (+1) un programa una posición dentro de su dominio
+export async function moverPrograma(id: string, direccion: -1 | 1) {
+  const supabase = await createClient()
+  const { data: programa } = await supabase
+    .from('programas_base')
+    .select('dominio_id, orden')
+    .eq('id', id)
+    .single()
+
+  if (!programa?.dominio_id || programa.orden === null) return { error: 'Este programa no tiene posición en el currículo' }
+
+  const nuevaPosicion = programa.orden + direccion
+  if (nuevaPosicion < 1) return { success: true }
+
+  const rpcError = await colocarEnCurriculo(supabase, id, programa.dominio_id, nuevaPosicion)
+  if (rpcError) return { error: rpcError.message }
+
+  revalidatePath('/dashboard/curriculo')
+  return { success: true }
 }
 
 export async function eliminarPrograma(id: string) {
@@ -216,16 +254,18 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   const tipo = parseTipoPrograma(formData.get('tipo'))
   if (!tipo) return { error: 'Tipo de programa no válido' }
-  const nuevoOrden = parseOrden(formData)
+  const dominioId = parseDominio(formData)
+  if (!dominioId) return { error: 'Elige el dominio del programa' }
+  const posicion = parsePosicion(formData)
   const visibilidadForm = formData.get('visibilidad') as string | null
 
   const { data: programaActual } = await supabase
     .from('programas_base')
-    .select('orden, clinica_id')
+    .select('orden, clinica_id, dominio_id, visibilidad')
     .eq('id', id)
     .single()
 
-  const ordenAnterior = programaActual?.orden ?? null
+  if (!programaActual) return { error: 'Programa no encontrado' }
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
   const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
@@ -233,7 +273,6 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   const updateData: {
     nombre: string
-    area: string
     objetivo: string
     materiales: string
     instrucciones_terapeuta: string
@@ -250,7 +289,6 @@ export async function editarPrograma(id: string, formData: FormData) {
     visibilidad?: Enums<'visibilidad_programa'>
   } = {
     nombre: formData.get('nombre') as string,
-    area: formData.get('area') as string,
     objetivo: formData.get('objetivo') as string,
     materiales: formData.get('materiales') as string,
     instrucciones_terapeuta: formData.get('instrucciones_terapeuta') as string,
@@ -267,7 +305,7 @@ export async function editarPrograma(id: string, formData: FormData) {
   }
 
   // La visibilidad solo tiene sentido en programas propios de una clínica
-  if (programaActual?.clinica_id && visibilidadForm) {
+  if (programaActual.clinica_id && visibilidadForm) {
     updateData.visibilidad = parseVisibilidad(visibilidadForm)
   }
 
@@ -278,16 +316,13 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   if (error) return { error: error.message }
 
-  if (nuevoOrden !== ordenAnterior) {
-    // Igual que en crearPrograma: null hay que dejarlo tal cual, no
-    // convertirlo en 0 — si no, "quitar el orden" (nuevoOrden null) se trata
-    // como "mover a la posición 0" y el programa se queda con orden = 0 en
-    // vez de sin orden.
-    const { error: rpcError } = await supabase.rpc('asignar_orden_curriculo', {
-      p_id: id,
-      p_nuevo_orden: nuevoOrden,
-      p_orden_anterior: ordenAnterior,
-    } as unknown as { p_id: string; p_nuevo_orden: number; p_orden_anterior: number })
+  const cambiaDominio = dominioId !== programaActual.dominio_id
+  const cambiaPosicion = posicion !== null && posicion !== programaActual.orden
+  const cambiaVisibilidad = updateData.visibilidad !== undefined && updateData.visibilidad !== programaActual.visibilidad
+  if (cambiaDominio || cambiaPosicion || cambiaVisibilidad) {
+    // Si cambia de dominio sin posición indicada, va al final del nuevo dominio
+    const destino = posicion ?? (cambiaDominio ? null : programaActual.orden)
+    const rpcError = await colocarEnCurriculo(supabase, id, dominioId, destino)
     if (rpcError) return { error: rpcError.message }
   }
 
@@ -328,6 +363,7 @@ export async function clonarPrograma(id: string) {
       direccion_objetivo: original.direccion_objetivo,
       direccion_cadena: original.direccion_cadena,
       orden: null,
+      dominio_id: original.dominio_id,
       clinica_id: original.clinica_id,
       visibilidad: original.visibilidad,
       creado_por: user.id,
@@ -338,6 +374,12 @@ export async function clonarPrograma(id: string) {
 
   if (insertError || !nuevo) {
     return { error: insertError?.message ?? 'Error clonando el programa' }
+  }
+
+  // La copia queda justo detrás del original en su dominio
+  if (original.dominio_id && original.orden !== null) {
+    const rpcError = await colocarEnCurriculo(supabase, nuevo.id, original.dominio_id, original.orden + 1)
+    if (rpcError) return { error: rpcError.message }
   }
 
    if (original.tipo === 'aba_clasico') {

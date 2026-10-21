@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 
 export async function guardarValoracion(
   alumnoId: string,
@@ -78,12 +79,13 @@ export async function importarNoDominados(alumnoId: string) {
 
   let importados = 0
   const errores: string[] = []
+  const codificador = crearCodificador(await cargarEstructuraCurriculo(supabase))
 
   for (const v of pendientes) {
     const { data: base } = await supabase
       .from('programas_base')
       .select(
-        'nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden'
+        'nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id'
       )
       .eq('id', v.programa_base_id)
       .single()
@@ -106,7 +108,7 @@ export async function importarNoDominados(alumnoId: string) {
         ensayos_por_bloque: base.ensayos_por_bloque,
         bloques_para_dominio: base.bloques_para_dominio,
         porcentaje_dominio: base.porcentaje_dominio,
-        orden: base.orden,
+        orden: codificador.ordenGlobal(base),
       })
       .select('id')
       .single()

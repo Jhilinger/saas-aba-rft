@@ -5,12 +5,16 @@ import { useRouter } from 'next/navigation'
 import { editarPrograma } from '../actions'
 import { useToast } from '../../../providers/toast-provider'
 import { Button } from '../../../ui'
+import CamposDominio from '../campos-dominio'
+import type { EstructuraCurriculo } from '../estructura'
 
 type Programa = {
   id: string
   nombre: string
   tipo: string
-  area: string
+  dominio_id: string | null
+  clinica_id: string | null
+  visibilidad: string
   objetivo: string | null
   materiales: string | null
   instrucciones_terapeuta: string | null
@@ -37,7 +41,13 @@ const FORMATOS_REGISTRO = [
   { value: 'analisis_tareas', label: 'Análisis de tareas (encadenamiento)' },
 ]
 
-export default function EditarProgramaForm({ programa }: { programa: Programa }) {
+export default function EditarProgramaForm({
+  programa,
+  estructura,
+}: {
+  programa: Programa
+  estructura: EstructuraCurriculo
+}) {
   const [editando, setEditando] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [formatoRecogida, setFormatoRecogida] = useState(programa.formato_recogida)
@@ -88,25 +98,12 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
         </div>
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Orden</label>
-          <input
-            name="orden"
-            type="number"
-            defaultValue={programa.orden ?? ''}
-            placeholder="ej. 1 (opcional)"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Área</label>
-          <input
-            name="area"
-            defaultValue={programa.area}
-            required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
+        <CamposDominio
+          estructura={estructura}
+          dominioId={programa.dominio_id}
+          posicion={programa.orden}
+          conPosicion={programa.clinica_id === null || programa.visibilidad === 'clinica'}
+        />
 
         {programa.tipo === 'aba_clasico' && (
           <>
@@ -161,7 +158,7 @@ export default function EditarProgramaForm({ programa }: { programa: Programa })
         {programa.tipo === 'rft' && (
           <>
             <div className="space-y-1">
-              <label className="text-sm font-semibold text-slate-700">Nivel</label>
+              <label className="text-sm font-semibold text-slate-700">Tipo de tarea relacional</label>
               <select
                 name="nivel_rft"
                 value={nivelRft}

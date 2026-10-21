@@ -10,7 +10,7 @@ type Programa = {
   tipo: string
   estado: string
   fecha_inicio: string
-  orden: number | null
+  codigo: string | null
 }
 
 const POR_PAGINA = 10
@@ -50,7 +50,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
         <table className="w-full text-sm min-w-[550px]">
           <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
             <tr>
-              <th className="p-3">Orden</th>
+              <th className="p-3">Código</th>
               <th className="p-3">Programa</th>
               <th className="p-3">Tipo</th>
               <th className="p-3">Estado</th>
@@ -60,7 +60,7 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
           <tbody>
             {paginados.map((p) => (
               <tr key={p.id} className={`border-b border-slate-100 last:border-0 ${p.estado === 'pausado' ? 'opacity-50' : ''}`}>
-                <td className="p-3 text-slate-500">{p.orden ?? '—'}</td>
+                <td className="p-3 font-mono text-xs text-slate-500 whitespace-nowrap">{p.codigo ?? '—'}</td>
                 <td className="p-3 font-medium text-slate-800">
                   {p.tipo === 'aba_clasico' ? (
                     <Link href={`/dashboard/programas/${p.id}`} className="hover:underline">
