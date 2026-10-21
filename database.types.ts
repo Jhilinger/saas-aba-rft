@@ -2089,10 +2089,6 @@ export type Database = {
         Args: { p_alumno_id: string }
         Returns: boolean
       }
-      asignar_orden_curriculo: {
-        Args: { p_id: string; p_nuevo_orden: number; p_orden_anterior: number }
-        Returns: undefined
-      }
       auth_clinica_id: { Args: never; Returns: string }
       auth_rol: {
         Args: never
