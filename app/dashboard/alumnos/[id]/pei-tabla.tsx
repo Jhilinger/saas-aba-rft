@@ -82,24 +82,16 @@ export default function PeiTabla({ programas, niveles }: { programas: Programa[]
   }, [visibles])
   const complementarios = visibles.filter((p) => !p.dominioId)
 
-  const resumen = Object.entries(ESTADOS)
-    .map(([clave, { label }]) => ({ label, n: visibles.filter((p) => p.estado === clave).length }))
-    .filter((r) => r.n > 0)
-
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-        <p>
-          {visibles.length} programa{visibles.length === 1 ? '' : 's'}
-          {resumen.length > 0 && ': ' + resumen.map((r) => `${r.n} ${r.label.toLowerCase()}`).join(' · ')}
-        </p>
-        {numPausados > 0 && (
+      {numPausados > 0 && (
+        <div className="flex justify-end text-sm text-slate-600">
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={mostrarPausados} onChange={(e) => setMostrarPausados(e.target.checked)} />
             Mostrar pausados ({numPausados})
           </label>
-        )}
-      </div>
+        </div>
+      )}
 
       {niveles.map((n) => {
         const dominios = n.dominios.filter((d) => porDominio.has(d.id))
