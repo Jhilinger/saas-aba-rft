@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { editarPrograma } from '../actions'
 import { useToast } from '../../../providers/toast-provider'
 import { Button } from '../../../ui'
-import CamposDominio from '../campos-dominio'
+import CamposDominio, { CampoArea } from '../campos-dominio'
 import type { EstructuraCurriculo } from '../estructura'
 
 type Programa = {
@@ -14,7 +14,7 @@ type Programa = {
   tipo: string
   dominio_id: string | null
   clinica_id: string | null
-  visibilidad: string
+  area: string
   objetivo: string | null
   materiales: string | null
   instrucciones_terapeuta: string | null
@@ -98,12 +98,11 @@ export default function EditarProgramaForm({
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
         </div>
-        <CamposDominio
-          estructura={estructura}
-          dominioId={programa.dominio_id}
-          posicion={programa.orden}
-          conPosicion={programa.clinica_id === null || programa.visibilidad === 'clinica'}
-        />
+        {programa.clinica_id === null ? (
+          <CamposDominio estructura={estructura} dominioId={programa.dominio_id} posicion={programa.orden} />
+        ) : (
+          <CampoArea area={programa.area} />
+        )}
 
         {programa.tipo === 'aba_clasico' && (
           <>

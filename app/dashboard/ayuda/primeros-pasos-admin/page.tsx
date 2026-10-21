@@ -46,16 +46,19 @@ export default function PrimerosPasosAdminPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Configura el currículo de tu clínica</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Añade programas complementarios si los necesitas</h2>
           <p>
-            Ve a <Link href="/dashboard/curriculo" className="text-indigo-600 hover:underline">Currículo clínica</Link>.
-            Ahí puedes clonar programas del Currículo Base (la biblioteca compartida de programas
-            ABA y RFT) y adaptarlos a tu forma de trabajar, o crear programas completamente nuevos
-            desde cero.
+            Todos los alumnos trabajan con el Currículo Base, organizado por niveles y dominios. Al asignar
+            un programa a un alumno, el terapeuta puede adaptar sus estímulos y materiales a ese niño. Si
+            tu equipo necesita trabajar algo que no está en el currículo (autonomía, conducta, habilidades
+            concretas…), créalo en{' '}
+            <Link href="/dashboard/curriculo" className="text-indigo-600 hover:underline">Programas de la clínica</Link>.
+            Estos programas complementarios no cuentan en los porcentajes de progreso ni bloquean la secuencia
+            del PEI.
           </p>
           <p className="mt-2">
-            No hace falta que tengas todo el currículo listo antes de empezar — puedes ir
-            añadiendo programas sobre la marcha, a medida que los necesites para cada alumno.
+            No hace falta crear ninguno para empezar: puedes añadirlos sobre la marcha, a medida
+            que los necesites para algún alumno.
           </p>
                </section>
 

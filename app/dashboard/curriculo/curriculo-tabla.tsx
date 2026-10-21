@@ -9,7 +9,7 @@ import { crearCodificador, type EstructuraCurriculo } from './estructura'
 import { useToast } from '../../providers/toast-provider'
 import { Panel } from '../../ui'
 
-type Programa = {
+export type Programa = {
   id: string
   nombre: string
   tipo: string
@@ -24,7 +24,7 @@ type Programa = {
 
 const SIN_DOMINIO = 'sin-dominio'
 
-function origenBadge(p: Programa) {
+export function origenBadge(p: Programa) {
   if (p.clinica_id === null) {
     return (
       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 whitespace-nowrap">
@@ -46,7 +46,7 @@ function origenBadge(p: Programa) {
   )
 }
 
-function tipoBadge(p: Programa) {
+export function tipoBadge(p: Programa) {
   return (
     <span
       className={`rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${

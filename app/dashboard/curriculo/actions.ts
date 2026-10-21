@@ -84,6 +84,12 @@ function parseDominio(formData: FormData): string | null {
   return typeof raw === 'string' && raw.trim() !== '' ? raw : null
 }
 
+// Área de texto libre de los programas complementarios (los del currículo
+// la reciben del dominio, por trigger)
+function parseArea(formData: FormData): string {
+  return ((formData.get('area') as string) ?? '').trim()
+}
+
 // Coloca el programa en su dominio/posición (renumera el resto del dominio)
 async function colocarEnCurriculo(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -113,11 +119,15 @@ export async function crearPrograma(formData: FormData) {
 
   if (!perfil) return { error: 'Perfil no encontrado' }
 
+  // Global (superadmin) = currículo, con dominio; clínica/terapeuta =
+  // complementario, sin dominio y con área libre
   const esGlobal = perfil.rol === 'superadmin'
   const tipo = parseTipoPrograma(formData.get('tipo'))
   if (!tipo) return { error: 'Tipo de programa no válido' }
-  const dominioId = parseDominio(formData)
-  if (!dominioId) return { error: 'Elige el dominio del programa' }
+  const dominioId = esGlobal ? parseDominio(formData) : null
+  if (esGlobal && !dominioId) return { error: 'Elige el dominio del programa' }
+  const area = parseArea(formData)
+  if (!esGlobal && !area) return { error: 'Indica el área del programa' }
   const posicion = parsePosicion(formData)
   const visibilidad = esGlobal ? 'clinica' : parseVisibilidad(formData.get('visibilidad'))
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
@@ -133,7 +143,7 @@ export async function crearPrograma(formData: FormData) {
       tipo_relacion: tipo === 'rft' ? parseTipoRelacion(formData.get('tipo_relacion')) : null,
       nivel_rft: nivelRft,
       dominio_id: dominioId,
-      area: '', // lo rellena el trigger a partir del dominio
+      area, // en los del currículo lo sobrescribe el trigger a partir del dominio
       objetivo: formData.get('objetivo') as string,
       materiales: formData.get('materiales') as string,
       instrucciones_terapeuta: formData.get('instrucciones_terapeuta') as string,
@@ -154,8 +164,7 @@ export async function crearPrograma(formData: FormData) {
 
   if (error) return { error: error.message }
 
-  // Los privados no tienen posición en el currículo (solo dominio)
-  if (visibilidad === 'clinica') {
+  if (dominioId) {
     const rpcError = await colocarEnCurriculo(supabase, data.id, dominioId, posicion)
     if (rpcError) return { error: rpcError.message }
   }
@@ -254,18 +263,23 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   const tipo = parseTipoPrograma(formData.get('tipo'))
   if (!tipo) return { error: 'Tipo de programa no válido' }
-  const dominioId = parseDominio(formData)
-  if (!dominioId) return { error: 'Elige el dominio del programa' }
   const posicion = parsePosicion(formData)
   const visibilidadForm = formData.get('visibilidad') as string | null
 
   const { data: programaActual } = await supabase
     .from('programas_base')
-    .select('orden, clinica_id, dominio_id, visibilidad')
+    .select('orden, clinica_id, dominio_id')
     .eq('id', id)
     .single()
 
   if (!programaActual) return { error: 'Programa no encontrado' }
+
+  // Del currículo (global): dominio + posición. Complementario: área libre.
+  const esDelCurriculo = programaActual.clinica_id === null
+  const dominioId = esDelCurriculo ? parseDominio(formData) : null
+  if (esDelCurriculo && !dominioId) return { error: 'Elige el dominio del programa' }
+  const area = parseArea(formData)
+  if (!esDelCurriculo && !area) return { error: 'Indica el área del programa' }
   const formatoRecogida = parseFormatoRecogida(tipo, formData.get('formato_recogida'))
   const direccionObjetivo = parseDireccionObjetivo(formatoRecogida, formData.get('direccion_objetivo'))
   const direccionCadena = parseDireccionCadena(formatoRecogida, formData.get('direccion_cadena'))
@@ -287,6 +301,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     direccion_objetivo: string | null
     direccion_cadena: string | null
     visibilidad?: Enums<'visibilidad_programa'>
+    area?: string
   } = {
     nombre: formData.get('nombre') as string,
     objetivo: formData.get('objetivo') as string,
@@ -304,9 +319,10 @@ export async function editarPrograma(id: string, formData: FormData) {
     direccion_cadena: direccionCadena,
   }
 
-  // La visibilidad solo tiene sentido en programas propios de una clínica
-  if (programaActual.clinica_id && visibilidadForm) {
-    updateData.visibilidad = parseVisibilidad(visibilidadForm)
+  // La visibilidad y el área libre solo existen en los complementarios
+  if (!esDelCurriculo) {
+    updateData.area = area
+    if (visibilidadForm) updateData.visibilidad = parseVisibilidad(visibilidadForm)
   }
 
   const { error } = await supabase
@@ -318,8 +334,7 @@ export async function editarPrograma(id: string, formData: FormData) {
 
   const cambiaDominio = dominioId !== programaActual.dominio_id
   const cambiaPosicion = posicion !== null && posicion !== programaActual.orden
-  const cambiaVisibilidad = updateData.visibilidad !== undefined && updateData.visibilidad !== programaActual.visibilidad
-  if (cambiaDominio || cambiaPosicion || cambiaVisibilidad) {
+  if (dominioId && (cambiaDominio || cambiaPosicion)) {
     // Si cambia de dominio sin posición indicada, va al final del nuevo dominio
     const destino = posicion ?? (cambiaDominio ? null : programaActual.orden)
     const rpcError = await colocarEnCurriculo(supabase, id, dominioId, destino)

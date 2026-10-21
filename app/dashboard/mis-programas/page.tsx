@@ -1,9 +1,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import ProgramaFormPrivado from './programa-form'
-import CurriculoTabla from '../curriculo/curriculo-tabla'
+import ComplementariosTabla from '../curriculo/complementarios-tabla'
 import CurriculoTabs from '../curriculo/curriculo-tabs'
-import { cargarEstructuraCurriculo } from '../curriculo/estructura'
 
 export default async function MisProgramasPage() {
   const supabase = await createClient()
@@ -21,14 +20,11 @@ export default async function MisProgramasPage() {
     redirect('/dashboard')
   }
 
-  const [{ data: programas, error }, estructura] = await Promise.all([
-    supabase
-      .from('programas_base')
-      .select('id, nombre, tipo, tipo_relacion, dominio_id, activo, orden, clinica_id, visibilidad, creado_por')
-      .eq('creado_por', perfil.id)
-      .eq('visibilidad', 'privado'),
-    cargarEstructuraCurriculo(supabase),
-  ])
+  const { data: programas, error } = await supabase
+    .from('programas_base')
+    .select('id, nombre, tipo, tipo_relacion, area, dominio_id, activo, orden, clinica_id, visibilidad, creado_por')
+    .eq('creado_por', perfil.id)
+    .eq('visibilidad', 'privado')
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
@@ -37,19 +33,14 @@ export default async function MisProgramasPage() {
         <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Mis programas</h1>
       </div>
       <p className="-mt-3 text-sm text-slate-500">
-        Tu espacio privado de programas — solo tú los ves y los usas, aunque puedas asignarlos a cualquier alumno.
+        Tus programas complementarios privados: solo tú los ves y los usas, aunque puedas asignarlos a cualquier
+        alumno. No forman parte del currículo, así que no cuentan en los porcentajes de progreso ni bloquean la
+        secuencia del PEI.
       </p>
 
       <CurriculoTabs
-        tabla={
-          <CurriculoTabla
-            programas={programas ?? []}
-            estructura={estructura}
-            miPerfilId={perfil.id}
-            miRol={perfil.rol}
-          />
-        }
-        formulario={<ProgramaFormPrivado estructura={estructura} />}
+        tabla={<ComplementariosTabla programas={programas ?? []} miPerfilId={perfil.id} miRol={perfil.rol} />}
+        formulario={<ProgramaFormPrivado />}
       />
 
       {error && (

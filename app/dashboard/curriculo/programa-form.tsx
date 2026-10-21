@@ -6,7 +6,7 @@ import { crearPrograma } from './actions'
 import { useRouter } from 'next/navigation'
 import { useToast } from '../../providers/toast-provider'
 import { Button, Panel } from '../../ui'
-import CamposDominio from './campos-dominio'
+import CamposDominio, { CampoArea } from './campos-dominio'
 import type { EstructuraCurriculo } from './estructura'
 
 function BotonCrear() {
@@ -49,8 +49,14 @@ export default function ProgramaForm({ esGlobal, estructura }: { esGlobal: boole
       className="space-y-4 p-4 sm:p-6"
     >
       <h2 className="font-semibold text-slate-700">
-        Nuevo programa {esGlobal ? '(global, para todas las clínicas)' : '(compartido con toda tu clínica)'}
+        {esGlobal ? 'Nuevo programa del currículo (global, para todas las clínicas)' : 'Nuevo programa complementario (compartido con toda tu clínica)'}
       </h2>
+      {!esGlobal && (
+        <p className="-mt-2 text-sm text-slate-500">
+          Los programas complementarios no forman parte del currículo: no tienen nivel ni dominio, no cuentan en
+          los porcentajes de progreso y no bloquean la secuencia del PEI.
+        </p>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
@@ -58,7 +64,7 @@ export default function ProgramaForm({ esGlobal, estructura }: { esGlobal: boole
           <input name="nombre" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
-        <CamposDominio estructura={estructura} />
+        {esGlobal ? <CamposDominio estructura={estructura} /> : <CampoArea />}
 
         <div className="space-y-1">
           <label className="text-sm font-semibold text-slate-700">Tipo</label>

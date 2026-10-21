@@ -1,21 +1,36 @@
 import type { EstructuraCurriculo } from './estructura'
 
+// Programas complementarios (de clínica o de un terapeuta): no tienen dominio,
+// solo un área libre para agruparlos (ej. Autonomía, Conducta)
+export function CampoArea({ area }: { area?: string }) {
+  return (
+    <div className="space-y-1">
+      <label className="text-sm font-semibold text-slate-700">Área</label>
+      <input
+        name="area"
+        required
+        defaultValue={area ?? ''}
+        placeholder="ej. Autonomía, Conducta, Habilidades sociales"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+      />
+    </div>
+  )
+}
+
 // Selector de dominio (agrupado por nivel) + posición dentro del dominio.
-// Los programas privados no tienen posición, así que se puede ocultar.
+// Solo para programas del currículo (globales).
 export default function CamposDominio({
   estructura,
   dominioId,
   posicion,
-  conPosicion = true,
 }: {
   estructura: EstructuraCurriculo
   dominioId?: string | null
   posicion?: number | null
-  conPosicion?: boolean
 }) {
   return (
     <>
-      <div className={`space-y-1 ${conPosicion ? '' : 'sm:col-span-2'}`}>
+      <div className="space-y-1">
         <label className="text-sm font-semibold text-slate-700">Dominio</label>
         <select
           name="dominio_id"
@@ -40,19 +55,17 @@ export default function CamposDominio({
         </select>
       </div>
 
-      {conPosicion && (
-        <div className="space-y-1">
-          <label className="text-sm font-semibold text-slate-700">Posición en el dominio</label>
-          <input
-            name="posicion"
-            type="number"
-            min={1}
-            defaultValue={posicion ?? ''}
-            placeholder="vacío = al final"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        </div>
-      )}
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-slate-700">Posición en el dominio</label>
+        <input
+          name="posicion"
+          type="number"
+          min={1}
+          defaultValue={posicion ?? ''}
+          placeholder="vacío = al final"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+        />
+      </div>
     </>
   )
 }

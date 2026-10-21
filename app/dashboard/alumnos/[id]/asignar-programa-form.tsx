@@ -22,7 +22,7 @@ type Fuente = 'base' | 'clinica' | 'mios'
 
 const FUENTES: { key: Fuente; label: string }[] = [
   { key: 'base', label: 'Currículo base' },
-  { key: 'clinica', label: 'Currículo clínica' },
+  { key: 'clinica', label: 'Programas de la clínica' },
   { key: 'mios', label: 'Mis programas' },
 ]
 
@@ -212,7 +212,7 @@ export default function AsignarProgramaForm({
         {listaDeFuente.length === 0 && (
           <p className="text-sm text-slate-500">
             {fuente === 'base' && 'No hay programas en el currículo global todavía.'}
-            {fuente === 'clinica' && 'Tu clínica todavía no tiene programas compartidos. Créalos desde "Currículo clínica".'}
+            {fuente === 'clinica' && 'Tu clínica todavía no tiene programas compartidos. Créalos desde "Programas de la clínica".'}
             {fuente === 'mios' && 'Todavía no has creado ningún programa propio. Créalos desde "Mis programas".'}
           </p>
         )}

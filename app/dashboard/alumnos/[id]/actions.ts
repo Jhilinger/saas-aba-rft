@@ -8,7 +8,7 @@ import { cargarProgresoAlumno } from './progreso/cargar-progreso'
 
 type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 
-// Importa un programa (de Currículo base, Currículo clínica o Mis programas
+// Importa un programa (del Currículo base, Programas de la clínica o Mis programas
 // — los 3 viven en la misma tabla programas_base): copia sus conjuntos y
 // estímulos (solo aplica de verdad a ABA; en RFT solo se copian los metadatos)
 // Si el dominio del programa está bloqueado por la secuencia del currículo,

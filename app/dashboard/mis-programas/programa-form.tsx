@@ -6,8 +6,7 @@ import { crearPrograma } from '../curriculo/actions'
 import { useRouter } from 'next/navigation'
 import { useToast } from '../../providers/toast-provider'
 import { Button, Panel } from '../../ui'
-import CamposDominio from '../curriculo/campos-dominio'
-import type { EstructuraCurriculo } from '../curriculo/estructura'
+import { CampoArea } from '../curriculo/campos-dominio'
 
 function BotonCrear() {
   const { pending } = useFormStatus()
@@ -18,7 +17,7 @@ function BotonCrear() {
   )
 }
 
-export default function ProgramaFormPrivado({ estructura }: { estructura: EstructuraCurriculo }) {
+export default function ProgramaFormPrivado() {
   const [tipo, setTipo] = useState('aba_clasico')
   const router = useRouter()
   const toast = useToast()
@@ -37,7 +36,11 @@ export default function ProgramaFormPrivado({ estructura }: { estructura: Estruc
       }}
       className="space-y-4 p-4 sm:p-6"
     >
-      <h2 className="font-semibold text-slate-700">Nuevo programa (privado, solo para ti)</h2>
+      <h2 className="font-semibold text-slate-700">Nuevo programa complementario (privado, solo para ti)</h2>
+      <p className="-mt-2 text-sm text-slate-500">
+        Los programas complementarios no forman parte del currículo: no tienen nivel ni dominio, no cuentan en los
+        porcentajes de progreso y no bloquean la secuencia del PEI.
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
@@ -45,7 +48,7 @@ export default function ProgramaFormPrivado({ estructura }: { estructura: Estruc
           <input name="nombre" required className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm" />
         </div>
 
-        <CamposDominio estructura={estructura} conPosicion={false} />
+        <CampoArea />
 
         <div className="space-y-1">
           <label className="text-sm font-semibold text-slate-700">Tipo</label>

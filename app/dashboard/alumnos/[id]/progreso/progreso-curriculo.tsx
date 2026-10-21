@@ -214,8 +214,8 @@ export default function ProgresoCurriculo({
 
       {fueraDelCurriculo.length > 0 && (
         <Panel className="p-4 sm:p-5">
-          <h3 className="font-semibold text-slate-800">Otros programas</h3>
-          <p className="text-xs text-slate-500">Programas que no forman parte de ningún dominio del currículo. No cuentan en los porcentajes.</p>
+          <h3 className="font-semibold text-slate-800">Programas complementarios</h3>
+          <p className="text-xs text-slate-500">Programas fuera del currículo. No cuentan en los porcentajes.</p>
           <ul className="mt-2 divide-y divide-slate-100">
             {fueraDelCurriculo.map((p) => (
               <FilaPrograma key={p.id} p={p} />
