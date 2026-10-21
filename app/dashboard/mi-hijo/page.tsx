@@ -32,7 +32,7 @@ export default async function ProgresoFamiliaPage() {
 
   const secciones = await Promise.all(
     alumnos.map(async (alumno) => {
-      const [{ data: curriculo }, { data: importados }] = await Promise.all([
+      const [{ data: curriculo }, { data: importados }, { data: dominadosValoracion }] = await Promise.all([
         supabase
           .from('programas_base')
           .select('id, nombre, tipo, dominio_id, orden, clinica_id')
@@ -43,15 +43,18 @@ export default async function ProgresoFamiliaPage() {
           .select('id, programa_base_id, estado, nombre, tipo, formato_recogida, visible_familia, programas_base(id, nombre, tipo, dominio_id, orden, clinica_id, activo)')
           .eq('alumno_id', alumno.id)
           .in('tipo', ['aba_clasico', 'rft']),
+        // Solo los ids dominados en la valoración inicial (sin notas), para
+        // que los porcentajes coincidan con los del terapeuta
+        supabase.rpc('programas_dominados_valoracion', { p_alumno_id: alumno.id }),
       ])
 
-      // Las familias no ven la valoración inicial: el estado sale solo del PEI.
       // Fuera del currículo se respeta "visible para la familia" cuando el
       // formato no es ensayo discreto (igual que en la página del programa).
       const progreso = calcularProgreso({
         estructura,
         curriculo: curriculo ?? [],
         asignados: importados ?? [],
+        dominadoEnValoracion: new Set(dominadosValoracion ?? []),
         hrefAsignado: ({ id, tipo }) =>
           tipo === 'aba_clasico' ? `/dashboard/mi-hijo/programa/${id}` : `/dashboard/mi-hijo/programa-rft/${id}`,
         mostrarFueraDelCurriculo: (p) =>
