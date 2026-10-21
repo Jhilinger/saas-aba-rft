@@ -16,6 +16,8 @@ type ProgramaBase = {
   creado_por: string
   // Motivo si la secuencia del currículo bloquea su dominio para este alumno
   bloqueo: string | null
+  // Ya en el PEI o dominado (PEI o valoración): no tiene sentido importarlo
+  situacion: 'disponible' | 'en_pei' | 'dominado'
 }
 
 type Fuente = 'base' | 'clinica' | 'mios'
@@ -48,6 +50,7 @@ export default function AsignarProgramaForm({
   const [filtroTexto, setFiltroTexto] = useState('')
   const [filtroArea, setFiltroArea] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
+  const [mostrarBloqueados, setMostrarBloqueados] = useState(false)
 
   const listaDeFuente = useMemo(() => {
     if (fuente === 'base') return programasBase.filter((p) => p.clinica_id === null)
@@ -55,13 +58,21 @@ export default function AsignarProgramaForm({
     return programasBase.filter((p) => p.creado_por === miPerfilId)
   }, [programasBase, fuente, miPerfilId])
 
+  // Solo se ofrecen los importables: fuera del PEI, no dominados y, salvo
+  // que se pidan, no bloqueados por la secuencia
+  const candidatos = useMemo(() => listaDeFuente.filter((p) => p.situacion === 'disponible'), [listaDeFuente])
+  const numEnPei = listaDeFuente.filter((p) => p.situacion === 'en_pei').length
+  const numDominados = listaDeFuente.filter((p) => p.situacion === 'dominado').length
+  const numBloqueados = candidatos.filter((p) => p.bloqueo).length
+
   const areas = useMemo(
-    () => [...new Set(listaDeFuente.map((p) => p.area))].sort(),
-    [listaDeFuente]
+    () => [...new Set(candidatos.filter((p) => mostrarBloqueados || !p.bloqueo).map((p) => p.area))].sort(),
+    [candidatos, mostrarBloqueados]
   )
 
   const programasFiltrados = useMemo(() => {
-    return listaDeFuente.filter((p) => {
+    return candidatos.filter((p) => {
+      if (p.bloqueo && !mostrarBloqueados) return false
       if (
         filtroTexto &&
         !p.nombre.toLowerCase().includes(filtroTexto.toLowerCase()) &&
@@ -72,10 +83,9 @@ export default function AsignarProgramaForm({
       if (filtroTipo && p.tipo !== filtroTipo) return false
       return true
     })
-  }, [listaDeFuente, filtroTexto, filtroArea, filtroTipo])
+  }, [candidatos, filtroTexto, filtroArea, filtroTipo, mostrarBloqueados])
 
   const seleccionado = programasBase.find((p) => p.id === programaId)
-  const numBloqueados = programasFiltrados.filter((p) => p.bloqueo).length
 
   const cambiarFuente = (f: Fuente) => {
     setFuente(f)
@@ -132,10 +142,28 @@ export default function AsignarProgramaForm({
           </select>
         </div>
 
-        <p className="text-xs text-slate-500">
-          {programasFiltrados.length} de {listaDeFuente.length} programas
-          {numBloqueados > 0 && ` · 🔒 ${numBloqueados} bloqueados por la secuencia del currículo`}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <p>
+            <strong className="text-slate-700">{programasFiltrados.length} para importar</strong>
+            {numEnPei > 0 && ` · ${numEnPei} ya en el PEI`}
+            {numDominados > 0 && ` · ${numDominados} dominados`}
+            {numBloqueados > 0 && !mostrarBloqueados && ` · 🔒 ${numBloqueados} bloqueados (ocultos)`}
+          </p>
+          {numBloqueados > 0 && (
+            <label className="flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                checked={mostrarBloqueados}
+                onChange={(e) => {
+                  setMostrarBloqueados(e.target.checked)
+                  setProgramaId('')
+                  setJustificacion('')
+                }}
+              />
+              Mostrar bloqueados ({numBloqueados})
+            </label>
+          )}
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <select

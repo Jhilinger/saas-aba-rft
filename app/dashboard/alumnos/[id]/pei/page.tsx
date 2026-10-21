@@ -39,7 +39,7 @@ export default async function AlumnoPage({
   const [{ data: programas }, { data: programasBase }, progreso] = await Promise.all([
     supabase
       .from('programas_alumno')
-      .select('id, nombre, tipo, estado, fecha_inicio, orden, excepcion_secuencia, programas_base(dominio_id, orden, clinica_id)')
+      .select('id, nombre, tipo, estado, fecha_inicio, orden, excepcion_secuencia, programa_base_id, programas_base(dominio_id, orden, clinica_id)')
       .eq('alumno_id', id)
       .order('orden', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false }),
@@ -53,6 +53,14 @@ export default async function AlumnoPage({
   // Secuencia del currículo: dominios bloqueados para este alumno
   const bloqueos = calcularBloqueos(progreso.niveles)
   const puedeForzar = ROLES_EXCEPCION_SECUENCIA.includes(perfil.rol)
+
+  // Para filtrar el selector: ya en el PEI, o dominados (PEI o valoración inicial)
+  const enPei = new Set((programas ?? []).map((p) => p.programa_base_id).filter(Boolean))
+  const dominados = new Set(
+    progreso.niveles.flatMap((n) => n.dominios.flatMap((d) => d.programas))
+      .filter((p) => p.estado === 'dominado')
+      .map((p) => p.id)
+  )
 
   // El código es posicional: se calcula en vivo desde el programa base
   const codificador = crearCodificador(estructura)
@@ -71,6 +79,11 @@ export default async function AlumnoPage({
       codigo: codificador.codigo(p),
       ordenGlobal: codificador.ordenGlobal(p),
       bloqueo: p.dominio_id ? (bloqueos.get(p.dominio_id) ?? null) : null,
+      situacion: enPei.has(p.id)
+        ? ('en_pei' as const)
+        : dominados.has(p.id)
+          ? ('dominado' as const)
+          : ('disponible' as const),
     }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity) || a.nombre.localeCompare(b.nombre))
 
