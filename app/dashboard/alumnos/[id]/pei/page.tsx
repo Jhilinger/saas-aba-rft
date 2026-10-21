@@ -87,22 +87,23 @@ export default async function AlumnoPage({
     }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity) || a.nombre.localeCompare(b.nombre))
 
-    return (
+  const niveles = estructura.niveles.map((n) => ({
+    ...n,
+    dominios: estructura.dominios.filter((d) => d.nivel === n.numero),
+  }))
+
+  return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
       <AsignarProgramaForm
         alumnoId={id}
         programasBase={opcionesBase}
+        niveles={niveles}
         miPerfilId={perfil.id}
         puedeForzar={puedeForzar}
+        abiertoInicial={programasPei.length === 0}
       />
-      <PeiTabla
-        programas={programasPei}
-        niveles={estructura.niveles.map((n) => ({
-          ...n,
-          dominios: estructura.dominios.filter((d) => d.nivel === n.numero),
-        }))}
-      />
+      <PeiTabla programas={programasPei} niveles={niveles} />
     </section>
   )
 }
