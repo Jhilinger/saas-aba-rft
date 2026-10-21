@@ -44,6 +44,8 @@ export default async function ProgramaDetallePage({
 
   const estructura = await cargarEstructuraCurriculo(supabase)
   const codigo = crearCodificador(estructura).codigo(programa)
+  const dominio = programa.clinica_id === null ? estructura.dominios.find((d) => d.id === programa.dominio_id) : undefined
+  const nivel = dominio ? estructura.niveles.find((n) => n.numero === dominio.nivel) : undefined
 
   // Editar: superadmin (todo), clinica_admin (los de su clínica), terapeuta
   // (los suyos). Ver: además, cualquiera del personal ve el currículo global y
@@ -92,7 +94,20 @@ export default async function ProgramaDetallePage({
           {codigo && <span className="mr-2 font-mono text-indigo-600">{codigo}</span>}
           {programa.nombre}
         </h1>
-        <p className="text-sm text-slate-500">{programa.area}</p>
+        {dominio && nivel ? (
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-indigo-50 px-2.5 py-1 font-medium text-indigo-700">
+              Nivel {nivel.numero} · {nivel.nombre}
+            </span>
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-700">
+              Dominio {dominio.codigo} · {dominio.nombre}
+            </span>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            {programa.clinica_id === null ? 'Sin dominio asignado' : `Programa complementario · ${programa.area}`}
+          </p>
+        )}
       </div>
 
       {!soloLectura && <EditarProgramaForm programa={programa} estructura={estructura} />}
