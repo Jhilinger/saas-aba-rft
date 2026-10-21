@@ -17,9 +17,11 @@ type Conjunto = { id: string; nombre: string; estimulos_base: Estimulo[] }
 export default function ConjuntoCard({
   conjunto,
   programaBaseId,
+  soloLectura = false,
 }: {
   conjunto: Conjunto
   programaBaseId: string
+  soloLectura?: boolean
 }) {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -32,7 +34,7 @@ export default function ConjuntoCard({
     <Panel className="p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-800">{conjunto.nombre}</h3>
-        <button
+        {!soloLectura && <button
           onClick={async () => {
             const ok = await confirmar({
               titulo: 'Eliminar conjunto',
@@ -53,7 +55,7 @@ export default function ConjuntoCard({
           className="text-xs font-medium text-rose-700 hover:text-rose-800"
         >
           Eliminar conjunto
-        </button>
+        </button>}
       </div>
 
       <ul className="space-y-1">
@@ -66,21 +68,23 @@ export default function ConjuntoCard({
               <strong>{e.nombre}</strong>
               {e.descripcion ? ` — ${e.descripcion}` : ''}
             </span>
-            <button
-              onClick={() => {
-                startTransition(async () => {
-                  const res = await eliminarEstimuloBase(e.id, programaBaseId)
-                  if (res?.error) {
-                    toast(res.error, 'error')
-                    return
-                  }
-                  router.refresh()
-                })
-              }}
-              className="text-xs text-rose-700 hover:text-rose-800"
-            >
-              Quitar
-            </button>
+            {!soloLectura && (
+              <button
+                onClick={() => {
+                  startTransition(async () => {
+                    const res = await eliminarEstimuloBase(e.id, programaBaseId)
+                    if (res?.error) {
+                      toast(res.error, 'error')
+                      return
+                    }
+                    router.refresh()
+                  })
+                }}
+                className="text-xs text-rose-700 hover:text-rose-800"
+              >
+                Quitar
+              </button>
+            )}
           </li>
         ))}
         {conjunto.estimulos_base.length === 0 && (
@@ -88,7 +92,7 @@ export default function ConjuntoCard({
         )}
       </ul>
 
-      <form
+      {!soloLectura && <form
         onSubmit={(e) => {
           e.preventDefault()
           if (!nombre.trim()) return
@@ -125,7 +129,7 @@ export default function ConjuntoCard({
         >
           Añadir
         </Button>
-      </form>
+      </form>}
     </Panel>
   )
 }

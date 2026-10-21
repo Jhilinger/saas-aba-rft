@@ -8,7 +8,15 @@ import { useToast } from '../../../providers/toast-provider'
 
 type Paso = { id: string; nombre: string; descripcion: string | null; orden: number }
 
-export default function PasoBaseCard({ paso, programaBaseId }: { paso: Paso; programaBaseId: string }) {
+export default function PasoBaseCard({
+  paso,
+  programaBaseId,
+  soloLectura = false,
+}: {
+  paso: Paso
+  programaBaseId: string
+  soloLectura?: boolean
+}) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const confirmar = useConfirm()
@@ -21,7 +29,7 @@ export default function PasoBaseCard({ paso, programaBaseId }: { paso: Paso; pro
         <p className="text-sm font-medium text-slate-800">{paso.nombre}</p>
         {paso.descripcion && <p className="text-xs text-slate-500">{paso.descripcion}</p>}
       </div>
-      <button
+      {!soloLectura && <button
         onClick={async () => {
           const ok = await confirmar({
             titulo: 'Eliminar paso',
@@ -43,7 +51,7 @@ export default function PasoBaseCard({ paso, programaBaseId }: { paso: Paso; pro
         className="text-xs font-medium text-rose-700 hover:text-rose-800"
       >
         Eliminar
-      </button>
+      </button>}
     </div>
   )
 }

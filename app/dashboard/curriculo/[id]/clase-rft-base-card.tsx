@@ -19,10 +19,12 @@ export default function ClaseRftBaseCard({
   clase,
   programaBaseId,
   nivelRft,
+  soloLectura = false,
 }: {
   clase: Clase
   programaBaseId: string
   nivelRft: string | null
+  soloLectura?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
@@ -47,7 +49,7 @@ export default function ClaseRftBaseCard({
             </span>
           </h3>
         </div>
-        <button
+        {!soloLectura && <button
           onClick={async () => {
             const ok = await confirmar({
               titulo: 'Eliminar clase',
@@ -69,7 +71,7 @@ export default function ClaseRftBaseCard({
           className="inline-flex items-center justify-center rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100"
         >
           Eliminar clase
-        </button>
+        </button>}
       </div>
 
       <ul className="space-y-1">
@@ -91,7 +93,7 @@ export default function ClaseRftBaseCard({
               )}
               {' '}— {e.nombre}
             </span>
-            <button
+            {!soloLectura && <button
               onClick={() => {
                 startTransition(async () => {
                   const res = await eliminarEstimuloRftBase(e.id, programaBaseId)
@@ -105,7 +107,7 @@ export default function ClaseRftBaseCard({
               className="text-xs text-rose-700 hover:text-rose-800"
             >
               Quitar
-            </button>
+            </button>}
           </li>
         ))}
         {clase.estimulos_rft_base.length === 0 && (
@@ -113,7 +115,7 @@ export default function ClaseRftBaseCard({
         )}
       </ul>
 
-            {enElLimite ? (
+      {soloLectura ? null : enElLimite ? (
         <p className="text-xs text-slate-500 italic">
           {NOMBRE_NIVEL_RFT[nivel]} admite como máximo {maxMiembros} miembro(s) por clase.
         </p>

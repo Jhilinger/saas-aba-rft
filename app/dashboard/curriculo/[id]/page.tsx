@@ -45,12 +45,26 @@ export default async function ProgramaDetallePage({
   const estructura = await cargarEstructuraCurriculo(supabase)
   const codigo = crearCodificador(estructura).codigo(programa)
 
-  const puedeVer =
+  // Editar: superadmin (todo), clinica_admin (los de su clínica), terapeuta
+  // (los suyos). Ver: además, cualquiera del personal ve el currículo global y
+  // los complementarios compartidos de su clínica (solo lectura).
+  const puedeEditar =
     perfil.rol === 'superadmin' ||
-    (perfil.rol === 'clinica_admin' && programa.clinica_id === perfil.clinica_id) ||
+    (perfil.rol === 'clinica_admin' && programa.clinica_id !== null && programa.clinica_id === perfil.clinica_id) ||
     (perfil.rol === 'terapeuta' && programa.creado_por === perfil.id)
+  const puedeVer =
+    puedeEditar ||
+    programa.clinica_id === null ||
+    (programa.clinica_id === perfil.clinica_id && programa.visibilidad === 'clinica')
 
   if (!puedeVer) redirect('/dashboard')
+  const soloLectura = !puedeEditar
+  const migaCurriculo =
+    programa.clinica_id === null
+      ? { label: 'Currículo', href: perfil.rol === 'superadmin' ? '/dashboard/curriculo' : '/dashboard/curriculo-base' }
+      : programa.visibilidad === 'privado'
+        ? { label: 'Mis programas', href: '/dashboard/mis-programas' }
+        : { label: 'Programas de la clínica', href: '/dashboard/curriculo' }
 
     const { data: conjuntos } = await supabase
     .from('conjuntos_estimulos_base')
@@ -73,7 +87,7 @@ export default async function ProgramaDetallePage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
       <div>
-        <Breadcrumb items={[{ label: 'Currículo', href: '/dashboard/curriculo' }, { label: programa.nombre }]} />
+        <Breadcrumb items={[migaCurriculo, { label: programa.nombre }]} />
         <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
           {codigo && <span className="mr-2 font-mono text-indigo-600">{codigo}</span>}
           {programa.nombre}
@@ -81,7 +95,7 @@ export default async function ProgramaDetallePage({
         <p className="text-sm text-slate-500">{programa.area}</p>
       </div>
 
-      <EditarProgramaForm programa={programa} estructura={estructura} />
+      {!soloLectura && <EditarProgramaForm programa={programa} estructura={estructura} />}
 
       <Panel className="grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-3 sm:p-5">
         <div className="sm:col-span-3">
@@ -131,11 +145,11 @@ export default async function ProgramaDetallePage({
             {programa.tipo === 'aba_clasico' && programa.formato_recogida === 'ensayo_discreto' && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Conjuntos de estímulos (plantilla)</h2>
-          <NuevoConjuntoForm programaBaseId={id} />
+          {!soloLectura && <NuevoConjuntoForm programaBaseId={id} />}
 
           <div className="space-y-4">
             {conjuntos?.map((c) => (
-              <ConjuntoCard key={c.id} conjunto={c} programaBaseId={id} />
+              <ConjuntoCard key={c.id} conjunto={c} programaBaseId={id} soloLectura={soloLectura} />
             ))}
           </div>
 
@@ -151,11 +165,11 @@ export default async function ProgramaDetallePage({
           <p className="text-sm text-slate-500">
             Orden {programa.direccion_cadena === 'atras' ? '— se enseñará empezando por el último paso' : '— se enseñará empezando por el primer paso'}.
           </p>
-          <NuevoPasoBaseForm programaBaseId={id} />
+          {!soloLectura && <NuevoPasoBaseForm programaBaseId={id} />}
 
           <div className="space-y-2">
             {pasosTarea?.map((p) => (
-              <PasoBaseCard key={p.id} paso={p} programaBaseId={id} />
+              <PasoBaseCard key={p.id} paso={p} programaBaseId={id} soloLectura={soloLectura} />
             ))}
           </div>
 
@@ -176,11 +190,11 @@ export default async function ProgramaDetallePage({
               qué clases combinan entre sí y por qué.
             </p>
           )}
-          <NuevaClaseRftForm programaBaseId={id} />
+          {!soloLectura && <NuevaClaseRftForm programaBaseId={id} />}
 
           <div className="space-y-4">
             {clasesRft?.map((c) => (
-              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} />
+              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} />
             ))}
           </div>
 
