@@ -2117,6 +2117,7 @@ export type Database = {
         Args: { p_alumno_id: string }
         Returns: string[]
       }
+      puede_acceder_alumno: { Args: { p_alumno_id: string }; Returns: boolean }
     }
     Enums: {
       destinatario_informe: "familia" | "formal"

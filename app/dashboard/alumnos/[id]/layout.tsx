@@ -38,8 +38,11 @@ export default async function AlumnoLayout({
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       <Panel className="p-4 sm:p-5">
-        <Link href="/dashboard/alumnos" className="text-sm font-medium text-indigo-600 hover:underline">
-          ← Volver a alumnos
+        <Link
+          href={perfil.rol === 'terapeuta' ? '/dashboard/mis-alumnos' : '/dashboard/alumnos'}
+          className="text-sm font-medium text-indigo-600 hover:underline"
+        >
+          ← Volver a {perfil.rol === 'terapeuta' ? 'mis alumnos' : 'alumnos'}
         </Link>
         <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{alumno.nombre_anonimizado}</h1>
         <p className="text-sm text-slate-500">Nacimiento: {new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</p>
