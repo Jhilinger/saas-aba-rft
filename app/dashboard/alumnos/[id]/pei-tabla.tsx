@@ -11,6 +11,7 @@ type Programa = {
   estado: string
   fecha_inicio: string
   codigo: string | null
+  excepcion_secuencia: string | null
 }
 
 const POR_PAGINA = 10
@@ -70,6 +71,14 @@ export default function PeiTabla({ programas }: { programas: Programa[] }) {
                     <Link href={`/dashboard/programas-rft/${p.id}`} className="hover:underline">
                       {p.nombre}
                     </Link>
+                  )}
+                  {p.excepcion_secuencia && (
+                    <span
+                      title={`Asignado fuera de secuencia: ${p.excepcion_secuencia}`}
+                      className="ml-2 cursor-help rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 whitespace-nowrap"
+                    >
+                      Excepción
+                    </span>
                   )}
                 </td>
                 <td className="p-3">

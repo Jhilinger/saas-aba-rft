@@ -3,6 +3,8 @@ import { redirect, notFound } from 'next/navigation'
 import AsignarProgramaForm from '../asignar-programa-form'
 import PeiTabla from '../pei-tabla'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
+import { calcularBloqueos, ROLES_EXCEPCION_SECUENCIA } from '../../../curriculo/secuencia'
+import { cargarProgresoAlumno } from '../progreso/cargar-progreso'
 
 export default async function AlumnoPage({
   params,
@@ -27,16 +29,17 @@ export default async function AlumnoPage({
 
   const { data: alumno } = await supabase
     .from('alumnos')
-    .select('id')
+    .select('id, clinica_id')
     .eq('id', id)
     .single()
 
   if (!alumno) notFound()
 
-  const [{ data: programas }, { data: programasBase }, estructura] = await Promise.all([
+  const estructura = await cargarEstructuraCurriculo(supabase)
+  const [{ data: programas }, { data: programasBase }, progreso] = await Promise.all([
     supabase
       .from('programas_alumno')
-      .select('id, nombre, tipo, estado, fecha_inicio, orden, programas_base(dominio_id, orden, clinica_id)')
+      .select('id, nombre, tipo, estado, fecha_inicio, orden, excepcion_secuencia, programas_base(dominio_id, orden, clinica_id)')
       .eq('alumno_id', id)
       .order('orden', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false }),
@@ -44,8 +47,12 @@ export default async function AlumnoPage({
       .from('programas_base')
       .select('id, nombre, tipo, area, dominio_id, orden, clinica_id, visibilidad, creado_por')
       .eq('activo', true),
-    cargarEstructuraCurriculo(supabase),
+    cargarProgresoAlumno(supabase, alumno, estructura),
   ])
+
+  // Secuencia del currículo: dominios bloqueados para este alumno
+  const bloqueos = calcularBloqueos(progreso.niveles)
+  const puedeForzar = ROLES_EXCEPCION_SECUENCIA.includes(perfil.rol)
 
   // El código es posicional: se calcula en vivo desde el programa base
   const codificador = crearCodificador(estructura)
@@ -57,13 +64,23 @@ export default async function AlumnoPage({
     }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity))
   const opcionesBase = (programasBase ?? [])
-    .map((p) => ({ ...p, codigo: codificador.codigo(p), ordenGlobal: codificador.ordenGlobal(p) }))
+    .map((p) => ({
+      ...p,
+      codigo: codificador.codigo(p),
+      ordenGlobal: codificador.ordenGlobal(p),
+      bloqueo: p.dominio_id ? (bloqueos.get(p.dominio_id) ?? null) : null,
+    }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity) || a.nombre.localeCompare(b.nombre))
 
     return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
-      <AsignarProgramaForm alumnoId={id} programasBase={opcionesBase} miPerfilId={perfil.id} />
+      <AsignarProgramaForm
+        alumnoId={id}
+        programasBase={opcionesBase}
+        miPerfilId={perfil.id}
+        puedeForzar={puedeForzar}
+      />
       <PeiTabla programas={programasPei} />
     </section>
   )

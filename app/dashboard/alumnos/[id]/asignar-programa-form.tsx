@@ -14,6 +14,8 @@ type ProgramaBase = {
   clinica_id: string | null
   visibilidad: string
   creado_por: string
+  // Motivo si la secuencia del currículo bloquea su dominio para este alumno
+  bloqueo: string | null
 }
 
 type Fuente = 'base' | 'clinica' | 'mios'
@@ -28,13 +30,17 @@ export default function AsignarProgramaForm({
   alumnoId,
   programasBase,
   miPerfilId,
+  puedeForzar,
 }: {
   alumnoId: string
   programasBase: ProgramaBase[]
   miPerfilId: string
+  // clinica_admin/superadmin: puede asignar bloqueados con justificación
+  puedeForzar: boolean
 }) {
   const [fuente, setFuente] = useState<Fuente>('base')
   const [programaId, setProgramaId] = useState('')
+  const [justificacion, setJustificacion] = useState('')
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -68,9 +74,13 @@ export default function AsignarProgramaForm({
     })
   }, [listaDeFuente, filtroTexto, filtroArea, filtroTipo])
 
+  const seleccionado = programasBase.find((p) => p.id === programaId)
+  const numBloqueados = programasFiltrados.filter((p) => p.bloqueo).length
+
   const cambiarFuente = (f: Fuente) => {
     setFuente(f)
     setProgramaId('')
+    setJustificacion('')
     setFiltroTexto('')
     setFiltroArea('')
     setFiltroTipo('')
@@ -124,6 +134,7 @@ export default function AsignarProgramaForm({
 
         <p className="text-xs text-slate-500">
           {programasFiltrados.length} de {listaDeFuente.length} programas
+          {numBloqueados > 0 && ` · 🔒 ${numBloqueados} bloqueados por la secuencia del currículo`}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-2">
@@ -131,6 +142,7 @@ export default function AsignarProgramaForm({
             value={programaId}
             onChange={(e) => {
               setProgramaId(e.target.value)
+              setJustificacion('')
               setError(null)
             }}
             className="flex-1 min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
@@ -138,31 +150,62 @@ export default function AsignarProgramaForm({
           >
             <option value="">Selecciona un programa...</option>
             {programasFiltrados.map((p) => (
-              <option key={p.id} value={p.id}>
+              <option key={p.id} value={p.id} disabled={!!p.bloqueo && !puedeForzar}>
+                {p.bloqueo ? '🔒 ' : ''}
                 {p.codigo ? `${p.codigo} — ` : ''}
                 {p.nombre} ({p.tipo === 'rft' ? 'Relacional' : 'Directo'})
               </option>
             ))}
           </select>
           <Button
-            disabled={!programaId || isPending}
+            disabled={!programaId || isPending || (!!seleccionado?.bloqueo && !justificacion.trim())}
             onClick={() => {
               setError(null)
               startTransition(async () => {
-                const res = await importarPrograma(alumnoId, programaId)
+                const res = await importarPrograma(
+                  alumnoId,
+                  programaId,
+                  seleccionado?.bloqueo ? justificacion : undefined
+                )
                 if (res.error) {
                   setError(res.error)
                   return
                 }
                 setProgramaId('')
+                setJustificacion('')
                 router.refresh()
               })
             }}
             className="py-3 sm:py-2 text-base sm:text-sm"
           >
-            Importar
+            {seleccionado?.bloqueo ? 'Importar con excepción' : 'Importar'}
           </Button>
         </div>
+
+        {seleccionado?.bloqueo && (
+          <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+            <p className="text-amber-800">
+              <span className="font-semibold">Fuera de secuencia:</span> {seleccionado.bloqueo}.
+            </p>
+            <label className="block space-y-1">
+              <span className="font-semibold text-slate-700">Justificación clínica (obligatoria)</span>
+              <textarea
+                value={justificacion}
+                onChange={(e) => setJustificacion(e.target.value)}
+                rows={2}
+                placeholder="ej. Lo domina en contexto natural; se trabaja para generalizar"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base sm:text-sm"
+              />
+            </label>
+          </div>
+        )}
+
+        {numBloqueados > 0 && !puedeForzar && (
+          <p className="text-xs text-slate-500">
+            Los programas con 🔒 se desbloquean cuando el alumno consigue el nivel o dominio anterior. Si hay un
+            motivo clínico para adelantarlos, el administrador de la clínica puede asignarlos con una justificación.
+          </p>
+        )}
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
 

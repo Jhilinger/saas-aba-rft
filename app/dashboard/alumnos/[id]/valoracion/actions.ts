@@ -3,6 +3,8 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
+import { calcularBloqueos } from '../../../curriculo/secuencia'
+import { cargarProgresoAlumno } from '../progreso/cargar-progreso'
 
 export async function guardarValoracion(
   alumnoId: string,
@@ -78,8 +80,16 @@ export async function importarNoDominados(alumnoId: string) {
   }
 
   let importados = 0
+  let bloqueados = 0
   const errores: string[] = []
-  const codificador = crearCodificador(await cargarEstructuraCurriculo(supabase))
+  const estructura = await cargarEstructuraCurriculo(supabase)
+  const codificador = crearCodificador(estructura)
+
+  // Secuencia del currículo: solo se importan los programas de dominios
+  // desbloqueados (los bloqueados se asignan uno a uno, con excepción)
+  const { data: alumno } = await supabase.from('alumnos').select('id, clinica_id').eq('id', alumnoId).single()
+  if (!alumno) return { error: 'Alumno no encontrado' }
+  const bloqueos = calcularBloqueos((await cargarProgresoAlumno(supabase, alumno, estructura)).niveles)
 
   for (const v of pendientes) {
     const { data: base } = await supabase
@@ -91,6 +101,10 @@ export async function importarNoDominados(alumnoId: string) {
       .single()
 
     if (!base) continue
+    if (base.dominio_id && bloqueos.has(base.dominio_id)) {
+      bloqueados++
+      continue
+    }
 
     const { data: programaAlumno, error: insertError } = await supabase
       .from('programas_alumno')
@@ -155,5 +169,5 @@ export async function importarNoDominados(alumnoId: string) {
   }
 
   revalidatePath(`/dashboard/alumnos/${alumnoId}`)
-  return { success: true, importados, errores }
+  return { success: true, importados, bloqueados, errores }
 }

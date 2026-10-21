@@ -1565,6 +1565,8 @@ export type Database = {
           direccion_objetivo: string | null
           ensayos_por_bloque: number
           estado: Database["public"]["Enums"]["estado_programa_alumno"]
+          excepcion_por: string | null
+          excepcion_secuencia: string | null
           fecha_dominio: string | null
           fecha_inicio: string
           formato_recogida: string
@@ -1591,6 +1593,8 @@ export type Database = {
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          excepcion_por?: string | null
+          excepcion_secuencia?: string | null
           fecha_dominio?: string | null
           fecha_inicio?: string
           formato_recogida?: string
@@ -1617,6 +1621,8 @@ export type Database = {
           direccion_objetivo?: string | null
           ensayos_por_bloque?: number
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          excepcion_por?: string | null
+          excepcion_secuencia?: string | null
           fecha_dominio?: string | null
           fecha_inicio?: string
           formato_recogida?: string
@@ -1639,6 +1645,13 @@ export type Database = {
             columns: ["alumno_id"]
             isOneToOne: false
             referencedRelation: "alumnos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "programas_alumno_excepcion_por_fkey"
+            columns: ["excepcion_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
           {

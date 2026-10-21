@@ -128,7 +128,13 @@ export default function EvaluacionClient({
         return
       }
       setResultadoImport({ importados: res.importados ?? 0 })
-      toast(`${res.importados} programa(s) importado(s) al PEI como línea base`, 'exito')
+      toast(
+        `${res.importados} programa(s) importado(s) al PEI como línea base` +
+          (res.bloqueados
+            ? `. ${res.bloqueados} no se importaron porque su nivel o dominio previo aún no está conseguido.`
+            : ''),
+        'exito'
+      )
       router.refresh()
     })
   }
