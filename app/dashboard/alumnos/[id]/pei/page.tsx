@@ -61,6 +61,8 @@ export default async function AlumnoPage({
       ...p,
       codigo: programas_base ? codificador.codigo(programas_base) : null,
       ordenGlobal: programas_base ? codificador.ordenGlobal(programas_base) : null,
+      // Solo los del currículo (globales) tienen dominio; el resto son complementarios
+      dominioId: programas_base?.clinica_id === null ? programas_base.dominio_id : null,
     }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity))
   const opcionesBase = (programasBase ?? [])
@@ -81,7 +83,13 @@ export default async function AlumnoPage({
         miPerfilId={perfil.id}
         puedeForzar={puedeForzar}
       />
-      <PeiTabla programas={programasPei} />
+      <PeiTabla
+        programas={programasPei}
+        niveles={estructura.niveles.map((n) => ({
+          ...n,
+          dominios: estructura.dominios.filter((d) => d.nivel === n.numero),
+        }))}
+      />
     </section>
   )
 }
