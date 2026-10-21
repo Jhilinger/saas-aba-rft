@@ -1,11 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import EvaluacionClient from './evaluacion-client'
+import EvaluacionClient, { type NivelValoracion, type ProgramaValoracion } from './evaluacion-client'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 
 const VALORACIONES = ['dominado', 'parcial', 'no'] as const
 type Valoracion = (typeof VALORACIONES)[number]
-import ValoracionTabs from './valoracion-tabs'
 
 export default async function ValoracionPage({
   params,
@@ -38,61 +37,69 @@ export default async function ValoracionPage({
 
   const filtroClinica = `clinica_id.is.null,and(clinica_id.eq.${alumno.clinica_id},visibilidad.eq.clinica)`
 
-  const [{ data: programasBase }, estructura] = await Promise.all([
+  const [{ data: programasBase }, { data: valoraciones }, { data: asignados }, estructura] = await Promise.all([
     supabase
       .from('programas_base')
-      .select('id, nombre, tipo, area, objetivo, orden, dominio_id, clinica_id')
+      .select('id, nombre, tipo, objetivo, orden, dominio_id, clinica_id')
       .eq('activo', true)
       .or(filtroClinica),
+    supabase.from('evaluaciones_iniciales').select('programa_base_id, valoracion').eq('alumno_id', alumnoId),
+    supabase
+      .from('programas_alumno')
+      .select('programa_base_id, estado')
+      .eq('alumno_id', alumnoId)
+      .not('programa_base_id', 'is', null),
     cargarEstructuraCurriculo(supabase),
   ])
 
-  // Se recorren en el orden del currículo (nivel → dominio → posición);
-  // los que no tienen posición quedan fuera de la valoración
+  // Se recorren en el orden del currículo (nivel → dominio → posición), sin
+  // separar directo/relacional; los programas sin posición quedan fuera
   const codificador = crearCodificador(estructura)
-  const enOrdenCurriculo = (tipo: string) =>
-    (programasBase ?? [])
-      .filter((p) => p.tipo === tipo)
-      .map(({ dominio_id, clinica_id, ...p }) => ({
-        ...p,
-        orden: codificador.ordenGlobal({ dominio_id, clinica_id, orden: p.orden }),
-      }))
-      .filter((p): p is typeof p & { orden: number } => p.orden !== null)
-      .sort((a, b) => a.orden - b.orden)
-  const programasAba = enOrdenCurriculo('aba_clasico')
-  const programasRft = enOrdenCurriculo('rft')
+  const dominios = new Map(estructura.dominios.map((d) => [d.id, d]))
+  const programas: ProgramaValoracion[] = (programasBase ?? [])
+    .map((p) => ({ p, ordenGlobal: codificador.ordenGlobal(p), dominio: p.dominio_id ? dominios.get(p.dominio_id) : undefined }))
+    .filter((x): x is typeof x & { ordenGlobal: number; dominio: NonNullable<typeof x.dominio> } =>
+      x.ordenGlobal !== null && x.dominio !== undefined
+    )
+    .sort((a, b) => a.ordenGlobal - b.ordenGlobal)
+    .map(({ p, dominio }) => ({
+      id: p.id,
+      nombre: p.nombre,
+      tipo: p.tipo,
+      objetivo: p.objetivo,
+      codigo: codificador.codigo(p),
+      dominioId: dominio.id,
+      nivel: dominio.nivel,
+    }))
 
-  const { data: valoraciones } = await supabase
-    .from('evaluaciones_iniciales')
-    .select('programa_base_id, valoracion')
-    .eq('alumno_id', alumnoId)
+  const niveles: NivelValoracion[] = estructura.niveles.map((n) => ({
+    numero: n.numero,
+    nombre: n.nombre,
+    dominios: estructura.dominios
+      .filter((d) => d.nivel === n.numero)
+      .map((d) => ({ id: d.id, codigo: d.codigo, nombre: d.nombre })),
+  }))
 
   const valoracionesValidas = (valoraciones ?? []).filter(
     (valoracion): valoracion is typeof valoracion & { valoracion: Valoracion } =>
       VALORACIONES.includes(valoracion.valoracion as Valoracion)
   )
 
-    return (
+  // Ya dominados en el PEI: cuentan como dominados y no se preguntan
+  const dominadosPei = (asignados ?? [])
+    .filter((a) => a.estado === 'dominado' || a.estado === 'mantenimiento')
+    .map((a) => a.programa_base_id!)
+
+  return (
     <div className="space-y-4">
-    <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
-    <ValoracionTabs
-      aba={
-        <EvaluacionClient
-          alumnoId={alumnoId}
-          programas={programasAba}
-          valoracionesIniciales={valoracionesValidas}
-        />
-      }
-      rft={
-        <EvaluacionClient
-          alumnoId={alumnoId}
-          programas={programasRft}
-          valoracionesIniciales={valoracionesValidas}
-          rachaLimite={1}
-          totalLimite={1}
-        />
-      }
-        />
+      <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
+      <EvaluacionClient
+        alumnoId={alumnoId}
+        programas={programas}
+        niveles={niveles}
+        valoracionesIniciales={valoracionesValidas}
+        dominadosPei={dominadosPei}
+      />
     </div>
   )
 }
