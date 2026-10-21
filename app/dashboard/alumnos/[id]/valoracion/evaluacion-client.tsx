@@ -100,6 +100,9 @@ export default function EvaluacionClient({
   const router = useRouter()
 
   const dominadosPeiSet = useMemo(() => new Set(dominadosPei), [dominadosPei])
+  // Niveles por debajo del umbral en los que el terapeuta decidió seguir
+  // valorando el siguiente (la parada por nivel es una recomendación)
+  const [nivelesSuperados, setNivelesSuperados] = useState<Set<number>>(new Set())
   const estadoDe = (id: string): ValorValoracion | undefined => (dominadosPeiSet.has(id) ? 'dominado' : mapa[id])
 
   const porDominio = useMemo(() => {
@@ -142,7 +145,8 @@ export default function EvaluacionClient({
   // - dentro de un dominio, RACHA_DOMINIO seguidos sin dominar = techo del
   //   dominio (se salta el resto y se pasa al siguiente dominio)
   // - al terminar un nivel, si no llega a UMBRAL_NIVEL (media de sus dominios,
-  //   igual que en progreso y PEI) la valoración se detiene ahí
+  //   igual que en progreso y PEI) se recomienda parar ahí; el terapeuta puede
+  //   seguir con el nivel siguiente (nivelesSuperados)
   const { siguiente, techos, detenidaEnNivel, porcentajes } = useMemo(() => {
     const techos = new Set<string>()
     const porcentajes = new Map<number, number | null>()
@@ -180,14 +184,14 @@ export default function EvaluacionClient({
         }
       }
       const pct = porcentajes.get(nivel.numero) ?? null
-      if (pct !== null && pct < UMBRAL_NIVEL) {
+      if (pct !== null && pct < UMBRAL_NIVEL && !nivelesSuperados.has(nivel.numero)) {
         return { siguiente: null, techos, detenidaEnNivel: { numero: nivel.numero, porcentaje: pct }, porcentajes }
       }
     }
     return { siguiente: null, techos, detenidaEnNivel: null, porcentajes }
     // estadoDe depende de mapa y dominadosPeiSet
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapa, dominadosPeiSet, niveles, porDominio])
+  }, [mapa, dominadosPeiSet, niveles, porDominio, nivelesSuperados])
 
   const resumen = useMemo(() => {
     const r = { dominado: 0, parcial: 0, no: 0, sinEvaluar: 0 }
@@ -309,18 +313,39 @@ export default function EvaluacionClient({
   // --- MODO: resumen ---
   const totalNoOParcial = resumen.parcial + resumen.no
   const pendientesRestantes = programas.filter((p) => estadoDe(p.id) !== 'dominado').length
+  const nivelSiguiente = detenidaEnNivel
+    ? niveles.find((n) => n.numero > detenidaEnNivel.numero && n.dominios.some((d) => porDominio.has(d.id)))
+    : undefined
 
   return (
     <div className="space-y-4">
       <Panel className="p-4 sm:p-6 space-y-4">
         <h2 className="font-semibold text-slate-800">
-          {detenidaEnNivel ? 'Evaluación detenida automáticamente' : 'Evaluación completa'}
+          {detenidaEnNivel ? 'Recomendamos parar aquí' : 'Evaluación completa'}
         </h2>
         {detenidaEnNivel && (
-          <p className="text-sm text-slate-500">
-            El Nivel {detenidaEnNivel.numero} está al {detenidaEnNivel.porcentaje}% (por debajo del {UMBRAL_NIVEL}%
-            necesario para pasar al siguiente). Es un buen punto para parar y trabajar con lo ya identificado.
-          </p>
+          <div className="space-y-3">
+            <p className="text-sm text-slate-500">
+              El Nivel {detenidaEnNivel.numero} está al {detenidaEnNivel.porcentaje}% (por debajo del {UMBRAL_NIVEL}%
+              necesario para pasar al siguiente). Es un buen punto para parar y trabajar con lo ya identificado.
+            </p>
+            {nivelSiguiente && (
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+                <p className="text-slate-600">
+                  Si sospechas que domina habilidades del Nivel {nivelSiguiente.numero}, puedes seguir valorándolo.
+                  Lo que salga dominado quedará registrado, aunque sus programas seguirán bloqueados en el PEI hasta
+                  que el Nivel {detenidaEnNivel.numero} llegue al {UMBRAL_NIVEL}% (salvo excepción del administrador).
+                </p>
+                <Button
+                  variant="secondary"
+                  onClick={() => setNivelesSuperados((prev) => new Set(prev).add(detenidaEnNivel.numero))}
+                  className="mt-2 px-3 py-1.5 font-medium"
+                >
+                  Seguir valorando el Nivel {nivelSiguiente.numero}
+                </Button>
+              </div>
+            )}
+          </div>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
