@@ -42,7 +42,8 @@ function FilaPrograma({ p }: { p: Programa }) {
       >
         {p.nombre}
       </Link>
-      <div className="flex flex-wrap items-center gap-2">
+      {/* En móvil, las etiquetas bajan a su propia línea bajo el nombre */}
+      <div className="flex w-full flex-wrap items-center gap-2 pl-[4.25rem] sm:w-auto sm:pl-0">
         {p.excepcion_secuencia && (
           <span
             title={`Asignado fuera de secuencia: ${p.excepcion_secuencia}`}

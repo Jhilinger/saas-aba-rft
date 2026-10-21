@@ -181,7 +181,7 @@ export default function CurriculoTabla({
               return (
                 <div
                   key={p.id}
-                  className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 pl-11 text-sm hover:bg-slate-50"
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-sm hover:bg-slate-50 sm:pl-11"
                 >
                   <span className="w-14 shrink-0 font-mono text-xs text-slate-500">{codigo ?? '—'}</span>
                   <Link
@@ -190,7 +190,8 @@ export default function CurriculoTabla({
                   >
                     {p.nombre}
                   </Link>
-                  <div className="flex flex-wrap items-center gap-2">
+                  {/* En móvil, las etiquetas y acciones bajan a su propia línea */}
+                  <div className="flex w-full flex-wrap items-center gap-2 pl-[4.25rem] sm:w-auto sm:pl-0">
                     {tipoBadge(p)}
                     {origenBadge(p)}
                     {!p.activo && <span className="text-xs text-slate-500">Inactivo</span>}
