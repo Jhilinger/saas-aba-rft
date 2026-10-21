@@ -2098,6 +2098,8 @@ export type Database = {
         Args: { p_dominio_id: string; p_id: string; p_posicion: number }
         Returns: undefined
       }
+      familia_alumnos: { Args: never; Returns: string[] }
+      familia_clinicas: { Args: never; Returns: string[] }
       programas_dominados_valoracion: {
         Args: { p_alumno_id: string }
         Returns: string[]
