@@ -55,7 +55,7 @@ export default async function ProgramaRftPage({
 
   const cabecera = (
     <div>
-      <Breadcrumb items={[{ label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}/pei` }, { label: programa.nombre }]} />
+      <Breadcrumb items={[perfil.rol === 'terapeuta' ? { label: 'Mis alumnos', href: '/dashboard/mis-alumnos' } : { label: 'Alumnos', href: '/dashboard/alumnos' }, { label: alumnoNombre, href: `/dashboard/alumnos/${programa.alumno_id}/pei` }, { label: programa.nombre }]} />
       <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{programa.nombre}</h1>
       <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
         {programa.area && <span>{programa.area}</span>}
