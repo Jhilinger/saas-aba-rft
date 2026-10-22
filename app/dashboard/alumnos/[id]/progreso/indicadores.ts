@@ -5,12 +5,12 @@ import type { createClient } from '@/utils/supabase/server'
 // uno exige un mínimo de datos: por debajo se muestra "datos insuficientes".
 //
 // Ventana: últimas VENTANA_DIAS, con tendencia frente a la ventana anterior.
-// - Generatividad: de los logros de la ventana, % sin enseñanza
+// - Directo frente a derivado: de los logros de la ventana, % sin enseñanza
 //   directa. Logro = conjunto ABA dominado o relación RFT dominada (fase +
 //   posiciones de un grupo). Derivado = test superado sin ayudas
 //   (dominio_rft_fases.via_entrenamiento = false).
 // - Independencia: ensayos ABA de intervención correctos sin ayuda / total.
-// - Tests a la primera: tests RFT cuya primera sesión cae en la ventana y se
+// - Generatividad (tests a la primera): tests RFT cuya primera sesión cae en la ventana y se
 //   superó en ese primer bloque, sin ayudas.
 // - Velocidad de aprendizaje (ensayos hasta el criterio): mediana de ensayos de intervención de los
 //   últimos 3 conjuntos ABA dominados, frente a los anteriores.
@@ -208,15 +208,15 @@ export async function calcularIndicadores(
   const indicadores: Indicador[] = [
     {
       clave: 'derivado',
-      titulo: 'Generatividad',
+      titulo: 'Directo frente a derivado',
       valor: derivadoAhora === null ? null : `${Math.round(derivadoAhora)}%`,
       detalle:
         derivadoAhora === null
           ? `Hacen falta al menos ${MIN_LOGROS} logros en el periodo (hay ${logrosAhora.total}).`
-          : `${logrosAhora.derivados} de ${logrosAhora.total} logros sin enseñanza directa`,
+          : `derivado: ${logrosAhora.derivados} de ${logrosAhora.total} logros sin enseñanza directa`,
       tendencia: tendencia(derivadoAhora, derivadoAntes, 10, true),
       explicacion:
-        'De los objetivos conseguidos en el periodo, qué parte surgió sin enseñarla directamente (relaciones derivadas en los tests). En el Nivel 1 es normal que sea bajo.',
+        'Cómo está aprendiendo ahora: de los objetivos conseguidos en el periodo, qué parte surgió sin enseñarla directamente (relaciones derivadas en los tests) y cuál por enseñanza directa. Depende mucho de lo que se esté trabajando: en el Nivel 1 lo normal es que sea casi todo directo.',
     },
     {
       clave: 'independencia',
@@ -231,7 +231,7 @@ export async function calcularIndicadores(
     },
     {
       clave: 'tests',
-      titulo: 'Tests a la primera',
+      titulo: 'Generatividad',
       valor: testsAhora.valor === null ? null : `${Math.round(testsAhora.valor)}%`,
       detalle:
         testsAhora.valor === null
@@ -239,7 +239,7 @@ export async function calcularIndicadores(
           : `${testsAhora.ok} de ${testsAhora.n} tests superados en el primer bloque`,
       tendencia: tendencia(testsAhora.valor, testsAntes.valor, 10, true),
       explicacion:
-        'Aprendizaje relacional: tests de vinculación y transformación de funciones superados en su primer bloque y sin ayudas, es decir, derivación real.',
+        'Capacidad de derivar: cuando se le pone a prueba, qué parte de los tests de vinculación y transformación de funciones supera en su primer bloque y sin ayudas. A diferencia de "Directo frente a derivado", no depende de cuánto se trabaje cada tipo de aprendizaje.',
     },
     {
       clave: 'criterio',

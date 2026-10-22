@@ -16,14 +16,30 @@ const TEXTO_VELOCIDAD: Record<Exclude<Tendencia, null>, string> = {
   estable: '→ Estable',
 }
 
+// El reparto directo/derivado no es mejor ni peor (depende del nivel): su
+// tendencia se describe en términos neutros
+const TEXTO_REPARTO: Record<Exclude<Tendencia, null>, string> = {
+  mejora: '↑ Más derivado',
+  empeora: '↓ Más directo',
+  estable: '→ Estable',
+}
+
 function Tarjeta({ ind }: { ind: Indicador }) {
   return (
     <Panel className="flex flex-col gap-1 p-4">
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-semibold text-slate-700">{ind.titulo}</p>
         {ind.tendencia && (
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${TENDENCIA[ind.tendencia].clase}`}>
-            {ind.clave === 'criterio' ? TEXTO_VELOCIDAD[ind.tendencia] : TENDENCIA[ind.tendencia].texto}
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
+              ind.clave === 'derivado' ? 'bg-indigo-50 text-indigo-700' : TENDENCIA[ind.tendencia].clase
+            }`}
+          >
+            {ind.clave === 'criterio'
+              ? TEXTO_VELOCIDAD[ind.tendencia]
+              : ind.clave === 'derivado'
+                ? TEXTO_REPARTO[ind.tendencia]
+                : TENDENCIA[ind.tendencia].texto}
           </span>
         )}
       </div>
