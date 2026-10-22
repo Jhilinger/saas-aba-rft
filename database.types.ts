@@ -83,60 +83,27 @@ export type Database = {
       alumnos: {
         Row: {
           activo: boolean
-          alergias: string | null
           clinica_id: string
-          colegio: string | null
-          conductas_riesgo: string | null
-          contacto_emergencia: string | null
           created_at: string
-          diagnostico: string | null
-          fecha_inicio_intervencion: string | null
           fecha_nacimiento: string
           id: string
-          idiomas_entorno: string | null
-          medicacion: string | null
-          modalidad_comunicacion: string | null
           nombre_anonimizado: string
-          notas_clinicas: string | null
-          otras_terapias: string | null
         }
         Insert: {
           activo?: boolean
-          alergias?: string | null
           clinica_id: string
-          colegio?: string | null
-          conductas_riesgo?: string | null
-          contacto_emergencia?: string | null
           created_at?: string
-          diagnostico?: string | null
-          fecha_inicio_intervencion?: string | null
           fecha_nacimiento: string
           id?: string
-          idiomas_entorno?: string | null
-          medicacion?: string | null
-          modalidad_comunicacion?: string | null
           nombre_anonimizado: string
-          notas_clinicas?: string | null
-          otras_terapias?: string | null
         }
         Update: {
           activo?: boolean
-          alergias?: string | null
           clinica_id?: string
-          colegio?: string | null
-          conductas_riesgo?: string | null
-          contacto_emergencia?: string | null
           created_at?: string
-          diagnostico?: string | null
-          fecha_inicio_intervencion?: string | null
           fecha_nacimiento?: string
           id?: string
-          idiomas_entorno?: string | null
-          medicacion?: string | null
-          modalidad_comunicacion?: string | null
           nombre_anonimizado?: string
-          notas_clinicas?: string | null
-          otras_terapias?: string | null
         }
         Relationships: [
           {
@@ -144,6 +111,62 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinicas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumnos_datos_clinicos: {
+        Row: {
+          alergias: string | null
+          alumno_id: string
+          colegio: string | null
+          conductas_riesgo: string | null
+          contacto_emergencia: string | null
+          diagnostico: string | null
+          fecha_inicio_intervencion: string | null
+          idiomas_entorno: string | null
+          medicacion: string | null
+          modalidad_comunicacion: string | null
+          notas_clinicas: string | null
+          otras_terapias: string | null
+          updated_at: string
+        }
+        Insert: {
+          alergias?: string | null
+          alumno_id: string
+          colegio?: string | null
+          conductas_riesgo?: string | null
+          contacto_emergencia?: string | null
+          diagnostico?: string | null
+          fecha_inicio_intervencion?: string | null
+          idiomas_entorno?: string | null
+          medicacion?: string | null
+          modalidad_comunicacion?: string | null
+          notas_clinicas?: string | null
+          otras_terapias?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alergias?: string | null
+          alumno_id?: string
+          colegio?: string | null
+          conductas_riesgo?: string | null
+          contacto_emergencia?: string | null
+          diagnostico?: string | null
+          fecha_inicio_intervencion?: string | null
+          idiomas_entorno?: string | null
+          medicacion?: string | null
+          modalidad_comunicacion?: string | null
+          notas_clinicas?: string | null
+          otras_terapias?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumnos_datos_clinicos_alumno_id_fkey"
+            columns: ["alumno_id"]
+            isOneToOne: true
+            referencedRelation: "alumnos"
             referencedColumns: ["id"]
           },
         ]

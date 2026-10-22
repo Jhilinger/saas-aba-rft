@@ -54,13 +54,13 @@ export async function generarInforme(
   }
 
   // --- Datos del alumno y de la clínica ---
-  const { data: alumno } = await supabase
-    .from('alumnos')
-    .select('nombre_anonimizado, fecha_nacimiento, diagnostico, clinica_id')
-    .eq('id', alumnoId)
-    .single()
+  const [{ data: alumnoBasico }, { data: clinicos }] = await Promise.all([
+    supabase.from('alumnos').select('nombre_anonimizado, fecha_nacimiento, clinica_id').eq('id', alumnoId).single(),
+    supabase.from('alumnos_datos_clinicos').select('diagnostico').eq('alumno_id', alumnoId).maybeSingle(),
+  ])
 
-  if (!alumno) return { error: 'Alumno no encontrado' }
+  if (!alumnoBasico) return { error: 'Alumno no encontrado' }
+  const alumno = { ...alumnoBasico, diagnostico: clinicos?.diagnostico ?? null }
 
   const { data: clinica } = await supabase
     .from('clinicas')

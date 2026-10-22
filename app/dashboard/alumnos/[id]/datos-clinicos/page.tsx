@@ -23,20 +23,38 @@ export default async function DatosClinicosPage({
     redirect('/dashboard')
   }
 
-  const { data: alumno } = await supabase
-    .from('alumnos')
-    .select(
-      'id, nombre_anonimizado, fecha_nacimiento, fecha_inicio_intervencion, clinica_id, diagnostico, modalidad_comunicacion, idiomas_entorno, colegio, otras_terapias, medicacion, notas_clinicas, contacto_emergencia, alergias, conductas_riesgo'
-    )
-    .eq('id', id)
-    .single()
+  const [{ data: alumno }, { data: clinicos }] = await Promise.all([
+    supabase.from('alumnos').select('id, nombre_anonimizado, fecha_nacimiento').eq('id', id).single(),
+    // Tabla aparte: solo la ve el personal con acceso al alumno
+    supabase
+      .from('alumnos_datos_clinicos')
+      .select(
+        'fecha_inicio_intervencion, diagnostico, modalidad_comunicacion, idiomas_entorno, colegio, otras_terapias, medicacion, alergias, conductas_riesgo, contacto_emergencia, notas_clinicas'
+      )
+      .eq('alumno_id', id)
+      .maybeSingle(),
+  ])
 
   if (!alumno) notFound()
 
-    return (
+  const vacio = {
+    fecha_inicio_intervencion: null,
+    diagnostico: null,
+    modalidad_comunicacion: null,
+    idiomas_entorno: null,
+    colegio: null,
+    otras_terapias: null,
+    medicacion: null,
+    alergias: null,
+    conductas_riesgo: null,
+    contacto_emergencia: null,
+    notas_clinicas: null,
+  }
+
+  return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Datos</h2>
-      <EditarAlumnoForm alumno={alumno} />
+      <EditarAlumnoForm alumno={{ ...alumno, ...vacio, ...clinicos }} />
     </div>
   )
 }

@@ -212,21 +212,29 @@ export async function editarAlumno(alumnoId: string, formData: FormData) {
     .update({
       nombre_anonimizado: formData.get('nombre_anonimizado') as string,
       fecha_nacimiento: formData.get('fecha_nacimiento') as string,
-      fecha_inicio_intervencion: textoONulo('fecha_inicio_intervencion'),
-      diagnostico: formData.get('diagnostico') as string,
-      modalidad_comunicacion: textoONulo('modalidad_comunicacion'),
-      idiomas_entorno: textoONulo('idiomas_entorno'),
-      colegio: formData.get('colegio') as string,
-      otras_terapias: textoONulo('otras_terapias'),
-      medicacion: textoONulo('medicacion'),
-      notas_clinicas: formData.get('notas_clinicas') as string,
-      contacto_emergencia: formData.get('contacto_emergencia') as string,
-      alergias: formData.get('alergias') as string,
-      conductas_riesgo: textoONulo('conductas_riesgo'),
     })
     .eq('id', alumnoId)
 
   if (error) return { error: error.message }
+
+  // Datos clínicos: tabla aparte, solo visible para el personal (no familias)
+  const { error: errorClinicos } = await supabase.from('alumnos_datos_clinicos').upsert({
+    alumno_id: alumnoId,
+    fecha_inicio_intervencion: textoONulo('fecha_inicio_intervencion'),
+    diagnostico: textoONulo('diagnostico'),
+    modalidad_comunicacion: textoONulo('modalidad_comunicacion'),
+    idiomas_entorno: textoONulo('idiomas_entorno'),
+    colegio: textoONulo('colegio'),
+    otras_terapias: textoONulo('otras_terapias'),
+    medicacion: textoONulo('medicacion'),
+    alergias: textoONulo('alergias'),
+    conductas_riesgo: textoONulo('conductas_riesgo'),
+    contacto_emergencia: textoONulo('contacto_emergencia'),
+    notas_clinicas: textoONulo('notas_clinicas'),
+    updated_at: new Date().toISOString(),
+  })
+
+  if (errorClinicos) return { error: errorClinicos.message }
 
   revalidatePath(`/dashboard/alumnos/${alumnoId}`)
   revalidatePath('/dashboard/equipo')
