@@ -10,7 +10,7 @@ const PREGUNTAS = [
   {
     pregunta: '¿Qué es Abacontext?',
     respuesta:
-      'Una plataforma de gestión clínica para centros que trabajan con Análisis Aplicado de Conducta (ABA), pensada además para acompañarte a incorporar la Teoría del Marco Relacional (RFT) — con toma de datos, agenda, portal de familia, documentos y facturación, todo en un solo sitio.',
+      'Una plataforma de gestión clínica para centros que trabajan con Análisis Aplicado de Conducta (ABA), pensada además para acompañarte a incorporar la Teoría del Marco Relacional (RFT) — con un currículo estructurado por niveles y dominios, toma de datos, seguimiento del progreso y portal de familia, todo en un solo sitio.',
   },
   {
     pregunta: '¿Necesito saber RFT para empezar a usarlo?',

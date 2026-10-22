@@ -100,23 +100,6 @@ export async function generarInforme(
       })
       .join('; ')
   }
-    // --- Asistencia del período ---
-  const { data: sesionesPeriodo } = await supabase
-    .from('sesiones_programadas')
-    .select('estado')
-    .eq('alumno_id', alumnoId)
-    .gte('fecha_hora', periodoDesde)
-    .lt('fecha_hora', periodoHasta + 'T23:59:59.999')
-    .neq('estado', 'programada') // solo sesiones ya resueltas, no las futuras
-
-  let textoAsistencia: string | null = null
-  if (sesionesPeriodo && sesionesPeriodo.length > 0) {
-    const asistidas = sesionesPeriodo.filter((s) => s.estado === 'asistio').length
-    const canceladas = sesionesPeriodo.filter((s) => s.estado === 'cancelada').length
-    const noAsistio = sesionesPeriodo.filter((s) => s.estado === 'no_asistio').length
-    textoAsistencia = `${sesionesPeriodo.length} sesiones en el período: ${asistidas} asistidas, ${canceladas} canceladas, ${noAsistio} sin asistir`
-  }
-
   // --- Programas del alumno ---
   const { data: programas } = await supabase
     .from('programas_alumno')
@@ -331,13 +314,11 @@ export async function generarInforme(
 
   const areas = Object.keys(textoPorArea)
 
-  if (areas.length === 0 && !textoAsistencia) {
+  if (areas.length === 0) {
     return { error: 'No hay datos registrados para este alumno en el período seleccionado.' }
   }
 
-  const datosPorArea = areas.length > 0
-    ? areas.map((area) => `ÁREA: ${area}\n\n${textoPorArea[area].join('\n---\n')}`).join('\n\n===\n\n')
-    : '(Sin datos de programas en este período)'
+  const datosPorArea = areas.map((area) => `ÁREA: ${area}\n\n${textoPorArea[area].join('\n---\n')}`).join('\n\n===\n\n')
 
   // --- Prompt según destinatario ---
   const instruccionTono =
@@ -353,7 +334,7 @@ FORMATO OBLIGATORIO:
 - Cada título de sección debe ir en su propia línea, EN MAYÚSCULAS y sin ningún símbolo delante (ej.: INTRODUCCIÓN, en vez de "## Introducción" o "**Introducción**").
 - Extensión objetivo: entre 300 y 500 palabras en total.
 - Estructura exacta:
-  1. Título "INTRODUCCIÓN" — 2-3 frases situando el período y el alumno. Si hay reforzadores/preferencias conocidos, puedes mencionarlos brevemente aquí como contexto (ej. "durante las sesiones se han utilizado sus reforzadores habituales, como..."), sin dedicarles una sección propia. Si hay datos de asistencia, menciona aquí también de forma breve cuántas sesiones hubo y cuántas se asistieron.
+  1. Título "INTRODUCCIÓN" — 2-3 frases situando el período y el alumno. Si hay reforzadores/preferencias conocidos, puedes mencionarlos brevemente aquí como contexto (ej. "durante las sesiones se han utilizado sus reforzadores habituales, como..."), sin dedicarles una sección propia.
   2. Un apartado por cada ÁREA de trabajo (usa el nombre del área, ya en mayúsculas, como título). DENTRO de cada área, combina TODOS los programas de esa área en un único párrafo fluido y natural — NO crees un sub-apartado ni un título separado para cada programa individual, intégralos en el mismo relato.
   3. Título "RESUMEN" — 1-2 frases de cierre general.
 
@@ -362,13 +343,12 @@ REGLAS DE CONTENIDO:
 - NO des interpretaciones clínicas, diagnósticos, ni recomendaciones de tratamiento — eso es responsabilidad exclusiva del terapeuta.
 - Integra las notas del terapeuta de forma natural en el relato, no las cites literalmente entre comillas.
 - Los reforzadores/preferencias son solo contexto de fondo, no un progreso a describir — menciónalos como mucho una vez, brevemente.
-- La asistencia es un dato objetivo a mencionar brevemente en la introducción, sin interpretarla (no valores si es "buena" o "mala" asistencia, solo indica las cifras).
 - Cuando un registro indique explícitamente el objetivo ("aumentar" o "reducir"): presta mucha atención a esa dirección — nunca describas una bajada de porcentaje como "empeoramiento" si el objetivo era precisamente reducir esa conducta, y viceversa.
 
 DATOS DEL ALUMNO:
 - Iniciales: ${alumno.nombre_anonimizado}
 - Edad: ${edad} años
-${destinatario === 'formal' && alumno.diagnostico ? `- Diagnóstico: ${alumno.diagnostico}\n` : ''}${textoPreferencias ? `- Reforzadores/preferencias conocidos: ${textoPreferencias}\n` : ''}${textoEvaluacionesPref ? `- Evaluación formal de preferencias en el período: ${textoEvaluacionesPref}\n` : ''}${textoAsistencia ? `- Asistencia del período: ${textoAsistencia}\n` : ''}- Centro: ${clinica?.nombre ?? 'Centro de terapia'}
+${destinatario === 'formal' && alumno.diagnostico ? `- Diagnóstico: ${alumno.diagnostico}\n` : ''}${textoPreferencias ? `- Reforzadores/preferencias conocidos: ${textoPreferencias}\n` : ''}${textoEvaluacionesPref ? `- Evaluación formal de preferencias en el período: ${textoEvaluacionesPref}\n` : ''}- Centro: ${clinica?.nombre ?? 'Centro de terapia'}
 - Período del informe: ${periodoDesde} a ${periodoHasta}
 
 DATOS DEL PERÍODO (agrupados por área):

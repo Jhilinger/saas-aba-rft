@@ -64,8 +64,7 @@ export default function PrivacidadPage() {
           <p>
             Nombre o iniciales del alumno, fecha de nacimiento, datos de programas de
             aprendizaje (ABA y RFT), registros de conducta (intervalo, duración, tasa,
-            ABC), evaluaciones, informes generados, y datos de facturación aportados
-            voluntariamente por la familia.
+            ABC), evaluaciones e informes generados.
           </p>
           <p className="mt-2">
             Estos datos incluyen <strong>categorías especiales de datos</strong> (datos

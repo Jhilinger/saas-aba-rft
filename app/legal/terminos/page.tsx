@@ -35,8 +35,8 @@ export default function TerminosPage() {
           <h2 className="mb-2 text-lg font-semibold text-slate-900">2. Descripción del servicio</h2>
           <p>
             Abacontext ofrece, entre otras funciones: gestión de currículo y programas
-            (ABA/RFT), toma de datos y registros de conducta, evaluación inicial, agenda
-            de sesiones, portal de familia, generación de informes (incluyendo mediante
+            (ABA/RFT), toma de datos y registros de conducta, evaluación inicial, portal de
+            familia, generación de informes (incluyendo mediante
             inteligencia artificial) y facturación de la suscripción.
           </p>
         </section>

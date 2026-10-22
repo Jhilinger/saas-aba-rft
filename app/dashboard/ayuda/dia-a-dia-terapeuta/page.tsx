@@ -13,26 +13,13 @@ export default function DiaADiaTerapeutaPage() {
 
       <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Tu día a día como terapeuta</h1>
       <p className="text-sm text-slate-500">
-        Un recorrido por todo lo que usarás normalmente: tu agenda, la toma de datos, y el
-        seguimiento del progreso.
+        Un recorrido por todo lo que usarás normalmente: la toma de datos y el seguimiento del
+        progreso.
       </p>
 
       <div className="space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">1. Revisa tu agenda</h2>
-          <p>
-            Entra en <Link href="/dashboard/agenda" className="text-indigo-600 hover:underline">Agenda</Link>{' '}
-            para ver tus sesiones de la semana en una cuadrícula, día por día. Si tienes sesiones
-            pasadas sin marcar, verás un aviso destacado arriba para no olvidarte.
-          </p>
-          <p className="mt-2">
-            Al hacer clic en una sesión pasada sin marcar, se despliega un menú rápido para marcarla
-            como Asistió, Cancelada (por ti o por la familia), o No asistió.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">2. Toma de datos en el PEI</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">1. Toma de datos en el PEI</h2>
           <p>
             Entra en la ficha del alumno → <strong>PEI</strong>, y elige el programa con el que vas
             a trabajar en la sesión. Ahí tienes la pantalla de toma de datos de ensayo discreto:
@@ -47,7 +34,7 @@ export default function DiaADiaTerapeutaPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Medir una conducta en vez de enseñar una habilidad</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">2. Medir una conducta en vez de enseñar una habilidad</h2>
           <p>
             Cuando el objetivo no es enseñar una habilidad sino medir una conducta concreta (una
             rabieta, el tiempo en tarea...), crea el programa igual que cualquier otro de
@@ -72,7 +59,7 @@ export default function DiaADiaTerapeutaPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Evaluación de preferencias (MSWO/MSW)</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Evaluación de preferencias (MSWO/MSW)</h2>
           <p>
             En <strong>Preferencias</strong> puedes hacer una evaluación formal de qué le motiva más
             al alumno, con 2 procedimientos: MSWO (el alumno elige entre varios ítems, el elegido se
@@ -83,11 +70,11 @@ export default function DiaADiaTerapeutaPage() {
                 </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Consulta el progreso</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Consulta el progreso</h2>
           <p>
-            En <strong>Progreso</strong>, dentro de la ficha del alumno, tienes una tabla con todos
-            los programas del PEI y su estado actual, con filtros por tipo y estado. Desde ahí
-            puedes acceder al gráfico de evolución de cualquier programa concreto, con línea base
+            En <strong>Progreso</strong>, dentro de la ficha del alumno, ves de un vistazo cuánto
+            ha avanzado en cada nivel y dominio del currículo. Al pulsar un dominio se despliegan
+            sus programas, y desde cada uno accedes a su gráfico de evolución, con la línea base
             diferenciada de la intervención y la línea de tendencia.
           </p>
         </section>
@@ -95,9 +82,8 @@ export default function DiaADiaTerapeutaPage() {
         <section>
           <h2 className="mb-2 text-lg font-semibold text-slate-900">Resumen</h2>
           <p>
-            Tu flujo típico de sesión: revisa la Agenda → entra en el alumno → toma datos en el PEI
-            → marca la sesión como asistida al terminar. El
-            Progreso y los gráficos se construyen solos a partir de los datos que vayas registrando.
+            Tu flujo típico de sesión: entra en el alumno → toma datos en el PEI. El Progreso y los
+            gráficos se construyen solos a partir de los datos que vayas registrando.
           </p>
         </section>
       </div>

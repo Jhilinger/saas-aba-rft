@@ -6,7 +6,6 @@ import AbacontextIcon from './abacontext-icon'
 import {
   ClipboardList,
   Activity,
-  CalendarDays,
   Users,
   Receipt,
   Star,
@@ -81,8 +80,8 @@ const BLOQUES_FUNCIONALIDAD = [
         Icono: ClipboardList,
       },
       {
-        titulo: 'Currículo reutilizable',
-        texto: 'Biblioteca propia de programas ABA y grupos RFT — se define una vez, se usa con cada alumno que lo necesite.',
+        titulo: 'Currículo por niveles y dominios',
+        texto: 'Cuatro niveles y dieciséis dominios de aprendizaje directo y relacional, con cada programa en su sitio y su código.',
         Icono: BookOpenCheck,
       },
       {
@@ -107,9 +106,9 @@ const BLOQUES_FUNCIONALIDAD = [
         Icono: Activity,
       },
       {
-        titulo: 'Agenda semanal',
-        texto: 'Sesiones recurrentes y un aviso siempre visible de lo que quedó pendiente de marcar.',
-        Icono: CalendarDays,
+        titulo: 'Secuencia guiada',
+        texto: 'El PEI ofrece lo que toca trabajar: cada nivel y dominio se desbloquea al conseguir el anterior.',
+        Icono: GraduationCap,
       },
     ],
   },
@@ -124,7 +123,7 @@ const BLOQUES_FUNCIONALIDAD = [
       },
       {
         titulo: 'Portal de familia',
-        texto: 'Progreso, asistencia e informes generados con IA, en un único acceso.',
+        texto: 'Progreso por niveles y dominios e informes generados con IA, en un único acceso.',
         Icono: Users,
       },
       {

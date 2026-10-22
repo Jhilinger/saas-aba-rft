@@ -700,60 +700,6 @@ export type Database = {
           },
         ]
       }
-      datos_facturacion_familia: {
-        Row: {
-          actualizado_por: string | null
-          alumno_id: string
-          ciudad: string | null
-          codigo_postal: string | null
-          direccion: string | null
-          id: string
-          nif: string | null
-          nombre_razon_social: string | null
-          pais: string | null
-          updated_at: string
-        }
-        Insert: {
-          actualizado_por?: string | null
-          alumno_id: string
-          ciudad?: string | null
-          codigo_postal?: string | null
-          direccion?: string | null
-          id?: string
-          nif?: string | null
-          nombre_razon_social?: string | null
-          pais?: string | null
-          updated_at?: string
-        }
-        Update: {
-          actualizado_por?: string | null
-          alumno_id?: string
-          ciudad?: string | null
-          codigo_postal?: string | null
-          direccion?: string | null
-          id?: string
-          nif?: string | null
-          nombre_razon_social?: string | null
-          pais?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "datos_facturacion_familia_actualizado_por_fkey"
-            columns: ["actualizado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "datos_facturacion_familia_alumno_id_fkey"
-            columns: ["alumno_id"]
-            isOneToOne: true
-            referencedRelation: "alumnos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dominio_rft_fases: {
         Row: {
           dominado: boolean
@@ -1849,76 +1795,6 @@ export type Database = {
           },
         ]
       }
-      sesiones_programadas: {
-        Row: {
-          alumno_id: string
-          cancelado_por: string | null
-          confirmada_familia: boolean
-          creado_por: string | null
-          created_at: string
-          duracion_minutos: number
-          estado: Database["public"]["Enums"]["estado_sesion"]
-          fecha_hora: string
-          id: string
-          notas: string | null
-          serie_id: string | null
-          terapeuta_id: string
-          updated_at: string
-        }
-        Insert: {
-          alumno_id: string
-          cancelado_por?: string | null
-          confirmada_familia?: boolean
-          creado_por?: string | null
-          created_at?: string
-          duracion_minutos?: number
-          estado?: Database["public"]["Enums"]["estado_sesion"]
-          fecha_hora: string
-          id?: string
-          notas?: string | null
-          serie_id?: string | null
-          terapeuta_id: string
-          updated_at?: string
-        }
-        Update: {
-          alumno_id?: string
-          cancelado_por?: string | null
-          confirmada_familia?: boolean
-          creado_por?: string | null
-          created_at?: string
-          duracion_minutos?: number
-          estado?: Database["public"]["Enums"]["estado_sesion"]
-          fecha_hora?: string
-          id?: string
-          notas?: string | null
-          serie_id?: string | null
-          terapeuta_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "sesiones_programadas_alumno_id_fkey"
-            columns: ["alumno_id"]
-            isOneToOne: false
-            referencedRelation: "alumnos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sesiones_programadas_creado_por_fkey"
-            columns: ["creado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "sesiones_programadas_terapeuta_id_fkey"
-            columns: ["terapeuta_id"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       stripe_eventos: {
         Row: {
           clinica_id: string | null
@@ -2018,7 +1894,6 @@ export type Database = {
         | "dominado"
         | "pausado"
         | "linea_base"
-      estado_sesion: "programada" | "asistio" | "cancelada" | "no_asistio"
       estado_suscripcion: "activa" | "impagada" | "cancelada" | "prueba"
       fase_rft:
         | "directo"
@@ -2189,7 +2064,6 @@ export const Constants = {
         "pausado",
         "linea_base",
       ],
-      estado_sesion: ["programada", "asistio", "cancelada", "no_asistio"],
       estado_suscripcion: ["activa", "impagada", "cancelada", "prueba"],
       fase_rft: [
         "directo",

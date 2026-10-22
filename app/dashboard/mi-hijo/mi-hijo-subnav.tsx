@@ -9,10 +9,7 @@ export default function MiHijoSubnav() {
 
   const enlaces = [
     { href: base, label: 'Progreso' },
-    { href: `${base}/asistencia`, label: 'Asistencia' },
     { href: `${base}/informes`, label: 'Informes' },
-    { href: `${base}/documentos`, label: 'Documentos' },
-    { href: `${base}/facturacion`, label: 'Facturación' },
   ]
 
   const activo = (href: string) => (href === base ? pathname === base : pathname.startsWith(href))

@@ -27,8 +27,8 @@ export default function PrimerosPasosAdminPage() {
           </p>
           <p className="mt-2">
             Si tú mismo también atiendes a alumnos como terapeuta, activa el interruptor
-            "También soy terapeuta" — esto añade las secciones de trabajo diario (Mis Alumnos,
-            Agenda, Mis programas) a tu propio menú, sin necesitar una segunda cuenta.
+            "También soy terapeuta" — esto añade las secciones de trabajo diario (Mis Alumnos y
+            Mis programas) a tu propio menú, sin necesitar una segunda cuenta.
           </p>
         </section>
 
@@ -80,14 +80,14 @@ export default function PrimerosPasosAdminPage() {
           <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Ya está todo listo para trabajar</h2>
           <p>
             Con el equipo, los alumnos y el currículo configurados, tus terapeutas ya pueden entrar
-            a tomar datos, gestionar la agenda, y hacer seguimiento del progreso. Como administrador,
+            a tomar datos y hacer seguimiento del progreso. Como administrador,
             tú tienes visibilidad completa de toda la clínica desde el menú lateral.
           </p>
           <p className="mt-2">
             Un último paso recomendado: entra en{' '}
             <Link href="/dashboard/familia" className="text-indigo-600 hover:underline">Familia</Link>{' '}
             para vincular las cuentas de las familias de tus alumnos, así podrán ver el progreso
-            y confirmar la asistencia desde su propio portal.
+            y los informes desde su propio portal.
           </p>
         </section>
       </div>

@@ -9,12 +9,12 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
     {
       href: '/dashboard/ayuda/primeros-pasos-admin',
       titulo: 'Primeros pasos como administrador',
-      resumen: 'Crea tu equipo de terapeutas, da de alta a tus alumnos, y configura el currículo de tu clínica.',
+      resumen: 'Crea tu equipo de terapeutas, da de alta a tus alumnos y vincula a las familias.',
     },
     {
       href: '/dashboard/ayuda/facturacion-admin',
-      titulo: 'Facturación y suscripción',
-      resumen: 'Cómo funciona el cobro de tu suscripción, y la facturación de cada alumno.',
+      titulo: 'Tu suscripción',
+      resumen: 'Cómo funciona el cobro de tu suscripción.',
     },
     {
       href: '/dashboard/ayuda/informes-lote-admin',
@@ -26,14 +26,14 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
     {
       href: '/dashboard/ayuda/dia-a-dia-terapeuta',
       titulo: 'Tu día a día como terapeuta',
-      resumen: 'Agenda, toma de datos en el PEI, preferencias, y progreso.',
+      resumen: 'Toma de datos en el PEI, preferencias y progreso.',
     },
   ],
     familia: [
     {
       href: '/dashboard/ayuda/guia-familia',
       titulo: 'Guía para familias',
-      resumen: 'Progreso, asistencia, informes, registros de conducta, documentos y facturación.',
+      resumen: 'Progreso, informes y registros de conducta.',
     },
   ],
 }

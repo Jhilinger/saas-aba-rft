@@ -13,31 +13,22 @@ export default function GuiaFamiliaPage() {
 
       <h1 className="text-xl sm:text-2xl font-bold text-slate-800">Guía para familias</h1>
       <p className="text-sm text-slate-500">
-        Todo lo que puedes hacer desde tu portal: seguir el progreso, confirmar sesiones,
-        consultar informes, y más.
+        Todo lo que puedes hacer desde tu portal: seguir el progreso y consultar los informes.
       </p>
 
       <div className="space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
           <h2 className="mb-2 text-lg font-semibold text-slate-900">1. Ver el progreso</h2>
           <p>
-            En <strong>Progreso</strong>, la pantalla con la que entras por defecto, verás una
-            tabla con todos los programas que está trabajando tu hijo/a, y si quieres más detalle,
-            puedes entrar en el gráfico de evolución de cualquiera de ellos.
+            En <strong>Progreso</strong>, la pantalla con la que entras por defecto, verás cuánto
+            ha avanzado tu hijo/a en cada nivel y área del currículo. Al pulsar un área se
+            despliegan los programas que está trabajando, y puedes entrar en el gráfico de
+            evolución de cualquiera de ellos.
           </p>
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">2. Confirmar la asistencia</h2>
-                    <p>
-            En <strong>Asistencia</strong> verás el listado de sesiones realizadas. Te pedimos que
-            las confirmes cuando corresponda — es un simple clic, y ayuda a mantener el registro al
-            día. Recibirás un recordatorio por email hacia final de mes si te queda alguna pendiente.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Informes</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">2. Informes</h2>
           <p>
             En <strong>Informes</strong> puedes consultar y descargar los informes que el equipo
             terapéutico haya generado sobre el progreso de tu hijo/a.
@@ -45,7 +36,7 @@ export default function GuiaFamiliaPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Registros de conducta compartidos</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">3. Registros de conducta compartidos</h2>
           <p>
             Si el equipo terapéutico decide compartir contigo algún registro de conducta concreto
             (por ejemplo, para hacer seguimiento de una conducta también en casa), lo verás junto
@@ -55,13 +46,6 @@ export default function GuiaFamiliaPage() {
           </p>
         </section>
 
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Facturación</h2>
-          <p>
-            En <strong>Facturación</strong> puedes aportar tus datos de facturación (nombre o razón
-            social, NIF, dirección) para que tu clínica pueda emitirte las facturas correctamente.
-          </p>
-        </section>
       </div>
     </div>
   )

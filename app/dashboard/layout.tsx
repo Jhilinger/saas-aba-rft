@@ -21,7 +21,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
     const enlaces: Enlace[] = [
       { href: '/dashboard', label: 'Inicio' },
       { href: '/dashboard/facturacion', label: 'Suscripción', grupo: 'centro' },
-      { href: '/dashboard/facturacion-alumnos', label: 'Facturación', grupo: 'centro' },
       { href: '/dashboard/curriculo-base', label: 'Currículo', grupo: 'centro' },
       { href: '/dashboard/curriculo', label: 'Programas de la clínica', grupo: 'centro' },
       { href: '/dashboard/informes-lote', label: 'Informes en lote', grupo: 'centro' },
@@ -33,7 +32,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
     if (tambienTerapeuta) {
       enlaces.push(
         { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos', grupo: 'trabajo' },
-        { href: '/dashboard/agenda', label: 'Agenda', grupo: 'trabajo' },
         { href: '/dashboard/mis-programas', label: 'Mis programas', grupo: 'trabajo' }
       )
     }
@@ -44,7 +42,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
     return [
       { href: '/dashboard', label: 'Inicio' },
       { href: '/dashboard/mis-alumnos', label: 'Mis Alumnos' },
-      { href: '/dashboard/agenda', label: 'Agenda' },
       { href: '/dashboard/curriculo-base', label: 'Currículo' },
       { href: '/dashboard/mis-programas', label: 'Mis programas' },
       { href: '/dashboard/ayuda', label: 'Ayuda' }
@@ -54,9 +51,7 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
     if (rol === 'familia') {
     return [
       { href: '/dashboard/mi-hijo', label: 'Progreso' },
-      { href: '/dashboard/mi-hijo/asistencia', label: 'Asistencia' },
       { href: '/dashboard/mi-hijo/informes', label: 'Informes' },
-      { href: '/dashboard/mi-hijo/facturacion', label: 'Facturación' },
       { href: '/dashboard/ayuda', label: 'Ayuda' }
     ]
   }
