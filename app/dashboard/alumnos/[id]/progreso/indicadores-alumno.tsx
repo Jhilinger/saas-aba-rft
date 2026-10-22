@@ -8,6 +8,14 @@ const TENDENCIA: Record<Exclude<Tendencia, null>, { texto: string; clase: string
   estable: { texto: '→ Estable', clase: 'bg-slate-100 text-slate-600' },
 }
 
+// En velocidad, el valor son ensayos (menos = mejor): la tendencia se dice
+// en términos de rapidez para que no se lea al revés
+const TEXTO_VELOCIDAD: Record<Exclude<Tendencia, null>, string> = {
+  mejora: '↑ Más rápido',
+  empeora: '↓ Más lento',
+  estable: '→ Estable',
+}
+
 function Tarjeta({ ind }: { ind: Indicador }) {
   return (
     <Panel className="flex flex-col gap-1 p-4">
@@ -15,7 +23,7 @@ function Tarjeta({ ind }: { ind: Indicador }) {
         <p className="text-sm font-semibold text-slate-700">{ind.titulo}</p>
         {ind.tendencia && (
           <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${TENDENCIA[ind.tendencia].clase}`}>
-            {TENDENCIA[ind.tendencia].texto}
+            {ind.clave === 'criterio' ? TEXTO_VELOCIDAD[ind.tendencia] : TENDENCIA[ind.tendencia].texto}
           </span>
         )}
       </div>

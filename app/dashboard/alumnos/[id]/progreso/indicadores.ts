@@ -5,14 +5,14 @@ import type { createClient } from '@/utils/supabase/server'
 // uno exige un mínimo de datos: por debajo se muestra "datos insuficientes".
 //
 // Ventana: últimas VENTANA_DIAS, con tendencia frente a la ventana anterior.
-// - Aprendizaje derivado: de los logros de la ventana, % sin enseñanza
+// - Generatividad: de los logros de la ventana, % sin enseñanza
 //   directa. Logro = conjunto ABA dominado o relación RFT dominada (fase +
 //   posiciones de un grupo). Derivado = test superado sin ayudas
 //   (dominio_rft_fases.via_entrenamiento = false).
 // - Independencia: ensayos ABA de intervención correctos sin ayuda / total.
 // - Tests a la primera: tests RFT cuya primera sesión cae en la ventana y se
 //   superó en ese primer bloque, sin ayudas.
-// - Ensayos hasta el criterio: mediana de ensayos de intervención de los
+// - Velocidad de aprendizaje (ensayos hasta el criterio): mediana de ensayos de intervención de los
 //   últimos 3 conjuntos ABA dominados, frente a los anteriores.
 // - Estancados: conjuntos ABA / relaciones RFT en entrenamiento sin dominar,
 //   con >= BLOQUES_MIN_ESTANCAMIENTO bloques y sin mejora reciente.
@@ -208,7 +208,7 @@ export async function calcularIndicadores(
   const indicadores: Indicador[] = [
     {
       clave: 'derivado',
-      titulo: 'Aprendizaje derivado',
+      titulo: 'Generatividad',
       valor: derivadoAhora === null ? null : `${Math.round(derivadoAhora)}%`,
       detalle:
         derivadoAhora === null
@@ -243,21 +243,21 @@ export async function calcularIndicadores(
     },
     {
       clave: 'criterio',
-      titulo: 'Ensayos hasta el criterio',
+      titulo: 'Velocidad de aprendizaje',
       valor: criterioAhora === null ? null : `${Math.round(criterioAhora)}`,
       detalle:
         criterioAhora === null
           ? `Hacen falta al menos 2 conjuntos dominados (hay ${dominadosAba.length}).`
           : criterioAntes === null
-            ? `ensayos por conjunto (mediana de los últimos ${ultimos.length})`
-            : `ensayos por conjunto (antes ${Math.round(criterioAntes)})`,
+            ? `ensayos hasta el criterio por conjunto (mediana de los últimos ${ultimos.length})`
+            : `ensayos hasta el criterio por conjunto (antes ${Math.round(criterioAntes)})`,
       // Menos ensayos = aprende más rápido; umbral del 15% sobre el valor anterior
       tendencia:
         criterioAhora === null || criterioAntes === null
           ? null
           : tendencia(criterioAhora, criterioAntes, criterioAntes * 0.15, false),
       explicacion:
-        'Aprender a aprender: ensayos de intervención que necesitaron los últimos conjuntos dominados. Si baja, cada vez aprende más rápido. No usa la ventana de 8 semanas.',
+        'Aprender a aprender: ensayos de intervención que necesitaron los últimos conjuntos dominados hasta llegar al criterio. Cuantos menos, más rápido aprende. No usa la ventana de 8 semanas.',
     },
   ]
 
