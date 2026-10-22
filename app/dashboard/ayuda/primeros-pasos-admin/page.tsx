@@ -86,8 +86,8 @@ export default function PrimerosPasosAdminPage() {
           <p className="mt-2">
             Un último paso recomendado: entra en{' '}
             <Link href="/dashboard/familia" className="text-indigo-600 hover:underline">Familia</Link>{' '}
-            para vincular las cuentas de las familias de tus alumnos, así podrán ver el progreso,
-            confirmar asistencia, y firmar documentos desde su propio portal.
+            para vincular las cuentas de las familias de tus alumnos, así podrán ver el progreso
+            y confirmar la asistencia desde su propio portal.
           </p>
         </section>
       </div>

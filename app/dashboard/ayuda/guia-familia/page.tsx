@@ -56,16 +56,7 @@ export default function GuiaFamiliaPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Documentos</h2>
-          <p>
-            En <strong>Documentos</strong> puedes firmar digitalmente los documentos legales que tu
-            clínica te solicite (consentimientos informados, protección de datos...), directamente
-            desde el móvil, dibujando tu firma con el dedo.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-slate-900">6. Facturación</h2>
+          <h2 className="mb-2 text-lg font-semibold text-slate-900">5. Facturación</h2>
           <p>
             En <strong>Facturación</strong> puedes aportar tus datos de facturación (nombre o razón
             social, NIF, dirección) para que tu clínica pueda emitirte las facturas correctamente.

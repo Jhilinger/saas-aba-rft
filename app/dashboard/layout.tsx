@@ -24,7 +24,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/facturacion-alumnos', label: 'Facturación', grupo: 'centro' },
       { href: '/dashboard/curriculo-base', label: 'Currículo', grupo: 'centro' },
       { href: '/dashboard/curriculo', label: 'Programas de la clínica', grupo: 'centro' },
-      { href: '/dashboard/documentos-legales', label: 'Documentos legales', grupo: 'centro' },
       { href: '/dashboard/informes-lote', label: 'Informes en lote', grupo: 'centro' },
       { href: '/dashboard/equipo', label: 'Terapeutas', grupo: 'perfiles' },
       { href: '/dashboard/alumnos', label: 'Alumnos', grupo: 'perfiles' },
@@ -57,7 +56,6 @@ function construirEnlaces(rol: string, tambienTerapeuta: boolean): Enlace[] {
       { href: '/dashboard/mi-hijo', label: 'Progreso' },
       { href: '/dashboard/mi-hijo/asistencia', label: 'Asistencia' },
       { href: '/dashboard/mi-hijo/informes', label: 'Informes' },
-      { href: '/dashboard/mi-hijo/documentos', label: 'Documentos' },
       { href: '/dashboard/mi-hijo/facturacion', label: 'Facturación' },
       { href: '/dashboard/ayuda', label: 'Ayuda' }
     ]

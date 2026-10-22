@@ -17,11 +17,6 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
       resumen: 'Cómo funciona el cobro de tu suscripción, y la facturación de cada alumno.',
     },
     {
-      href: '/dashboard/ayuda/documentos-legales-admin',
-      titulo: 'Documentos legales',
-      resumen: 'Crear plantillas de documentos y hacer seguimiento de las firmas de las familias.',
-    },
-    {
       href: '/dashboard/ayuda/informes-lote-admin',
       titulo: 'Informes en lote',
       resumen: 'Genera el informe de progreso de varios alumnos a la vez.',

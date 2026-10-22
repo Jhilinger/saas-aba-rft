@@ -12,7 +12,7 @@ export default function PrivacidadPage() {
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-slate-900">Política de Privacidad</h1>
-      <p className="mt-1 text-sm text-slate-600">Última actualización: [27/08/2026]</p>
+      <p className="mt-1 text-sm text-slate-600">Última actualización: [22/10/2026]</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
@@ -44,8 +44,7 @@ export default function PrivacidadPage() {
             <li>
               <strong>Como encargado del tratamiento</strong>, respecto a los datos
               clínicos de los alumnos/pacientes que cada clínica introduce en la
-              plataforma (programas, evaluaciones, registros de conducta, documentos
-              firmados). En este caso, <strong>la clínica es la responsable del
+              plataforma (programas, evaluaciones, registros de conducta). En este caso, <strong>la clínica es la responsable del
               tratamiento</strong> de los datos de sus propios pacientes, y Abacontext
               únicamente los trata siguiendo sus instrucciones, para prestarle el
               servicio. La clínica es quien debe recabar el consentimiento informado de
@@ -65,8 +64,8 @@ export default function PrivacidadPage() {
           <p>
             Nombre o iniciales del alumno, fecha de nacimiento, datos de programas de
             aprendizaje (ABA y RFT), registros de conducta (intervalo, duración, tasa,
-            ABC), evaluaciones, informes generados, documentos firmados digitalmente, y
-            datos de facturación aportados voluntariamente por la familia.
+            ABC), evaluaciones, informes generados, y datos de facturación aportados
+            voluntariamente por la familia.
           </p>
           <p className="mt-2">
             Estos datos incluyen <strong>categorías especiales de datos</strong> (datos

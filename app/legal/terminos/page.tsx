@@ -12,7 +12,7 @@ export default function TerminosPage() {
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-slate-900">Términos de Uso</h1>
-      <p className="mt-1 text-sm text-slate-600">Última actualización: [27/08/2026]</p>
+      <p className="mt-1 text-sm text-slate-600">Última actualización: [22/10/2026]</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-slate-700">
         <section>
@@ -37,8 +37,7 @@ export default function TerminosPage() {
             Abacontext ofrece, entre otras funciones: gestión de currículo y programas
             (ABA/RFT), toma de datos y registros de conducta, evaluación inicial, agenda
             de sesiones, portal de familia, generación de informes (incluyendo mediante
-            inteligencia artificial), documentos con firma digital, y facturación de la
-            suscripción.
+            inteligencia artificial) y facturación de la suscripción.
           </p>
         </section>
 

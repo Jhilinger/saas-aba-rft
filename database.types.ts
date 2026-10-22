@@ -754,67 +754,6 @@ export type Database = {
           },
         ]
       }
-      documentos_firmados: {
-        Row: {
-          alumno_id: string
-          contenido_firmado: string
-          dni_firmante: string | null
-          fecha_firma: string
-          firma_imagen_url: string
-          firmado_por: string
-          id: string
-          nombre_firmante: string | null
-          pdf_url: string
-          tipo_documento_id: string
-        }
-        Insert: {
-          alumno_id: string
-          contenido_firmado: string
-          dni_firmante?: string | null
-          fecha_firma?: string
-          firma_imagen_url: string
-          firmado_por: string
-          id?: string
-          nombre_firmante?: string | null
-          pdf_url: string
-          tipo_documento_id: string
-        }
-        Update: {
-          alumno_id?: string
-          contenido_firmado?: string
-          dni_firmante?: string | null
-          fecha_firma?: string
-          firma_imagen_url?: string
-          firmado_por?: string
-          id?: string
-          nombre_firmante?: string | null
-          pdf_url?: string
-          tipo_documento_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "documentos_firmados_alumno_id_fkey"
-            columns: ["alumno_id"]
-            isOneToOne: false
-            referencedRelation: "alumnos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_firmados_firmado_por_fkey"
-            columns: ["firmado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "documentos_firmados_tipo_documento_id_fkey"
-            columns: ["tipo_documento_id"]
-            isOneToOne: false
-            referencedRelation: "tipos_documento_clinica"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dominio_rft_fases: {
         Row: {
           dominado: boolean
@@ -2014,54 +1953,6 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinicas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tipos_documento_clinica: {
-        Row: {
-          activo: boolean
-          clinica_id: string
-          contenido: string
-          creado_por: string | null
-          created_at: string
-          id: string
-          titulo: string
-          updated_at: string
-        }
-        Insert: {
-          activo?: boolean
-          clinica_id: string
-          contenido: string
-          creado_por?: string | null
-          created_at?: string
-          id?: string
-          titulo: string
-          updated_at?: string
-        }
-        Update: {
-          activo?: boolean
-          clinica_id?: string
-          contenido?: string
-          creado_por?: string | null
-          created_at?: string
-          id?: string
-          titulo?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tipos_documento_clinica_clinica_id_fkey"
-            columns: ["clinica_id"]
-            isOneToOne: false
-            referencedRelation: "clinicas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tipos_documento_clinica_creado_por_fkey"
-            columns: ["creado_por"]
-            isOneToOne: false
-            referencedRelation: "perfiles"
             referencedColumns: ["id"]
           },
         ]
