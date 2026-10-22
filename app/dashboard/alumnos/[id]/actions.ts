@@ -204,17 +204,25 @@ export async function crearProgramaPersonalizado(
 
 export async function editarAlumno(alumnoId: string, formData: FormData) {
   const supabase = await createClient()
+  // Campo vacío = sin dato (null): una fecha o modalidad vacía no es válida
+  const textoONulo = (campo: string) => ((formData.get(campo) as string) ?? '').trim() || null
 
   const { error } = await supabase
     .from('alumnos')
     .update({
       nombre_anonimizado: formData.get('nombre_anonimizado') as string,
       fecha_nacimiento: formData.get('fecha_nacimiento') as string,
+      fecha_inicio_intervencion: textoONulo('fecha_inicio_intervencion'),
       diagnostico: formData.get('diagnostico') as string,
+      modalidad_comunicacion: textoONulo('modalidad_comunicacion'),
+      idiomas_entorno: textoONulo('idiomas_entorno'),
       colegio: formData.get('colegio') as string,
+      otras_terapias: textoONulo('otras_terapias'),
+      medicacion: textoONulo('medicacion'),
       notas_clinicas: formData.get('notas_clinicas') as string,
       contacto_emergencia: formData.get('contacto_emergencia') as string,
       alergias: formData.get('alergias') as string,
+      conductas_riesgo: textoONulo('conductas_riesgo'),
     })
     .eq('id', alumnoId)
 

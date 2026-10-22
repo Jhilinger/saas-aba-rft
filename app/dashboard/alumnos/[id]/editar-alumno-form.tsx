@@ -10,12 +10,67 @@ type Alumno = {
   id: string
   nombre_anonimizado: string
   fecha_nacimiento: string
+  fecha_inicio_intervencion: string | null
   diagnostico: string | null
+  modalidad_comunicacion: string | null
+  idiomas_entorno: string | null
   colegio: string | null
-  notas_clinicas: string | null
-  contacto_emergencia: string | null
+  otras_terapias: string | null
+  medicacion: string | null
   alergias: string | null
+  conductas_riesgo: string | null
+  contacto_emergencia: string | null
+  notas_clinicas: string | null
 }
+
+export const MODALIDADES_COMUNICACION: Record<string, string> = {
+  vocal: 'Vocal',
+  signos: 'Signos',
+  pictogramas: 'Pictogramas / intercambio de imágenes',
+  saac: 'Comunicador o tableta (SAAC)',
+  mixta: 'Mixta',
+  no_funcional: 'Sin comunicación funcional todavía',
+}
+
+const inputClase = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base sm:text-sm'
+
+function Dato({ label, valor, ancho = false }: { label: string; valor: string | null; ancho?: boolean }) {
+  return (
+    <div className={ancho ? 'sm:col-span-2' : ''}>
+      <span className="text-slate-500">{label}</span>
+      <p className="whitespace-pre-wrap text-slate-700">{valor || '—'}</p>
+    </div>
+  )
+}
+
+function Campo({
+  label,
+  name,
+  valor,
+  ancho = false,
+  multilinea = false,
+  placeholder,
+}: {
+  label: string
+  name: string
+  valor: string | null
+  ancho?: boolean
+  multilinea?: boolean
+  placeholder?: string
+}) {
+  return (
+    <div className={`space-y-1 ${ancho ? 'sm:col-span-2' : ''}`}>
+      <label className="text-sm text-slate-600">{label}</label>
+      {multilinea ? (
+        <textarea name={name} defaultValue={valor ?? ''} rows={3} placeholder={placeholder} className={inputClase} />
+      ) : (
+        <input name={name} defaultValue={valor ?? ''} placeholder={placeholder} className={inputClase} />
+      )}
+    </div>
+  )
+}
+
+const fecha = (f: string | null) => (f ? new Date(f).toLocaleDateString('es-ES') : null)
 
 export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
   const [editando, setEditando] = useState(false)
@@ -33,26 +88,20 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
           </Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <span className="text-slate-500">Diagnóstico / condición</span>
-            <p className="text-slate-700">{alumno.diagnostico || '—'}</p>
-          </div>
-          <div>
-            <span className="text-slate-500">Colegio</span>
-            <p className="text-slate-700">{alumno.colegio || '—'}</p>
-          </div>
-          <div>
-            <span className="text-slate-500">Contacto de emergencia</span>
-            <p className="text-slate-700">{alumno.contacto_emergencia || '—'}</p>
-          </div>
-          <div>
-            <span className="text-slate-500">Alergias / condiciones médicas</span>
-            <p className="text-slate-700">{alumno.alergias || '—'}</p>
-          </div>
-          <div className="sm:col-span-2">
-            <span className="text-slate-500">Notas clínicas</span>
-            <p className="text-slate-700 whitespace-pre-wrap">{alumno.notas_clinicas || '—'}</p>
-          </div>
+          <Dato label="Fecha de inicio de la intervención" valor={fecha(alumno.fecha_inicio_intervencion)} />
+          <Dato label="Diagnóstico / condición" valor={alumno.diagnostico} />
+          <Dato
+            label="Modalidad de comunicación"
+            valor={alumno.modalidad_comunicacion ? MODALIDADES_COMUNICACION[alumno.modalidad_comunicacion] : null}
+          />
+          <Dato label="Idiomas del entorno" valor={alumno.idiomas_entorno} />
+          <Dato label="Colegio" valor={alumno.colegio} />
+          <Dato label="Otras terapias o profesionales" valor={alumno.otras_terapias} />
+          <Dato label="Medicación actual" valor={alumno.medicacion} />
+          <Dato label="Alergias / condiciones médicas" valor={alumno.alergias} />
+          <Dato label="Contacto de emergencia" valor={alumno.contacto_emergencia} />
+          <Dato label="Conductas de riesgo y plan de actuación" valor={alumno.conductas_riesgo} ancho />
+          <Dato label="Notas clínicas" valor={alumno.notas_clinicas} ancho />
         </div>
       </Panel>
     )
@@ -80,65 +129,53 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1">
           <label className="text-sm text-slate-600">Iniciales</label>
-          <input
-            name="nombre_anonimizado"
-            defaultValue={alumno.nombre_anonimizado}
-            required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
+          <input name="nombre_anonimizado" defaultValue={alumno.nombre_anonimizado} required className={inputClase} />
         </div>
         <div className="space-y-1">
           <label className="text-sm text-slate-600">Fecha de nacimiento</label>
+          <input name="fecha_nacimiento" type="date" defaultValue={alumno.fecha_nacimiento} required className={inputClase} />
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm text-slate-600">Fecha de inicio de la intervención</label>
           <input
-            name="fecha_nacimiento"
+            name="fecha_inicio_intervencion"
             type="date"
-            defaultValue={alumno.fecha_nacimiento}
-            required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            defaultValue={alumno.fecha_inicio_intervencion ?? ''}
+            className={inputClase}
           />
         </div>
+        <Campo label="Diagnóstico / condición" name="diagnostico" valor={alumno.diagnostico} />
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Diagnóstico / condición</label>
-          <input
-            name="diagnostico"
-            defaultValue={alumno.diagnostico ?? ''}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
+          <label className="text-sm text-slate-600">Modalidad de comunicación</label>
+          <select name="modalidad_comunicacion" defaultValue={alumno.modalidad_comunicacion ?? ''} className={inputClase}>
+            <option value="">Sin indicar</option>
+            {Object.entries(MODALIDADES_COMUNICACION).map(([valor, label]) => (
+              <option key={valor} value={valor}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Colegio</label>
-          <input
-            name="colegio"
-            defaultValue={alumno.colegio ?? ''}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Contacto de emergencia</label>
-          <input
-            name="contacto_emergencia"
-            placeholder="Nombre y teléfono"
-            defaultValue={alumno.contacto_emergencia ?? ''}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm text-slate-600">Alergias / condiciones médicas</label>
-          <input
-            name="alergias"
-            defaultValue={alumno.alergias ?? ''}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
-        <div className="sm:col-span-2 space-y-1">
-          <label className="text-sm text-slate-600">Notas clínicas</label>
-          <textarea
-            name="notas_clinicas"
-            defaultValue={alumno.notas_clinicas ?? ''}
-            rows={3}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          />
-        </div>
+        <Campo label="Idiomas del entorno" name="idiomas_entorno" valor={alumno.idiomas_entorno} placeholder="ej. Castellano y catalán" />
+        <Campo label="Colegio" name="colegio" valor={alumno.colegio} />
+        <Campo
+          label="Otras terapias o profesionales"
+          name="otras_terapias"
+          valor={alumno.otras_terapias}
+          placeholder="ej. Logopedia (2 h/semana), terapia ocupacional"
+        />
+        <Campo label="Medicación actual" name="medicacion" valor={alumno.medicacion} />
+        <Campo label="Alergias / condiciones médicas" name="alergias" valor={alumno.alergias} />
+        <Campo label="Contacto de emergencia" name="contacto_emergencia" valor={alumno.contacto_emergencia} placeholder="Nombre y teléfono" />
+        <Campo
+          label="Conductas de riesgo y plan de actuación"
+          name="conductas_riesgo"
+          valor={alumno.conductas_riesgo}
+          ancho
+          multilinea
+          placeholder="ej. Intentos de fuga en transiciones: mantener la puerta cerrada y anticipar con agenda visual"
+        />
+        <Campo label="Notas clínicas" name="notas_clinicas" valor={alumno.notas_clinicas} ancho multilinea />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">

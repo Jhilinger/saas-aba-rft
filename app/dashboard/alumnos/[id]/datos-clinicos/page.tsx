@@ -26,7 +26,7 @@ export default async function DatosClinicosPage({
   const { data: alumno } = await supabase
     .from('alumnos')
     .select(
-      'id, nombre_anonimizado, fecha_nacimiento, clinica_id, diagnostico, colegio, notas_clinicas, contacto_emergencia, alergias'
+      'id, nombre_anonimizado, fecha_nacimiento, fecha_inicio_intervencion, clinica_id, diagnostico, modalidad_comunicacion, idiomas_entorno, colegio, otras_terapias, medicacion, notas_clinicas, contacto_emergencia, alergias, conductas_riesgo'
     )
     .eq('id', id)
     .single()

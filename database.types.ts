@@ -86,39 +86,57 @@ export type Database = {
           alergias: string | null
           clinica_id: string
           colegio: string | null
+          conductas_riesgo: string | null
           contacto_emergencia: string | null
           created_at: string
           diagnostico: string | null
+          fecha_inicio_intervencion: string | null
           fecha_nacimiento: string
           id: string
+          idiomas_entorno: string | null
+          medicacion: string | null
+          modalidad_comunicacion: string | null
           nombre_anonimizado: string
           notas_clinicas: string | null
+          otras_terapias: string | null
         }
         Insert: {
           activo?: boolean
           alergias?: string | null
           clinica_id: string
           colegio?: string | null
+          conductas_riesgo?: string | null
           contacto_emergencia?: string | null
           created_at?: string
           diagnostico?: string | null
+          fecha_inicio_intervencion?: string | null
           fecha_nacimiento: string
           id?: string
+          idiomas_entorno?: string | null
+          medicacion?: string | null
+          modalidad_comunicacion?: string | null
           nombre_anonimizado: string
           notas_clinicas?: string | null
+          otras_terapias?: string | null
         }
         Update: {
           activo?: boolean
           alergias?: string | null
           clinica_id?: string
           colegio?: string | null
+          conductas_riesgo?: string | null
           contacto_emergencia?: string | null
           created_at?: string
           diagnostico?: string | null
+          fecha_inicio_intervencion?: string | null
           fecha_nacimiento?: string
           id?: string
+          idiomas_entorno?: string | null
+          medicacion?: string | null
+          modalidad_comunicacion?: string | null
           nombre_anonimizado?: string
           notas_clinicas?: string | null
+          otras_terapias?: string | null
         }
         Relationships: [
           {
