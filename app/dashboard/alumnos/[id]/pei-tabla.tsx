@@ -47,9 +47,9 @@ function FilaPrograma({ p }: { p: Programa }) {
         {p.excepcion_secuencia && (
           <span
             title={`Asignado fuera de secuencia: ${p.excepcion_secuencia}`}
-            className="cursor-help rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 whitespace-nowrap"
+            className="cursor-help rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs font-medium text-slate-600 whitespace-nowrap"
           >
-            Excepción
+            ⚑ Excepción
           </span>
         )}
         <span className="text-xs text-slate-500 whitespace-nowrap">{p.tipo === 'rft' ? 'Relacional' : 'Directo'}</span>

@@ -374,12 +374,9 @@ export default function EvaluacionClient({
         )}
 
         {pendientesRestantes > 0 && (
-          <button
-            onClick={iniciarContinuacion}
-            className="w-full rounded-lg bg-sky-600 py-3 text-sm font-semibold text-white hover:bg-sky-500"
-          >
+          <Button variant="secondary" onClick={iniciarContinuacion} className="w-full py-3">
             Continuar valorando pendientes ({pendientesRestantes})
-          </button>
+          </Button>
         )}
 
         {resultadoImport && (
@@ -392,10 +389,19 @@ export default function EvaluacionClient({
 
       {niveles
         .filter((n) => n.dominios.some((d) => porDominio.has(d.id)))
-        .map((n) => {
+        .map((n, i) => {
           const pct = porcentajes.get(n.numero) ?? null
           return (
-            <Panel key={n.numero} className="overflow-hidden">
+            <div key={n.numero} className="space-y-3">
+            {i === 0 && (
+              <div className="flex flex-wrap gap-4 text-xs text-slate-500">
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Dominado</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> Parcial</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-rose-600" /> No</span>
+                <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-slate-200" /> Sin evaluar</span>
+              </div>
+            )}
+            <Panel className="overflow-hidden">
               <div className="flex items-baseline justify-between gap-3 border-b border-slate-100 p-4 sm:px-5">
                 <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Nivel {n.numero}</p>
@@ -428,14 +434,15 @@ export default function EvaluacionClient({
                         </div>
                         <div className="flex h-2 w-full overflow-hidden rounded-full bg-slate-100 sm:ml-11 sm:w-auto">
                           <div className="bg-emerald-500" style={{ width: pctDe(cuenta.dominado) }} />
-                          <div className="bg-amber-400" style={{ width: pctDe(cuenta.parcial) }} />
-                          <div className="bg-rose-400" style={{ width: pctDe(cuenta.no) }} />
+                          <div className="bg-amber-500" style={{ width: pctDe(cuenta.parcial) }} />
+                          <div className="bg-rose-600" style={{ width: pctDe(cuenta.no) }} />
                         </div>
                       </li>
                     )
                   })}
               </ul>
             </Panel>
+            </div>
           )
         })}
     </div>

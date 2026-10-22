@@ -159,10 +159,12 @@ export default function AsignarProgramaForm({
 
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
         <p>
-          <strong className="text-slate-800">{visibles.length} disponibles</strong>
+          <strong className="text-slate-800">
+            {visibles.length} {visibles.length === 1 ? 'disponible' : 'disponibles'}
+          </strong>
           {numEnPei > 0 && ` · ${numEnPei} ya en el PEI`}
-          {numDominados > 0 && ` · ${numDominados} dominados`}
-          {numBloqueados > 0 && !mostrarBloqueados && ` · 🔒 ${numBloqueados} bloqueados`}
+          {numDominados > 0 && ` · ${numDominados} ${numDominados === 1 ? 'dominado' : 'dominados'}`}
+          {numBloqueados > 0 && !mostrarBloqueados && ` · 🔒 ${numBloqueados} ${numBloqueados === 1 ? 'bloqueado' : 'bloqueados'}`}
         </p>
         {numBloqueados > 0 && (
           <label className="flex items-center gap-1.5">
@@ -190,7 +192,7 @@ export default function AsignarProgramaForm({
               <li key={p.id} className="space-y-2 px-4 py-2.5 text-sm">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   {p.codigo && <span className="w-14 shrink-0 font-mono text-xs text-slate-500">{p.codigo}</span>}
-                  <span className="min-w-0 flex-1 basis-40 text-slate-800">
+                  <span className="min-w-0 flex-1 text-slate-800">
                     {p.bloqueo && '🔒 '}
                     {p.nombre}
                     <span className="ml-2 text-xs text-slate-400">{p.tipo === 'rft' ? 'Relacional' : 'Directo'}</span>

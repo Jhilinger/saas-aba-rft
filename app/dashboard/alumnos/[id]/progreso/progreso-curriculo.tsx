@@ -51,7 +51,7 @@ function BarraDominio({ d }: { d: DominioProgreso }) {
   return (
     <div className="flex h-2 w-full overflow-hidden rounded-full bg-slate-100">
       <div className="bg-emerald-500" style={{ width: pct(d.dominados) }} />
-      <div className="bg-amber-400" style={{ width: pct(d.adquisicion) }} />
+      <div className="bg-amber-500" style={{ width: pct(d.adquisicion) }} />
     </div>
   )
 }
@@ -59,7 +59,7 @@ function BarraDominio({ d }: { d: DominioProgreso }) {
 function FilaPrograma({ p }: { p: ProgramaProgreso }) {
   return (
     <li className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5 text-sm">
-      <span className="w-14 shrink-0 font-mono text-xs text-slate-500">{p.codigo ?? '—'}</span>
+      {p.codigo && <span className="w-14 shrink-0 font-mono text-xs text-slate-500">{p.codigo}</span>}
       {p.href ? (
         <Link href={p.href} className="min-w-0 flex-1 text-slate-800 hover:underline">
           {p.nombre}
@@ -131,15 +131,17 @@ export default function ProgresoCurriculo({
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Dominado
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400" /> En adquisición
+            <span className="h-2.5 w-2.5 rounded-full bg-amber-500" /> En adquisición
           </span>
           <span className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-slate-200" /> Sin enseñar
           </span>
         </div>
-        <Button variant="secondary" onClick={exportar} className="px-3 py-1.5 text-xs font-medium">
-          Exportar CSV
-        </Button>
+        {!ocultarSinEnsenar && (
+          <Button variant="secondary" onClick={exportar} className="px-3 py-1.5 text-xs font-medium">
+            Exportar CSV
+          </Button>
+        )}
       </div>
 
       {niveles.map((n) =>
