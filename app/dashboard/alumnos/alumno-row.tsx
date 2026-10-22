@@ -109,7 +109,7 @@ export default function AlumnoRow({
   return (
     <tr className={`border-b border-slate-100 last:border-0 ${!alumno.activo ? 'opacity-50' : ''}`}>
       <td className="p-3 font-medium text-slate-800">
-        <Link href={`/dashboard/alumnos/${alumno.id}`} className="hover:underline">
+        <Link href={`/dashboard/alumnos/${alumno.id}/pei`} className="hover:underline">
           {alumno.nombre_anonimizado}
         </Link>
         {!alumno.activo && (

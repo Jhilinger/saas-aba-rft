@@ -18,12 +18,11 @@ export function enlaceActivo(pathname: string, enlaces: Enlace[]): string | null
 export function enlacesAlumno(alumnoId: string): Enlace[] {
   const base = `/dashboard/alumnos/${alumnoId}`
   return [
-    { href: base, label: 'Inicio' },
-    { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },
+    { href: `${base}/pei`, label: 'PEI' },
     { href: `${base}/progreso`, label: 'Progreso' },
     { href: `${base}/valoracion`, label: 'Valoración' },
-    { href: `${base}/pei`, label: 'PEI' },
     { href: `${base}/preferencias`, label: 'Preferencias' },
     { href: `${base}/informes`, label: 'Informes' },
+    { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },
   ]
 }

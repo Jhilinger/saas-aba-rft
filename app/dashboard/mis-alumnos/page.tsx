@@ -64,7 +64,7 @@ export default async function MisAlumnosPage() {
             {alumnos.map((a) => (
               <tr key={a.id} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-indigo-50/40">
                 <td className="p-3 font-medium text-slate-800">
-                  <Link href={`/dashboard/alumnos/${a.id}`} className="hover:underline">
+                  <Link href={`/dashboard/alumnos/${a.id}/pei`} className="hover:underline">
                     {a.nombre_anonimizado}
                   </Link>
                 </td>

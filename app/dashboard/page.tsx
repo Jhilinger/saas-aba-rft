@@ -297,7 +297,7 @@ async function InicioClinica({ clinicaId }: { clinicaId: string }) {
                 <ul className="mt-2 space-y-1">
                   {sinTerapeuta.slice(0, 5).map((a) => (
                     <li key={a.id}>
-                      <Link href={`/dashboard/alumnos/${a.id}`} className="text-amber-700 hover:underline">
+                      <Link href={`/dashboard/alumnos/${a.id}/pei`} className="text-amber-700 hover:underline">
                         {a.nombre_anonimizado}
                       </Link>
                     </li>
