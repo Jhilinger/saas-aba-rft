@@ -1878,6 +1878,14 @@ export type Database = {
         Args: { p_dominio_id: string; p_id: string; p_posicion: number }
         Returns: undefined
       }
+      eliminar_alumno_sin_datos: {
+        Args: { p_alumno_id: string }
+        Returns: undefined
+      }
+      eliminar_perfil_sin_actividad: {
+        Args: { p_perfil_id: string }
+        Returns: undefined
+      }
       familia_alumnos: { Args: never; Returns: string[] }
       familia_clinicas: { Args: never; Returns: string[] }
       programas_dominados_valoracion: {

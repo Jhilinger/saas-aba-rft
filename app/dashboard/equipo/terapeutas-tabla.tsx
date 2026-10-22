@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import TerapeutaActions from './terapeuta-actions'
+import NombreEditable from '../nombre-editable'
 import { descargarCSV } from '@/utils/csv'
 import { Button, Panel } from '../../ui'
 
@@ -59,7 +60,7 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
             {filtrados.map((t) => (
               <tr key={t.id} className={`border-b border-slate-100 last:border-0 ${!t.activo ? 'opacity-50' : ''}`}>
                 <td className="p-3 font-medium text-slate-800">
-                  {t.nombre}
+                  <NombreEditable id={t.id} nombre={t.nombre} />
                   {!t.activo && (
                     <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 whitespace-nowrap">
                       Desactivado

@@ -126,12 +126,18 @@ export default function AlumnoRow({
               .map((at) => nombreTerapeuta(at.terapeuta_id) + (at.es_principal ? ' (principal)' : ''))
               .join(', ')}
       </td>
-      <td className="p-3 flex gap-3">
+      <td className="p-3 flex flex-wrap gap-3">
+        <Link
+          href={`/dashboard/alumnos/${alumno.id}/datos-clinicos`}
+          className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+        >
+          Editar datos
+        </Link>
         <button
           onClick={() => setEditando(true)}
           className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
         >
-          Editar
+          Terapeutas
         </button>
         <AlumnoActions id={alumno.id} activo={alumno.activo} />
       </td>

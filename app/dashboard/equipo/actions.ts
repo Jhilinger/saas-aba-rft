@@ -139,3 +139,37 @@ export async function toggleTambienTerapeuta(valorActual: boolean) {
   revalidatePath('/dashboard/equipo')
   return { success: true }
 }
+// --- Corregir / eliminar perfiles (terapeutas y familias) ---
+
+// Corrige el nombre de un terapeuta o familiar de la clínica (RLS + trigger
+// perfiles_proteger_campos limitan qué perfiles y campos puede tocar)
+export async function editarNombrePerfil(id: string, nombre: string) {
+  const perfilActual = await getPerfilActual()
+  if (!perfilActual || perfilActual.rol !== 'clinica_admin') return { error: 'No autorizado' }
+
+  const limpio = nombre.trim()
+  if (!limpio) return { error: 'El nombre no puede quedar vacío' }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.from('perfiles').update({ nombre: limpio }).eq('id', id).select('id')
+  if (error) return { error: error.message }
+  if (!data?.length) return { error: 'No se ha podido actualizar el perfil' }
+
+  revalidatePath('/dashboard/equipo')
+  revalidatePath('/dashboard/familia')
+  return { success: true }
+}
+
+// Elimina del todo (cuenta de acceso incluida) un terapeuta o familiar creado
+// por error. Si ya tiene actividad registrada, la función SQL lo impide y
+// devuelve el motivo: en ese caso hay que desactivarlo.
+export async function eliminarPerfil(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('eliminar_perfil_sin_actividad', { p_perfil_id: id })
+  if (error) return { error: error.message }
+
+  revalidatePath('/dashboard/equipo')
+  revalidatePath('/dashboard/familia')
+  revalidatePath('/dashboard/alumnos')
+  return { success: true }
+}

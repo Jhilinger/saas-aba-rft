@@ -6,6 +6,8 @@ import { crearFamiliar, desvincularFamiliarAlumno, vincularFamiliarAlumno } from
 import { useConfirm } from '../../providers/confirm-provider'
 import { useToast } from '../../providers/toast-provider'
 import { Button, Panel } from '../../ui'
+import { eliminarPerfil } from '../equipo/actions'
+import NombreEditable from '../nombre-editable'
 
 type Alumno = { id: string; nombre_anonimizado: string }
 type Familiar = { perfilId: string; nombre: string; email: string; alumnos: { id: string; nombre: string }[] }
@@ -64,6 +66,32 @@ export default function FamiliaTabla({
         return
       }
       toast('Desvinculado', 'exito')
+      router.refresh()
+    })
+  }
+
+  // Solo si la familia no ha registrado observaciones; si las tiene, basta con
+  // desvincularla de sus alumnos
+  const eliminar = async (perfilId: string, nombreFamiliar: string) => {
+    const ok = await confirmar({
+      titulo: 'Eliminar familiar',
+      mensaje: `Se borrará la cuenta de ${nombreFamiliar} por completo y perderá el acceso. Útil si se invitó por error o con el email mal escrito.`,
+      textoConfirmar: 'Eliminar',
+      peligroso: true,
+    })
+    if (!ok) return
+    startTransition(async () => {
+      const res = await eliminarPerfil(perfilId)
+      if (res?.error) {
+        toast(
+          res.error.includes('actividad')
+            ? 'Esta familia ya ha registrado observaciones: desvincúlala de sus alumnos en lugar de eliminarla.'
+            : res.error,
+          'error'
+        )
+        return
+      }
+      toast('Familiar eliminado', 'exito')
       router.refresh()
     })
   }
@@ -142,15 +170,26 @@ export default function FamiliaTabla({
           <Panel key={f.perfilId} className="p-4 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="font-medium text-slate-800">{f.nombre}</p>
+                <p className="font-medium text-slate-800">
+                  <NombreEditable id={f.perfilId} nombre={f.nombre} />
+                </p>
                 <p className="text-xs text-slate-500">{f.email}</p>
               </div>
-              <button
-                onClick={() => setAnadiendoA(anadiendoA === f.perfilId ? null : f.perfilId)}
-                className="text-xs font-medium text-indigo-600 hover:underline"
-              >
-                + Vincular otro alumno
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setAnadiendoA(anadiendoA === f.perfilId ? null : f.perfilId)}
+                  className="text-xs font-medium text-indigo-600 hover:underline"
+                >
+                  + Vincular otro alumno
+                </button>
+                <button
+                  onClick={() => eliminar(f.perfilId, f.nombre)}
+                  disabled={isPending}
+                  className="text-xs font-medium text-rose-700 hover:text-rose-800"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
 
             {anadiendoA === f.perfilId && (

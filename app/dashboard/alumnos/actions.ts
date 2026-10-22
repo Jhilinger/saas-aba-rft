@@ -131,3 +131,18 @@ export async function actualizarTerapeutasAlumno(
   revalidatePath('/dashboard/alumnos')
   return { success: true }
 }
+// Elimina un alumno creado por error. Solo si no tiene ningún dato clínico
+// (lo comprueba la función SQL); si los tiene, hay que archivarlo.
+export async function eliminarAlumno(id: string) {
+  const supabase = await createClient()
+
+  const { data: alumno } = await supabase.from('alumnos').select('clinica_id').eq('id', id).single()
+
+  const { error } = await supabase.rpc('eliminar_alumno_sin_datos', { p_alumno_id: id })
+  if (error) return { error: error.message }
+
+  if (alumno) await sincronizarAlumnosStripe(alumno.clinica_id)
+
+  revalidatePath('/dashboard/alumnos')
+  return { success: true }
+}
