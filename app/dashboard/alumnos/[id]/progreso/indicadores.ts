@@ -17,7 +17,9 @@ import type { createClient } from '@/utils/supabase/server'
 // - Estancados: conjuntos ABA / relaciones RFT en entrenamiento sin dominar,
 //   con >= BLOQUES_MIN_ESTANCAMIENTO bloques y sin mejora reciente.
 
-export const VENTANA_DIAS = 56
+// 3 meses: con 2 h/semana, 8 semanas daban pocos tests y conjuntos dominados
+export const VENTANA_DIAS = 91
+export const VENTANA_TEXTO = '3 meses'
 const BLOQUES_MIN_ESTANCAMIENTO = 6
 const MIN_LOGROS = 3
 const MIN_ENSAYOS = 30
@@ -257,7 +259,7 @@ export async function calcularIndicadores(
           ? null
           : tendencia(criterioAhora, criterioAntes, criterioAntes * 0.15, false),
       explicacion:
-        'Aprender a aprender: ensayos de intervención que necesitaron los últimos conjuntos dominados hasta llegar al criterio. Cuantos menos, más rápido aprende. No usa la ventana de 8 semanas.',
+        'Aprender a aprender: ensayos de intervención que necesitaron los últimos conjuntos dominados hasta llegar al criterio. Cuantos menos, más rápido aprende. No usa la ventana de 3 meses.',
     },
   ]
 

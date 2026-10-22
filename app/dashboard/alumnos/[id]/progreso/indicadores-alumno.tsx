@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Panel } from '../../../../ui'
-import { VENTANA_DIAS, type Estancado, type Indicador, type Tendencia } from './indicadores'
+import { VENTANA_TEXTO, type Estancado, type Indicador, type Tendencia } from './indicadores'
 
 const TENDENCIA: Record<Exclude<Tendencia, null>, { texto: string; clase: string }> = {
   mejora: { texto: '↑ Mejora', clase: 'bg-emerald-50 text-emerald-700' },
@@ -67,9 +67,9 @@ export default function IndicadoresAlumno({
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Indicadores de aprendizaje</h3>
+        <h3 className="text-base font-semibold text-slate-800">Cómo aprende</h3>
         <p className="text-xs text-slate-400">
-          Últimas {VENTANA_DIAS / 7} semanas, frente a las {VENTANA_DIAS / 7} anteriores · orientativos
+          Indicadores de los últimos {VENTANA_TEXTO}, frente a los {VENTANA_TEXTO} anteriores · orientativos
         </p>
       </div>
 
