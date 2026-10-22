@@ -142,7 +142,20 @@ export default function ProgresoCurriculo({
         </Button>
       </div>
 
-      {niveles.map((n) => (
+      {niveles.map((n) =>
+        n.porcentaje === null ? (
+          // Nivel sin programas: una línea compacta, para no empujar hacia
+          // abajo lo importante
+          <div
+            key={n.numero}
+            className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-xl border border-dashed border-slate-200 px-4 py-2.5 text-sm sm:px-5"
+          >
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Nivel {n.numero}</span>
+            <span className="text-xs text-slate-500 sm:order-last">Sin programas todavía</span>
+            {/* En móvil el nombre baja a su propia línea en vez de quedar aplastado */}
+            <span className="min-w-0 basis-full text-slate-600 sm:basis-0 sm:flex-1">{n.nombre}</span>
+          </div>
+        ) : (
         <Panel key={n.numero} className="overflow-hidden">
           <div className="space-y-2 border-b border-slate-100 p-4 sm:p-5">
             <div className="flex items-baseline justify-between gap-3">
@@ -150,17 +163,11 @@ export default function ProgresoCurriculo({
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Nivel {n.numero}</p>
                 <h3 className="font-semibold text-slate-800">{n.nombre}</h3>
               </div>
-              <span className={`text-2xl font-bold tabular-nums ${n.porcentaje === null ? 'text-slate-300' : 'text-slate-800'}`}>
-                {n.porcentaje === null ? '—' : `${n.porcentaje}%`}
-              </span>
+              <span className="text-2xl font-bold tabular-nums text-slate-800">{n.porcentaje}%</span>
             </div>
-            {n.porcentaje === null ? (
-              <p className="text-xs text-slate-400">Este nivel todavía no tiene programas.</p>
-            ) : (
-              <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-emerald-500" style={{ width: `${n.porcentaje}%` }} />
-              </div>
-            )}
+            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-emerald-500" style={{ width: `${n.porcentaje}%` }} />
+            </div>
           </div>
 
           <ul>
@@ -169,9 +176,9 @@ export default function ProgresoCurriculo({
               if (d.total === 0) {
                 return (
                   <li key={d.id} className="flex items-center gap-3 border-b border-slate-100 px-4 py-2.5 text-sm last:border-0 sm:px-5">
-                    <span className="w-8 shrink-0 font-mono text-xs text-slate-300">{d.codigo}</span>
-                    <span className="min-w-0 flex-1 text-slate-400">{d.nombre}</span>
-                    <span className="text-xs text-slate-300">Sin programas</span>
+                    <span className="w-8 shrink-0 font-mono text-xs text-slate-400">{d.codigo}</span>
+                    <span className="min-w-0 flex-1 text-slate-500">{d.nombre}</span>
+                    <span className="text-xs text-slate-500">Sin programas</span>
                   </li>
                 )
               }
@@ -210,7 +217,8 @@ export default function ProgresoCurriculo({
             })}
           </ul>
         </Panel>
-      ))}
+        )
+      )}
 
       {fueraDelCurriculo.length > 0 && (
         <Panel className="p-4 sm:p-5">

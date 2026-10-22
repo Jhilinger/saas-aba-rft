@@ -41,7 +41,7 @@ export default async function ProgresoPage({
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className="text-base font-semibold text-slate-800">Qué ha aprendido</h3>
-          <p className="text-xs text-slate-400">Progreso en el currículo por nivel y dominio</p>
+          <p className="text-xs text-slate-500">Progreso en el currículo por nivel y dominio</p>
         </div>
         <ProgresoCurriculo niveles={niveles} fueraDelCurriculo={fueraDelCurriculo} />
       </section>

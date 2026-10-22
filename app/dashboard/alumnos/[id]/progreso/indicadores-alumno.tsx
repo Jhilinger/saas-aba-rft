@@ -25,28 +25,35 @@ const TEXTO_REPARTO: Record<Exclude<Tendencia, null>, string> = {
 }
 
 function Tarjeta({ ind }: { ind: Indicador }) {
+  const textoTendencia = !ind.tendencia
+    ? null
+    : ind.clave === 'criterio'
+      ? TEXTO_VELOCIDAD[ind.tendencia]
+      : ind.clave === 'derivado'
+        ? TEXTO_REPARTO[ind.tendencia]
+        : TENDENCIA[ind.tendencia].texto
+  const claseTendencia = !ind.tendencia
+    ? ''
+    : ind.clave === 'derivado'
+      ? 'bg-indigo-50 text-indigo-700'
+      : TENDENCIA[ind.tendencia].clase
+
+  // Título a todo el ancho y tendencia junto al valor: así los valores de
+  // las cuatro tarjetas quedan a la misma altura aunque el título ocupe 2 líneas
   return (
     <Panel className="flex flex-col gap-1 p-4">
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-semibold text-slate-700">{ind.titulo}</p>
-        {ind.tendencia && (
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
-              ind.clave === 'derivado' ? 'bg-indigo-50 text-indigo-700' : TENDENCIA[ind.tendencia].clase
-            }`}
-          >
-            {ind.clave === 'criterio'
-              ? TEXTO_VELOCIDAD[ind.tendencia]
-              : ind.clave === 'derivado'
-                ? TEXTO_REPARTO[ind.tendencia]
-                : TENDENCIA[ind.tendencia].texto}
-          </span>
-        )}
-      </div>
+      <p className="text-sm font-semibold text-slate-700">{ind.titulo}</p>
       {ind.valor === null ? (
-        <p className="text-lg font-semibold text-slate-300">Datos insuficientes</p>
+        <p className="text-lg font-semibold text-slate-400">Datos insuficientes</p>
       ) : (
-        <p className="text-3xl font-bold tabular-nums text-slate-800">{ind.valor}</p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-3xl font-bold tabular-nums text-slate-800">{ind.valor}</p>
+          {textoTendencia && (
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${claseTendencia}`}>
+              {textoTendencia}
+            </span>
+          )}
+        </div>
       )}
       <p className="text-xs text-slate-500">{ind.detalle}</p>
       <details className="mt-auto pt-1 text-xs text-slate-500">
@@ -68,7 +75,7 @@ export default function IndicadoresAlumno({
     <section className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-base font-semibold text-slate-800">Cómo aprende</h3>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Indicadores de los últimos {VENTANA_TEXTO}, frente a los {VENTANA_TEXTO} anteriores · orientativos
         </p>
       </div>
