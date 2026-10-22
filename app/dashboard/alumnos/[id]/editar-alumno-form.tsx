@@ -143,6 +143,9 @@ export default function EditarAlumnoForm({ alumno }: { alumno: Alumno }) {
             defaultValue={alumno.fecha_inicio_intervencion ?? ''}
             className={inputClase}
           />
+          <p className="text-xs text-slate-500">
+            Por defecto, la fecha de alta. Cámbiala si la intervención empezó antes.
+          </p>
         </div>
         <Campo label="Diagnóstico / condición" name="diagnostico" valor={alumno.diagnostico} />
         <div className="space-y-1">
