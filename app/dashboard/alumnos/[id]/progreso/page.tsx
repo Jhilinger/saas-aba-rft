@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import ProgresoCurriculo from './progreso-curriculo'
 import { cargarProgresoAlumno } from './cargar-progreso'
+import { calcularIndicadores } from './indicadores'
+import IndicadoresAlumno from './indicadores-alumno'
 
 export default async function ProgresoPage({
   params,
@@ -27,11 +29,15 @@ export default async function ProgresoPage({
   const { data: alumno } = await supabase.from('alumnos').select('id, clinica_id').eq('id', alumnoId).single()
   if (!alumno) notFound()
 
-  const { niveles, fueraDelCurriculo } = await cargarProgresoAlumno(supabase, alumno)
+  const [{ niveles, fueraDelCurriculo }, { indicadores, estancados }] = await Promise.all([
+    cargarProgresoAlumno(supabase, alumno),
+    calcularIndicadores(supabase, alumno.id),
+  ])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="text-lg font-semibold text-slate-800">Progreso del Alumno</h2>
+      <IndicadoresAlumno indicadores={indicadores} estancados={estancados} />
       <ProgresoCurriculo niveles={niveles} fueraDelCurriculo={fueraDelCurriculo} />
     </div>
   )
