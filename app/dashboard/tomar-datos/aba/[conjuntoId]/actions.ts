@@ -3,11 +3,13 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { Enums } from '@/database.types'
+import { duracionValida, latenciaMedia, latenciaValida } from '../../tiempos'
 
 type EnsayoInput = {
   estimuloId: string
   correcto: boolean
   ayuda: string
+  latenciaMs?: number | null
 }
 const AYUDAS_VALIDAS = ['independiente', 'verbal', 'verbal_parcial', 'gestual', 'visual', 'modelado', 'fisica_parcial', 'fisica_total', 'textual'] as const satisfies readonly Enums<'tipo_ayuda'>[]
 const TIPOS_SONDA = ['generalizacion', 'mantenimiento'] as const
@@ -19,7 +21,8 @@ export async function guardarBloqueAba(
   alumnoId: string,
   ensayos: EnsayoInput[],
   notas?: string,
-  tipoSonda?: TipoSonda
+  tipoSonda?: TipoSonda,
+  duracionSegundos?: number | null
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -50,10 +53,13 @@ export async function guardarBloqueAba(
 
   const totalEnsayos = ensayos.length
   const aciertos = ensayos.filter((e) => e.correcto && e.ayuda === 'independiente').length
+  const latencias = ensayos.map((e) => latenciaValida(e.latenciaMs))
 
   const { data: bloque, error: bloqueError } = await supabase
     .from('bloques_ensayo')
     .insert({
+      duracion_segundos: duracionValida(duracionSegundos),
+      latencia_media_ms: latenciaMedia(latencias),
       conjunto_id: conjuntoId,
       terapeuta_id: user.id,
       total_ensayos: totalEnsayos,
@@ -69,11 +75,12 @@ export async function guardarBloqueAba(
   }
 
   const { error: detalleError } = await supabase.from('ensayos_aba_detalle').insert(
-    ensayos.map((e) => ({
+    ensayos.map((e, i) => ({
       bloque_id: bloque.id,
       estimulo_id: e.estimuloId,
       correcto: e.correcto,
       ayuda: e.ayuda as Enums<'tipo_ayuda'>,
+      latencia_ms: latencias[i],
     }))
   )
 
@@ -166,7 +173,7 @@ export async function obtenerHistorialBloques(conjuntoId: string) {
 
   const { data: bloques } = await supabase
     .from('bloques_ensayo')
-    .select('id, total_ensayos, aciertos, porcentaje, notas, fase, fecha')
+    .select('id, total_ensayos, aciertos, porcentaje, notas, fase, fecha, latencia_media_ms, aciertos_por_minuto')
     .eq('conjunto_id', conjuntoId)
     .order('fecha', { ascending: false })
 

@@ -18,6 +18,8 @@ type Bloque = {
   notas: string | null
   fase: 'linea_base' | 'intervencion'
   fecha: string
+  latencia_media_ms: number | null
+  aciertos_por_minuto: number | null
 }
 
 type EnsayoDetalle = {
@@ -127,6 +129,8 @@ export default function HistorialBloques({
                   {' · '}
                   {b.porcentaje}% ({b.aciertos}/{b.total_ensayos})
                   {b.fase === 'linea_base' && ' · Línea base'}
+                  {b.latencia_media_ms !== null && ` · ${(b.latencia_media_ms / 1000).toFixed(1)} s/ensayo`}
+                  {b.aciertos_por_minuto !== null && ` · ${b.aciertos_por_minuto} aciertos/min`}
                 </span>
                 <button
                   onClick={() => (editandoId === b.id ? setEditandoId(null) : empezarEdicion(b))}

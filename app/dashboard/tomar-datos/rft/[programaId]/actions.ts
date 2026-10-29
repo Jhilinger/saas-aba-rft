@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { FASES_QUE_REQUIEREN_CONEXION, construirGrafoEntrenado, estanConectadas } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
+import { duracionValida, latenciaMedia, latenciaValida } from '../../tiempos'
 
 type EnsayoInput = {
   claseId: string
@@ -12,6 +13,7 @@ type EnsayoInput = {
   pregunta?: string
   correcto: boolean
   ayuda: string
+  latenciaMs?: number | null
 }
 // "directo" existe en el enum de la base de datos pero nunca ha sido
 // seleccionable desde la interfaz (no encaja con el flujo de comparación
@@ -40,7 +42,8 @@ export async function guardarBloqueRft(
   posicionDestino: string,
   numComparativos: number,
   ensayos: EnsayoInput[],
-  notas?: string
+  notas?: string,
+  duracionSegundos?: number | null
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -95,10 +98,13 @@ export async function guardarBloqueRft(
   // Solo cuenta como acierto si fue correcto Y sin ayuda (independiente).
   // Un acierto con ayuda se guarda igualmente en el detalle, pero no suma al %.
   const aciertos = ensayos.filter((e) => e.correcto && e.ayuda === 'independiente').length
+  const latencias = ensayos.map((e) => latenciaValida(e.latenciaMs))
 
   const { data: bloque, error: bloqueError } = await supabase
     .from('bloques_ensayo_rft')
     .insert({
+      duracion_segundos: duracionValida(duracionSegundos),
+      latencia_media_ms: latenciaMedia(latencias),
       programa_alumno_id: programaAlumnoId,
       terapeuta_id: user.id,
       grupo,
@@ -118,7 +124,7 @@ export async function guardarBloqueRft(
   }
 
   const { error: detalleError } = await supabase.from('ensayos_rft_detalle').insert(
-    ensayos.map((e) => ({
+    ensayos.map((e, i) => ({
       bloque_id: bloque.id,
       clase_id: e.claseId,
       estimulo_origen_id: e.estimuloOrigenId,
@@ -126,6 +132,7 @@ export async function guardarBloqueRft(
       pregunta: e.pregunta ?? null,
       correcto: e.correcto,
       ayuda: e.ayuda as AyudaRft,
+      latencia_ms: latencias[i],
     }))
   )
 

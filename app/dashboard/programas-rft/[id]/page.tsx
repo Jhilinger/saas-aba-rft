@@ -9,6 +9,15 @@ import { avisoPlantilla } from '../../programas/plantilla'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
 
+const NOMBRE_FASE: Record<string, string> = {
+  entrenamiento: 'Entrenamiento',
+  test_mutuo: 'Test mutuo',
+  test_combinatorio: 'Test combinatorio',
+  transformacion_funciones: 'Transformación',
+  generalizacion: 'Sonda de generalización',
+  mantenimiento: 'Sonda de mantenimiento',
+}
+
 type TestBloque = {
   fase: Enums<'fase_rft'>
   posicionOrigen: string | null
@@ -161,6 +170,15 @@ export default async function ProgramaRftPage({
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]
   const diferenciasPlantilla = await avisoPlantilla(supabase, id)
 
+  // Fluidez: últimos bloques con datos de tiempo (latencia o duración)
+  const { data: bloquesFluidez } = await supabase
+    .from('bloques_ensayo_rft')
+    .select('id, fecha, fase, grupo, posicion_origen, posicion_destino, porcentaje, latencia_media_ms, aciertos_por_minuto')
+    .eq('programa_alumno_id', id)
+    .or('latencia_media_ms.not.is.null,aciertos_por_minuto.not.is.null')
+    .order('fecha', { ascending: false })
+    .limit(10)
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
@@ -178,6 +196,47 @@ export default async function ProgramaRftPage({
         porcentajeDominio={programa.porcentaje_dominio}
         nivelRft={programa.nivel_rft}
       />
+
+      {bloquesFluidez && bloquesFluidez.length > 0 && (
+        <Panel className="space-y-3 p-4 text-sm sm:p-5">
+          <div>
+            <h2 className="font-semibold text-slate-700">Fluidez de los últimos bloques</h2>
+            <p className="text-xs text-slate-500">
+              Latencia media por ensayo (registrada al pulsar el resultado) y aciertos sin ayuda por minuto.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="text-slate-500">
+                <tr>
+                  <th className="py-1 pr-3 font-medium">Fecha</th>
+                  <th className="py-1 pr-3 font-medium">Fase</th>
+                  <th className="py-1 pr-3 font-medium">Grupo · relación</th>
+                  <th className="py-1 pr-3 text-right font-medium">Acierto</th>
+                  <th className="py-1 pr-3 text-right font-medium">Latencia</th>
+                  <th className="py-1 text-right font-medium">Aciertos/min</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {bloquesFluidez.map((b) => (
+                  <tr key={b.id}>
+                    <td className="py-1.5 pr-3">{new Date(b.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</td>
+                    <td className="py-1.5 pr-3">{NOMBRE_FASE[b.fase] ?? b.fase}</td>
+                    <td className="py-1.5 pr-3">
+                      {b.grupo} · {b.posicion_origen}→{b.posicion_destino}
+                    </td>
+                    <td className="py-1.5 pr-3 text-right">{Number(b.porcentaje)}%</td>
+                    <td className="py-1.5 pr-3 text-right">
+                      {b.latencia_media_ms !== null ? `${(b.latencia_media_ms / 1000).toFixed(1)} s` : '—'}
+                    </td>
+                    <td className="py-1.5 text-right">{b.aciertos_por_minuto ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      )}
     </div>
   )
 }

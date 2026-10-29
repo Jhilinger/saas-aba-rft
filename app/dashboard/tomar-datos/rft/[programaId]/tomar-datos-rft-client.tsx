@@ -16,6 +16,7 @@ import {
   type ParEntrenado,
 } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
+import { segundosDesde, useCronometroEnsayo } from '../../cronometro'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
@@ -31,6 +32,7 @@ type EnsayoRft = {
   pregunta?: string
   correcto: boolean
   ayuda: string
+  latenciaMs?: number | null
 }
 
 const FASES_TODAS = [
@@ -135,6 +137,10 @@ export default function TomarDatosRftClient({
   const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[]; derivado: boolean } | null>(null)
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
+  // Duración del bloque: desde que empieza hasta el último ensayo registrado
+  const [inicioBloque, setInicioBloque] = useState<number | null>(null)
+  const [duracionBloque, setDuracionBloque] = useState<number | null>(null)
+  const cronometro = useCronometroEnsayo(secuencia ? ensayos.length : null)
   const router = useRouter()
   const toast = useToast()
 
@@ -191,7 +197,8 @@ export default function TomarDatosRftClient({
       faseActual: string,
       origen: string,
       destino: string,
-      numComparativos: number
+      numComparativos: number,
+      duracionSegundos: number | null
     ) => {
       startTransition(async () => {
         try {
@@ -203,15 +210,17 @@ export default function TomarDatosRftClient({
             origen,
             destino,
             numComparativos,
-            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda }) => ({
+            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs }) => ({
               claseId,
               estimuloOrigenId,
               estimuloDestinoId,
               pregunta,
               correcto,
               ayuda,
+              latenciaMs,
             })),
-            notasActuales
+            notasActuales,
+            duracionSegundos
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -246,6 +255,8 @@ export default function TomarDatosRftClient({
       posicionOrigen: string
       posicionDestino: string
       tamanoBloque: number
+      inicioBloque?: number | null
+      duracionBloque?: number | null
     }>(claveProgreso)
     if (guardado) {
       setGrupoSeleccionado(guardado.grupoSeleccionado)
@@ -256,6 +267,8 @@ export default function TomarDatosRftClient({
       setSecuencia(guardado.secuencia)
       setEnsayos(guardado.ensayos)
       setNotas(guardado.notas)
+      setInicioBloque(guardado.inicioBloque ?? null)
+      setDuracionBloque(guardado.duracionBloque ?? null)
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
         const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
         const numComparativos = clasesDelGrupoGuardado.filter(
@@ -268,7 +281,8 @@ export default function TomarDatosRftClient({
           guardado.fase,
           guardado.posicionOrigen,
           guardado.posicionDestino,
-          numComparativos
+          numComparativos,
+          guardado.duracionBloque ?? null
         )
       }
     }
@@ -283,7 +297,7 @@ export default function TomarDatosRftClient({
     const onOnline = () => {
       actualizarEstado()
       if (estadoGuardado === 'pendiente' && grupoSeleccionado) {
-        intentarGuardar(ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
+        intentarGuardar(ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length, duracionBloque)
       }
     }
     window.addEventListener('online', onOnline)
@@ -293,7 +307,7 @@ export default function TomarDatosRftClient({
       window.removeEventListener('offline', actualizarEstado)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estadoGuardado, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, intentarGuardar])
+  }, [estadoGuardado, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, duracionBloque, intentarGuardar])
 
   const claseActualId = secuencia?.[ensayos.length]?.id
 
@@ -321,6 +335,8 @@ export default function TomarDatosRftClient({
       return
     }
     setSecuencia(generarSecuenciaClases(clasesValidas, tamanoBloque))
+    setInicioBloque(Date.now())
+    setDuracionBloque(null)
     setEnsayos([])
     setNotas('')
     setResultado(null)
@@ -345,6 +361,7 @@ export default function TomarDatosRftClient({
         pregunta,
         correcto,
         ayuda,
+        latenciaMs: cronometro.leer(),
       },
     ]
     setEnsayos(nuevos)
@@ -352,7 +369,9 @@ export default function TomarDatosRftClient({
     setPreguntaActual('')
 
     if (nuevos.length === secuencia.length) {
-      intentarGuardar(nuevos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
+      const duracion = segundosDesde(inicioBloque)
+      setDuracionBloque(duracion)
+      intentarGuardar(nuevos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length, duracion)
     }
   }
 
@@ -370,8 +389,10 @@ export default function TomarDatosRftClient({
       posicionOrigen,
       posicionDestino,
       tamanoBloque,
+      inicioBloque,
+      duracionBloque,
     })
-  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, claveProgreso])
+  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, claveProgreso])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -419,7 +440,7 @@ export default function TomarDatosRftClient({
         tipo={estadoGuardado}
         reintentando={isPending}
         onReintentar={() =>
-          intentarGuardar(ensayos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length)
+          intentarGuardar(ensayos, notas, grupoSeleccionado!, faseEfectiva, posicionOrigen, posicionDestino, clasesValidas.length, duracionBloque)
         }
         onVolver={() => router.push(`/dashboard/programas-rft/${programaAlumnoId}`)}
       />
@@ -696,7 +717,10 @@ export default function TomarDatosRftClient({
             </div>
             <textarea
               value={preguntaActual}
-              onChange={(e) => setPreguntaActual(e.target.value)}
+              onChange={(e) => {
+                setPreguntaActual(e.target.value)
+                cronometro.reiniciar()
+              }}
               placeholder="Escribe aquí la pregunta que le haces al alumno..."
               rows={2}
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
@@ -714,7 +738,10 @@ export default function TomarDatosRftClient({
                 </Button>
                 <Button
                   variant="warning"
-                  onClick={() => setMostrandoAyudas(true)}
+                  onClick={() => {
+                    cronometro.capturar()
+                    setMostrandoAyudas(true)
+                  }}
                   disabled={isPending}
                   className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >
@@ -788,7 +815,10 @@ export default function TomarDatosRftClient({
                 </Button>
                 <Button
                   variant="warning"
-                  onClick={() => setMostrandoAyudas(true)}
+                  onClick={() => {
+                    cronometro.capturar()
+                    setMostrandoAyudas(true)
+                  }}
                   disabled={isPending}
                   className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
                 >

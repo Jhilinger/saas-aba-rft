@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueAba } from './actions'
+import { segundosDesde, useCronometroEnsayo } from '../../cronometro'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
@@ -16,6 +17,7 @@ type EnsayoRegistrado = {
   estimuloNombre: string
   correcto: boolean
   ayuda: string
+  latenciaMs?: number | null
 }
 
 const AYUDAS = [
@@ -98,20 +100,30 @@ export default function TomarDatosClient({
   const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean; tipoSonda: string } | null>(null)
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
+  // Duración del bloque: desde que empieza hasta el último ensayo registrado
+  const [inicioBloque, setInicioBloque] = useState<number | null>(null)
+  const [duracionBloque, setDuracionBloque] = useState<number | null>(null)
+  const cronometro = useCronometroEnsayo(secuencia ? ensayos.length : null)
   const router = useRouter()
   const toast = useToast()
 
   const intentarGuardar = useCallback(
-    (listaEnsayos: EnsayoRegistrado[], notasActuales: string, sondaActual: 'normal' | 'generalizacion' | 'mantenimiento') => {
+    (
+      listaEnsayos: EnsayoRegistrado[],
+      notasActuales: string,
+      sondaActual: 'normal' | 'generalizacion' | 'mantenimiento',
+      duracionSegundos: number | null
+    ) => {
       startTransition(async () => {
         try {
           const res = await guardarBloqueAba(
             conjuntoId,
             programaAlumnoId,
             alumnoId,
-            listaEnsayos.map(({ estimuloId, correcto, ayuda }) => ({ estimuloId, correcto, ayuda })),
+            listaEnsayos.map(({ estimuloId, correcto, ayuda, latenciaMs }) => ({ estimuloId, correcto, ayuda, latenciaMs })),
             notasActuales,
-            sondaActual === 'normal' ? undefined : sondaActual
+            sondaActual === 'normal' ? undefined : sondaActual,
+            duracionSegundos
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -143,6 +155,8 @@ export default function TomarDatosClient({
       notas: string
       tamanoBloque: number
       tipoSonda: 'normal' | 'generalizacion' | 'mantenimiento'
+      inicioBloque?: number | null
+      duracionBloque?: number | null
     }>(claveProgreso)
     if (guardado) {
       setSecuencia(guardado.secuencia)
@@ -150,8 +164,10 @@ export default function TomarDatosClient({
       setNotas(guardado.notas)
       setTamanoBloque(guardado.tamanoBloque)
       setTipoSonda(guardado.tipoSonda ?? 'normal')
+      setInicioBloque(guardado.inicioBloque ?? null)
+      setDuracionBloque(guardado.duracionBloque ?? null)
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
-        intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal')
+        intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal', guardado.duracionBloque ?? null)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,7 +180,7 @@ export default function TomarDatosClient({
     actualizarEstado()
     const onOnline = () => {
       actualizarEstado()
-      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas, tipoSonda)
+      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas, tipoSonda, duracionBloque)
     }
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', actualizarEstado)
@@ -172,10 +188,12 @@ export default function TomarDatosClient({
       window.removeEventListener('online', onOnline)
       window.removeEventListener('offline', actualizarEstado)
     }
-  }, [estadoGuardado, ensayos, notas, tipoSonda, intentarGuardar])
+  }, [estadoGuardado, ensayos, notas, tipoSonda, duracionBloque, intentarGuardar])
 
   const empezarBloque = () => {
     setSecuencia(generarSecuencia(estimulos, tamanoBloque))
+    setInicioBloque(Date.now())
+    setDuracionBloque(null)
     setEnsayos([])
     setNotas(tipoSonda === 'generalizacion' && contexto.trim() ? `Contexto: ${contexto.trim()}` : '')
     setResultado(null)
@@ -187,13 +205,15 @@ export default function TomarDatosClient({
     const actual = secuencia[ensayos.length]
     const nuevos = [
       ...ensayos,
-      { estimuloId: actual.id, estimuloNombre: actual.nombre, correcto, ayuda },
+      { estimuloId: actual.id, estimuloNombre: actual.nombre, correcto, ayuda, latenciaMs: cronometro.leer() },
     ]
     setEnsayos(nuevos)
     setMostrandoAyudas(false)
 
     if (nuevos.length === secuencia.length) {
-      intentarGuardar(nuevos, notas, tipoSonda)
+      const duracion = segundosDesde(inicioBloque)
+      setDuracionBloque(duracion)
+      intentarGuardar(nuevos, notas, tipoSonda, duracion)
     }
   }
 
@@ -204,8 +224,8 @@ export default function TomarDatosClient({
   // Guarda el progreso en el dispositivo según se registra cada ensayo
   useEffect(() => {
     if (!secuencia) return
-    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda })
-  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, claveProgreso])
+    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque })
+  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, claveProgreso])
 
   if (resultado) {
     return (
@@ -262,7 +282,7 @@ export default function TomarDatosClient({
       <PantallaGuardadoPendiente
         tipo={estadoGuardado}
         reintentando={isPending}
-        onReintentar={() => intentarGuardar(ensayos, notas, tipoSonda)}
+        onReintentar={() => intentarGuardar(ensayos, notas, tipoSonda, duracionBloque)}
         onVolver={() => router.push(`/dashboard/programas/${programaAlumnoId}`)}
       />
     )
@@ -449,7 +469,10 @@ export default function TomarDatosClient({
             </Button>
             <Button
               variant="warning"
-              onClick={() => setMostrandoAyudas(true)}
+              onClick={() => {
+                cronometro.capturar()
+                setMostrandoAyudas(true)
+              }}
               disabled={isPending}
               className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >

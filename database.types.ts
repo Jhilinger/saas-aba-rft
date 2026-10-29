@@ -267,10 +267,13 @@ export type Database = {
       bloques_ensayo: {
         Row: {
           aciertos: number
+          aciertos_por_minuto: number | null
           conjunto_id: string
+          duracion_segundos: number | null
           fase: string
           fecha: string
           id: string
+          latencia_media_ms: number | null
           notas: string | null
           porcentaje: number | null
           terapeuta_id: string
@@ -278,10 +281,13 @@ export type Database = {
         }
         Insert: {
           aciertos?: number
+          aciertos_por_minuto?: number | null
           conjunto_id: string
+          duracion_segundos?: number | null
           fase?: string
           fecha?: string
           id?: string
+          latencia_media_ms?: number | null
           notas?: string | null
           porcentaje?: number | null
           terapeuta_id: string
@@ -289,10 +295,13 @@ export type Database = {
         }
         Update: {
           aciertos?: number
+          aciertos_por_minuto?: number | null
           conjunto_id?: string
+          duracion_segundos?: number | null
           fase?: string
           fecha?: string
           id?: string
+          latencia_media_ms?: number | null
           notas?: string | null
           porcentaje?: number | null
           terapeuta_id?: string
@@ -318,10 +327,13 @@ export type Database = {
       bloques_ensayo_rft: {
         Row: {
           aciertos: number
+          aciertos_por_minuto: number | null
+          duracion_segundos: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha: string
           grupo: string | null
           id: string
+          latencia_media_ms: number | null
           notas: string | null
           num_comparativos: number
           porcentaje: number | null
@@ -333,10 +345,13 @@ export type Database = {
         }
         Insert: {
           aciertos?: number
+          aciertos_por_minuto?: number | null
+          duracion_segundos?: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
           grupo?: string | null
           id?: string
+          latencia_media_ms?: number | null
           notas?: string | null
           num_comparativos?: number
           porcentaje?: number | null
@@ -348,10 +363,13 @@ export type Database = {
         }
         Update: {
           aciertos?: number
+          aciertos_por_minuto?: number | null
+          duracion_segundos?: number | null
           fase?: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
           grupo?: string | null
           id?: string
+          latencia_media_ms?: number | null
           notas?: string | null
           num_comparativos?: number
           porcentaje?: number | null
@@ -821,6 +839,7 @@ export type Database = {
           correcto: boolean
           estimulo_id: string
           id: string
+          latencia_ms: number | null
           notas: string | null
         }
         Insert: {
@@ -829,6 +848,7 @@ export type Database = {
           correcto: boolean
           estimulo_id: string
           id?: string
+          latencia_ms?: number | null
           notas?: string | null
         }
         Update: {
@@ -837,6 +857,7 @@ export type Database = {
           correcto?: boolean
           estimulo_id?: string
           id?: string
+          latencia_ms?: number | null
           notas?: string | null
         }
         Relationships: [
@@ -865,6 +886,7 @@ export type Database = {
           estimulo_destino_id: string | null
           estimulo_origen_id: string
           id: string
+          latencia_ms: number | null
           notas: string | null
           pregunta: string | null
         }
@@ -876,6 +898,7 @@ export type Database = {
           estimulo_destino_id?: string | null
           estimulo_origen_id: string
           id?: string
+          latencia_ms?: number | null
           notas?: string | null
           pregunta?: string | null
         }
@@ -887,6 +910,7 @@ export type Database = {
           estimulo_destino_id?: string | null
           estimulo_origen_id?: string
           id?: string
+          latencia_ms?: number | null
           notas?: string | null
           pregunta?: string | null
         }
