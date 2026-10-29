@@ -13,7 +13,7 @@ import {
 } from '../niveles-rft'
 
 const TIPOS_PROGRAMA = ['aba_clasico', 'rft'] as const satisfies readonly Enums<'tipo_programa'>[]
-const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
+const TIPOS_RELACION = ['coordinacion', 'distincion', 'oposicion', 'comparacion', 'jerarquia', 'espacial', 'temporal', 'causal', 'deictica'] as const satisfies readonly Enums<'tipo_relacion_rft'>[]
 const VISIBILIDADES = ['privado', 'clinica'] as const satisfies readonly Enums<'visibilidad_programa'>[]
 const FORMATOS_RECOGIDA = ['ensayo_discreto', 'intervalo', 'duracion', 'tasa', 'abc', 'latencia', 'analisis_tareas'] as const
 const DIRECCIONES_OBJETIVO = ['aumentar', 'reducir'] as const

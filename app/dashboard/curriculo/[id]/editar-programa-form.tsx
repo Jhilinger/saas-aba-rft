@@ -184,6 +184,7 @@ export default function EditarProgramaForm({
                   <option value="oposicion">Oposición</option>
                   <option value="comparacion">Comparación</option>
                   <option value="jerarquia">Jerarquía</option>
+                  <option value="espacial">Espacial</option>
                   <option value="temporal">Temporal</option>
                   <option value="causal">Causal</option>
                   <option value="deictica">Deíctico</option>

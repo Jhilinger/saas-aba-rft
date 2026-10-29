@@ -1974,6 +1974,7 @@ export type Database = {
         | "oposicion"
         | "comparacion"
         | "jerarquia"
+        | "espacial"
         | "temporal"
         | "causal"
         | "deictica"
@@ -2147,6 +2148,7 @@ export const Constants = {
         "oposicion",
         "comparacion",
         "jerarquia",
+        "espacial",
         "temporal",
         "causal",
         "deictica",
