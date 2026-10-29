@@ -7,7 +7,7 @@ export async function cargarItems(supabase: Supabase): Promise<ItemEvaluacion[]>
   const { data } = await supabase
     .from('evaluacion_items')
     .select(
-      'id, codigo, tipo, nivel, dominio_id, orden, titulo, formatos, relacional, indicador, consigna, materiales, ensayos, criterio_2, criterio_1, criterio_0, pregunta_familia, requiere_item_id, requiere_puntuacion, dominios_curriculo(codigo, nombre)'
+      'id, codigo, tipo, nivel, dominio_id, orden, titulo, formatos, relacional, indicador, consigna, materiales, ensayos, criterio_2, criterio_1, criterio_0, pregunta_familia, requiere_item_id, requiere_puntuacion, guion, dominios_curriculo(codigo, nombre)'
     )
     .eq('activo', true)
 
@@ -33,6 +33,7 @@ export async function cargarItems(supabase: Supabase): Promise<ItemEvaluacion[]>
     preguntaFamilia: i.pregunta_familia,
     requiereItemId: i.requiere_item_id,
     requierePuntuacion: i.requiere_puntuacion,
+    guion: i.guion,
   }))
 }
 

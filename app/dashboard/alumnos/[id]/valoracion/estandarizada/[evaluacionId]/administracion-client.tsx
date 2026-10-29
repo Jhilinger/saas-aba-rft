@@ -13,6 +13,7 @@ import {
   calcularRuta,
   CRITERIO_BLOQUE,
   estadoEntrenamiento,
+  falloControl,
   MAX_BLOQUES,
   nivelPorCribado,
   ordenarItems,
@@ -26,6 +27,8 @@ import {
   type RespuestaEvaluacion,
 } from '../logica'
 import { ESTADO_EVALUACION, ESTADO_ITEM, ICONO_FORMATO } from '../etiquetas'
+import { parsearGuion, pasosParaModalidad } from '../guion'
+import PantallaAlumno from './pantalla-alumno'
 import { useToast } from '../../../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../../../ui'
 
@@ -362,8 +365,11 @@ function FichaItem({
   const [fuente, setFuente] = useState<Fuente>(respuesta?.fuente ?? 'observado')
   const [elegida, setElegida] = useState<number | null>(respuesta?.puntuacion ?? null)
   const [notas, setNotas] = useState(respuesta?.notas ?? '')
+  const [enTableta, setEnTableta] = useState(false)
   const [isPending, startTransition] = useTransition()
   const toast = useToast()
+  const pasos = useMemo(() => pasosParaModalidad(parsearGuion(item.guion), modalidad), [item.guion, modalidad])
+  const conTableta = item.formatos.includes('tableta') && pasos.length > 0
 
   const entrenamiento = estadoEntrenamiento(ensayos)
   const propuesta = fuente === 'observado' ? puntuacionPropuesta(item, ensayos) : null
@@ -377,9 +383,9 @@ function FichaItem({
       return i < 0 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)]
     })
 
-  const guardar = (noProcede: boolean) => {
+  const guardar = (noProcede: boolean, ensayosForzados?: Ensayo[]) => {
     const puntuacion = noProcede ? null : efectiva
-    const ensayosGuardados = fuente === 'observado' ? ensayos : []
+    const ensayosGuardados = fuente === 'observado' ? (ensayosForzados ?? ensayos) : []
     startTransition(async () => {
       const res = await guardarRespuesta(evaluacionId, item.id, { puntuacion, noProcede, fuente, ensayos: ensayosGuardados, notas })
       if (res.error) {
@@ -471,6 +477,42 @@ function FichaItem({
         <Bloque titulo="Pregunta a la familia">
           <p>{item.preguntaFamilia}</p>
         </Bloque>
+      )}
+
+      {enTableta && (
+        <PantallaAlumno
+          codigo={item.codigo}
+          pasos={pasos}
+          alCancelar={() => setEnTableta(false)}
+          alTerminar={(resultado) => {
+            setEnTableta(false)
+            setEnsayos(resultado.ensayos)
+            setElegida(null)
+            if (resultado.noProcede) {
+              toast('No supera la comprobación previa: el ítem no se aplica', 'error')
+              guardar(true, resultado.ensayos)
+            }
+          }}
+        />
+      )}
+
+      {fuente === 'observado' && conTableta && editable && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm">
+          <Button onClick={() => setEnTableta(true)} className="px-3 py-1.5">
+            🖥 Aplicar en la tableta
+          </Button>
+          <span className="text-xs text-slate-600">
+            {pasos.filter((p) => p.fase === 'test').length} ensayos de test
+            {pasos.some((p) => p.fase === 'entrenamiento') && ' con entrenamiento por bloques'}. Mantén pulsado «Evaluador» para
+            repetir un ensayo o salir. Los resultados sustituyen a los registrados aquí.
+          </span>
+        </div>
+      )}
+
+      {fuente === 'observado' && falloControl(ensayos) && (
+        <p className="rounded-lg bg-amber-50 p-2 text-xs text-amber-800">
+          Ha fallado algún ensayo de control (una relación enunciada tal cual): la puntuación máxima es 1.
+        </p>
       )}
 
       {fuente === 'observado' && (

@@ -24,10 +24,20 @@ export type ItemEvaluacion = {
   preguntaFamilia: string | null
   requiereItemId: string | null
   requierePuntuacion: number | null
+  // Ensayos predefinidos para la pantalla del alumno (ver guion.ts)
+  guion: unknown
 }
 
 export type FaseEnsayo = 'entrenamiento' | 'test'
-export type Ensayo = { fase: FaseEnsayo; correcto: boolean }
+// respuesta: índice (o índices) de la opción tocada, en el orden del guion;
+// control: ensayo sobre una relación enunciada tal cual
+export type Ensayo = {
+  fase: FaseEnsayo
+  correcto: boolean
+  control?: boolean
+  respuesta?: number | number[]
+  latenciaMs?: number
+}
 export type Fuente = 'observado' | 'informado'
 
 export type RespuestaEvaluacion = {
@@ -88,7 +98,13 @@ export function puntuacionPropuesta(item: ItemEvaluacion, ensayos: Ensayo[]): nu
   const u1 = umbralCriterio(item.criterio1)
   if (u2 === null || u1 === null) return null
   const aciertos = test.filter((e) => e.correcto).length
-  return aciertos >= u2 ? 2 : aciertos >= u1 ? 1 : 0
+  const puntuacion = aciertos >= u2 ? 2 : aciertos >= u1 ? 1 : 0
+  return falloControl(ensayos) ? Math.min(puntuacion, 1) : puntuacion
+}
+
+// Fallar una relación enunciada impide interpretar la derivación: máximo 1
+export function falloControl(ensayos: Ensayo[]) {
+  return ensayos.some((e) => e.fase === 'test' && e.control && !e.correcto)
 }
 
 // Nivel del primer ítem de cribado que no obtiene un 2; null si falta alguno
@@ -204,5 +220,13 @@ export function leerEnsayos(valor: unknown): Ensayo[] {
         (e.fase === 'entrenamiento' || e.fase === 'test') &&
         typeof e.correcto === 'boolean'
     )
-    .map((e) => ({ fase: e.fase, correcto: e.correcto }))
+    .map((e) => {
+      const ensayo: Ensayo = { fase: e.fase, correcto: e.correcto }
+      if (e.control === true) ensayo.control = true
+      if (typeof e.respuesta === 'number' || (Array.isArray(e.respuesta) && e.respuesta.every((n) => typeof n === 'number'))) {
+        ensayo.respuesta = Array.isArray(e.respuesta) ? e.respuesta.slice(0, 20) : e.respuesta
+      }
+      if (typeof e.latenciaMs === 'number' && e.latenciaMs >= 0 && e.latenciaMs < 600000) ensayo.latenciaMs = Math.round(e.latenciaMs)
+      return ensayo
+    })
 }
