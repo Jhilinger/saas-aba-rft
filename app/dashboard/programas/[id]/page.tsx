@@ -19,6 +19,8 @@ import GraficoConducta from '../../alumnos/[id]/conducta/[programaId]/grafico-co
 import PasosTareaPanel from './pasos-tarea-panel'
 import AnalisisTareasClient from './analisis-tareas-client'
 import ToggleVisibleFamilia from './toggle-visible-familia'
+import AvisoPlantilla from '../aviso-plantilla'
+import { avisoPlantilla } from '../plantilla'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Tables } from '@/database.types'
 
@@ -139,6 +141,9 @@ export default async function ProgramaAlumnoPage({
       </div>
     </div>
   )
+
+  const diferenciasPlantilla = await avisoPlantilla(supabase, id)
+  const aviso = diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />
 
   if (programa.formato_recogida !== 'ensayo_discreto') {
     const cuerpo = await (async () => {
@@ -276,6 +281,7 @@ export default async function ProgramaAlumnoPage({
     return (
       <div className="mx-auto max-w-2xl space-y-6 p-4 sm:p-8">
         {cabecera}
+        {aviso}
         {infoPanel}
         {cuerpo}
       </div>
@@ -304,6 +310,7 @@ export default async function ProgramaAlumnoPage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
+      {aviso}
       {infoPanel}
       {observacionesPendientes && observacionesPendientes.length > 0 && (
         <ObservacionesPendientes

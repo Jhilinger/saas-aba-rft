@@ -4,6 +4,8 @@ import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
 import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selector'
 import VideoDiferido from '../../video-diferido'
+import AvisoPlantilla from '../../programas/aviso-plantilla'
+import { avisoPlantilla } from '../../programas/plantilla'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
 
@@ -157,10 +159,12 @@ export default async function ProgramaRftPage({
     .eq('programa_alumno_id', id)
 
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]
+  const diferenciasPlantilla = await avisoPlantilla(supabase, id)
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
+      {diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
       {infoPanel}
 
       <ProgramaRftClient

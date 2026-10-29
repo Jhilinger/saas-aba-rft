@@ -1503,6 +1503,7 @@ export type Database = {
           nombre: string
           objetivo: string | null
           orden: number | null
+          plantilla_sincronizada_at: string
           porcentaje_dominio: number
           programa_base_id: string | null
           terapeuta_id: string
@@ -1531,6 +1532,7 @@ export type Database = {
           nombre: string
           objetivo?: string | null
           orden?: number | null
+          plantilla_sincronizada_at?: string
           porcentaje_dominio?: number
           programa_base_id?: string | null
           terapeuta_id: string
@@ -1559,6 +1561,7 @@ export type Database = {
           nombre?: string
           objetivo?: string | null
           orden?: number | null
+          plantilla_sincronizada_at?: string
           porcentaje_dominio?: number
           programa_base_id?: string | null
           terapeuta_id?: string
@@ -1603,6 +1606,7 @@ export type Database = {
           ayudas_posibles: string | null
           bloques_para_dominio: number
           clinica_id: string | null
+          contenido_actualizado_at: string
           creado_por: string
           created_at: string
           criterio_dominio: string | null
@@ -1630,6 +1634,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           clinica_id?: string | null
+          contenido_actualizado_at?: string
           creado_por: string
           created_at?: string
           criterio_dominio?: string | null
@@ -1659,6 +1664,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           clinica_id?: string | null
+          contenido_actualizado_at?: string
           creado_por?: string
           created_at?: string
           criterio_dominio?: string | null
@@ -1929,6 +1935,10 @@ export type Database = {
       }
       familia_alumnos: { Args: never; Returns: string[] }
       familia_clinicas: { Args: never; Returns: string[] }
+      marcar_contenido_programa_base: {
+        Args: { p_programa_base_id: string }
+        Returns: undefined
+      }
       programas_dominados_valoracion: {
         Args: { p_alumno_id: string }
         Returns: string[]
