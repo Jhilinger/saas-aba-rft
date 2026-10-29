@@ -51,3 +51,8 @@ export async function cargarRespuestas(supabase: Supabase, evaluacionId: string)
     notas: r.notas,
   }))
 }
+
+export async function cargarVinculos(supabase: Supabase) {
+  const { data } = await supabase.from('evaluacion_item_programas').select('item_id, programa_base_id')
+  return (data ?? []).map((v) => ({ itemId: v.item_id, programaBaseId: v.programa_base_id }))
+}

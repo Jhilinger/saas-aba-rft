@@ -2,7 +2,9 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { cargarItems, cargarRespuestas } from './cargar'
+import { cargarItems, cargarRespuestas, cargarVinculos } from './cargar'
+import { calcularColocacion, notaColocacion } from './colocacion'
+import { importarPrograma } from '../../actions'
 import { calcularRuta, estadoEntrenamiento, leerEnsayos, type Ensayo, type Fuente } from './logica'
 
 const MAX_ENSAYOS = 60
@@ -179,4 +181,75 @@ export async function cambiarEstadoEvaluacion(evaluacionId: string, estado: 'en_
 
   revalidatePath(rutaLista(evaluacion.alumno_id), 'layout')
   return { success: true }
+}
+
+// Traslada la evaluación finalizada a la valoración por programas. Los
+// programas de `mantener` conservan su valoración manual.
+export async function aplicarColocacion(evaluacionId: string, mantener: string[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const { data: evaluacion } = await supabase
+    .from('evaluaciones')
+    .select('id, alumno_id, estado, finalizada_at')
+    .eq('id', evaluacionId)
+    .single()
+  if (!evaluacion || evaluacion.estado !== 'finalizada') return { error: 'Solo se puede colocar una evaluación finalizada' }
+
+  const [items, respuestas, vinculos, { data: dominadosPei }] = await Promise.all([
+    cargarItems(supabase),
+    cargarRespuestas(supabase, evaluacionId),
+    cargarVinculos(supabase),
+    supabase
+      .from('programas_alumno')
+      .select('programa_base_id')
+      .eq('alumno_id', evaluacion.alumno_id)
+      .in('estado', ['dominado', 'mantenimiento'])
+      .not('programa_base_id', 'is', null),
+  ])
+  const colocacion = calcularColocacion(items, new Map(respuestas.map((r) => [r.itemId, r])), vinculos)
+  const fecha = new Date(evaluacion.finalizada_at ?? Date.now()).toLocaleDateString('es-ES')
+  // Lo ya dominado en el PEI no se vuelve a valorar
+  const conservar = new Set([...mantener, ...(dominadosPei ?? []).map((p) => p.programa_base_id!)])
+  const ahora = new Date().toISOString()
+
+  const filas = colocacion
+    .filter((c) => !conservar.has(c.programaBaseId))
+    .map((c) => ({
+      alumno_id: evaluacion.alumno_id,
+      programa_base_id: c.programaBaseId,
+      valoracion: c.valoracion,
+      notas: notaColocacion(fecha, c.evidencias),
+      evaluado_por: user.id,
+      updated_at: ahora,
+    }))
+
+  if (filas.length) {
+    const { error } = await supabase.from('evaluaciones_iniciales').upsert(filas, { onConflict: 'alumno_id,programa_base_id' })
+    if (error) return { error: error.message }
+  }
+
+  const { error } = await supabase
+    .from('evaluaciones')
+    .update({ colocacion_aplicada_at: ahora, updated_at: ahora })
+    .eq('id', evaluacionId)
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/alumnos/${evaluacion.alumno_id}`, 'layout')
+  return { success: true, aplicados: filas.length }
+}
+
+// Añade al PEI los programas elegidos de la propuesta (con el importador
+// habitual, que vuelve a comprobar la secuencia del currículo)
+export async function anadirPropuestaAlPei(alumnoId: string, programaBaseIds: string[]) {
+  const errores: string[] = []
+  let importados = 0
+  for (const id of programaBaseIds.slice(0, 20)) {
+    const res = await importarPrograma(alumnoId, id)
+    if ('error' in res && res.error) errores.push(res.error)
+    else importados++
+  }
+  revalidatePath(`/dashboard/alumnos/${alumnoId}`, 'layout')
+  return { importados, errores }
 }

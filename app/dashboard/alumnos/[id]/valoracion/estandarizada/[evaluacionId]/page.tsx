@@ -31,12 +31,22 @@ export default async function AdministracionPage({
         <h2 className="text-lg font-semibold text-slate-800">
           Evaluación del {new Date(evaluacion.iniciada_at).toLocaleDateString('es-ES')}
         </h2>
-        <Link
-          href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada`}
-          className="text-sm font-medium text-indigo-600 hover:underline"
-        >
-          ← Evaluaciones
-        </Link>
+        <span className="flex flex-wrap items-center gap-3">
+          {evaluacion.estado === 'finalizada' && (
+            <Link
+              href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada/${evaluacionId}/colocacion`}
+              className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+            >
+              Colocación en el currículo →
+            </Link>
+          )}
+          <Link
+            href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada`}
+            className="text-sm font-medium text-indigo-600 hover:underline"
+          >
+            ← Evaluaciones
+          </Link>
+        </span>
       </div>
       <AdministracionClient
         evaluacion={{
