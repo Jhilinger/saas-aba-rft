@@ -1110,6 +1110,130 @@ export type Database = {
           },
         ]
       }
+      evaluacion_item_programas: {
+        Row: {
+          item_id: string
+          programa_base_id: string
+        }
+        Insert: {
+          item_id: string
+          programa_base_id: string
+        }
+        Update: {
+          item_id?: string
+          programa_base_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluacion_item_programas_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "evaluacion_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluacion_item_programas_programa_base_id_fkey"
+            columns: ["programa_base_id"]
+            isOneToOne: false
+            referencedRelation: "programas_base"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluacion_items: {
+        Row: {
+          activo: boolean
+          codigo: string
+          consigna: string
+          created_at: string
+          criterio_0: string | null
+          criterio_1: string | null
+          criterio_2: string | null
+          dominio_id: string | null
+          ensayos: number | null
+          formatos: string[]
+          id: string
+          indicador: boolean
+          materiales: string | null
+          nivel: number
+          orden: number
+          pregunta_familia: string | null
+          relacional: boolean
+          requiere_item_id: string | null
+          requiere_puntuacion: number | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          consigna: string
+          created_at?: string
+          criterio_0?: string | null
+          criterio_1?: string | null
+          criterio_2?: string | null
+          dominio_id?: string | null
+          ensayos?: number | null
+          formatos?: string[]
+          id?: string
+          indicador?: boolean
+          materiales?: string | null
+          nivel: number
+          orden: number
+          pregunta_familia?: string | null
+          relacional?: boolean
+          requiere_item_id?: string | null
+          requiere_puntuacion?: number | null
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          consigna?: string
+          created_at?: string
+          criterio_0?: string | null
+          criterio_1?: string | null
+          criterio_2?: string | null
+          dominio_id?: string | null
+          ensayos?: number | null
+          formatos?: string[]
+          id?: string
+          indicador?: boolean
+          materiales?: string | null
+          nivel?: number
+          orden?: number
+          pregunta_familia?: string | null
+          relacional?: boolean
+          requiere_item_id?: string | null
+          requiere_puntuacion?: number | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluacion_items_dominio_id_fkey"
+            columns: ["dominio_id"]
+            isOneToOne: false
+            referencedRelation: "dominios_curriculo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluacion_items_nivel_fkey"
+            columns: ["nivel"]
+            isOneToOne: false
+            referencedRelation: "niveles_curriculo"
+            referencedColumns: ["numero"]
+          },
+          {
+            foreignKeyName: "evaluacion_items_requiere_item_id_fkey"
+            columns: ["requiere_item_id"]
+            isOneToOne: false
+            referencedRelation: "evaluacion_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluaciones_iniciales: {
         Row: {
           alumno_id: string
