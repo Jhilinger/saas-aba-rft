@@ -18,6 +18,8 @@ type ProgramaBase = {
   creado_por: string
   // Motivo si la secuencia del currículo bloquea su dominio para este alumno
   bloqueo: string | null
+  // Requisitos previos que el alumno todavía no domina (solo avisan)
+  requisitosPendientes: string[]
   // Ya en el PEI o dominado (PEI o valoración): no tiene sentido importarlo
   situacion: 'disponible' | 'en_pei' | 'dominado'
 }
@@ -220,6 +222,11 @@ export default function AsignarProgramaForm({
                   ) : null}
                 </div>
                 {p.bloqueo && <p className="text-xs text-amber-700">{p.bloqueo}.</p>}
+                {p.requisitosPendientes.length > 0 && (
+                  <p className="text-xs text-amber-700">
+                    ⚠ Requisitos previos sin dominar: {p.requisitosPendientes.join(' · ')}
+                  </p>
+                )}
                 {excepcionId === p.id && (
                   <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
                     <label className="block space-y-1">

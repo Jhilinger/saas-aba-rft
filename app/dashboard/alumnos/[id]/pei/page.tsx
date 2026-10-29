@@ -36,7 +36,7 @@ export default async function AlumnoPage({
   if (!alumno) notFound()
 
   const estructura = await cargarEstructuraCurriculo(supabase)
-  const [{ data: programas }, { data: programasBase }, progreso] = await Promise.all([
+  const [{ data: programas }, { data: programasBase }, progreso, { data: requisitos }] = await Promise.all([
     supabase
       .from('programas_alumno')
       .select('id, nombre, tipo, estado, fecha_inicio, orden, excepcion_secuencia, programa_base_id, programas_base(dominio_id, orden, clinica_id)')
@@ -48,6 +48,7 @@ export default async function AlumnoPage({
       .select('id, nombre, tipo, area, dominio_id, orden, clinica_id, visibilidad, creado_por')
       .eq('activo', true),
     cargarProgresoAlumno(supabase, alumno, estructura),
+    supabase.from('requisitos_programa').select('programa_base_id, requisito_id'),
   ])
 
   // Secuencia del currículo: dominios bloqueados para este alumno
@@ -73,12 +74,26 @@ export default async function AlumnoPage({
       dominioId: programas_base?.clinica_id === null ? programas_base.dominio_id : null,
     }))
     .sort((a, b) => (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity))
+  // Requisitos previos que el alumno todavía no domina (solo avisan, no bloquean)
+  const nombrePrograma = new Map(
+    (programasBase ?? []).map((p) => {
+      const codigo = codificador.codigo(p)
+      return [p.id, codigo ? `${codigo} ${p.nombre}` : p.nombre]
+    })
+  )
+  const requisitosDe = new Map<string, string[]>()
+  for (const r of requisitos ?? []) {
+    requisitosDe.set(r.programa_base_id, [...(requisitosDe.get(r.programa_base_id) ?? []), r.requisito_id])
+  }
   const opcionesBase = (programasBase ?? [])
     .map((p) => ({
       ...p,
       codigo: codificador.codigo(p),
       ordenGlobal: codificador.ordenGlobal(p),
       bloqueo: p.dominio_id ? (bloqueos.get(p.dominio_id) ?? null) : null,
+      requisitosPendientes: (requisitosDe.get(p.id) ?? [])
+        .filter((r) => !dominados.has(r) && nombrePrograma.has(r))
+        .map((r) => nombrePrograma.get(r)!),
       situacion: enPei.has(p.id)
         ? ('en_pei' as const)
         : dominados.has(p.id)

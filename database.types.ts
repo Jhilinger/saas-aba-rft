@@ -1806,6 +1806,39 @@ export type Database = {
           },
         ]
       }
+      requisitos_programa: {
+        Row: {
+          created_at: string
+          programa_base_id: string
+          requisito_id: string
+        }
+        Insert: {
+          created_at?: string
+          programa_base_id: string
+          requisito_id: string
+        }
+        Update: {
+          created_at?: string
+          programa_base_id?: string
+          requisito_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requisitos_programa_programa_base_id_fkey"
+            columns: ["programa_base_id"]
+            isOneToOne: false
+            referencedRelation: "programas_base"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requisitos_programa_requisito_id_fkey"
+            columns: ["requisito_id"]
+            isOneToOne: false
+            referencedRelation: "programas_base"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resultados_paso_bloque: {
         Row: {
           bloque_id: string
@@ -1944,6 +1977,10 @@ export type Database = {
         Returns: string[]
       }
       puede_acceder_alumno: { Args: { p_alumno_id: string }; Returns: boolean }
+      puede_editar_programa_base: {
+        Args: { p_programa_base_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       destinatario_informe: "familia" | "formal"

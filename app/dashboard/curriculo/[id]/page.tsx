@@ -8,6 +8,7 @@ import NuevaClaseRftForm from './nueva-clase-rft-form'
 import ClaseRftBaseCard from './clase-rft-base-card'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
+import RequisitosPrograma from './requisitos-programa'
 import { Breadcrumb, Panel } from '../../../ui'
 import { cargarEstructuraCurriculo, crearCodificador } from '../estructura'
 
@@ -86,6 +87,32 @@ export default async function ProgramaDetallePage({
     .eq('programa_base_id', id)
     .order('orden')
 
+  // Requisitos previos y, para editarlos, los programas que se pueden elegir
+  const codificador = crearCodificador(estructura)
+  const [{ data: requisitosRaw }, { data: candidatosRaw }] = await Promise.all([
+    supabase
+      .from('requisitos_programa')
+      .select('programas_base!requisitos_programa_requisito_id_fkey(id, nombre, dominio_id, orden, clinica_id)')
+      .eq('programa_base_id', id),
+    soloLectura
+      ? Promise.resolve({ data: [] })
+      : supabase.from('programas_base').select('id, nombre, dominio_id, orden, clinica_id').eq('activo', true).neq('id', id),
+  ])
+  const aReferencia = (p: { id: string; nombre: string; dominio_id: string | null; orden: number | null; clinica_id: string | null }) => ({
+    id: p.id,
+    nombre: p.nombre,
+    codigo: codificador.codigo(p),
+    ordenGlobal: codificador.ordenGlobal(p),
+  })
+  const porOrden = (a: { ordenGlobal: number | null; nombre: string }, b: { ordenGlobal: number | null; nombre: string }) =>
+    (a.ordenGlobal ?? Infinity) - (b.ordenGlobal ?? Infinity) || a.nombre.localeCompare(b.nombre)
+  const requisitos = (requisitosRaw ?? [])
+    .map((r) => r.programas_base)
+    .filter((p): p is NonNullable<typeof p> => !!p)
+    .map(aReferencia)
+    .sort(porOrden)
+  const candidatos = (candidatosRaw ?? []).map(aReferencia).sort(porOrden)
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 sm:space-y-8">
       <div>
@@ -111,6 +138,8 @@ export default async function ProgramaDetallePage({
       </div>
 
       {!soloLectura && <EditarProgramaForm programa={programa} estructura={estructura} />}
+
+      <RequisitosPrograma programaBaseId={id} requisitos={requisitos} candidatos={candidatos} soloLectura={soloLectura} />
 
       <Panel className="grid grid-cols-1 gap-4 p-4 text-sm sm:grid-cols-3 sm:p-5">
         <div className="sm:col-span-3">
