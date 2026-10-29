@@ -3,24 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Panel } from '../ui'
 import type { Tables } from '@/database.types'
-
-type BloqueAbaActividad = Pick<Tables<'bloques_ensayo'>, 'fecha' | 'porcentaje'> & {
-  conjuntos_estimulos_alumno: (Pick<Tables<'conjuntos_estimulos_alumno'>, 'programa_alumno_id'> & {
-    programas_alumno:
-      | (Pick<Tables<'programas_alumno'>, 'nombre' | 'alumno_id'> & {
-          alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
-        })
-      | null
-  }) | null
-}
-
-type BloqueRftActividad = Pick<Tables<'bloques_ensayo_rft'>, 'fecha' | 'porcentaje' | 'programa_alumno_id'> & {
-  programas_alumno:
-    | (Pick<Tables<'programas_alumno'>, 'nombre' | 'alumno_id'> & {
-        alumnos: Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
-      })
-    | null
-}
+import SesionHoy from './sesion-hoy'
+import { puedeDisenar } from './permisos'
 
 type AlumnoConTerapeuta = Pick<Tables<'alumnos'>, 'id' | 'nombre_anonimizado'> & {
   alumno_terapeuta: Pick<Tables<'alumno_terapeuta'>, 'terapeuta_id'>[]
@@ -34,7 +18,7 @@ export default async function DashboardPage() {
 
   const { data: perfil, error } = await supabase
     .from('perfiles')
-    .select('id, nombre, rol, clinica_id')
+    .select('id, nombre, rol, clinica_id, tambien_terapeuta')
     .eq('id', user.id)
     .single()
 
@@ -53,12 +37,20 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">Resumen</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600">{perfil.rol === 'terapeuta' ? 'Sesión de hoy' : 'Resumen'}</p>
         <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">Hola, {perfil.nombre}</h1>
       </div>
 
-      {perfil.rol === 'terapeuta' && <InicioTerapeuta terapeutaId={perfil.id} />}
+      {perfil.rol === 'terapeuta' && (
+        <SesionHoy supabase={supabase} terapeutaId={perfil.id} disena={await puedeDisenar(supabase)} />
+      )}
       {perfil.rol === 'clinica_admin' && perfil.clinica_id && <InicioClinica clinicaId={perfil.clinica_id} />}
+      {perfil.rol === 'clinica_admin' && perfil.tambien_terapeuta && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-slate-700">Mis alumnos</h2>
+          <SesionHoy supabase={supabase} terapeutaId={perfil.id} disena />
+        </section>
+      )}
       {perfil.rol === 'superadmin' && <InicioSuperadmin />}
       {perfil.rol === 'familia' && (
         <p className="text-slate-600">
@@ -69,141 +61,6 @@ export default async function DashboardPage() {
           para ver su progreso.
         </p>
       )}
-    </div>
-  )
-}
-
-// ============================================================================
-// TERAPEUTA
-// ============================================================================
-async function InicioTerapeuta({ terapeutaId }: { terapeutaId: string }) {
-  const supabase = await createClient()
-
-  const { data: vinculos } = await supabase
-    .from('alumno_terapeuta')
-    .select('alumno_id')
-    .eq('terapeuta_id', terapeutaId)
-
-  const alumnoIds = (vinculos ?? []).map((v) => v.alumno_id)
-
-  const { count: totalProgramas } = alumnoIds.length
-    ? await supabase
-        .from('programas_alumno')
-        .select('id', { count: 'exact', head: true })
-        .in('alumno_id', alumnoIds)
-    : { count: 0 }
-
-  const { data: bloquesAba } = await supabase
-    .from('bloques_ensayo')
-    .select('fecha, porcentaje, conjuntos_estimulos_alumno(programa_alumno_id, programas_alumno(nombre, alumno_id, alumnos(nombre_anonimizado)))')
-    .eq('terapeuta_id', terapeutaId)
-    .order('fecha', { ascending: false })
-    .limit(8)
-
-  const { data: bloquesRft } = await supabase
-    .from('bloques_ensayo_rft')
-    .select('fecha, porcentaje, programa_alumno_id, programas_alumno(nombre, alumno_id, alumnos(nombre_anonimizado))')
-    .eq('terapeuta_id', terapeutaId)
-    .order('fecha', { ascending: false })
-    .limit(8)
-
-  type Actividad = {
-    fecha: string
-    porcentaje: number
-    tipo: 'aba' | 'rft'
-    programaId: string
-    programaNombre: string
-    alumnoNombre: string
-  }
-
-  const actividad: Actividad[] = [
-    ...((bloquesAba ?? []) as unknown as BloqueAbaActividad[]).map((b) => ({
-      fecha: b.fecha,
-      porcentaje: Number(b.porcentaje),
-      tipo: 'aba' as const,
-      programaId: b.conjuntos_estimulos_alumno?.programa_alumno_id ?? '',
-      programaNombre: b.conjuntos_estimulos_alumno?.programas_alumno?.nombre ?? '—',
-      alumnoNombre: b.conjuntos_estimulos_alumno?.programas_alumno?.alumnos?.nombre_anonimizado ?? '—',
-    })),
-    ...((bloquesRft ?? []) as unknown as BloqueRftActividad[]).map((b) => ({
-      fecha: b.fecha,
-      porcentaje: Number(b.porcentaje),
-      tipo: 'rft' as const,
-      programaId: b.programa_alumno_id,
-      programaNombre: b.programas_alumno?.nombre ?? '—',
-      alumnoNombre: b.programas_alumno?.alumnos?.nombre_anonimizado ?? '—',
-    })),
-  ]
-    .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
-    .slice(0, 8)
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
-        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-primary)' }}>
-          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{alumnoIds.length}</p>
-          <p className="text-sm text-slate-500">Alumnos asignados</p>
-        </Panel>
-        <Panel className="p-4 sm:p-5 border-t-4" style={{ borderTopColor: 'var(--brand-accent)' }}>
-          <p className="text-2xl sm:text-3xl font-bold text-slate-800">{totalProgramas ?? 0}</p>
-          <p className="text-sm text-slate-500">Programas en total</p>
-        </Panel>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href="/dashboard/mis-alumnos"
-          className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
-        >
-          Mis Alumnos
-        </Link>
-        <Link
-          href="/dashboard/mis-programas"
-          className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200"
-        >
-          Mis programas
-        </Link>
-      </div>
-
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-700">Última actividad</h2>
-        <Panel className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[500px]">
-            <thead className="border-b border-slate-200 bg-slate-50 text-left text-slate-500">
-              <tr>
-                <th className="p-3">Alumno</th>
-                <th className="p-3">Programa</th>
-                <th className="p-3">%</th>
-                <th className="p-3">Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {actividad.map((a, i) => (
-                <tr key={i} className="border-b border-slate-100 transition-colors last:border-0 hover:bg-indigo-50/40">
-                  <td className="p-3 font-medium text-slate-800">{a.alumnoNombre}</td>
-                  <td className="p-3">
-                    <Link
-                      href={a.tipo === 'aba' ? `/dashboard/programas/${a.programaId}` : `/dashboard/programas-rft/${a.programaId}`}
-                      className="text-indigo-600 hover:underline"
-                    >
-                      {a.programaNombre}
-                    </Link>
-                  </td>
-                  <td className={`p-3 font-medium ${a.porcentaje >= 90 ? 'text-emerald-700' : 'text-slate-600'}`}>
-                    {a.porcentaje}%
-                  </td>
-                  <td className="p-3 text-slate-500 whitespace-nowrap">
-                    {new Date(a.fecha).toLocaleDateString('es-ES')}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {actividad.length === 0 && (
-            <p className="p-6 text-center text-slate-500">Todavía no has tomado datos.</p>
-          )}
-        </Panel>
-      </section>
     </div>
   )
 }
