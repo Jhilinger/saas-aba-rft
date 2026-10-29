@@ -55,6 +55,8 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
     .select('grupo, ensayos_rft_detalle(ayuda)')
     .eq('programa_alumno_id', programaAlumnoId)
     .eq('fase', 'entrenamiento')
+    // Los ensayos de control no forman parte del entrenamiento
+    .eq('ensayos_rft_detalle.tipo_ensayo', 'principal')
 
   const ensayosPorGrupo: Record<string, { ayuda: string | null }[]> = {}
   for (const b of bloquesEntrenamiento ?? []) {

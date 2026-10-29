@@ -17,6 +17,7 @@ type Clase = {
   grupo: string
   tipo_relacion: string
   estado: string
+  respuestas_esperadas: import('@/database.types').Json
   estimulos_rft: Estimulo[]
   relaciones_entrenadas_rft: Relacion[]
 }
@@ -52,6 +53,7 @@ export default function ProgramaRftClient({
   dominioFases,
   porcentajeDominio,
   nivelRft,
+  conRespuestasEsperadas,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -62,6 +64,7 @@ export default function ProgramaRftClient({
   dominioFases: DominioFase[]
   porcentajeDominio: number
   nivelRft: string | null
+  conRespuestasEsperadas: boolean
 }) {
   const [tab, setTab] = useState<'evolucion' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -256,6 +259,7 @@ export default function ProgramaRftClient({
                 programaAlumnoId={programaAlumnoId}
                 testsRealizados={testsPorClase[c.id] ?? []}
                 nivelRft={nivelRft}
+                conRespuestasEsperadas={conRespuestasEsperadas}
               />
             ))}
           </div>

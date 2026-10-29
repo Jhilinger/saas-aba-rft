@@ -6,25 +6,31 @@ import {
   crearEstimuloRftBase,
   eliminarEstimuloRftBase,
   eliminarClaseRftBase,
+  guardarRespuestasEsperadasBase,
 } from '../actions'
+import RespuestasEsperadas from '../../respuestas-esperadas'
+import type { Json } from '@/database.types'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
-type Clase = { id: string; nombre: string; grupo: string; estimulos_rft_base: Estimulo[] }
+type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft_base: Estimulo[] }
 
 export default function ClaseRftBaseCard({
   clase,
   programaBaseId,
   nivelRft,
   soloLectura = false,
+  conRespuestasEsperadas = false,
 }: {
   clase: Clase
   programaBaseId: string
   nivelRft: string | null
   soloLectura?: boolean
+  // El programa usa respuestas de opciones/ejecución/abiertas en alguna fase
+  conRespuestasEsperadas?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
@@ -114,6 +120,15 @@ export default function ClaseRftBaseCard({
           <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
         )}
       </ul>
+
+      {conRespuestasEsperadas && (
+        <RespuestasEsperadas
+          respuestas={clase.respuestas_esperadas}
+          posiciones={posicionesPermitidas}
+          soloLectura={soloLectura}
+          guardar={(respuestas) => guardarRespuestasEsperadasBase(clase.id, programaBaseId, respuestas)}
+        />
+      )}
 
       {soloLectura ? null : enElLimite ? (
         <p className="text-xs text-slate-500 italic">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useEffect, useCallback } from 'react'
+import { useState, useTransition, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueRft } from './actions'
 import VideoDiferido from '../../../video-diferido'
@@ -17,9 +17,11 @@ import {
 } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 import { segundosDesde, useCronometroEnsayo } from '../../cronometro'
+import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
+import type { Json } from '@/database.types'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
-type Clase = { id: string; nombre: string; grupo: string; estimulos_rft: Estimulo[] }
+type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
 type EnsayoRft = {
@@ -33,6 +35,17 @@ type EnsayoRft = {
   correcto: boolean
   ayuda: string
   latenciaMs?: number | null
+  respuesta?: string | null
+}
+
+// Pregunta extra durante el bloque (ej. de asimetría): se guarda con su
+// resultado, pero no cuenta para el % de acierto ni para el dominio
+type ControlRft = {
+  claseId: string
+  estimuloOrigenId: string
+  pregunta: string
+  respuesta: string | null
+  correcto: boolean
 }
 
 const FASES_TODAS = [
@@ -107,6 +120,7 @@ export default function TomarDatosRftClient({
   grupoInicial,
   dominioFases,
   nivelRft,
+  respuesta,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -118,6 +132,7 @@ export default function TomarDatosRftClient({
   grupoInicial?: string | null
   dominioFases: DominioFase[]
   nivelRft: string | null
+  respuesta: { tipo_respuesta: string; opciones_respuesta: string[] | null; respuesta_por_fase: Json }
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -134,13 +149,30 @@ export default function TomarDatosRftClient({
   const [preguntaActual, setPreguntaActual] = useState('')
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
-  const [resultado, setResultado] = useState<{ porcentaje: number; clasesDominadasAhora: string[]; derivado: boolean } | null>(null)
+  const [resultado, setResultado] = useState<{
+    porcentaje: number
+    clasesDominadasAhora: string[]
+    derivado: boolean
+    controles: { total: number; aciertos: number }
+  } | null>(null)
+  // Respuesta de opciones elegida, a falta de marcar ✓/✗ (si la clase no tiene respuesta esperada)
+  const [respuestaPendiente, setRespuestaPendiente] = useState<string | null>(null)
+  const [respuestaAbierta, setRespuestaAbierta] = useState('')
+  const [controles, setControles] = useState<ControlRft[]>([])
+  const controlesRef = useRef<ControlRft[]>([])
+  const [controlAbierto, setControlAbierto] = useState(false)
+  const [controlPregunta, setControlPregunta] = useState('')
+  const [controlRespuesta, setControlRespuesta] = useState('')
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
   // Duración del bloque: desde que empieza hasta el último ensayo registrado
   const [inicioBloque, setInicioBloque] = useState<number | null>(null)
   const [duracionBloque, setDuracionBloque] = useState<number | null>(null)
   const cronometro = useCronometroEnsayo(secuencia ? ensayos.length : null)
+  const fijarControles = (lista: ControlRft[]) => {
+    controlesRef.current = lista
+    setControles(lista)
+  }
   const router = useRouter()
   const toast = useToast()
 
@@ -210,7 +242,7 @@ export default function TomarDatosRftClient({
             origen,
             destino,
             numComparativos,
-            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs }) => ({
+            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs, respuesta }) => ({
               claseId,
               estimuloOrigenId,
               estimuloDestinoId,
@@ -218,9 +250,11 @@ export default function TomarDatosRftClient({
               correcto,
               ayuda,
               latenciaMs,
+              respuesta,
             })),
             notasActuales,
-            duracionSegundos
+            duracionSegundos,
+            controlesRef.current
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -229,7 +263,15 @@ export default function TomarDatosRftClient({
           }
           borrarProgreso(claveProgreso)
           setEstadoGuardado('idle')
-          setResultado({ porcentaje: res.porcentaje ?? 0, clasesDominadasAhora: res.clasesDominadasAhora ?? [], derivado: res.derivado ?? false })
+          setResultado({
+            porcentaje: res.porcentaje ?? 0,
+            clasesDominadasAhora: res.clasesDominadasAhora ?? [],
+            derivado: res.derivado ?? false,
+            controles: {
+              total: controlesRef.current.length,
+              aciertos: controlesRef.current.filter((c) => c.correcto).length,
+            },
+          })
         } catch (e) {
           if (esFalloDeRed(e)) {
             setEstadoGuardado('pendiente')
@@ -257,6 +299,7 @@ export default function TomarDatosRftClient({
       tamanoBloque: number
       inicioBloque?: number | null
       duracionBloque?: number | null
+      controles?: ControlRft[]
     }>(claveProgreso)
     if (guardado) {
       setGrupoSeleccionado(guardado.grupoSeleccionado)
@@ -269,6 +312,8 @@ export default function TomarDatosRftClient({
       setNotas(guardado.notas)
       setInicioBloque(guardado.inicioBloque ?? null)
       setDuracionBloque(guardado.duracionBloque ?? null)
+      controlesRef.current = guardado.controles ?? []
+      setControles(guardado.controles ?? [])
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
         const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
         const numComparativos = clasesDelGrupoGuardado.filter(
@@ -337,13 +382,14 @@ export default function TomarDatosRftClient({
     setSecuencia(generarSecuenciaClases(clasesValidas, tamanoBloque))
     setInicioBloque(Date.now())
     setDuracionBloque(null)
+    fijarControles([])
     setEnsayos([])
     setNotas('')
     setResultado(null)
     setEstadoGuardado('idle')
   }
 
-  const registrar = (correcto: boolean, ayuda: string, pregunta?: string) => {
+  const registrar = (correcto: boolean, ayuda: string, pregunta?: string, respuestaAlumno?: string | null) => {
     if (!secuencia) return
     const claseActual = secuencia[ensayos.length]
     const origen = encontrarEstimulo(claseActual, posicionOrigen)!
@@ -362,11 +408,14 @@ export default function TomarDatosRftClient({
         correcto,
         ayuda,
         latenciaMs: cronometro.leer(),
+        respuesta: respuestaAlumno ?? null,
       },
     ]
     setEnsayos(nuevos)
     setMostrandoAyudas(false)
     setPreguntaActual('')
+    setRespuestaPendiente(null)
+    setRespuestaAbierta('')
 
     if (nuevos.length === secuencia.length) {
       const duracion = segundosDesde(inicioBloque)
@@ -391,8 +440,9 @@ export default function TomarDatosRftClient({
       tamanoBloque,
       inicioBloque,
       duracionBloque,
+      controles,
     })
-  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, claveProgreso])
+  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -410,6 +460,11 @@ export default function TomarDatosRftClient({
         </p>
         {hayDominio && (
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
+        )}
+        {resultado.controles.total > 0 && (
+          <p className="text-sm text-slate-600">
+            Ensayos de control: {resultado.controles.aciertos}/{resultado.controles.total} correctos (no cuentan para el dominio)
+          </p>
         )}
         <div className="flex flex-col sm:flex-row justify-center gap-3">
           <Button
@@ -643,6 +698,42 @@ export default function TomarDatosRftClient({
 
   const origenActual = encontrarEstimulo(claseActual, posicionOrigen)!
   const esTransformacion = fase === 'transformacion_funciones'
+  // La fase elegida decide el tipo de respuesta (las sondas usan el de su fase)
+  const config = configRespuesta(respuesta, fase)
+  const esperada =
+    leerRespuestasEsperadas(claseActual.respuestas_esperadas)[claveCombinacion(posicionOrigen, posicionDestino)] ?? null
+  const conPregunta = esTransformacion || config.tipo === 'opciones' || config.tipo === 'abierta'
+  const etiquetas =
+    config.tipo === 'ejecucion'
+      ? { correcto: '✓ Lo hace sin ayuda', ayuda: '✓ Lo hace con ayuda', incorrecto: '✗ No lo hace' }
+      : { correcto: '✓ Correcto sin ayuda', ayuda: '✓ Correcto con ayuda', incorrecto: '✗ Incorrecto' }
+  const respuestaRegistrada = config.tipo === 'abierta' ? respuestaAbierta.trim() || null : null
+
+  // Opciones fijas: con respuesta esperada se corrige sola; si no, el terapeuta marca ✓/✗
+  const elegirOpcion = (opcion: string) => {
+    if (esperada) {
+      registrar(opcion === esperada, 'independiente', preguntaActual, opcion)
+    } else {
+      cronometro.capturar()
+      setRespuestaPendiente(opcion)
+    }
+  }
+
+  const anadirControl = (correcto: boolean) => {
+    fijarControles([
+      ...controles,
+      {
+        claseId: claseActual.id,
+        estimuloOrigenId: origenActual.id,
+        pregunta: controlPregunta.trim(),
+        respuesta: controlRespuesta.trim() || null,
+        correcto,
+      },
+    ])
+    setControlPregunta('')
+    setControlRespuesta('')
+    setControlAbierto(false)
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -696,170 +787,235 @@ export default function TomarDatosRftClient({
 
       <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
         {esTransformacion ? (
-          <>
-            <p className="text-sm text-slate-500">
-              Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {comparativos.map((c) => (
-                <span
-                  key={c.claseId}
-                  className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
-                    c.esCorrecto
-                      ? 'border-emerald-600 bg-emerald-600 text-white'
-                      : 'border-slate-300 bg-white text-slate-600'
-                  }`}
-                  title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
-                >
-                  {c.estimulo.nombre}
-                </span>
-              ))}
-            </div>
-            <textarea
-              value={preguntaActual}
-              onChange={(e) => {
-                setPreguntaActual(e.target.value)
-                cronometro.reiniciar()
-              }}
-              placeholder="Escribe aquí la pregunta que le haces al alumno..."
-              rows={2}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-            />
-
-            {!mostrandoAyudas && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="success"
-                  onClick={() => registrar(true, 'independiente', preguntaActual)}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✓ Correcto sin ayuda
-                </Button>
-                <Button
-                  variant="warning"
-                  onClick={() => {
-                    cronometro.capturar()
-                    setMostrandoAyudas(true)
-                  }}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✓ Correcto con ayuda
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => registrar(false, 'independiente', preguntaActual)}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✗ Incorrecto
-                </Button>
-              </div>
-            )}
-
-            {mostrandoAyudas && (
-              <div className="space-y-3">
-                <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
-                  {AYUDAS.map((a) => (
-                    <button
-                      key={a.value}
-                      onClick={() => registrar(true, a.value, preguntaActual)}
-                      disabled={isPending}
-                      className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setMostrandoAyudas(false)}
-                  className="text-sm text-slate-500 hover:text-slate-600 py-2"
-                >
-                  Cancelar
-                </button>
-              </div>
-            )}
-          </>
+          <p className="text-sm text-slate-500">
+            Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
+          </p>
         ) : (
           <>
             <p className="text-xl sm:text-2xl font-bold text-slate-800">{origenActual.nombre}</p>
             <p className="text-xs text-slate-500">{claseActual.nombre}</p>
+          </>
+        )}
 
-            <div className="flex flex-wrap justify-center gap-2">
-              {comparativos.map((c) => (
-                <span
-                  key={c.claseId}
-                                    className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
-                    c.esCorrecto
-                      ? 'border-emerald-600 bg-emerald-600 text-white'
-                      : 'border-slate-300 bg-white text-slate-600'
-                  }`}
-                  title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
+        {config.tipo === 'seleccion' && (
+          <div className="flex flex-wrap justify-center gap-2">
+            {comparativos.map((c) => (
+              <span
+                key={c.claseId}
+                className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+                  c.esCorrecto
+                    ? 'border-emerald-600 bg-emerald-600 text-white'
+                    : 'border-slate-300 bg-white text-slate-600'
+                }`}
+                title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
+              >
+                {c.estimulo.nombre}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {config.tipo !== 'seleccion' && esperada && (
+          <p className="text-sm text-slate-600">
+            Respuesta esperada: <strong className="text-emerald-700">{esperada}</strong>{' '}
+            <span className="text-xs text-slate-400">(solo visible para ti)</span>
+          </p>
+        )}
+
+        {conPregunta && (
+          <textarea
+            value={preguntaActual}
+            onChange={(e) => {
+              setPreguntaActual(e.target.value)
+              cronometro.reiniciar()
+            }}
+            placeholder="Escribe aquí la pregunta que le haces al alumno..."
+            rows={2}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+          />
+        )}
+
+        {config.tipo === 'abierta' && !mostrandoAyudas && (
+          <textarea
+            value={respuestaAbierta}
+            onChange={(e) => setRespuestaAbierta(e.target.value)}
+            placeholder="Respuesta del alumno (opcional)"
+            rows={2}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+          />
+        )}
+
+        {mostrandoAyudas ? (
+          <div className="space-y-3">
+            <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
+              {AYUDAS.map((a) => (
+                <button
+                  key={a.value}
+                  onClick={() =>
+                    registrar(true, a.value, preguntaActual, config.tipo === 'opciones' ? esperada : respuestaRegistrada)
+                  }
+                  disabled={isPending}
+                  className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
                 >
-                  {c.estimulo.nombre}
-                </span>
+                  {a.label}
+                </button>
               ))}
             </div>
+            <button
+              onClick={() => setMostrandoAyudas(false)}
+              className="text-sm text-slate-500 hover:text-slate-600 py-2"
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : config.tipo === 'opciones' && respuestaPendiente !== null ? (
+          <div className="space-y-3">
+            <p className="text-sm text-slate-600">
+              Ha respondido: <strong>{respuestaPendiente}</strong>. ¿Es correcto?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                variant="success"
+                onClick={() => registrar(true, 'independiente', preguntaActual, respuestaPendiente)}
+                disabled={isPending}
+                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+              >
+                ✓ Correcto
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => registrar(false, 'independiente', preguntaActual, respuestaPendiente)}
+                disabled={isPending}
+                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+              >
+                ✗ Incorrecto
+              </Button>
+            </div>
+            <button onClick={() => setRespuestaPendiente(null)} className="text-sm text-slate-500 hover:text-slate-600 py-2">
+              Cambiar respuesta
+            </button>
+          </div>
+        ) : config.tipo === 'opciones' ? (
+          <div className="space-y-3">
+            <p className="text-sm text-slate-600">¿Qué ha respondido el alumno?</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {config.opciones.map((opcion) => (
+                <Button
+                  key={opcion}
+                  variant="secondary"
+                  onClick={() => elegirOpcion(opcion)}
+                  disabled={isPending}
+                  className="min-w-[7rem] py-4 sm:py-3 text-base active:scale-[0.98]"
+                >
+                  {opcion}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="warning"
+              onClick={() => {
+                cronometro.capturar()
+                setMostrandoAyudas(true)
+              }}
+              disabled={isPending}
+              className="w-full py-3 text-sm active:scale-[0.98]"
+            >
+              ✓ Correcto con ayuda
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              variant="success"
+              onClick={() => registrar(true, 'independiente', preguntaActual, respuestaRegistrada)}
+              disabled={isPending}
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+            >
+              {etiquetas.correcto}
+            </Button>
+            <Button
+              variant="warning"
+              onClick={() => {
+                cronometro.capturar()
+                setMostrandoAyudas(true)
+              }}
+              disabled={isPending}
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+            >
+              {etiquetas.ayuda}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => registrar(false, 'independiente', preguntaActual, respuestaRegistrada)}
+              disabled={isPending}
+              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+            >
+              {etiquetas.incorrecto}
+            </Button>
+          </div>
+        )}
+      </div>
 
-            {!mostrandoAyudas && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="success"
-                  onClick={() => registrar(true, 'independiente')}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✓ Correcto sin ayuda
-                </Button>
-                <Button
-                  variant="warning"
-                  onClick={() => {
-                    cronometro.capturar()
-                    setMostrandoAyudas(true)
-                  }}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✓ Correcto con ayuda
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => registrar(false, 'independiente')}
-                  disabled={isPending}
-                  className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  ✗ Incorrecto
-                </Button>
+      <div className="rounded-xl border border-slate-200 bg-white p-3 text-sm">
+        {controlAbierto ? (
+          <div className="space-y-2">
+            <p className="font-medium text-slate-700">Ensayo de control</p>
+            <p className="text-xs text-slate-500">
+              Pregunta extra (ej. de asimetría). Se guarda con el bloque, pero no cuenta para el % de acierto ni para el dominio.
+            </p>
+            <textarea
+              value={controlPregunta}
+              onChange={(e) => setControlPregunta(e.target.value)}
+              placeholder="Pregunta (ej. ¿Todos los animales son ZOG?)"
+              rows={2}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+            />
+            {config.tipo === 'opciones' ? (
+              <div className="flex flex-wrap gap-2">
+                {config.opciones.map((opcion) => (
+                  <button
+                    key={opcion}
+                    onClick={() => setControlRespuesta(opcion)}
+                    className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                      controlRespuesta === opcion ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {opcion}
+                  </button>
+                ))}
               </div>
+            ) : (
+              <input
+                value={controlRespuesta}
+                onChange={(e) => setControlRespuesta(e.target.value)}
+                placeholder="Respuesta del alumno"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
             )}
-
-            {mostrandoAyudas && (
-              <div className="space-y-3">
-                <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
-                  {AYUDAS.map((a) => (
-                    <button
-                      key={a.value}
-                      onClick={() => registrar(true, a.value)}
-                      disabled={isPending}
-                      className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
-                    >
-                      {a.label}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setMostrandoAyudas(false)}
-                  className="text-sm text-slate-500 hover:text-slate-600 py-2"
-                >
-                  Cancelar
-                </button>
-              </div>
-            )}
-
-          </>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button variant="success" onClick={() => anadirControl(true)} disabled={!controlPregunta.trim()} className="flex-1">
+                ✓ Correcto
+              </Button>
+              <Button variant="danger" onClick={() => anadirControl(false)} disabled={!controlPregunta.trim()} className="flex-1">
+                ✗ Incorrecto
+              </Button>
+              <Button variant="secondary" onClick={() => setControlAbierto(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs text-slate-500">
+              {controles.length > 0
+                ? `Ensayos de control: ${controles.filter((c) => c.correcto).length}/${controles.length} correctos`
+                : 'Sin ensayos de control en este bloque'}
+            </span>
+            <button onClick={() => setControlAbierto(true)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800">
+              + Ensayo de control
+            </button>
+          </div>
         )}
       </div>
 

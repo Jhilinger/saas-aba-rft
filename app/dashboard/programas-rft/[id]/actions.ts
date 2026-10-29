@@ -5,6 +5,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { Tables } from '@/database.types'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
+import { validarRespuestasEsperadas } from '../../respuestas-rft'
 
 // Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
 // puede ver este programa antes de usar el cliente admin para el borrado en
@@ -227,6 +228,22 @@ export async function eliminarRelacionEntrenada(id: string, programaAlumnoId: st
   const admin = createAdminClient()
   const { error } = await admin.from('relaciones_entrenadas_rft').delete().eq('id', id)
   if (error) return { error: error.message }
+  revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  return { success: true }
+}
+// --- RESPUESTAS ESPERADAS ---
+
+export async function guardarRespuestasEsperadas(claseId: string, programaAlumnoId: string, respuestas: Record<string, string>) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const validas = validarRespuestasEsperadas(respuestas)
+  if (!validas) return { error: 'Respuestas esperadas no válidas' }
+
+  const { error } = await supabase.from('clases_rft').update({ respuestas_esperadas: validas }).eq('id', claseId)
+  if (error) return { error: error.message }
+
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   return { success: true }
 }

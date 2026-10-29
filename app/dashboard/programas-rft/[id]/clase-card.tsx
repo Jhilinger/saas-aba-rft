@@ -9,7 +9,10 @@ import {
   eliminarClase,
   eliminarClaseForzado,
   eliminarRelacionEntrenada,
+  guardarRespuestasEsperadas,
 } from './actions'
+import RespuestasEsperadas from '../../respuestas-esperadas'
+import type { Json } from '@/database.types'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
@@ -27,6 +30,7 @@ type Clase = {
   grupo: string
   tipo_relacion: string
   estado: string
+  respuestas_esperadas: Json
   estimulos_rft: Estimulo[]
   relaciones_entrenadas_rft: Relacion[]
 }
@@ -52,11 +56,14 @@ export default function ClaseCard({
   programaAlumnoId,
   testsRealizados = [],
   nivelRft,
+  conRespuestasEsperadas = false,
 }: {
   clase: Clase
   programaAlumnoId: string
   testsRealizados?: TestRealizado[]
   nivelRft: string | null
+  // El programa usa respuestas de opciones/ejecución/abiertas en alguna fase
+  conRespuestasEsperadas?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
@@ -238,6 +245,14 @@ export default function ClaseCard({
           </form>
         )}
       </div>
+
+      {conRespuestasEsperadas && (
+        <RespuestasEsperadas
+          respuestas={clase.respuestas_esperadas}
+          posiciones={POSICIONES_POR_NIVEL[coerceNivelRft(nivelRft)]}
+          guardar={(respuestas) => guardarRespuestasEsperadas(clase.id, programaAlumnoId, respuestas)}
+        />
+      )}
 
       {/* Relaciones entrenadas y testeadas: informativo, se rellena solo al tomar datos. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

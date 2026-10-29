@@ -49,6 +49,7 @@ export async function actualizarDesdePlantilla(
           nombre: clase.nombre,
           grupo: clase.grupo,
           tipo_relacion: base.tipo_relacion ?? 'coordinacion',
+          respuestas_esperadas: clase.respuestas_esperadas,
         })
         .select('id')
         .single()

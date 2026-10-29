@@ -2,7 +2,8 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
-import type { Enums } from '@/database.types'
+import type { Enums, Json } from '@/database.types'
+import { esTipoRespuesta, leerRespuestaPorFase, parsearOpciones, validarRespuestasEsperadas, type TipoRespuesta } from '../respuestas-rft'
 import {
   NIVELES_RFT,
   coerceNivelRft,
@@ -77,6 +78,33 @@ function parsePosicion(formData: FormData): number | null {
   if (!raw || raw.trim() === '') return null
   const n = parseInt(raw, 10)
   return Number.isNaN(n) ? null : n
+}
+
+// Tipo de respuesta de un programa RFT (general y por fase). Las opciones
+// fijas necesitan al menos dos.
+function parseConfigRespuesta(formData: FormData):
+  | { tipo_respuesta: TipoRespuesta; opciones_respuesta: string[] | null; respuesta_por_fase: Json }
+  | { error: string } {
+  const tipoRespuesta = formData.get('tipo_respuesta')
+  const tipo: TipoRespuesta = esTipoRespuesta(tipoRespuesta) ? tipoRespuesta : 'seleccion'
+  const opciones = tipo === 'opciones' ? parsearOpciones((formData.get('opciones_respuesta') as string) ?? '') : []
+  if (tipo === 'opciones' && opciones.length < 2) return { error: 'Indica al menos dos opciones de respuesta' }
+
+  let porFaseCrudo: Json = {}
+  try {
+    porFaseCrudo = JSON.parse((formData.get('respuesta_por_fase') as string) || '{}')
+  } catch {
+    return { error: 'Configuración de respuesta por fase no válida' }
+  }
+  const porFase = leerRespuestaPorFase(porFaseCrudo)
+  for (const config of Object.values(porFase)) {
+    if (config.tipo === 'opciones' && config.opciones.length < 2) {
+      return { error: 'Indica al menos dos opciones de respuesta en cada fase con opciones fijas' }
+    }
+    if (config.tipo !== 'opciones') config.opciones = []
+  }
+
+  return { tipo_respuesta: tipo, opciones_respuesta: opciones.length ? opciones : null, respuesta_por_fase: porFase }
 }
 
 function parseDominio(formData: FormData): string | null {
@@ -297,6 +325,9 @@ export async function editarPrograma(id: string, formData: FormData) {
     video_url: string | null
     tipo_relacion: Enums<'tipo_relacion_rft'> | null
     nivel_rft: string | null
+    tipo_respuesta?: string
+    opciones_respuesta?: string[] | null
+    respuesta_por_fase?: Json
     formato_recogida: string
     direccion_objetivo: string | null
     direccion_cadena: string | null
@@ -317,6 +348,12 @@ export async function editarPrograma(id: string, formData: FormData) {
     formato_recogida: formatoRecogida,
     direccion_objetivo: direccionObjetivo,
     direccion_cadena: direccionCadena,
+  }
+
+  if (tipo === 'rft') {
+    const respuesta = parseConfigRespuesta(formData)
+    if ('error' in respuesta) return { error: respuesta.error }
+    Object.assign(updateData, respuesta)
   }
 
   // La visibilidad y el área libre solo existen en los complementarios
@@ -377,6 +414,9 @@ export async function clonarPrograma(id: string) {
       formato_recogida: original.formato_recogida,
       direccion_objetivo: original.direccion_objetivo,
       direccion_cadena: original.direccion_cadena,
+      tipo_respuesta: original.tipo_respuesta,
+      opciones_respuesta: original.opciones_respuesta,
+      respuesta_por_fase: original.respuesta_por_fase,
       orden: null,
       dominio_id: original.dominio_id,
       clinica_id: original.clinica_id,
@@ -444,14 +484,20 @@ export async function clonarPrograma(id: string) {
   } else if (original.tipo === 'rft') {
     const { data: clases } = await supabase
       .from('clases_rft_base')
-      .select('nombre, grupo, orden, estimulos_rft_base(etiqueta, nombre, posicion, orden)')
+      .select('nombre, grupo, orden, respuestas_esperadas, estimulos_rft_base(etiqueta, nombre, posicion, orden)')
       .eq('programa_base_id', id)
       .order('orden')
 
     for (const clase of clases ?? []) {
       const { data: nuevaClase } = await supabase
         .from('clases_rft_base')
-        .insert({ programa_base_id: nuevo.id, nombre: clase.nombre, grupo: clase.grupo, orden: clase.orden })
+        .insert({
+          programa_base_id: nuevo.id,
+          nombre: clase.nombre,
+          grupo: clase.grupo,
+          orden: clase.orden,
+          respuestas_esperadas: clase.respuestas_esperadas,
+        })
         .select('id')
         .single()
 
@@ -583,3 +629,22 @@ export async function eliminarPasoBase(id: string, programaBaseId: string) {
   return { success: true }
 }
 
+
+export async function guardarRespuestasEsperadasBase(
+  claseBaseId: string,
+  programaBaseId: string,
+  respuestas: Record<string, string>
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const validas = validarRespuestasEsperadas(respuestas)
+  if (!validas) return { error: 'Respuestas esperadas no válidas' }
+
+  const { error } = await supabase.from('clases_rft_base').update({ respuestas_esperadas: validas }).eq('id', claseBaseId)
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
+  return { success: true }
+}

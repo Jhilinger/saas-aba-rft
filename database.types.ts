@@ -328,6 +328,8 @@ export type Database = {
         Row: {
           aciertos: number
           aciertos_por_minuto: number | null
+          controles_aciertos: number
+          controles_total: number
           duracion_segundos: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha: string
@@ -346,6 +348,8 @@ export type Database = {
         Insert: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          controles_aciertos?: number
+          controles_total?: number
           duracion_segundos?: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
@@ -364,6 +368,8 @@ export type Database = {
         Update: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          controles_aciertos?: number
+          controles_total?: number
           duracion_segundos?: number | null
           fase?: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
@@ -563,6 +569,7 @@ export type Database = {
           id: string
           nombre: string
           programa_alumno_id: string
+          respuestas_esperadas: Json
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
         }
         Insert: {
@@ -572,6 +579,7 @@ export type Database = {
           id?: string
           nombre: string
           programa_alumno_id: string
+          respuestas_esperadas?: Json
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
         }
         Update: {
@@ -581,6 +589,7 @@ export type Database = {
           id?: string
           nombre?: string
           programa_alumno_id?: string
+          respuestas_esperadas?: Json
           tipo_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
         }
         Relationships: [
@@ -600,6 +609,7 @@ export type Database = {
           nombre: string
           orden: number | null
           programa_base_id: string
+          respuestas_esperadas: Json
         }
         Insert: {
           grupo?: string
@@ -607,6 +617,7 @@ export type Database = {
           nombre: string
           orden?: number | null
           programa_base_id: string
+          respuestas_esperadas?: Json
         }
         Update: {
           grupo?: string
@@ -614,6 +625,7 @@ export type Database = {
           nombre?: string
           orden?: number | null
           programa_base_id?: string
+          respuestas_esperadas?: Json
         }
         Relationships: [
           {
@@ -889,6 +901,8 @@ export type Database = {
           latencia_ms: number | null
           notas: string | null
           pregunta: string | null
+          respuesta: string | null
+          tipo_ensayo: string
         }
         Insert: {
           ayuda?: Database["public"]["Enums"]["tipo_ayuda"]
@@ -901,6 +915,8 @@ export type Database = {
           latencia_ms?: number | null
           notas?: string | null
           pregunta?: string | null
+          respuesta?: string | null
+          tipo_ensayo?: string
         }
         Update: {
           ayuda?: Database["public"]["Enums"]["tipo_ayuda"]
@@ -913,6 +929,8 @@ export type Database = {
           latencia_ms?: number | null
           notas?: string | null
           pregunta?: string | null
+          respuesta?: string | null
+          tipo_ensayo?: string
         }
         Relationships: [
           {
@@ -1526,12 +1544,15 @@ export type Database = {
           nivel_rft: string | null
           nombre: string
           objetivo: string | null
+          opciones_respuesta: string[] | null
           orden: number | null
           plantilla_sincronizada_at: string
           porcentaje_dominio: number
           programa_base_id: string | null
+          respuesta_por_fase: Json
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
+          tipo_respuesta: string
           visible_familia: boolean
         }
         Insert: {
@@ -1555,12 +1576,15 @@ export type Database = {
           nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
+          opciones_respuesta?: string[] | null
           orden?: number | null
           plantilla_sincronizada_at?: string
           porcentaje_dominio?: number
           programa_base_id?: string | null
+          respuesta_por_fase?: Json
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
+          tipo_respuesta?: string
           visible_familia?: boolean
         }
         Update: {
@@ -1584,12 +1608,15 @@ export type Database = {
           nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
+          opciones_respuesta?: string[] | null
           orden?: number | null
           plantilla_sincronizada_at?: string
           porcentaje_dominio?: number
           programa_base_id?: string | null
+          respuesta_por_fase?: Json
           terapeuta_id?: string
           tipo?: Database["public"]["Enums"]["tipo_programa"]
+          tipo_respuesta?: string
           visible_familia?: boolean
         }
         Relationships: [
@@ -1645,10 +1672,13 @@ export type Database = {
           nivel_rft: string | null
           nombre: string
           objetivo: string | null
+          opciones_respuesta: string[] | null
           orden: number | null
           porcentaje_dominio: number
+          respuesta_por_fase: Json
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"] | null
+          tipo_respuesta: string
           video_url: string | null
           visibilidad: Database["public"]["Enums"]["visibilidad_programa"]
         }
@@ -1673,12 +1703,15 @@ export type Database = {
           nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
+          opciones_respuesta?: string[] | null
           orden?: number | null
           porcentaje_dominio?: number
+          respuesta_por_fase?: Json
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion?:
             | Database["public"]["Enums"]["tipo_relacion_rft"]
             | null
+          tipo_respuesta?: string
           video_url?: string | null
           visibilidad?: Database["public"]["Enums"]["visibilidad_programa"]
         }
@@ -1703,12 +1736,15 @@ export type Database = {
           nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
+          opciones_respuesta?: string[] | null
           orden?: number | null
           porcentaje_dominio?: number
+          respuesta_por_fase?: Json
           tipo?: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion?:
             | Database["public"]["Enums"]["tipo_relacion_rft"]
             | null
+          tipo_respuesta?: string
           video_url?: string | null
           visibilidad?: Database["public"]["Enums"]["visibilidad_programa"]
         }

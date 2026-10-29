@@ -6,6 +6,7 @@ import EstadoProgramaSelector from '../../programas/[id]/estado-programa-selecto
 import VideoDiferido from '../../video-diferido'
 import AvisoPlantilla from '../../programas/aviso-plantilla'
 import { avisoPlantilla } from '../../programas/plantilla'
+import { usaRespuestasSinSeleccion } from '../../respuestas-rft'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
 
@@ -50,7 +51,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -128,7 +129,7 @@ export default async function ProgramaRftPage({
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, estimulos_rft(id, etiqueta, nombre, posicion), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, estimulos_rft(id, etiqueta, nombre, posicion), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')
@@ -195,6 +196,7 @@ export default async function ProgramaRftPage({
         dominioFases={dominioFases ?? []}
         porcentajeDominio={programa.porcentaje_dominio}
         nivelRft={programa.nivel_rft}
+        conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)}
       />
 
       {bloquesFluidez && bloquesFluidez.length > 0 && (

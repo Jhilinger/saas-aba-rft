@@ -36,7 +36,7 @@ export default async function TomarDatosRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
+      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
     )
     .eq('id', programaId)
     .single()
@@ -47,7 +47,7 @@ export default async function TomarDatosRftPage({
 
   const { data: clases } = await supabase
     .from('clases_rft')
-    .select('id, nombre, grupo, estimulos_rft(id, nombre, posicion)')
+    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft(id, nombre, posicion)')
     .eq('programa_alumno_id', programaId)
     .order('grupo')
     .order('created_at')
@@ -84,6 +84,11 @@ export default async function TomarDatosRftPage({
         grupoInicial={grupo ?? null}
         dominioFases={dominioFases ?? []}
         nivelRft={programa.nivel_rft}
+        respuesta={{
+          tipo_respuesta: programa.tipo_respuesta,
+          opciones_respuesta: programa.opciones_respuesta,
+          respuesta_por_fase: programa.respuesta_por_fase,
+        }}
       />
     </div>
   )

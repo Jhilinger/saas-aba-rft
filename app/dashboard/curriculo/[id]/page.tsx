@@ -9,6 +9,7 @@ import ClaseRftBaseCard from './clase-rft-base-card'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
 import RequisitosPrograma from './requisitos-programa'
+import { usaRespuestasSinSeleccion } from '../../respuestas-rft'
 import { Breadcrumb, Panel } from '../../../ui'
 import { cargarEstructuraCurriculo, crearCodificador } from '../estructura'
 
@@ -36,7 +37,7 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft'
+      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase'
     )
     .eq('id', id)
     .single()
@@ -77,7 +78,7 @@ export default async function ProgramaDetallePage({
 
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
-    .select('id, nombre, grupo, estimulos_rft_base(id, etiqueta, nombre, posicion)')
+    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft_base(id, etiqueta, nombre, posicion)')
     .eq('programa_base_id', id)
     .order('orden')
 
@@ -238,7 +239,7 @@ export default async function ProgramaDetallePage({
 
           <div className="space-y-4">
             {clasesRft?.map((c) => (
-              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} />
+              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} />
             ))}
           </div>
 

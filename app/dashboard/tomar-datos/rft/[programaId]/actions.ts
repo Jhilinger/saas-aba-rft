@@ -14,6 +14,22 @@ type EnsayoInput = {
   correcto: boolean
   ayuda: string
   latenciaMs?: number | null
+  respuesta?: string | null
+}
+
+type ControlInput = {
+  claseId: string
+  estimuloOrigenId: string
+  pregunta: string
+  respuesta: string | null
+  correcto: boolean
+}
+
+// Texto libre del alumno o pregunta del terapeuta: recortado y con límite
+function textoLimitado(valor: unknown, maximo: number): string | null {
+  if (typeof valor !== 'string') return null
+  const limpio = valor.trim()
+  return limpio ? limpio.slice(0, maximo) : null
 }
 // "directo" existe en el enum de la base de datos pero nunca ha sido
 // seleccionable desde la interfaz (no encaja con el flujo de comparación
@@ -43,7 +59,8 @@ export async function guardarBloqueRft(
   numComparativos: number,
   ensayos: EnsayoInput[],
   notas?: string,
-  duracionSegundos?: number | null
+  duracionSegundos?: number | null,
+  controles: ControlInput[] = []
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -105,6 +122,9 @@ export async function guardarBloqueRft(
     .insert({
       duracion_segundos: duracionValida(duracionSegundos),
       latencia_media_ms: latenciaMedia(latencias),
+      // Los ensayos de control se guardan aparte: no cuentan para el % ni el dominio
+      controles_total: controles.length,
+      controles_aciertos: controles.filter((c) => c.correcto).length,
       programa_alumno_id: programaAlumnoId,
       terapeuta_id: user.id,
       grupo,
@@ -133,10 +153,28 @@ export async function guardarBloqueRft(
       correcto: e.correcto,
       ayuda: e.ayuda as AyudaRft,
       latencia_ms: latencias[i],
+      respuesta: textoLimitado(e.respuesta, 500),
     }))
   )
 
   if (detalleError) return { error: detalleError.message }
+
+  if (controles.length > 0) {
+    const { error: controlesError } = await supabase.from('ensayos_rft_detalle').insert(
+      controles.map((c) => ({
+        bloque_id: bloque.id,
+        clase_id: c.claseId,
+        estimulo_origen_id: c.estimuloOrigenId,
+        estimulo_destino_id: null,
+        pregunta: textoLimitado(c.pregunta, 1000),
+        respuesta: textoLimitado(c.respuesta, 500),
+        correcto: c.correcto,
+        ayuda: 'independiente' as AyudaRft,
+        tipo_ensayo: 'control',
+      }))
+    )
+    if (controlesError) return { error: controlesError.message }
+  }
 
   // Si es fase de entrenamiento, marcamos como entrenados los pares usados
   // (evitando duplicados gracias al unique constraint de la tabla)

@@ -7,6 +7,8 @@ import { useToast } from '../../../providers/toast-provider'
 import { Button } from '../../../ui'
 import CamposDominio, { CampoArea } from '../campos-dominio'
 import type { EstructuraCurriculo } from '../estructura'
+import CamposRespuesta from './campos-respuesta'
+import type { Json } from '@/database.types'
 
 type Programa = {
   id: string
@@ -29,6 +31,9 @@ type Programa = {
   direccion_objetivo: string | null
   direccion_cadena: string | null
   nivel_rft: string | null
+  tipo_respuesta: string
+  opciones_respuesta: string[] | null
+  respuesta_por_fase: Json
 }
 
 const FORMATOS_REGISTRO = [
@@ -192,6 +197,8 @@ export default function EditarProgramaForm({
                 </select>
               </div>
             )}
+
+            <CamposRespuesta nivelRft={nivelRft} inicial={programa} />
           </>
         )}
 
