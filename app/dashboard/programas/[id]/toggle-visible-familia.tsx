@@ -9,10 +9,12 @@ export default function ToggleVisibleFamilia({
   programaAlumnoId,
   alumnoId,
   visibleFamilia,
+  soloLectura = false,
 }: {
   programaAlumnoId: string
   alumnoId: string
   visibleFamilia: boolean
+  soloLectura?: boolean
 }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -23,7 +25,7 @@ export default function ToggleVisibleFamilia({
       <input
         type="checkbox"
         checked={visibleFamilia}
-        disabled={isPending}
+        disabled={isPending || soloLectura}
         onChange={(e) => {
           const valor = e.target.checked
           startTransition(async () => {

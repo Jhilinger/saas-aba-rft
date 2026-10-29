@@ -33,11 +33,13 @@ export default function EstadoProgramaSelector({
   alumnoId,
   estadoActual,
   variante = 'habilidad',
+  soloLectura = false,
 }: {
   programaAlumnoId: string
   alumnoId: string
   estadoActual: string
   variante?: 'habilidad' | 'conducta'
+  soloLectura?: boolean
 }) {
   const OPCIONES = variante === 'conducta' ? OPCIONES_CONDUCTA : OPCIONES_HABILIDAD
   const [isPending, startTransition] = useTransition()
@@ -55,6 +57,14 @@ export default function EstadoProgramaSelector({
       toast('Estado del programa actualizado', 'exito')
       router.refresh()
     })
+  }
+
+  if (soloLectura) {
+    return (
+      <span className={`rounded-lg border px-2 py-1 text-xs font-medium ${COLOR[estadoActual] ?? 'text-slate-600 bg-slate-50 border-slate-200'}`}>
+        {OPCIONES.find((o) => o.value === estadoActual)?.label ?? estadoActual}
+      </span>
+    )
   }
 
   return (

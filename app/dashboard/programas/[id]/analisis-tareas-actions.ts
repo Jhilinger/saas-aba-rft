@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { revalidatePath } from 'next/cache'
 import type { Enums } from '@/database.types'
 
@@ -10,6 +11,7 @@ function revalidarAnalisisTareas(programaAlumnoId: string) {
 }
 
 export async function crearPasoAlumno(programaAlumnoId: string, nombre: string, descripcion: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   if (!nombre.trim()) return { error: 'El nombre del paso es obligatorio' }
 
@@ -30,6 +32,7 @@ export async function crearPasoAlumno(programaAlumnoId: string, nombre: string, 
 }
 
 export async function eliminarPasoAlumno(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('pasos_tarea_alumno').delete().eq('id', id)
   if (error) return { error: error.message }
@@ -42,6 +45,7 @@ export async function cambiarEstadoPaso(
   programaAlumnoId: string,
   estado: Enums<'estado_programa_alumno'>
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('pasos_tarea_alumno').update({ estado }).eq('id', id)
   if (error) return { error: error.message }

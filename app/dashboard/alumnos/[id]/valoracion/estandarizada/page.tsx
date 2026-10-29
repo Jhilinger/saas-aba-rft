@@ -25,7 +25,7 @@ export default async function EvaluacionesEstandarizadasPage({ params }: { param
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-slate-800">Evaluación inicial estandarizada</h2>
         <Link href={`/dashboard/alumnos/${alumnoId}/valoracion`} className="text-sm font-medium text-indigo-600 hover:underline">
-          ← Valoración por programas
+          ← Punto de partida
         </Link>
       </div>
 
@@ -33,7 +33,7 @@ export default async function EvaluacionesEstandarizadasPage({ params }: { param
         <p>
           Banco de ítems con administración y puntuación fijas (0/1/2). El cribado decide el nivel de inicio; en cada
           dominio se deja de aplicar tras dos ceros seguidos, y se pasa al nivel siguiente si el nivel alcanza la mitad
-          de los puntos. Al finalizar, los resultados se trasladan a la valoración por programas.
+          de los puntos. Al finalizar, los resultados se trasladan al punto de partida del alumno.
         </p>
         {!hayEnCurso && <NuevaEvaluacion alumnoId={alumnoId} />}
       </Panel>

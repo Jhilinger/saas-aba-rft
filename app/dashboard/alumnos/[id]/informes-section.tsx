@@ -128,11 +128,14 @@ export default function InformesSection({
   nombreAlumno,
   nombreClinica,
   informesIniciales,
+  soloLectura = false,
 }: {
   alumnoId: string
   nombreAlumno: string
   nombreClinica: string
   informesIniciales: Informe[]
+  // Sin permiso de diseño: se consultan y descargan, pero no se generan ni borran
+  soloLectura?: boolean
 }) {
   const [destinatario, setDestinatario] = useState<'familia' | 'formal'>('familia')
   const [periodoDesde, setPeriodoDesde] = useState(hace30Dias())
@@ -187,6 +190,7 @@ export default function InformesSection({
   }
   return (
     <section className="space-y-4">
+      {!soloLectura && (
       <Panel className="p-4 sm:p-6 space-y-4">
         <h2 className="font-semibold text-slate-700">Generar informe de progreso</h2>
 
@@ -228,6 +232,7 @@ export default function InformesSection({
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
       </Panel>
+      )}
 
       <div className="space-y-3">
         <h2 className="font-semibold text-slate-700">Historial</h2>
@@ -258,12 +263,14 @@ export default function InformesSection({
                 >
                   Descargar PDF
                 </button>
-                <button
-                  onClick={() => borrar(informe.id)}
-                  className="text-xs font-medium text-rose-600 hover:underline"
-                >
-                  Eliminar
-                </button>
+                {!soloLectura && (
+                  <button
+                    onClick={() => borrar(informe.id)}
+                    className="text-xs font-medium text-rose-600 hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                )}
               </div>
             </div>
             {informeAbierto === informe.id && (

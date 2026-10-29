@@ -47,6 +47,7 @@ export default function ColocacionClient({
   filas,
   propuestos,
   bloqueados,
+  soloLectura = false,
 }: {
   alumnoId: string
   evaluacionId: string
@@ -55,6 +56,8 @@ export default function ColocacionClient({
   filas: FilaColocacion[]
   propuestos: ProgramaPropuesto[]
   bloqueados: number
+  // Aplica la evaluación cualquier terapeuta; la colocación la decide quien diseña
+  soloLectura?: boolean
 }) {
   const conflictos = filas.filter((f) => !f.dominadoPei && f.actualManual && f.actual !== f.propuesta)
   const [mantener, setMantener] = useState<Set<string>>(new Set())
@@ -79,7 +82,7 @@ export default function ColocacionClient({
         toast(res.error, 'error')
         return
       }
-      toast('Colocación aplicada a la valoración por programas', 'exito')
+      toast('Colocación aplicada al punto de partida', 'exito')
       router.refresh()
     })
 
@@ -95,7 +98,7 @@ export default function ColocacionClient({
     <div className="space-y-4">
       <Panel className="space-y-3 p-4">
         <div>
-          <p className="font-semibold text-slate-800">1. Traslado a la valoración por programas</p>
+          <p className="font-semibold text-slate-800">1. Traslado al punto de partida</p>
           <p className="text-sm text-slate-500">
             Cada programa toma la puntuación más baja de los ítems que lo evalúan: 2 → dominado, 1 → parcial, 0 → no. Los
             ítems no aplicados por techo o requisito cuentan como 0; los indicadores no marcan programas. Lo ya dominado
@@ -150,7 +153,12 @@ export default function ColocacionClient({
           </ul>
         </details>
 
-        <div className="flex flex-wrap items-center gap-3">
+        {soloLectura && (
+          <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">
+            La colocación en el currículo la decide el supervisor del alumno.
+          </p>
+        )}
+        <div className={`flex flex-wrap items-center gap-3 ${soloLectura ? 'hidden' : ''}`}>
           <Button onClick={aplicar} disabled={isPending || filas.length === 0}>
             {aplicadaAt ? 'Volver a aplicar' : 'Aplicar a la valoración'}
           </Button>
@@ -175,7 +183,7 @@ export default function ColocacionClient({
               {bloqueados} programas evaluados como no o parcial están en dominios bloqueados por la secuencia del
               currículo.
               {nivelInicio !== null && nivelInicio > 1 &&
-                ` Los niveles por debajo del ${nivelInicio} no se evaluaron: valóralos en la valoración por programas o usa la excepción de secuencia.`}
+                ` Los niveles por debajo del ${nivelInicio} no se evaluaron: márcalos en Punto de partida o usa la excepción de secuencia.`}
             </p>
           )}
 
@@ -199,7 +207,7 @@ export default function ColocacionClient({
             </ul>
           )}
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className={`flex flex-wrap items-center gap-3 ${soloLectura ? 'hidden' : ''}`}>
             <Button onClick={anadir} disabled={isPending || elegidos.length === 0}>
               Añadir al PEI ({elegidos.length})
             </Button>

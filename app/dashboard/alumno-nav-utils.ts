@@ -20,7 +20,7 @@ export function enlacesAlumno(alumnoId: string): Enlace[] {
   return [
     { href: `${base}/pei`, label: 'PEI' },
     { href: `${base}/progreso`, label: 'Progreso' },
-    { href: `${base}/valoracion`, label: 'Valoración' },
+    { href: `${base}/valoracion`, label: 'Punto de partida' },
     { href: `${base}/preferencias`, label: 'Preferencias' },
     { href: `${base}/informes`, label: 'Informes' },
     { href: `${base}/datos-clinicos`, label: 'Datos clínicos' },

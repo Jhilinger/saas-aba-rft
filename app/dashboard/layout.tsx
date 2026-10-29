@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar } from './permisos'
 import { redirect } from 'next/navigation'
 import { logout } from '../logout-action'
 import MobileNav from './mobile-nav'
@@ -80,7 +81,11 @@ export default async function DashboardLayout({
     redirect('/login?error=' + encodeURIComponent('Tu cuenta ha sido desactivada. Contacta con tu clínica.'))
   }
 
-  const enlacesRol = construirEnlaces(perfil?.rol ?? '', perfil?.tambien_terapeuta ?? false)
+  // «Mis programas» es diseño: sin ese permiso el terapeuta no lo ve
+  const disena = await puedeDisenar(supabase)
+  const enlacesRol = construirEnlaces(perfil?.rol ?? '', perfil?.tambien_terapeuta ?? false).filter(
+    (e) => disena || e.href !== '/dashboard/mis-programas'
+  )
 
   return (
     <ToastProvider>

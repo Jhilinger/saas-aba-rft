@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../../../permisos'
 import { revalidatePath } from 'next/cache'
 
 // Estos componentes de registro (ABC, tasa, duración, intervalo, latencia) se
@@ -14,6 +15,7 @@ function revalidarRegistroConducta(alumnoId: string, programaAlumnoId: string) {
 }
 
 export async function toggleVisibleFamiliaPrograma(programaAlumnoId: string, alumnoId: string, valor: boolean) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase
     .from('programas_alumno')

@@ -22,6 +22,7 @@ import ToggleVisibleFamilia from './toggle-visible-familia'
 import AvisoPlantilla from '../aviso-plantilla'
 import { avisoPlantilla } from '../plantilla'
 import { Breadcrumb, Panel } from '../../../ui'
+import { puedeDisenar } from '../../permisos'
 import type { Tables } from '@/database.types'
 
 export default async function ProgramaAlumnoPage({
@@ -44,6 +45,7 @@ export default async function ProgramaAlumnoPage({
   if (!perfil || !['superadmin', 'clinica_admin', 'terapeuta'].includes(perfil.rol)) {
     redirect('/dashboard')
   }
+  const disena = await puedeDisenar(supabase)
 
     const { data: programa } = await supabase
     .from('programas_alumno')
@@ -130,12 +132,14 @@ export default async function ProgramaAlumnoPage({
           alumnoId={programa.alumno_id}
           estadoActual={programa.estado}
           variante={programa.formato_recogida === 'ensayo_discreto' ? 'habilidad' : 'conducta'}
+          soloLectura={!disena}
         />
         {programa.formato_recogida !== 'ensayo_discreto' && (
           <ToggleVisibleFamilia
             programaAlumnoId={programa.id}
             alumnoId={programa.alumno_id}
             visibleFamilia={programa.visible_familia}
+            soloLectura={!disena}
           />
         )}
       </div>
@@ -143,7 +147,7 @@ export default async function ProgramaAlumnoPage({
   )
 
   const diferenciasPlantilla = await avisoPlantilla(supabase, id)
-  const aviso = diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />
+  const aviso = disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />
 
   if (programa.formato_recogida !== 'ensayo_discreto') {
     const cuerpo = await (async () => {
@@ -262,7 +266,7 @@ export default async function ProgramaAlumnoPage({
 
         return (
           <>
-            <PasosTareaPanel pasos={pasosOrdenados} programaAlumnoId={id} pasoObjetivoId={pasoObjetivo?.id ?? null} />
+            <PasosTareaPanel pasos={pasosOrdenados} programaAlumnoId={id} pasoObjetivoId={pasoObjetivo?.id ?? null} soloLectura={!disena} />
             <Panel className="p-3 sm:p-5">
               <GraficoConducta puntos={puntos} etiquetaY="% de pasos independientes" direccionObjetivo="aumentar" titulo={programa.nombre} dominioYFijo={[0, 100]} />
             </Panel>
@@ -354,7 +358,7 @@ export default async function ProgramaAlumnoPage({
         }
         conjuntos={
           <section className="space-y-6">
-            <NuevoConjuntoForm programaAlumnoId={id} />
+            {disena && <NuevoConjuntoForm programaAlumnoId={id} />}
 
             {enLineaBase.length > 0 && (
               <div className="space-y-3">
@@ -363,7 +367,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {enLineaBase.map((c) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id}/>
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
                   ))}
                 </div>
               </div>
@@ -375,7 +379,7 @@ export default async function ProgramaAlumnoPage({
               </h2>
               <div className="space-y-4">
                 {enAdquisicion.map((c) => (
-                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
+                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
                 ))}
                 {enAdquisicion.length === 0 && (
                   <p className="text-sm text-slate-500">Sin conjuntos en adquisición.</p>
@@ -390,7 +394,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {dominados.map((c) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} />
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
                   ))}
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import TerapeutasTabla from './terapeutas-tabla'
 import ToggleTambienTerapeuta from './toggle-tambien-terapeuta'
 import InvitarTerapeutaForm from './invitar-terapeuta-form'
+import { AjusteDiseno } from './ajuste-diseno'
 
 export default async function EquipoPage() {
   const supabase = await createClient()
@@ -23,12 +24,16 @@ export default async function EquipoPage() {
   const clinicaId = perfil.clinica_id
   if (!clinicaId) redirect('/dashboard')
 
-  const { data: terapeutasReales } = await supabase
-    .from('perfiles')
-    .select('id, nombre, email, activo')
-    .eq('clinica_id', clinicaId)
-    .eq('rol', 'terapeuta')
-    .order('nombre')
+  const [{ data: terapeutasReales }, { data: clinica }] = await Promise.all([
+    supabase
+      .from('perfiles')
+      .select('id, nombre, email, activo, es_supervisor')
+      .eq('clinica_id', clinicaId)
+      .eq('rol', 'terapeuta')
+      .order('nombre'),
+    supabase.from('clinicas').select('diseno_pei').eq('id', clinicaId).single(),
+  ])
+  const modoDiseno = clinica?.diseno_pei === 'terapeutas' ? 'terapeutas' : 'supervisores'
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-8 sm:space-y-10">
@@ -42,10 +47,12 @@ export default async function EquipoPage() {
         <ToggleTambienTerapeuta nombre={perfil.nombre} activo={perfil.tambien_terapeuta} />
       )}
 
+      {perfil.rol === 'clinica_admin' && <AjusteDiseno modo={modoDiseno} />}
+
       <section className="space-y-4">
         <InvitarTerapeutaForm />
 
-        <TerapeutasTabla terapeutas={terapeutasReales ?? []} />
+        <TerapeutasTabla terapeutas={terapeutasReales ?? []} conSupervisores={modoDiseno === 'supervisores' && perfil.rol === 'clinica_admin'} />
       </section>
     </div>
   )

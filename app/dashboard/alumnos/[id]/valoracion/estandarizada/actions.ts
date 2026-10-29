@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../../../permisos'
 import { revalidatePath } from 'next/cache'
 import { cargarItems, cargarRespuestas, cargarVinculos } from './cargar'
 import { calcularColocacion, notaColocacion } from './colocacion'
@@ -187,6 +188,7 @@ export async function cambiarEstadoEvaluacion(evaluacionId: string, estado: 'en_
 // programas de `mantener` conservan su valoración manual.
 export async function aplicarColocacion(evaluacionId: string, mantener: string[]) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 

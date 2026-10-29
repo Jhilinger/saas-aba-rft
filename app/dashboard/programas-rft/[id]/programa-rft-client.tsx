@@ -54,6 +54,7 @@ export default function ProgramaRftClient({
   porcentajeDominio,
   nivelRft,
   conRespuestasEsperadas,
+  soloLectura = false,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -65,6 +66,7 @@ export default function ProgramaRftClient({
   porcentajeDominio: number
   nivelRft: string | null
   conRespuestasEsperadas: boolean
+  soloLectura?: boolean
 }) {
   const [tab, setTab] = useState<'evolucion' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -116,7 +118,7 @@ export default function ProgramaRftClient({
             </button>
           ))}
 
-          {!creandoGrupo ? (
+          {soloLectura ? null : !creandoGrupo ? (
             <button
               onClick={() => setCreandoGrupo(true)}
               className="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50"
@@ -245,7 +247,7 @@ export default function ProgramaRftClient({
         )
       ) : (
         <section className="space-y-4">
-          {grupoSeleccionado ? (
+          {soloLectura ? null : grupoSeleccionado ? (
             <NuevaClaseForm programaAlumnoId={programaAlumnoId} grupoActual={grupoSeleccionado} />
           ) : (
             <p className="text-sm text-slate-500">Crea un grupo primero (botón "+ Grupo" arriba).</p>
@@ -260,6 +262,7 @@ export default function ProgramaRftClient({
                 testsRealizados={testsPorClase[c.id] ?? []}
                 nivelRft={nivelRft}
                 conRespuestasEsperadas={conRespuestasEsperadas}
+                soloLectura={soloLectura}
               />
             ))}
           </div>

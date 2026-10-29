@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import InformesSection from '../informes-section'
 import { listarInformes } from './actions'
+import { puedeDisenar } from '../../../permisos'
 
 export default async function InformesAlumnoPage({
   params,
@@ -48,6 +49,7 @@ export default async function InformesAlumnoPage({
       nombreAlumno={alumno.nombre_anonimizado}
       nombreClinica={clinicaDatos?.nombre ?? 'Centro de terapia'}
       informesIniciales={informesIniciales}
+      soloLectura={!(await puedeDisenar(supabase))}
         />
     </div>
   )

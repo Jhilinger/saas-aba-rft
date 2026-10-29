@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar } from '../../../permisos'
 import { redirect, notFound } from 'next/navigation'
 import AsignarProgramaForm from '../asignar-programa-form'
 import PeiTabla from '../pei-tabla'
@@ -54,6 +55,7 @@ export default async function AlumnoPage({
   // Secuencia del currículo: dominios bloqueados para este alumno
   const bloqueos = calcularBloqueos(progreso.niveles)
   const puedeForzar = ROLES_EXCEPCION_SECUENCIA.includes(perfil.rol)
+  const disena = await puedeDisenar(supabase)
 
   // Para filtrar el selector: ya en el PEI, o dominados (PEI o valoración inicial)
   const enPei = new Set((programas ?? []).map((p) => p.programa_base_id).filter(Boolean))
@@ -110,14 +112,20 @@ export default async function AlumnoPage({
   return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
-      <AsignarProgramaForm
-        alumnoId={id}
-        programasBase={opcionesBase}
-        niveles={niveles}
-        miPerfilId={perfil.id}
-        puedeForzar={puedeForzar}
-        abiertoInicial={programasPei.length === 0}
-      />
+      {disena ? (
+        <AsignarProgramaForm
+          alumnoId={id}
+          programasBase={opcionesBase}
+          niveles={niveles}
+          miPerfilId={perfil.id}
+          puedeForzar={puedeForzar}
+          abiertoInicial={programasPei.length === 0}
+        />
+      ) : (
+        <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">
+          El PEI lo diseña el supervisor del alumno. Desde aquí puedes consultar los programas y tomar datos.
+        </p>
+      )}
       <PeiTabla programas={programasPei} niveles={niveles} />
     </section>
   )

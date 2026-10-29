@@ -1,10 +1,8 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../../permisos'
 import { revalidatePath } from 'next/cache'
-import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
-import { calcularBloqueos } from '../../../curriculo/secuencia'
-import { cargarProgresoAlumno } from '../progreso/cargar-progreso'
 
 export async function guardarValoracion(
   alumnoId: string,
@@ -13,6 +11,7 @@ export async function guardarValoracion(
   notas?: string
 ) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 
@@ -36,6 +35,7 @@ export async function guardarValoracion(
 
 export async function borrarValoracion(alumnoId: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
 
   const { error } = await supabase
     .from('evaluaciones_iniciales')
@@ -49,125 +49,43 @@ export async function borrarValoracion(alumnoId: string, programaBaseId: string)
   return { success: true }
 }
 
-// Importa al PEI (como línea base) todos los programas marcados como
-// "no" o "parcial" que todavía no estén ya importados para este alumno
-export async function importarNoDominados(alumnoId: string) {
+// Marca como dominados, de una vez, los programas indicados que aún no tienen
+// valoración (ej. los de los niveles por debajo del de inicio de la
+// evaluación). No toca los ya valorados.
+export async function marcarDominadosEnBloque(alumnoId: string, programaBaseIds: string[], motivo: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 
-  const { data: valoraciones } = await supabase
+  const texto = motivo.trim().slice(0, 200)
+  if (!texto) return { error: 'Indica el motivo' }
+  const ids = [...new Set(programaBaseIds)].slice(0, 300)
+  if (ids.length === 0) return { success: true, marcados: 0 }
+
+  const { data: yaValorados } = await supabase
     .from('evaluaciones_iniciales')
-    .select('programa_base_id, valoracion')
-    .eq('alumno_id', alumnoId)
-    .in('valoracion', ['no', 'parcial'])
-
-  if (!valoraciones || valoraciones.length === 0) {
-    return { error: 'No hay programas marcados como "No" o "Parcial" para importar' }
-  }
-
-  const { data: yaImportados } = await supabase
-    .from('programas_alumno')
     .select('programa_base_id')
     .eq('alumno_id', alumnoId)
-    .not('programa_base_id', 'is', null)
+    .in('programa_base_id', ids)
+  const valorados = new Set((yaValorados ?? []).map((v) => v.programa_base_id))
+  const ahora = new Date().toISOString()
+  const filas = ids
+    .filter((id) => !valorados.has(id))
+    .map((id) => ({
+      alumno_id: alumnoId,
+      programa_base_id: id,
+      valoracion: 'dominado',
+      notas: `Marcado en bloque: ${texto}`,
+      evaluado_por: user.id,
+      updated_at: ahora,
+    }))
 
-  const idsYaImportados = new Set((yaImportados ?? []).map((p) => p.programa_base_id))
-  const pendientes = valoraciones.filter((v) => !idsYaImportados.has(v.programa_base_id))
-
-  if (pendientes.length === 0) {
-    return { success: true, importados: 0, yaExistian: valoraciones.length }
+  if (filas.length) {
+    const { error } = await supabase.from('evaluaciones_iniciales').insert(filas)
+    if (error) return { error: error.message }
   }
 
-  let importados = 0
-  let bloqueados = 0
-  const errores: string[] = []
-  const estructura = await cargarEstructuraCurriculo(supabase)
-  const codificador = crearCodificador(estructura)
-
-  // Secuencia del currículo: solo se importan los programas de dominios
-  // desbloqueados (los bloqueados se asignan uno a uno, con excepción)
-  const { data: alumno } = await supabase.from('alumnos').select('id, clinica_id').eq('id', alumnoId).single()
-  if (!alumno) return { error: 'Alumno no encontrado' }
-  const bloqueos = calcularBloqueos((await cargarProgresoAlumno(supabase, alumno, estructura)).niveles)
-
-  for (const v of pendientes) {
-    const { data: base } = await supabase
-      .from('programas_base')
-      .select(
-        'nombre, tipo, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id'
-      )
-      .eq('id', v.programa_base_id)
-      .single()
-
-    if (!base) continue
-    if (base.dominio_id && bloqueos.has(base.dominio_id)) {
-      bloqueados++
-      continue
-    }
-
-    const { data: programaAlumno, error: insertError } = await supabase
-      .from('programas_alumno')
-      .insert({
-        alumno_id: alumnoId,
-        programa_base_id: v.programa_base_id,
-        nombre: base.nombre,
-        tipo: base.tipo,
-        area: base.area,
-        objetivo: base.objetivo,
-        materiales: base.materiales,
-        instrucciones_terapeuta: base.instrucciones_terapeuta,
-        ayudas_posibles: base.ayudas_posibles,
-        terapeuta_id: user.id,
-        ensayos_por_bloque: base.ensayos_por_bloque,
-        bloques_para_dominio: base.bloques_para_dominio,
-        porcentaje_dominio: base.porcentaje_dominio,
-        orden: codificador.ordenGlobal(base),
-      })
-      .select('id')
-      .single()
-
-    if (insertError || !programaAlumno) {
-      errores.push(base.nombre)
-      continue
-    }
-
-    // Si es ABA, copiamos también los conjuntos/estímulos de plantilla
-    // (nacen en línea base automáticamente, por el valor por defecto)
-    if (base.tipo === 'aba_clasico') {
-      const { data: conjuntosBase } = await supabase
-        .from('conjuntos_estimulos_base')
-        .select('nombre, orden, estimulos_base(nombre, descripcion, orden)')
-        .eq('programa_base_id', v.programa_base_id)
-        .order('orden')
-
-      for (const conjunto of conjuntosBase ?? []) {
-        const { data: nuevoConjunto } = await supabase
-          .from('conjuntos_estimulos_alumno')
-          .insert({
-            programa_alumno_id: programaAlumno.id,
-            nombre: conjunto.nombre,
-            orden: conjunto.orden,
-          })
-          .select('id')
-          .single()
-
-        if (nuevoConjunto && conjunto.estimulos_base?.length) {
-          await supabase.from('estimulos_alumno').insert(
-            conjunto.estimulos_base.map((e) => ({
-              conjunto_id: nuevoConjunto.id,
-              nombre: e.nombre,
-              descripcion: e.descripcion,
-              orden: e.orden,
-            }))
-          )
-        }
-      }
-    }
-
-    importados++
-  }
-
-  revalidatePath(`/dashboard/alumnos/${alumnoId}`)
-  return { success: true, importados, bloqueados, errores }
+  revalidatePath(`/dashboard/alumnos/${alumnoId}`, 'layout')
+  return { success: true, marcados: filas.length }
 }

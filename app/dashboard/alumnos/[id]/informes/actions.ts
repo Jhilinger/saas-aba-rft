@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../../permisos'
 import { revalidatePath } from 'next/cache'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -36,6 +37,7 @@ export async function generarInforme(
   periodoDesde: string,
   periodoHasta: string
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
@@ -404,6 +406,7 @@ export async function listarInformes(alumnoId: string) {
 }
 
 export async function eliminarInforme(id: string, alumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('informes').delete().eq('id', id)
   if (error) return { error: error.message }

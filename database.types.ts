@@ -642,6 +642,7 @@ export type Database = {
           activa: boolean
           ciudad: string | null
           created_at: string
+          diseno_pei: string
           estado_suscripcion: string
           id: string
           logo_url: string | null
@@ -660,6 +661,7 @@ export type Database = {
           activa?: boolean
           ciudad?: string | null
           created_at?: string
+          diseno_pei?: string
           estado_suscripcion?: string
           id?: string
           logo_url?: string | null
@@ -678,6 +680,7 @@ export type Database = {
           activa?: boolean
           ciudad?: string | null
           created_at?: string
+          diseno_pei?: string
           estado_suscripcion?: string
           id?: string
           logo_url?: string | null
@@ -1687,6 +1690,7 @@ export type Database = {
           clinica_id: string | null
           created_at: string
           email: string
+          es_supervisor: boolean
           id: string
           nombre: string
           rol: Database["public"]["Enums"]["rol_usuario"]
@@ -1697,6 +1701,7 @@ export type Database = {
           clinica_id?: string | null
           created_at?: string
           email: string
+          es_supervisor?: boolean
           id: string
           nombre: string
           rol: Database["public"]["Enums"]["rol_usuario"]
@@ -1707,6 +1712,7 @@ export type Database = {
           clinica_id?: string | null
           created_at?: string
           email?: string
+          es_supervisor?: boolean
           id?: string
           nombre?: string
           rol?: Database["public"]["Enums"]["rol_usuario"]
@@ -2255,6 +2261,7 @@ export type Database = {
         Returns: boolean
       }
       auth_clinica_id: { Args: never; Returns: string }
+      auth_puede_disenar: { Args: never; Returns: boolean }
       auth_rol: {
         Args: never
         Returns: Database["public"]["Enums"]["rol_usuario"]
@@ -2273,6 +2280,7 @@ export type Database = {
       }
       familia_alumnos: { Args: never; Returns: string[] }
       familia_clinicas: { Args: never; Returns: string[] }
+      fijar_diseno_pei: { Args: { p_valor: string }; Returns: undefined }
       marcar_contenido_programa_base: {
         Args: { p_programa_base_id: string }
         Returns: undefined

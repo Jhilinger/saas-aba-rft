@@ -173,3 +173,36 @@ export async function eliminarPerfil(id: string) {
   revalidatePath('/dashboard/alumnos')
   return { success: true }
 }
+
+// --- Quién diseña la intervención ---
+
+export async function cambiarDisenoPei(valor: 'supervisores' | 'terapeutas') {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('fijar_diseno_pei', { p_valor: valor })
+  if (error) return { error: error.message }
+  revalidatePath('/dashboard', 'layout')
+  return { success: true }
+}
+
+// Marca o desmarca a un terapeuta como supervisor (solo el clinica_admin; el
+// trigger de perfiles lo impide a cualquier otro)
+export async function cambiarSupervisor(terapeutaId: string, valor: boolean) {
+  const supabase = await createClient()
+  const perfilActual = await getPerfilActual()
+  if (!perfilActual || perfilActual.rol !== 'clinica_admin') {
+    return { error: 'Solo el administrador de la clínica puede cambiar esto' }
+  }
+
+  const { data, error } = await supabase
+    .from('perfiles')
+    .update({ es_supervisor: valor })
+    .eq('id', terapeutaId)
+    .eq('rol', 'terapeuta')
+    .eq('clinica_id', perfilActual.clinica_id!)
+    .select('id')
+  if (error) return { error: error.message }
+  if (!data?.length) return { error: 'Terapeuta no encontrado' }
+
+  revalidatePath('/dashboard/equipo')
+  return { success: true }
+}

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../permisos'
 import { revalidatePath } from 'next/cache'
 import { CAMPOS_PLANTILLA, compararConPlantilla, type CampoPlantilla } from './plantilla'
 
@@ -18,6 +19,7 @@ export async function actualizarDesdePlantilla(
   campos: CampoPlantilla[],
   anadirElementos: boolean
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
@@ -113,6 +115,7 @@ export async function actualizarDesdePlantilla(
 // Mantiene la versión del alumno: el aviso no vuelve a salir hasta que la
 // plantilla cambie otra vez
 export async function descartarAvisoPlantilla(programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }

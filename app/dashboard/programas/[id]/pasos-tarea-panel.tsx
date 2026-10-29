@@ -28,10 +28,12 @@ export default function PasosTareaPanel({
   pasos,
   programaAlumnoId,
   pasoObjetivoId,
+  soloLectura = false,
 }: {
   pasos: Paso[]
   programaAlumnoId: string
   pasoObjetivoId: string | null
+  soloLectura?: boolean
 }) {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -84,7 +86,7 @@ export default function PasosTareaPanel({
                       router.refresh()
                     })
                   }}
-                  disabled={isPending}
+                  disabled={isPending || soloLectura}
                   aria-label={`Estado del paso ${p.nombre}`}
                   className={`rounded-lg border px-2 py-1 text-xs font-medium ${info.color} disabled:opacity-50`}
                 >
@@ -94,6 +96,7 @@ export default function PasosTareaPanel({
                     </option>
                   ))}
                 </select>
+                {!soloLectura && (
                 <button
                   onClick={async () => {
                     const ok = await confirmar({
@@ -117,6 +120,7 @@ export default function PasosTareaPanel({
                 >
                   Eliminar
                 </button>
+                )}
               </div>
             </div>
           )
@@ -124,6 +128,7 @@ export default function PasosTareaPanel({
         {pasos.length === 0 && <p className="text-sm text-slate-500 text-center py-2">Sin pasos todavía.</p>}
       </div>
 
+      {!soloLectura && (
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -157,6 +162,7 @@ export default function PasosTareaPanel({
           Añadir paso
         </Button>
       </form>
+      )}
     </Panel>
   )
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar } from '../../permisos'
 import { redirect, notFound } from 'next/navigation'
 import ProgramaRftClient from './programa-rft-client'
 import { obtenerEvolucionRft } from './evolucion-actions'
@@ -47,6 +48,7 @@ export default async function ProgramaRftPage({
   if (!perfil || !['superadmin', 'clinica_admin', 'terapeuta'].includes(perfil.rol)) {
     redirect('/dashboard')
   }
+  const disena = await puedeDisenar(supabase)
 
     const { data: programa } = await supabase
     .from('programas_alumno')
@@ -75,6 +77,7 @@ export default async function ProgramaRftPage({
           programaAlumnoId={programa.id}
           alumnoId={programa.alumno_id}
           estadoActual={programa.estado}
+          soloLectura={!disena}
         />
       </div>
     </div>
@@ -183,7 +186,7 @@ export default async function ProgramaRftPage({
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
-      {diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
+      {disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
       {infoPanel}
 
       <ProgramaRftClient
@@ -197,6 +200,7 @@ export default async function ProgramaRftPage({
         porcentajeDominio={programa.porcentaje_dominio}
         nivelRft={programa.nivel_rft}
         conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)}
+        soloLectura={!disena}
       />
 
       {bloquesFluidez && bloquesFluidez.length > 0 && (

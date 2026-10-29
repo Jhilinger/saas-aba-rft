@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
+import { puedeDisenar } from '../permisos'
 import ProgramaFormPrivado from './programa-form'
 import ComplementariosTabla from '../curriculo/complementarios-tabla'
 import CurriculoTabs from '../curriculo/curriculo-tabs'
@@ -16,7 +17,7 @@ export default async function MisProgramasPage() {
     .eq('id', user.id)
     .single()
 
-  if (!perfil || !['clinica_admin', 'terapeuta'].includes(perfil.rol)) {
+  if (!perfil || !['clinica_admin', 'terapeuta'].includes(perfil.rol) || !(await puedeDisenar(supabase))) {
     redirect('/dashboard')
   }
 

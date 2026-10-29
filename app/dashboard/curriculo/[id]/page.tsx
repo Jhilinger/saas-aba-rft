@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar } from '../../permisos'
 import { redirect, notFound } from 'next/navigation'
 import NuevoConjuntoForm from './nuevo-conjunto-form'
 import ConjuntoCard from './conjunto-card'
@@ -62,7 +63,7 @@ export default async function ProgramaDetallePage({
     (programa.clinica_id === perfil.clinica_id && programa.visibilidad === 'clinica')
 
   if (!puedeVer) redirect('/dashboard')
-  const soloLectura = !puedeEditar
+  const soloLectura = !puedeEditar || !(await puedeDisenar(supabase))
   const migaCurriculo =
     programa.clinica_id === null
       ? { label: 'Currículo', href: perfil.rol === 'superadmin' ? '/dashboard/curriculo' : '/dashboard/curriculo-base' }

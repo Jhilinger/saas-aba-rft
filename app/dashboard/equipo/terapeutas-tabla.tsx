@@ -2,13 +2,21 @@
 
 import { useState, useMemo } from 'react'
 import TerapeutaActions from './terapeuta-actions'
+import { InterruptorSupervisor } from './ajuste-diseno'
 import NombreEditable from '../nombre-editable'
 import { descargarCSV } from '@/utils/csv'
 import { Button, Panel } from '../../ui'
 
-type Terapeuta = { id: string; nombre: string; email: string; activo: boolean }
+type Terapeuta = { id: string; nombre: string; email: string; activo: boolean; es_supervisor: boolean }
 
-export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[] }) {
+export default function TerapeutasTabla({
+  terapeutas,
+  conSupervisores,
+}: {
+  terapeutas: Terapeuta[]
+  // La clínica funciona con supervisores: se muestra quién lo es
+  conSupervisores: boolean
+}) {
   const [busqueda, setBusqueda] = useState('')
 
   const filtrados = useMemo(() => {
@@ -24,6 +32,7 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
       Nombre: t.nombre,
       Email: t.email,
       Estado: t.activo ? 'Activo' : 'Desactivado',
+      Supervisor: t.es_supervisor ? 'Sí' : 'No',
     }))
     descargarCSV(`terapeutas-${new Date().toISOString().split('T')[0]}.csv`, filas)
   }
@@ -53,6 +62,7 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
             <tr>
               <th className="p-3">Nombre</th>
               <th className="p-3">Email</th>
+              {conSupervisores && <th className="p-3">Supervisor</th>}
               <th className="p-3"></th>
             </tr>
           </thead>
@@ -68,6 +78,11 @@ export default function TerapeutasTabla({ terapeutas }: { terapeutas: Terapeuta[
                   )}
                 </td>
                 <td className="p-3 text-slate-600">{t.email}</td>
+                {conSupervisores && (
+                  <td className="p-3">
+                    <InterruptorSupervisor id={t.id} nombre={t.nombre} activo={t.es_supervisor} />
+                  </td>
+                )}
                 <td className="p-3">
                   <TerapeutaActions id={t.id} activo={t.activo} />
                 </td>

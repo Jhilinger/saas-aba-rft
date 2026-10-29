@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../permisos'
 import { revalidatePath } from 'next/cache'
 
 // Requisitos previos entre programas. La RLS decide quién puede editarlos
@@ -8,6 +9,7 @@ import { revalidatePath } from 'next/cache'
 
 export async function agregarRequisito(programaBaseId: string, requisitoId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
   if (programaBaseId === requisitoId) return { error: 'Un programa no puede ser requisito de sí mismo' }
@@ -44,6 +46,7 @@ export async function agregarRequisito(programaBaseId: string, requisitoId: stri
 
 export async function quitarRequisito(programaBaseId: string, requisitoId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 

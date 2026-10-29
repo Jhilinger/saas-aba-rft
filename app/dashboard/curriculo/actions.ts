@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../permisos'
 import { revalidatePath } from 'next/cache'
 import type { Enums, Json } from '@/database.types'
 import { esTipoRespuesta, leerRespuestaPorFase, parsearOpciones, validarRespuestasEsperadas, type TipoRespuesta } from '../respuestas-rft'
@@ -135,6 +136,7 @@ async function colocarEnCurriculo(
 
 export async function crearPrograma(formData: FormData) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
@@ -204,6 +206,7 @@ export async function crearPrograma(formData: FormData) {
 // Sube (-1) o baja (+1) un programa una posición dentro de su dominio
 export async function moverPrograma(id: string, direccion: -1 | 1) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: programa } = await supabase
     .from('programas_base')
     .select('dominio_id, orden')
@@ -224,6 +227,7 @@ export async function moverPrograma(id: string, direccion: -1 | 1) {
 
 export async function eliminarPrograma(id: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('programas_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath('/dashboard/curriculo')
@@ -232,6 +236,7 @@ export async function eliminarPrograma(id: string) {
 
 export async function togglePrograma(id: string, activo: boolean) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase
     .from('programas_base')
     .update({ activo: !activo })
@@ -245,6 +250,7 @@ export async function togglePrograma(id: string, activo: boolean) {
 
 export async function crearConjuntoBase(programaBaseId: string, nombre: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data, error } = await supabase
     .from('conjuntos_estimulos_base')
     .insert({ programa_base_id: programaBaseId, nombre })
@@ -257,6 +263,7 @@ export async function crearConjuntoBase(programaBaseId: string, nombre: string) 
 
 export async function eliminarConjuntoBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('conjuntos_estimulos_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
@@ -270,6 +277,7 @@ export async function crearEstimuloBase(
   descripcion: string
 ) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase
     .from('estimulos_base')
     .insert({ conjunto_id: conjuntoId, nombre, descripcion })
@@ -280,6 +288,7 @@ export async function crearEstimuloBase(
 
 export async function eliminarEstimuloBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('estimulos_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
@@ -288,6 +297,7 @@ export async function eliminarEstimuloBase(id: string, programaBaseId: string) {
 
 export async function editarPrograma(id: string, formData: FormData) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
 
   const tipo = parseTipoPrograma(formData.get('tipo'))
   if (!tipo) return { error: 'Tipo de programa no válido' }
@@ -384,6 +394,7 @@ export async function editarPrograma(id: string, formData: FormData) {
 }
 export async function clonarPrograma(id: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 
@@ -524,6 +535,7 @@ export async function clonarPrograma(id: string) {
 
 export async function crearClaseRftBase(programaBaseId: string, nombre: string, grupo: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data, error } = await supabase
     .from('clases_rft_base')
     .insert({ programa_base_id: programaBaseId, nombre, grupo })
@@ -536,6 +548,7 @@ export async function crearClaseRftBase(programaBaseId: string, nombre: string, 
 
 export async function eliminarClaseRftBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('clases_rft_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
@@ -549,6 +562,7 @@ export async function crearEstimuloRftBase(
   posicion: string
 ) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
 
   const { data: programaBase } = await supabase
     .from('programas_base')
@@ -592,6 +606,7 @@ export async function crearEstimuloRftBase(
 
 export async function eliminarEstimuloRftBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('estimulos_rft_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
@@ -602,6 +617,7 @@ export async function eliminarEstimuloRftBase(id: string, programaBaseId: string
 
 export async function crearPasoBase(programaBaseId: string, nombre: string, descripcion: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
 
   if (!nombre.trim()) return { error: 'El nombre del paso es obligatorio' }
 
@@ -623,6 +639,7 @@ export async function crearPasoBase(programaBaseId: string, nombre: string, desc
 
 export async function eliminarPasoBase(id: string, programaBaseId: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { error } = await supabase.from('pasos_tarea_base').delete().eq('id', id)
   if (error) return { error: error.message }
   revalidatePath(`/dashboard/curriculo/${programaBaseId}`)
@@ -636,6 +653,7 @@ export async function guardarRespuestasEsperadasBase(
   respuestas: Record<string, string>
 ) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
@@ -17,6 +18,7 @@ async function puedeAccederPrograma(programaAlumnoId: string) {
 }
 
 export async function crearConjuntoAlumno(programaAlumnoId: string, nombre: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase
     .from('conjuntos_estimulos_alumno')
@@ -27,6 +29,7 @@ export async function crearConjuntoAlumno(programaAlumnoId: string, nombre: stri
 }
 
 export async function eliminarConjuntoAlumno(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('conjuntos_estimulos_alumno').delete().eq('id', id)
   if (error) {
@@ -42,6 +45,7 @@ export async function eliminarConjuntoAlumno(id: string, programaAlumnoId: strin
 }
 
 export async function eliminarConjuntoAlumnoForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
 
   // Los ensayos y bloques ya registrados son datos históricos de solo
@@ -76,6 +80,7 @@ export async function crearEstimuloAlumno(
   nombre: string,
   descripcion: string
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase
     .from('estimulos_alumno')
@@ -86,6 +91,7 @@ export async function crearEstimuloAlumno(
 }
 
 export async function eliminarEstimuloAlumno(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('estimulos_alumno').delete().eq('id', id)
   if (error) {
@@ -100,6 +106,7 @@ export async function eliminarEstimuloAlumno(id: string, programaAlumnoId: strin
 }
 
 export async function eliminarEstimuloAlumnoForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
 
   const admin = createAdminClient()
@@ -117,6 +124,7 @@ export async function eliminarEstimuloAlumnoForzado(id: string, programaAlumnoId
   return { success: true }
 }
 export async function iniciarIntervencion(conjuntoId: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
 
   const { error } = await supabase
@@ -135,6 +143,7 @@ export async function actualizarEstadoPrograma(
   alumnoId: string,
   estado: 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
 
   const { error } = await supabase

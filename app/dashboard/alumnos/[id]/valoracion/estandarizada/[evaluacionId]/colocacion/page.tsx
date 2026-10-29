@@ -7,6 +7,7 @@ import { cargarEstructuraCurriculo, crearCodificador } from '../../../../../../c
 import { calcularBloqueos } from '../../../../../../curriculo/secuencia'
 import { cargarProgresoAlumno } from '../../../../progreso/cargar-progreso'
 import ColocacionClient, { type FilaColocacion, type ProgramaPropuesto } from './colocacion-client'
+import { puedeDisenar } from '../../../../../../permisos'
 
 const PREFIJO_NOTA = 'Evaluación estandarizada'
 
@@ -147,6 +148,7 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
         filas={filas}
         propuestos={propuestos}
         bloqueados={bloqueados}
+        soloLectura={!(await puedeDisenar(supabase))}
       />
     </div>
   )

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import type { Tables } from '@/database.types'
@@ -22,6 +23,7 @@ async function puedeAccederPrograma(programaAlumnoId: string) {
 // --- CLASES ---
 
 export async function crearClase(programaAlumnoId: string, nombre: string, grupo: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
 
   // El tipo de relación se hereda del programa (currículo base). Si el
@@ -60,6 +62,7 @@ export async function crearClase(programaAlumnoId: string, nombre: string, grupo
 }
 
 export async function eliminarClase(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('clases_rft').delete().eq('id', id)
   if (error) {
@@ -75,6 +78,7 @@ export async function eliminarClase(id: string, programaAlumnoId: string) {
 }
 
 export async function eliminarClaseForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
 
   // Los ensayos, relaciones entrenadas y bloques ya registrados son datos
@@ -108,6 +112,7 @@ export async function crearEstimuloRft(
   descripcion: string,
   posicion: string
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
 
   const { data: programa } = await supabase
@@ -150,6 +155,7 @@ export async function crearEstimuloRft(
 }
 
 export async function eliminarEstimuloRft(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('estimulos_rft').delete().eq('id', id)
   if (error) {
@@ -165,6 +171,7 @@ export async function eliminarEstimuloRft(id: string, programaAlumnoId: string) 
 }
 
 export async function eliminarEstimuloRftForzado(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
 
   const admin = createAdminClient()
@@ -209,6 +216,7 @@ export async function crearRelacionEntrenada(
   estimuloOrigenId: string,
   estimuloDestinoId: string
 ) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { error } = await supabase.from('relaciones_entrenadas_rft').insert({
     clase_id: claseId,
@@ -221,6 +229,7 @@ export async function crearRelacionEntrenada(
 }
 
 export async function eliminarRelacionEntrenada(id: string, programaAlumnoId: string) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   if (!(await puedeAccederPrograma(programaAlumnoId))) return { error: 'No autorizado' }
 
   // Igual que los ensayos y bloques: no hay política RLS de borrado sobre
@@ -234,6 +243,7 @@ export async function eliminarRelacionEntrenada(id: string, programaAlumnoId: st
 // --- RESPUESTAS ESPERADAS ---
 
 export async function guardarRespuestasEsperadas(claseId: string, programaAlumnoId: string, respuestas: Record<string, string>) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }

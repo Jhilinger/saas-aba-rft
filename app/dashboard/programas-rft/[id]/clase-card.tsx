@@ -57,6 +57,7 @@ export default function ClaseCard({
   testsRealizados = [],
   nivelRft,
   conRespuestasEsperadas = false,
+  soloLectura = false,
 }: {
   clase: Clase
   programaAlumnoId: string
@@ -64,6 +65,8 @@ export default function ClaseCard({
   nivelRft: string | null
   // El programa usa respuestas de opciones/ejecución/abiertas en alguna fase
   conRespuestasEsperadas?: boolean
+  // Sin permiso de diseño: se consulta, pero no se cambian clases ni estímulos
+  soloLectura?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
@@ -92,6 +95,7 @@ export default function ClaseCard({
           </h3>
           <span className="text-xs text-slate-500">{clase.tipo_relacion}</span>
         </div>
+        {!soloLectura && (
         <button
           onClick={async () => {
             const ok = await confirmar({
@@ -135,6 +139,7 @@ export default function ClaseCard({
         >
           Eliminar clase
         </button>
+        )}
       </div>
       {/* Estímulos */}
       <div>
@@ -158,6 +163,7 @@ export default function ClaseCard({
                 )}
                 {' '}— {e.nombre}
               </span>
+              {!soloLectura && (
               <button
                 onClick={() => {
                   startTransition(async () => {
@@ -194,6 +200,7 @@ export default function ClaseCard({
               >
                 Quitar
               </button>
+              )}
             </li>
           ))}
           {clase.estimulos_rft.length === 0 && (
@@ -201,7 +208,7 @@ export default function ClaseCard({
           )}
         </ul>
 
-        {enElLimite ? (
+        {soloLectura ? null : enElLimite ? (
           <p className="mt-2 text-xs text-slate-500 italic">
             {NOMBRE_NIVEL_RFT[nivel]} admite como máximo {maxMiembros} miembro(s) por clase.
           </p>
@@ -251,6 +258,7 @@ export default function ClaseCard({
           respuestas={clase.respuestas_esperadas}
           posiciones={POSICIONES_POR_NIVEL[coerceNivelRft(nivelRft)]}
           guardar={(respuestas) => guardarRespuestasEsperadas(clase.id, programaAlumnoId, respuestas)}
+          soloLectura={soloLectura}
         />
       )}
 
@@ -267,6 +275,7 @@ export default function ClaseCard({
                 <span className="text-indigo-800">
                   {nombreEstimuloPorId(r.estimulo_origen_id)} → {nombreEstimuloPorId(r.estimulo_destino_id)}
                 </span>
+                {!soloLectura && (
                 <button
                   onClick={() => {
                     startTransition(async () => {
@@ -282,6 +291,7 @@ export default function ClaseCard({
                 >
                   Quitar
                 </button>
+                )}
               </li>
             ))}
             {clase.relaciones_entrenadas_rft.length === 0 && (

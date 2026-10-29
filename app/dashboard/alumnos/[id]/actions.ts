@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { revalidatePath } from 'next/cache'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../curriculo/estructura'
 import { calcularBloqueos, ROLES_EXCEPCION_SECUENCIA } from '../../curriculo/secuencia'
@@ -15,6 +16,7 @@ type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 // solo el clinica_admin/superadmin puede importarlo, con justificación.
 export async function importarPrograma(alumnoId: string, programaBaseId: string, justificacion?: string) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 
@@ -186,6 +188,7 @@ export async function crearProgramaPersonalizado(
   area: string
 ) {
   const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
 

@@ -30,10 +30,13 @@ export default function ConjuntoCard({
   conjunto,
   programaAlumnoId,
   alumnoId,
+  soloLectura = false,
 }: {
   conjunto: Conjunto
   programaAlumnoId: string
   alumnoId: string
+  // Sin permiso de diseño: se toman datos, pero no se cambian estímulos ni estados
+  soloLectura?: boolean
 }) {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -54,7 +57,7 @@ export default function ConjuntoCard({
           </span>
         </div>
         <div className="flex items-center gap-3">
-          {conjunto.estado === 'linea_base' && (
+          {!soloLectura && conjunto.estado === 'linea_base' && (
             <button
               onClick={async () => {
                 const ok = await confirmar({
@@ -85,6 +88,7 @@ export default function ConjuntoCard({
           >
             Tomar datos
           </a>
+          {!soloLectura && (
           <button
             onClick={async () => {
               const ok = await confirmar({
@@ -128,6 +132,7 @@ export default function ConjuntoCard({
           >
             Eliminar conjunto
           </button>
+          )}
         </div>
       </div>
 
@@ -141,6 +146,7 @@ export default function ConjuntoCard({
               <strong>{e.nombre}</strong>
               {e.descripcion ? ` — ${e.descripcion}` : ''}
             </span>
+            {!soloLectura && (
             <button
               onClick={async () => {
                 const res = await eliminarEstimuloAlumno(e.id, programaAlumnoId)
@@ -178,12 +184,14 @@ export default function ConjuntoCard({
             >
               Quitar
             </button>
+            )}
           </li>
         ))}
         {conjunto.estimulos_alumno.length === 0 && (
           <li className="text-xs text-slate-500 italic">Sin estímulos todavía.</li>
         )}
       </ul>
+      {!soloLectura && (
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -217,6 +225,7 @@ export default function ConjuntoCard({
           Añadir
         </Button>
       </form>
+      )}
 
       <HistorialBloques conjuntoId={conjunto.id} programaAlumnoId={programaAlumnoId} alumnoId={alumnoId} />
     </Panel>
