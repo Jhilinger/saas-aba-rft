@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
 import EvaluacionClient, { type NivelValoracion, type ProgramaValoracion } from './evaluacion-client'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 
@@ -92,7 +93,15 @@ export default async function ValoracionPage({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold text-slate-800">Valoración</h2>
+        <Link
+          href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada`}
+          className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+        >
+          Evaluación inicial estandarizada →
+        </Link>
+      </div>
       <EvaluacionClient
         alumnoId={alumnoId}
         programas={programas}

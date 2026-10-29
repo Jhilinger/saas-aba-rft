@@ -1152,6 +1152,7 @@ export type Database = {
           dominio_id: string | null
           ensayos: number | null
           formatos: string[]
+          guion: Json | null
           id: string
           indicador: boolean
           materiales: string | null
@@ -1175,6 +1176,7 @@ export type Database = {
           dominio_id?: string | null
           ensayos?: number | null
           formatos?: string[]
+          guion?: Json | null
           id?: string
           indicador?: boolean
           materiales?: string | null
@@ -1198,6 +1200,7 @@ export type Database = {
           dominio_id?: string | null
           ensayos?: number | null
           formatos?: string[]
+          guion?: Json | null
           id?: string
           indicador?: boolean
           materiales?: string | null
@@ -1231,6 +1234,124 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "evaluacion_items"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluacion_respuestas: {
+        Row: {
+          bloques_entrenamiento: number | null
+          ensayos: Json
+          entrenamiento_superado: boolean | null
+          evaluacion_id: string
+          fuente: string
+          item_id: string
+          no_aplicado: string | null
+          notas: string | null
+          puntuacion: number | null
+          updated_at: string
+        }
+        Insert: {
+          bloques_entrenamiento?: number | null
+          ensayos?: Json
+          entrenamiento_superado?: boolean | null
+          evaluacion_id: string
+          fuente?: string
+          item_id: string
+          no_aplicado?: string | null
+          notas?: string | null
+          puntuacion?: number | null
+          updated_at?: string
+        }
+        Update: {
+          bloques_entrenamiento?: number | null
+          ensayos?: Json
+          entrenamiento_superado?: boolean | null
+          evaluacion_id?: string
+          fuente?: string
+          item_id?: string
+          no_aplicado?: string | null
+          notas?: string | null
+          puntuacion?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluacion_respuestas_evaluacion_id_fkey"
+            columns: ["evaluacion_id"]
+            isOneToOne: false
+            referencedRelation: "evaluaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluacion_respuestas_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "evaluacion_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluaciones: {
+        Row: {
+          alumno_id: string
+          colocacion_aplicada_at: string | null
+          estado: string
+          evaluador_id: string | null
+          finalizada_at: string | null
+          id: string
+          iniciada_at: string
+          modalidad: string
+          nivel_inicio: number | null
+          notas: string | null
+          updated_at: string
+        }
+        Insert: {
+          alumno_id: string
+          colocacion_aplicada_at?: string | null
+          estado?: string
+          evaluador_id?: string | null
+          finalizada_at?: string | null
+          id?: string
+          iniciada_at?: string
+          modalidad?: string
+          nivel_inicio?: number | null
+          notas?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alumno_id?: string
+          colocacion_aplicada_at?: string | null
+          estado?: string
+          evaluador_id?: string | null
+          finalizada_at?: string | null
+          id?: string
+          iniciada_at?: string
+          modalidad?: string
+          nivel_inicio?: number | null
+          notas?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluaciones_alumno_id_fkey"
+            columns: ["alumno_id"]
+            isOneToOne: false
+            referencedRelation: "alumnos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluaciones_evaluador_id_fkey"
+            columns: ["evaluador_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluaciones_nivel_inicio_fkey"
+            columns: ["nivel_inicio"]
+            isOneToOne: false
+            referencedRelation: "niveles_curriculo"
+            referencedColumns: ["numero"]
           },
         ]
       }
