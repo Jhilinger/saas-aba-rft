@@ -36,8 +36,8 @@ export default async function AlumnoLayout({
   if (!alumno) notFound()
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
-      <Panel className="p-4 sm:p-5">
+    <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8 print:p-0">
+      <Panel className="p-4 sm:p-5 print:hidden">
         <Link
           href={perfil.rol === 'terapeuta' ? '/dashboard/mis-alumnos' : '/dashboard/alumnos'}
           className="text-sm font-medium text-indigo-600 hover:underline"
@@ -48,7 +48,9 @@ export default async function AlumnoLayout({
         <p className="text-sm text-slate-500">Nacimiento: {new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</p>
       </Panel>
 
-      <AlumnoSubnav alumnoId={id} />
+      <div className="print:hidden">
+        <AlumnoSubnav alumnoId={id} />
+      </div>
 
       {children}
     </div>

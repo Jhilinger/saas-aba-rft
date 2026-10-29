@@ -85,10 +85,12 @@ export default async function DashboardLayout({
   return (
     <ToastProvider>
     <ConfirmProvider>
-    <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
-      <MobileNav enlaces={enlacesRol} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
+    <div className="flex min-h-screen flex-col bg-slate-50 print:bg-white md:flex-row">
+      <div className="print:hidden">
+        <MobileNav enlaces={enlacesRol} nombre={perfil?.nombre ?? ''} rol={perfil?.rol ?? ''} />
+      </div>
 
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-5 md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-5 md:flex print:hidden">
         <div className="mb-8">
           <div className="flex items-center gap-2">
             <AbacontextIcon className="w-6 h-6" />

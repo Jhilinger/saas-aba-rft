@@ -32,6 +32,12 @@ export default async function AdministracionPage({
           Evaluación del {new Date(evaluacion.iniciada_at).toLocaleDateString('es-ES')}
         </h2>
         <span className="flex flex-wrap items-center gap-3">
+          <Link
+            href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada/${evaluacionId}/informe`}
+            className="text-sm font-medium text-indigo-600 hover:underline"
+          >
+            Informe
+          </Link>
           {evaluacion.estado === 'finalizada' && (
             <Link
               href={`/dashboard/alumnos/${alumnoId}/valoracion/estandarizada/${evaluacionId}/colocacion`}
