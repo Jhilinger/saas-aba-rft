@@ -1976,6 +1976,7 @@ export type Database = {
         | "jerarquia"
         | "espacial"
         | "temporal"
+        | "condicional"
         | "causal"
         | "deictica"
       visibilidad_programa: "privado" | "clinica"
@@ -2150,6 +2151,7 @@ export const Constants = {
         "jerarquia",
         "espacial",
         "temporal",
+        "condicional",
         "causal",
         "deictica",
       ],

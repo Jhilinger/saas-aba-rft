@@ -162,6 +162,7 @@ export default function ProgramaForm({ esGlobal, estructura }: { esGlobal: boole
                   <option value="jerarquia">Jerarquía</option>
                   <option value="espacial">Espacial</option>
                   <option value="temporal">Temporal</option>
+                  <option value="condicional">Condicional</option>
                   <option value="causal">Causal</option>
                   <option value="deictica">Deíctico</option>
                 </select>
