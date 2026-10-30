@@ -3,6 +3,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Panel } from '../../../ui'
 import AlumnoSubnav from './alumno-subnav'
+import PuestaEnMarcha from './puesta-en-marcha'
+import { puedeDisenar } from '../../permisos'
 
 export default async function AlumnoLayout({
   children,
@@ -47,6 +49,8 @@ export default async function AlumnoLayout({
         <h1 className="mt-2 text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">{alumno.nombre_anonimizado}</h1>
         <p className="text-sm text-slate-500">Nacimiento: {new Date(alumno.fecha_nacimiento).toLocaleDateString('es-ES')}</p>
       </Panel>
+
+      {(await puedeDisenar(supabase)) && <PuestaEnMarcha supabase={supabase} alumnoId={id} />}
 
       <div className="print:hidden">
         <AlumnoSubnav alumnoId={id} />
