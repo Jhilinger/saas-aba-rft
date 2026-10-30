@@ -20,6 +20,8 @@ import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronome
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
+import AyudaTermino from '../../../ayuda-termino'
+import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
@@ -130,11 +132,13 @@ function TarjetaRecomendacion({
       <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Siguiente bloque recomendado</p>
       <div>
         <p className="text-lg font-bold text-slate-800">
-          {NOMBRE_FASE_SECUENCIA[rec.paso.fase]} {rec.paso.origen}→{rec.paso.destino}
+          {NOMBRE_FASE_SECUENCIA[rec.paso.fase]}
+          <AyudaTermino clave={GLOSARIO_POR_FASE[rec.paso.fase] ?? 'entrenamiento'} /> {rec.paso.origen}→{rec.paso.destino}
           {conGrupo && <span className="font-normal text-slate-500"> · {rec.grupo}</span>}
         </p>
         <p className="text-xs text-slate-500">
           Paso {rec.indice + 1} de {rec.total} de la secuencia del programa
+          <AyudaTermino clave="secuencia" />
           {ejemplo && ` · ej.: ${ejemplo}`}
         </p>
       </div>
@@ -558,6 +562,7 @@ export default function TomarDatosRftClient({
               ? `¡Derivado en ${resultado.clasesDominadasAhora.join(', ')}! (superado en un solo bloque, sin ayudas)`
               : `¡Dominio conseguido en ${resultado.clasesDominadasAhora.join(', ')}!`
             : `Bloque guardado — ${resultado.porcentaje}% de acierto`}
+          {hayDominio && <AyudaTermino clave={resultado.derivado ? 'derivado' : 'dominado'} />}
         </p>
         {hayDominio && (
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
@@ -698,7 +703,10 @@ export default function TomarDatosRftClient({
         )}
 
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Fase</label>
+          <label className="text-sm text-slate-600">
+            Fase
+            <AyudaTermino clave={GLOSARIO_POR_FASE[fase] ?? 'entrenamiento'} />
+          </label>
           <select
             value={fase}
             onChange={(e) => setFase(e.target.value)}
@@ -726,6 +734,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <label className="text-sm text-slate-600 block min-h-[40px] sm:min-h-[20px]">
               {fase === 'transformacion_funciones' ? 'Posición conocida' : 'Posición muestra'}
+              <AyudaTermino clave="muestra_comparacion" />
             </label>
             <select
               value={posicionOrigen}
@@ -786,7 +795,11 @@ export default function TomarDatosRftClient({
 
         {puedeSonda && (
           <div className="space-y-1">
-            <p className="text-sm text-slate-600">Tipo de bloque</p>
+            <p className="text-sm text-slate-600">
+              Tipo de bloque
+              <AyudaTermino clave="sonda_mantenimiento" />
+              <AyudaTermino clave="sonda_generalizacion" />
+            </p>
             <div className="flex gap-2">
               {(['normal', 'mantenimiento', 'generalizacion'] as const).map((t) => (
                 <button
@@ -1169,6 +1182,7 @@ export default function TomarDatosRftClient({
             <button onClick={() => setControlAbierto(true)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800">
               + Ensayo de control
             </button>
+            <AyudaTermino clave="ensayo_control" />
           </div>
         )}
       </div>

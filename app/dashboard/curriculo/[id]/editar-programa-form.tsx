@@ -10,6 +10,7 @@ import type { EstructuraCurriculo } from '../estructura'
 import { formatearSecuencia, leerSecuencia } from '../../secuencia-rft'
 import CamposRespuesta from './campos-respuesta'
 import type { Json } from '@/database.types'
+import AyudaTermino from '../../ayuda-termino'
 
 type Programa = {
   id: string
@@ -202,7 +203,10 @@ export default function EditarProgramaForm({
 
             {nivelRft !== 'abstraccion' && (
               <div className="space-y-1">
-                <label className="text-sm font-semibold text-slate-700">Secuencia de bloques</label>
+                <label className="text-sm font-semibold text-slate-700">
+                  Secuencia de bloques
+                  <AyudaTermino clave="secuencia" />
+                </label>
                 <textarea
                   name="secuencia_rft"
                   defaultValue={formatearSecuencia(leerSecuencia(programa.secuencia_rft))}

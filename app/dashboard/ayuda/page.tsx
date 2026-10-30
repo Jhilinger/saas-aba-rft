@@ -21,12 +21,22 @@ const ARTICULOS_POR_ROL: Record<string, Articulo[]> = {
       titulo: 'Informes en lote',
       resumen: 'Genera el informe de progreso de varios alumnos a la vez.',
     },
+    {
+      href: '/dashboard/ayuda/glosario-rft',
+      titulo: 'Glosario RFT',
+      resumen: 'Clases, posiciones, fases, derivado y dominado, sondas y ensayos de control, explicados para el día a día.',
+    },
   ],
   terapeuta: [
     {
       href: '/dashboard/ayuda/dia-a-dia-terapeuta',
       titulo: 'Tu día a día como terapeuta',
       resumen: 'Toma de datos en el PEI, preferencias y progreso.',
+    },
+    {
+      href: '/dashboard/ayuda/glosario-rft',
+      titulo: 'Glosario RFT',
+      resumen: 'Clases, posiciones, fases, derivado y dominado, sondas y ensayos de control, explicados para el día a día.',
     },
   ],
     familia: [

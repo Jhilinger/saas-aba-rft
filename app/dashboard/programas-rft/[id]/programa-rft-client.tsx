@@ -8,6 +8,7 @@ import EvolucionRftChart from './evolucion-rft-chart'
 import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import type { DistribucionAyuda } from '../../ayuda-tipos'
 import { Panel } from '../../../ui'
+import AyudaTermino from '../../ayuda-termino'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
@@ -104,6 +105,11 @@ export default function ProgramaRftClient({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-slate-500">
+            Grupos
+            <AyudaTermino clave="grupo" />
+            <AyudaTermino clave="clase" />
+          </span>
           {gruposVisibles.map((g) => (
             <button
               key={g}

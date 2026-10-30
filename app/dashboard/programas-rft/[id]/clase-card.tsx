@@ -17,6 +17,7 @@ import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
+import AyudaTermino from '../../ayuda-termino'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
 type Relacion = {
@@ -143,7 +144,10 @@ export default function ClaseCard({
       </div>
       {/* Estímulos */}
       <div>
-        <p className="mb-1 text-xs font-medium text-slate-500">Estímulos</p>
+        <p className="mb-1 text-xs font-medium text-slate-500">
+          Estímulos por posición
+          <AyudaTermino clave="posicion" />
+        </p>
         <ul className="space-y-1">
           {clase.estimulos_rft.map((e) => (
               <li
@@ -265,7 +269,10 @@ export default function ClaseCard({
       {/* Relaciones entrenadas y testeadas: informativo, se rellena solo al tomar datos. */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <p className="mb-1 text-xs font-medium text-slate-500">Relaciones entrenadas</p>
+          <p className="mb-1 text-xs font-medium text-slate-500">
+            Relaciones entrenadas
+            <AyudaTermino clave="entrenamiento" />
+          </p>
           <ul className="space-y-1">
             {clase.relaciones_entrenadas_rft.map((r) => (
                 <li
