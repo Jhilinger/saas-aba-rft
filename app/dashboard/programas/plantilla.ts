@@ -1,6 +1,7 @@
 import type { createClient } from '@/utils/supabase/server'
 import type { Json } from '@/database.types'
 import { esTipoRespuesta, leerRespuestaPorFase, NOMBRE_TIPO_RESPUESTA } from '../respuestas-rft'
+import { formatearSecuencia, leerSecuencia } from '../secuencia-rft'
 
 type Supabase = Awaited<ReturnType<typeof createClient>>
 
@@ -22,6 +23,7 @@ export const CAMPOS_PLANTILLA = [
   { campo: 'tipo_respuesta', etiqueta: 'Tipo de respuesta' },
   { campo: 'opciones_respuesta', etiqueta: 'Opciones de respuesta' },
   { campo: 'respuesta_por_fase', etiqueta: 'Respuesta por fase' },
+  { campo: 'secuencia_rft', etiqueta: 'Secuencia de bloques' },
 ] as const
 
 export type CampoPlantilla = (typeof CAMPOS_PLANTILLA)[number]['campo']
@@ -40,7 +42,8 @@ type ValorCampo = Json | undefined
 
 function iguales(campo: CampoPlantilla, a: ValorCampo, b: ValorCampo) {
   if (CAMPOS_NUMERICOS.includes(campo)) return Number(a) === Number(b)
-  if (campo === 'opciones_respuesta' || campo === 'respuesta_por_fase') return JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
+  if (campo === 'opciones_respuesta' || campo === 'respuesta_por_fase' || campo === 'secuencia_rft')
+    return JSON.stringify(a ?? null) === JSON.stringify(b ?? null)
   return (a ?? '').toString().trim() === (b ?? '').toString().trim()
 }
 
@@ -49,6 +52,7 @@ function mostrar(campo: CampoPlantilla, valor: ValorCampo): string {
   if (valor === null || valor === undefined) return ''
   if (campo === 'tipo_respuesta') return esTipoRespuesta(valor) ? NOMBRE_TIPO_RESPUESTA[valor] : String(valor)
   if (campo === 'opciones_respuesta') return Array.isArray(valor) ? valor.join(', ') : ''
+  if (campo === 'secuencia_rft') return formatearSecuencia(leerSecuencia(valor))
   if (campo === 'respuesta_por_fase') {
     return Object.entries(leerRespuestaPorFase(valor))
       .map(([fase, c]) => `${fase}: ${NOMBRE_TIPO_RESPUESTA[c.tipo]}${c.opciones.length ? ` (${c.opciones.join(', ')})` : ''}`)
@@ -61,7 +65,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
   const { data: copia } = await supabase
     .from('programas_alumno')
     .select(
-      'id, alumno_id, tipo, formato_recogida, programa_base_id, plantilla_sincronizada_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase'
+      'id, alumno_id, tipo, formato_recogida, programa_base_id, plantilla_sincronizada_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft'
     )
     .eq('id', programaAlumnoId)
     .maybeSingle()
@@ -70,7 +74,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
   const { data: base } = await supabase
     .from('programas_base')
     .select(
-      'id, tipo, tipo_relacion, contenido_actualizado_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase'
+      'id, tipo, tipo_relacion, contenido_actualizado_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft'
     )
     .eq('id', copia.programa_base_id)
     .maybeSingle()

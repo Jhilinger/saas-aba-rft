@@ -1801,6 +1801,7 @@ export type Database = {
           porcentaje_dominio: number
           programa_base_id: string | null
           respuesta_por_fase: Json
+          secuencia_rft: Json | null
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta: string
@@ -1833,6 +1834,7 @@ export type Database = {
           porcentaje_dominio?: number
           programa_base_id?: string | null
           respuesta_por_fase?: Json
+          secuencia_rft?: Json | null
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string
@@ -1865,6 +1867,7 @@ export type Database = {
           porcentaje_dominio?: number
           programa_base_id?: string | null
           respuesta_por_fase?: Json
+          secuencia_rft?: Json | null
           terapeuta_id?: string
           tipo?: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string
@@ -1927,6 +1930,7 @@ export type Database = {
           orden: number | null
           porcentaje_dominio: number
           respuesta_por_fase: Json
+          secuencia_rft: Json | null
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"] | null
           tipo_respuesta: string
@@ -1958,6 +1962,7 @@ export type Database = {
           orden?: number | null
           porcentaje_dominio?: number
           respuesta_por_fase?: Json
+          secuencia_rft?: Json | null
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion?:
             | Database["public"]["Enums"]["tipo_relacion_rft"]
@@ -1991,6 +1996,7 @@ export type Database = {
           orden?: number | null
           porcentaje_dominio?: number
           respuesta_por_fase?: Json
+          secuencia_rft?: Json | null
           tipo?: Database["public"]["Enums"]["tipo_programa"]
           tipo_relacion?:
             | Database["public"]["Enums"]["tipo_relacion_rft"]

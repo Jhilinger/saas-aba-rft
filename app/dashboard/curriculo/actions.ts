@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar, SIN_PERMISO_DISENO } from '../permisos'
+import { parsearSecuencia } from '../secuencia-rft'
 import { revalidatePath } from 'next/cache'
 import type { Enums, Json } from '@/database.types'
 import { esTipoRespuesta, leerRespuestaPorFase, parsearOpciones, validarRespuestasEsperadas, type TipoRespuesta } from '../respuestas-rft'
@@ -338,6 +339,7 @@ export async function editarPrograma(id: string, formData: FormData) {
     tipo_respuesta?: string
     opciones_respuesta?: string[] | null
     respuesta_por_fase?: Json
+    secuencia_rft?: Json
     formato_recogida: string
     direccion_objetivo: string | null
     direccion_cadena: string | null
@@ -364,6 +366,9 @@ export async function editarPrograma(id: string, formData: FormData) {
     const respuesta = parseConfigRespuesta(formData)
     if ('error' in respuesta) return { error: respuesta.error }
     Object.assign(updateData, respuesta)
+    const secuencia = parsearSecuencia((formData.get('secuencia_rft') as string) ?? '', coerceNivelRft(nivelRft))
+    if ('error' in secuencia) return { error: secuencia.error }
+    updateData.secuencia_rft = secuencia.valor
   }
 
   // La visibilidad y el área libre solo existen en los complementarios
@@ -428,6 +433,7 @@ export async function clonarPrograma(id: string) {
       tipo_respuesta: original.tipo_respuesta,
       opciones_respuesta: original.opciones_respuesta,
       respuesta_por_fase: original.respuesta_por_fase,
+      secuencia_rft: original.secuencia_rft,
       orden: null,
       dominio_id: original.dominio_id,
       clinica_id: original.clinica_id,

@@ -7,6 +7,7 @@ import { useToast } from '../../../providers/toast-provider'
 import { Button } from '../../../ui'
 import CamposDominio, { CampoArea } from '../campos-dominio'
 import type { EstructuraCurriculo } from '../estructura'
+import { formatearSecuencia, leerSecuencia } from '../../secuencia-rft'
 import CamposRespuesta from './campos-respuesta'
 import type { Json } from '@/database.types'
 
@@ -34,6 +35,7 @@ type Programa = {
   tipo_respuesta: string
   opciones_respuesta: string[] | null
   respuesta_por_fase: Json
+  secuencia_rft: Json
 }
 
 const FORMATOS_REGISTRO = [
@@ -195,6 +197,23 @@ export default function EditarProgramaForm({
                   <option value="causal">Causal</option>
                   <option value="deictica">Deíctico</option>
                 </select>
+              </div>
+            )}
+
+            {nivelRft !== 'abstraccion' && (
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-slate-700">Secuencia de bloques</label>
+                <textarea
+                  name="secuencia_rft"
+                  defaultValue={formatearSecuencia(leerSecuencia(programa.secuencia_rft))}
+                  rows={4}
+                  placeholder={'Entrenamiento: A→B, B→C\nTest mutuo: B→A, C→B\nTest combinatorio: A→C, C→A'}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-base sm:text-sm"
+                />
+                <p className="text-xs text-slate-500">
+                  Una línea por fase, en orden. La toma de datos recomienda el primer bloque no dominado de cada grupo. Vacío:
+                  entrenamiento lineal, tests mutuos y tests combinatorios.
+                </p>
               </div>
             )}
 

@@ -35,3 +35,8 @@ export function useCronometroEnsayo(indiceEnsayo: number | null) {
 export function segundosDesde(inicio: number | null): number | null {
   return inicio === null ? null : Math.round((Date.now() - inicio) / 1000)
 }
+
+// Momento actual en ms, para marcar el inicio de un bloque desde un manejador
+export function marcaDeTiempo(): number {
+  return Date.now()
+}

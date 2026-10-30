@@ -16,9 +16,10 @@ import {
   type ParEntrenado,
 } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
-import { segundosDesde, useCronometroEnsayo } from '../../cronometro'
+import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronometro'
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
+import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null }
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
@@ -109,6 +110,54 @@ function ordenEstable(valor: string) {
   return [...valor].reduce((total, caracter) => total + caracter.charCodeAt(0), 0)
 }
 
+function TarjetaRecomendacion({
+  rec,
+  conGrupo,
+  ejemplo,
+  tamanoBloque,
+  onTamano,
+  onEmpezar,
+}: {
+  rec: Recomendacion
+  conGrupo: boolean
+  ejemplo: string | null
+  tamanoBloque: number
+  onTamano: (n: number) => void
+  onEmpezar: () => void
+}) {
+  return (
+    <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">Siguiente bloque recomendado</p>
+      <div>
+        <p className="text-lg font-bold text-slate-800">
+          {NOMBRE_FASE_SECUENCIA[rec.paso.fase]} {rec.paso.origen}→{rec.paso.destino}
+          {conGrupo && <span className="font-normal text-slate-500"> · {rec.grupo}</span>}
+        </p>
+        <p className="text-xs text-slate-500">
+          Paso {rec.indice + 1} de {rec.total} de la secuencia del programa
+          {ejemplo && ` · ej.: ${ejemplo}`}
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {[10, 20].map((n) => (
+          <button
+            key={n}
+            onClick={() => onTamano(n)}
+            className={`rounded-lg px-3 py-2 text-sm font-medium ${
+              tamanoBloque === n ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            {n} ensayos
+          </button>
+        ))}
+        <Button onClick={onEmpezar} className="ml-auto px-6 py-3 text-base sm:py-2">
+          Empezar
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 export default function TomarDatosRftClient({
   programaAlumnoId,
   alumnoId,
@@ -121,6 +170,7 @@ export default function TomarDatosRftClient({
   dominioFases,
   nivelRft,
   respuesta,
+  secuenciaPrograma,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -133,6 +183,8 @@ export default function TomarDatosRftClient({
   dominioFases: DominioFase[]
   nivelRft: string | null
   respuesta: { tipo_respuesta: string; opciones_respuesta: string[] | null; respuesta_por_fase: Json }
+  // Secuencia de bloques del programa (ver secuencia-rft.ts)
+  secuenciaPrograma: Json
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -143,6 +195,8 @@ export default function TomarDatosRftClient({
   const [posicionDestino, setPosicionDestino] = useState('')
   const [tipoSonda, setTipoSonda] = useState<'normal' | 'generalizacion' | 'mantenimiento'>('normal')
   const [tamanoBloque, setTamanoBloque] = useState(ensayosPorBloqueDefecto)
+  // El terapeuta elige la combinación a mano en lugar de la recomendada
+  const [manual, setManual] = useState(false)
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
@@ -379,14 +433,61 @@ export default function TomarDatosRftClient({
       toast('Antes hay que dominar en entrenamiento una cadena de relaciones que conecte esas posiciones.', 'error')
       return
     }
-    setSecuencia(generarSecuenciaClases(clasesValidas, tamanoBloque))
-    setInicioBloque(Date.now())
+    iniciarBloque(clasesValidas)
+  }
+
+  const iniciarBloque = (validas: Clase[]) => {
+    setSecuencia(generarSecuenciaClases(validas, tamanoBloque))
+    setInicioBloque(marcaDeTiempo())
     setDuracionBloque(null)
     fijarControles([])
     setEnsayos([])
     setNotas('')
     setResultado(null)
     setEstadoGuardado('idle')
+  }
+
+  // Recomendación: primer paso pendiente de la secuencia del programa
+  const posicionesDe = (grupo: string) => [
+    ...new Set(clases.filter((c) => c.grupo === grupo).flatMap((c) => c.estimulos_rft.map((e) => e.posicion).filter(Boolean) as string[])),
+  ]
+  const recomendacionGlobal = recomendarBloque(
+    secuenciaPrograma,
+    nivel,
+    grupos.map((g) => ({ grupo: g, posiciones: posicionesDe(g) })),
+    dominioFases
+  )
+  const recomendacionGrupo = grupoSeleccionado
+    ? recomendarBloque(secuenciaPrograma, nivel, [{ grupo: grupoSeleccionado, posiciones: posicionesDe(grupoSeleccionado) }], dominioFases)
+    : null
+  const clasesCon = (grupo: string, origen: string, destino: string) =>
+    clases.filter((c) => c.grupo === grupo && encontrarEstimulo(c, origen) && encontrarEstimulo(c, destino))
+
+  // Ejemplo con los estímulos reales de la primera clase que encaja
+  const ejemploDe = (rec: Recomendacion) => {
+    const clase = clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)[0]
+    const origen = clase && encontrarEstimulo(clase, rec.paso.origen)
+    const destino = clase && encontrarEstimulo(clase, rec.paso.destino)
+    return origen && destino ? `${origen.nombre} → ${destino.nombre}` : null
+  }
+
+  const empezarRecomendado = (rec: Recomendacion) => {
+    const validas = clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)
+    if (validas.length < 2) {
+      toast(`Necesitas al menos 2 clases con las posiciones ${rec.paso.origen} y ${rec.paso.destino} en "${rec.grupo}".`, 'error')
+      return
+    }
+    const requiere = (FASES_QUE_REQUIEREN_CONEXION as readonly string[]).includes(rec.paso.fase)
+    if (requiere && !estanConectadas(construirGrafoEntrenado(entrenamientosDominados, rec.grupo), rec.paso.origen, rec.paso.destino)) {
+      toast('Antes hay que dominar en entrenamiento una cadena de relaciones que conecte esas posiciones.', 'error')
+      return
+    }
+    setGrupoSeleccionado(rec.grupo)
+    setFase(rec.paso.fase)
+    setPosicionOrigen(rec.paso.origen)
+    setPosicionDestino(rec.paso.destino)
+    setTipoSonda('normal')
+    iniciarBloque(validas)
   }
 
   const registrar = (correcto: boolean, ayuda: string, pregunta?: string, respuestaAlumno?: string | null) => {
@@ -472,6 +573,9 @@ export default function TomarDatosRftClient({
               setResultado(null)
               setSecuencia(null)
               setEstadoGuardado('idle')
+              setManual(false)
+              // Trae lo dominado con este bloque para recomendar el siguiente
+              router.refresh()
             }}
             className="py-3 sm:py-2 text-base sm:text-sm"
           >
@@ -505,7 +609,19 @@ export default function TomarDatosRftClient({
   if (!grupoSeleccionado) {
     return (
       <Panel className="p-4 sm:p-6 space-y-4">
-        <p className="text-sm font-medium text-slate-600">¿Qué grupo de clases vas a trabajar?</p>
+        {recomendacionGlobal && (
+          <TarjetaRecomendacion
+            rec={recomendacionGlobal}
+            conGrupo
+            ejemplo={ejemploDe(recomendacionGlobal)}
+            tamanoBloque={tamanoBloque}
+            onTamano={setTamanoBloque}
+            onEmpezar={() => empezarRecomendado(recomendacionGlobal)}
+          />
+        )}
+        <p className="text-sm font-medium text-slate-600">
+          {recomendacionGlobal ? 'O elige un grupo:' : '¿Qué grupo de clases vas a trabajar?'}
+        </p>
         <div className="flex flex-wrap gap-2">
           {grupos.map((g) => (
             <button
@@ -520,6 +636,33 @@ export default function TomarDatosRftClient({
         {grupos.length === 0 && (
           <p className="text-sm text-slate-500">No hay clases todavía en este programa.</p>
         )}
+      </Panel>
+    )
+  }
+
+  if (!secuencia && recomendacionGrupo && !manual) {
+    return (
+      <Panel className="p-4 sm:p-6 space-y-4">
+        {sinConexion && <BannerSinConexion />}
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-slate-600">{grupoSeleccionado}</p>
+          {!grupoInicial && (
+            <button onClick={() => setGrupoSeleccionado(null)} className="text-xs text-indigo-600 hover:underline">
+              Cambiar grupo
+            </button>
+          )}
+        </div>
+        <TarjetaRecomendacion
+          rec={recomendacionGrupo}
+          conGrupo={false}
+          ejemplo={ejemploDe(recomendacionGrupo)}
+          tamanoBloque={tamanoBloque}
+          onTamano={setTamanoBloque}
+          onEmpezar={() => empezarRecomendado(recomendacionGrupo)}
+        />
+        <button onClick={() => setManual(true)} className="text-sm font-medium text-slate-500 hover:text-slate-700">
+          Elegir otra combinación o una sonda →
+        </button>
       </Panel>
     )
   }
@@ -542,6 +685,17 @@ export default function TomarDatosRftClient({
             </button>
           )}
         </div>
+
+        {recomendacionGrupo ? (
+          <button onClick={() => setManual(false)} className="text-sm font-medium text-indigo-600 hover:underline">
+            ← Volver al bloque recomendado
+          </button>
+        ) : (
+          <p className="rounded-lg bg-emerald-50 p-2 text-sm text-emerald-800">
+            Secuencia del programa completada en este grupo: puedes registrar sondas de mantenimiento o generalización, o
+            trabajar otro grupo.
+          </p>
+        )}
 
         <div className="space-y-1">
           <label className="text-sm text-slate-600">Fase</label>

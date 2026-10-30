@@ -38,7 +38,7 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase'
+      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft'
     )
     .eq('id', id)
     .single()
