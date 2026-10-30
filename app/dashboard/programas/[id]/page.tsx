@@ -24,6 +24,8 @@ import { avisoPlantilla } from '../plantilla'
 import { Breadcrumb, Panel } from '../../../ui'
 import { puedeDisenar } from '../../permisos'
 import type { Tables } from '@/database.types'
+import PanelAlertas from '../../panel-alertas'
+import { cargarAlertas } from '../../cargar-alertas'
 
 export default async function ProgramaAlumnoPage({
   params,
@@ -148,6 +150,10 @@ export default async function ProgramaAlumnoPage({
 
   const diferenciasPlantilla = await avisoPlantilla(supabase, id)
   const aviso = disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />
+  const alertas =
+    disena && programa.formato_recogida === 'ensayo_discreto' ? (
+      <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} />
+    ) : null
 
   if (programa.formato_recogida !== 'ensayo_discreto') {
     const cuerpo = await (async () => {
@@ -315,6 +321,7 @@ export default async function ProgramaAlumnoPage({
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
       {aviso}
+      {alertas}
       {infoPanel}
       {observacionesPendientes && observacionesPendientes.length > 0 && (
         <ObservacionesPendientes

@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import type { createClient } from '@/utils/supabase/server'
 import { Panel } from '../ui'
+import { cargarAlertas } from './cargar-alertas'
+import { ALERTA } from './alertas-progreso'
 
 type Supabase = Awaited<ReturnType<typeof createClient>>
 
 // Inicio del terapeuta: lo que hay que trabajar con cada alumno asignado, con
 // acceso directo a la toma de datos. A quien diseña la intervención le añade
-// avisos sobre el PEI.
+// avisos sobre el PEI y las alertas de estancamiento.
 
 const DIAS_SIN_DATOS = 14
 const MIN_PROGRAMAS_ACTIVOS = 3
@@ -110,6 +112,8 @@ export default async function SesionHoy({ supabase, terapeutaId, disena }: { sup
   }
 
   const conPuntoPartida = new Set((valoraciones ?? []).map((v) => v.alumno_id))
+  const alertas = disena ? await cargarAlertas(supabase, alumnoIds) : []
+  const MAX_ALERTAS_ALUMNO = 3
 
   return (
     <div className="space-y-4">
@@ -126,6 +130,15 @@ export default async function SesionHoy({ supabase, terapeutaId, disena }: { sup
           const sinDatos = activos.filter((p) => p.acciones.length > 0 && (haceDias(p.ultimoDato) ?? 0) > DIAS_SIN_DATOS)
           if (sinDatos.length)
             avisos.push({ texto: `${sinDatos.length} programas sin datos en más de ${DIAS_SIN_DATOS} días`, href: `/dashboard/alumnos/${alumno.id}/pei` })
+          const delAlumno = alertas.filter((u) => u.alumnoId === alumno.id)
+          for (const u of delAlumno.slice(0, MAX_ALERTAS_ALUMNO)) {
+            avisos.push({
+              texto: `${u.alertas.map((a) => ALERTA[a.tipo].titulo).join(', ')}: ${u.programaNombre} (${u.unidad})`,
+              href: u.tipo === 'rft' ? `/dashboard/programas-rft/${u.programaId}` : `/dashboard/programas/${u.programaId}`,
+            })
+          }
+          if (delAlumno.length > MAX_ALERTAS_ALUMNO)
+            avisos.push({ texto: `y ${delAlumno.length - MAX_ALERTAS_ALUMNO} alertas más`, href: `/dashboard/alumnos/${alumno.id}/pei` })
         }
 
         return (
@@ -140,7 +153,7 @@ export default async function SesionHoy({ supabase, terapeutaId, disena }: { sup
             {avisos.length > 0 && (
               <ul className="space-y-1">
                 {avisos.map((a) => (
-                  <li key={a.texto}>
+                  <li key={`${a.href}-${a.texto}`}>
                     <Link href={a.href} className="block rounded-lg bg-amber-50 px-3 py-1.5 text-sm text-amber-800 hover:bg-amber-100">
                       {a.texto}
                     </Link>

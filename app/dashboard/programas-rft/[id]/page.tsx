@@ -10,6 +10,8 @@ import { avisoPlantilla } from '../../programas/plantilla'
 import { usaRespuestasSinSeleccion } from '../../respuestas-rft'
 import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
+import PanelAlertas from '../../panel-alertas'
+import { cargarAlertas } from '../../cargar-alertas'
 
 const NOMBRE_FASE: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
@@ -187,6 +189,7 @@ export default async function ProgramaRftPage({
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
       {disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
+      {disena && <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} />}
       {infoPanel}
 
       <ProgramaRftClient
