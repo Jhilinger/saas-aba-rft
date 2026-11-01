@@ -5,6 +5,8 @@ import { useCronometroEnsayo } from '../../../../../tomar-datos/cronometro'
 import Figura from '../figuras'
 import BotonLargo from '../../../../../boton-largo'
 import { useEtapasEnsayo } from '../../../../../etapas-ensayo'
+import { decir } from '../../../../../voz'
+import AjustesVoz from '../../../../../ajustes-voz'
 import { esCorrecta, ordenesDeOpciones, type Estimulo, type Paso } from '../guion'
 import { CRITERIO_BLOQUE, MAX_BLOQUES, type Ensayo } from '../logica'
 
@@ -103,13 +105,6 @@ function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
 }
 
-function decir(texto: string) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-  const frase = new SpeechSynthesisUtterance(texto)
-  frase.lang = 'es-ES'
-  window.speechSynthesis.cancel()
-  window.speechSynthesis.speak(frase)
-}
 
 // Un ensayo en pantalla: pausa, opciones y después la muestra (o la voz). Se
 // monta de nuevo en cada ensayo; los toques antes de la muestra no cuentan.
@@ -399,8 +394,9 @@ export default function PantallaAlumno({
               Repetir este ensayo (no se registra)
             </button>
             <button onClick={() => setVoz((v) => !v)} className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left">
-              Voz sintética: {voz ? 'activada' : 'desactivada'}
+              Decir la consigna con voz sintética: {voz ? 'sí' : 'no'}
             </button>
+            <AjustesVoz />
             <button onClick={() => alTerminar({ ensayos, noProcede: false })} className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left">
               Terminar y conservar lo registrado
             </button>

@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { useEtapasEnsayo } from '../../../etapas-ensayo'
+import { decir } from '../../../voz'
+import AjustesVoz from '../../../ajustes-voz'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
@@ -46,13 +48,6 @@ export function urlImagen(imagenes: ImagenesBanco, concepto: string | null, fase
   return ejemplares[ensayo % 2 === 0 ? '1' : '2'] ?? ejemplares['1'] ?? null
 }
 
-function decir(texto: string) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-  const frase = new SpeechSynthesisUtterance(texto)
-  frase.lang = 'es-ES'
-  window.speechSynthesis.cancel()
-  window.speechSynthesis.speak(frase)
-}
 
 function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
@@ -187,6 +182,7 @@ export default function PantallaTablet({
 }) {
   const [ayuda, setAyuda] = useState<string | null>(null)
   const [menuAyuda, setMenuAyuda] = useState(false)
+  const [menuVoz, setMenuVoz] = useState(false)
 
   const responder = (correcto: boolean, respuesta: string | null) => {
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda)
@@ -206,6 +202,9 @@ export default function PantallaTablet({
           <BotonLargo onActivar={() => setMenuAyuda(true)} className="border border-slate-200 !bg-transparent">
             Ayuda
           </BotonLargo>
+          <BotonLargo onActivar={() => setMenuVoz(true)} className="border border-slate-200 !bg-transparent">
+            Voz
+          </BotonLargo>
           <BotonLargo onActivar={onSalir} className="border border-slate-200 !bg-transparent">
             Salir
           </BotonLargo>
@@ -222,6 +221,17 @@ export default function PantallaTablet({
         onResponder={responder}
         onMuestra={onMuestra}
       />
+
+      {menuVoz && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
+          <div className="w-full max-w-sm space-y-2 rounded-2xl bg-white p-4 text-sm">
+            <AjustesVoz />
+            <button onClick={() => setMenuVoz(false)} className="w-full rounded-lg px-3 py-2 text-slate-500">
+              Volver
+            </button>
+          </div>
+        </div>
+      )}
 
       {menuAyuda && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
