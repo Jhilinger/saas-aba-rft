@@ -19,14 +19,14 @@ const PAUSA_ENTRE_ENSAYOS = 700
 
 // Contenido de un estímulo dentro de una tarjeta de lado `lado` (expresión
 // CSS): emoji, figuras y textos se dimensionan como fracción de ese lado
-function Contenido({ estimulo, lado }: { estimulo: Estimulo; lado: string }) {
+function Contenido({ estimulo, lado, imagenes }: { estimulo: Estimulo; lado: string; imagenes: Record<string, string> }) {
   const f = (k: number) => `calc(${lado} * ${k})`
   if ('par' in estimulo) {
     return (
       <span className="flex items-center justify-center" style={{ gap: f(0.05) }}>
         {estimulo.par.map((e, i) => (
           <span key={i} className="flex items-center justify-center rounded-xl bg-slate-50" style={{ width: f(0.46), height: f(0.46) }}>
-            <Contenido estimulo={e} lado={f(0.46)} />
+            <Contenido estimulo={e} lado={f(0.46)} imagenes={imagenes} />
           </span>
         ))}
       </span>
@@ -36,6 +36,26 @@ function Contenido({ estimulo, lado }: { estimulo: Estimulo; lado: string }) {
     return (
       <span className="px-2 text-center text-slate-400" style={{ fontSize: f(0.08) }}>
         {estimulo.externo}
+      </span>
+    )
+  }
+  if ('img' in estimulo) {
+    const url = imagenes[estimulo.img]
+    return (
+      <span className="flex flex-col items-center justify-center" style={{ gap: f(0.03) }}>
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="" draggable={false} className="object-contain" style={{ width: f(estimulo.etiqueta ? 0.68 : 0.88), height: f(estimulo.etiqueta ? 0.68 : 0.88) }} />
+        ) : (
+          <span className="text-slate-400" style={{ fontSize: f(0.08) }}>
+            {estimulo.img}
+          </span>
+        )}
+        {estimulo.etiqueta && (
+          <span className="font-bold text-slate-700" style={{ fontSize: f(0.13) }}>
+            {estimulo.etiqueta}
+          </span>
+        )}
       </span>
     )
   }
@@ -88,11 +108,14 @@ export default function PantallaAlumno({
   pasos,
   alTerminar,
   alCancelar,
+  imagenes,
 }: {
   codigo: string
   pasos: Paso[]
   alTerminar: (resultado: ResultadoPantalla) => void
   alCancelar: () => void
+  // concepto del banco → URL del ejemplar de evaluación
+  imagenes: Record<string, string>
 }) {
   const ordenes = useMemo(() => ordenesDeOpciones(codigo, pasos), [codigo, pasos])
   const elementos = useMemo(() => pasos.map((paso, indice) => ({ paso, indice })), [pasos])
@@ -251,7 +274,7 @@ export default function PantallaAlumno({
                   style={{ width: ladoModelo, height: ladoModelo }}
                   className="flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
                 >
-                  <Contenido estimulo={m} lado={ladoModelo} />
+                  <Contenido estimulo={m} lado={ladoModelo} imagenes={imagenes} />
                 </span>
               ))
             ) : (
@@ -289,7 +312,7 @@ export default function PantallaAlumno({
                     marcada >= 0 ? 'border-indigo-500 ring-4 ring-indigo-200' : 'border-slate-200'
                   }`}
                 >
-                  <Contenido estimulo={p.opciones![i]} lado={ladoOpcion} />
+                  <Contenido estimulo={p.opciones![i]} lado={ladoOpcion} imagenes={imagenes} />
                   {p.respuesta === 'ordenar' && marcada >= 0 && (
                     <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-bold text-white">
                       {marcada + 1}

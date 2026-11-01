@@ -39,9 +39,25 @@ const ESTILO_CATEGORIA = {
   'animales de granja': 'Show the whole body of the animal, standing naturally, preferably seen from the side. No ground, grass, fences or scenery.',
   vehículos: 'Show the whole vehicle from a three-quarter side view. No road, scenery or visible people.',
   'prendas de vestir': 'Show the garment laid flat or on an invisible mannequin, never worn by a person. Paired items are shown as a pair.',
+  'evaluación objetos': 'Animals are shown whole and standing naturally; objects are shown whole.',
+}
+
+// Categorías con personas, acciones o varias piezas: plantilla propia, sin la
+// regla de «un solo objeto, sin personas»
+const PLANTILLA = {
+  'evaluación emociones': (d) =>
+    `A realistic close-up portrait photograph of ${d}. Head and shoulders, facing the camera, on a pure white background. ` +
+    'The emotion must be obvious and unambiguous at a glance. Natural, friendly look. No text, letters or logos. Square composition.',
+  'evaluación escenas': (d) =>
+    `A clear, simple realistic photograph of ${d}. The action must be obvious at a glance; the main subject is large and centered. ` +
+    'Plain, uncluttered light background with only what the scene needs. No text, letters, numbers or logos. Square composition.',
+  'evaluación secuencias': (d) =>
+    `A clear, simple realistic photograph of ${d}, centered on a pure white background, soft even lighting. ` +
+    'Only the elements described. No people except, if needed, a hand. No text, letters, numbers or logos. Square composition.',
 }
 
 function prompt(categoria, descripcion) {
+  if (PLANTILLA[categoria]) return PLANTILLA[categoria](descripcion)
   return `A realistic studio product photograph of ${descripcion}. ${ESTILO_CATEGORIA[categoria] ?? ''} ${ESTILO_COMUN}`
 }
 

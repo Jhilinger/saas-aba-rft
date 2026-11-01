@@ -23,7 +23,15 @@ export default async function AdministracionPage({
 
   if (!evaluacion || evaluacion.alumno_id !== alumnoId) notFound()
 
-  const [items, respuestas] = await Promise.all([cargarItems(supabase), cargarRespuestas(supabase, evaluacionId)])
+  const [items, respuestas, { data: filasImagenes }] = await Promise.all([
+    cargarItems(supabase),
+    cargarRespuestas(supabase, evaluacionId),
+    supabase.from('biblioteca_imagenes').select('concepto, ruta').eq('uso', 'evaluacion'),
+  ])
+  // Imágenes de la evaluación (ejemplar «eval» de cada concepto del banco)
+  const imagenes = Object.fromEntries(
+    (filasImagenes ?? []).map((f) => [f.concepto, supabase.storage.from('biblioteca').getPublicUrl(f.ruta).data.publicUrl])
+  )
 
   return (
     <div className="space-y-4">
@@ -63,6 +71,7 @@ export default async function AdministracionPage({
         }}
         items={items}
         respuestas={respuestas}
+        imagenes={imagenes}
       />
     </div>
   )

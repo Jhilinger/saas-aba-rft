@@ -45,10 +45,13 @@ export default function AdministracionClient({
   evaluacion,
   items,
   respuestas,
+  imagenes,
 }: {
   evaluacion: Evaluacion
   items: ItemEvaluacion[]
   respuestas: RespuestaEvaluacion[]
+  // concepto del banco → URL del ejemplar de evaluación (modo tableta)
+  imagenes: Record<string, string>
 }) {
   const [mapa, setMapa] = useState(() => new Map(respuestas.map((r) => [r.itemId, r])))
   const [nivelInicio, setNivelInicio] = useState(evaluacion.nivelInicio)
@@ -260,6 +263,7 @@ export default function AdministracionClient({
                 requisito={actual.requiereItemId ? porId.get(actual.requiereItemId)?.codigo ?? null : null}
                 modalidad={evaluacion.modalidad}
                 editable={editable}
+                imagenes={imagenes}
                 onGuardado={(r) => {
                   actualizar(r)
                   setSeleccionado(null)
@@ -348,6 +352,7 @@ function FichaItem({
   requisito,
   modalidad,
   editable,
+  imagenes,
   onGuardado,
   onBorrado,
 }: {
@@ -358,6 +363,7 @@ function FichaItem({
   requisito: string | null
   modalidad: 'vocal' | 'no_vocal'
   editable: boolean
+  imagenes: Record<string, string>
   onGuardado: (r: RespuestaEvaluacion) => void
   onBorrado: () => void
 }) {
@@ -483,6 +489,7 @@ function FichaItem({
         <PantallaAlumno
           codigo={item.codigo}
           pasos={pasos}
+          imagenes={imagenes}
           alCancelar={() => setEnTableta(false)}
           alTerminar={(resultado) => {
             setEnTableta(false)

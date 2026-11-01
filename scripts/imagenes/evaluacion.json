@@ -1,0 +1,92 @@
+{
+  "descripcion": "Imágenes exclusivas de la evaluación inicial (ejemplar «eval»), que sustituyen a los emoji de los guiones de tableta. Cada concepto indica el emoji al que reemplaza.",
+  "programas": [
+    {
+      "programa": "Evaluación inicial",
+      "categoria": "evaluación objetos",
+      "grupos": [
+        [
+          { "concepto": "manzana", "emoji": "🍎", "ejemplares": [], "evaluacion": "a shiny red apple with a short stem" },
+          { "concepto": "pez", "emoji": "🐟", "ejemplares": [], "evaluacion": "a small orange fish seen from the side" },
+          { "concepto": "balón", "emoji": "⚽", "ejemplares": [], "evaluacion": "a classic black and white soccer ball" },
+          { "concepto": "paraguas", "emoji": "🌂", "ejemplares": [], "evaluacion": "an open red umbrella" },
+          { "concepto": "llave", "emoji": "🔑", "ejemplares": [], "evaluacion": "a single golden door key" },
+          { "concepto": "tortuga", "emoji": "🐢", "ejemplares": [], "evaluacion": "a small land tortoise seen from the side" },
+          { "concepto": "globo", "emoji": "🎈", "ejemplares": [], "evaluacion": "a single red balloon with a string" },
+          { "concepto": "pato", "emoji": "🦆", "ejemplares": [], "evaluacion": "a brown female mallard duck standing" },
+          { "concepto": "vela", "emoji": "🕯️", "ejemplares": [], "evaluacion": "a single white candle, lit" },
+          { "concepto": "jirafa", "emoji": "🦒", "ejemplares": [], "evaluacion": "a whole giraffe standing, seen from the side" },
+          { "concepto": "silla", "emoji": "🪑", "ejemplares": [], "evaluacion": "a simple wooden chair" },
+          { "concepto": "uvas", "emoji": "🍇", "ejemplares": [], "evaluacion": "a bunch of purple grapes" },
+          { "concepto": "bicicleta", "emoji": "🚲", "ejemplares": [], "evaluacion": "a red bicycle seen from the side" },
+          { "concepto": "girasol", "emoji": "🌻", "ejemplares": [], "evaluacion": "a single sunflower head with a short stem" },
+          { "concepto": "calcetín", "emoji": "🧦", "ejemplares": [], "evaluacion": "a single blue sock" },
+          { "concepto": "cuchara", "emoji": "🥄", "ejemplares": [], "evaluacion": "a single metal spoon" },
+          { "concepto": "vaso", "emoji": "🥛", "ejemplares": [], "evaluacion": "an empty clear drinking glass" },
+          { "concepto": "sol", "emoji": "☀️", "ejemplares": [], "evaluacion": "a bright yellow sun with soft rays, as a simple realistic 3D object" },
+          { "concepto": "búho", "emoji": "🦉", "ejemplares": [], "evaluacion": "a brown owl perched, facing forward" },
+          { "concepto": "rana", "emoji": "🐸", "ejemplares": [], "evaluacion": "a green frog sitting" },
+          { "concepto": "cebra", "emoji": "🦓", "ejemplares": [], "evaluacion": "a whole zebra standing, seen from the side" },
+          { "concepto": "pollito amarillo", "emoji": "🐤", "ejemplares": [], "evaluacion": "a fluffy bright yellow chick facing left" },
+          { "concepto": "pera", "emoji": "🍐", "ejemplares": [], "evaluacion": "a single green pear" },
+          { "concepto": "zanahoria", "emoji": "🥕", "ejemplares": [], "evaluacion": "a single orange carrot with green leaves" },
+          { "concepto": "queso amarillo", "emoji": "🧀", "ejemplares": [], "evaluacion": "a yellow wedge of cheese with holes" },
+          { "concepto": "limón", "emoji": "🍋", "ejemplares": [], "evaluacion": "a single bright yellow lemon" },
+          { "concepto": "taxi", "emoji": "🚕", "ejemplares": [], "evaluacion": "a bright yellow taxi car with no text or logos" },
+          { "concepto": "flor amarilla", "emoji": "🌼", "ejemplares": [], "evaluacion": "a single bright yellow daisy flower" },
+          { "concepto": "martillo", "emoji": "🔨", "ejemplares": [], "evaluacion": "a hammer with a wooden handle" },
+          { "concepto": "libro azul", "emoji": "📘", "ejemplares": [], "evaluacion": "a closed blue hardcover book with no text on the cover" },
+          { "concepto": "frutero", "emoji": "🍎", "etiqueta": "Frutero", "ejemplares": [], "evaluacion": "a fruit bowl full of apples, oranges and bananas" },
+          { "concepto": "caja de juguetes", "emoji": "🧸", "ejemplares": [], "evaluacion": "an open wooden toy box full of toys, with a teddy bear on top" },
+          { "concepto": "armario de ropa", "emoji": "👕", "etiqueta": "Ropa", "ejemplares": [], "evaluacion": "an open wardrobe with folded and hanging clothes" }
+        ]
+      ]
+    },
+    {
+      "programa": "Evaluación inicial",
+      "categoria": "evaluación emociones",
+      "grupos": [
+        [
+          { "concepto": "contento", "emoji": "😀", "ejemplares": [], "evaluacion": "a child smiling broadly, clearly happy" },
+          { "concepto": "triste", "emoji": "😢", "ejemplares": [], "evaluacion": "a child looking clearly sad, with a tear on the cheek" },
+          { "concepto": "enfadado", "emoji": "😠", "ejemplares": [], "evaluacion": "a child looking clearly angry, frowning" },
+          { "concepto": "asustado", "emoji": "😨", "ejemplares": [], "evaluacion": "a child looking clearly scared, with wide open eyes" }
+        ]
+      ]
+    },
+    {
+      "programa": "Evaluación inicial",
+      "categoria": "evaluación escenas",
+      "grupos": [
+        [
+          { "concepto": "perro come", "emoji": "🐕🍖", "ejemplares": [], "evaluacion": "a dog eating from a food bowl" },
+          { "concepto": "perro duerme", "emoji": "🐕💤", "ejemplares": [], "evaluacion": "a dog sleeping curled up on a cushion" },
+          { "concepto": "niño come", "emoji": "👦🍖", "ejemplares": [], "evaluacion": "a young boy sitting at a table eating a plate of food with a spoon" },
+          { "concepto": "mamá duerme", "emoji": "👩💤", "ejemplares": [], "evaluacion": "a woman sleeping in a bed" },
+          { "concepto": "mamá come", "emoji": "👩🍖", "ejemplares": [], "evaluacion": "a woman sitting at a table eating a plate of food" },
+          { "concepto": "gato bebe", "emoji": "🐈🥛", "ejemplares": [], "evaluacion": "a cat drinking milk from a small bowl" },
+          { "concepto": "gato duerme", "emoji": "🐈💤", "ejemplares": [], "evaluacion": "a cat sleeping curled up on a cushion" },
+          { "concepto": "perro bebe", "emoji": "🐕🥛", "ejemplares": [], "evaluacion": "a dog drinking from a water bowl" },
+          { "concepto": "pintura derramada", "emoji": "🎨💦", "ejemplares": [], "evaluacion": "a child looking at a spilled jar of paint on a drawing on the table" },
+          { "concepto": "excursión con lluvia", "emoji": "🌧️", "ejemplares": [], "evaluacion": "children in raincoats on an outing under heavy rain" },
+          { "concepto": "abuelo bromea", "emoji": "👴😄", "ejemplares": [], "evaluacion": "a smiling grandfather playfully hugging a laughing grandchild" },
+          { "concepto": "regalo", "emoji": "🎁", "ejemplares": [], "evaluacion": "a happy child opening a wrapped gift box" }
+        ]
+      ]
+    },
+    {
+      "programa": "Evaluación inicial",
+      "categoria": "evaluación secuencias",
+      "grupos": [
+        [
+          { "concepto": "semilla", "emoji": "🌱", "ejemplares": [], "evaluacion": "a small terracotta pot with soil and a seed being planted in it" },
+          { "concepto": "riego", "emoji": "💧", "ejemplares": [], "evaluacion": "the same small terracotta pot with a tiny green sprout being watered by a small watering can" },
+          { "concepto": "flor", "emoji": "🌷", "ejemplares": [], "evaluacion": "the same small terracotta pot with a blooming red tulip" },
+          { "concepto": "huevo", "emoji": "🥚", "ejemplares": [], "evaluacion": "a single white egg in a small nest of straw" },
+          { "concepto": "huevo rompiéndose", "emoji": "🐣", "ejemplares": [], "evaluacion": "the same egg in the nest cracking open with a chick's beak poking out" },
+          { "concepto": "pollito nacido", "emoji": "🐥", "ejemplares": [], "evaluacion": "a newly hatched yellow chick standing in the same straw nest next to broken eggshell" }
+        ]
+      ]
+    }
+  ]
+}

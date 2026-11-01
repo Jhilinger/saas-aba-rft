@@ -12,6 +12,8 @@
 export type Estimulo =
   | { e: string; etiqueta?: string }
   | { t: string }
+  // Imagen del banco (biblioteca_imagenes), ejemplar de evaluación
+  | { img: string; etiqueta?: string }
   | { color: string }
   // v: variante fija de la figura (ej. familia de forma de las abstractas)
   | { fig: string; s: string; v?: number; etiqueta?: string }
@@ -36,6 +38,7 @@ function esEstimulo(v: unknown): v is Estimulo {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return false
   const o = v as Record<string, unknown>
   if (typeof o.e === 'string' || typeof o.t === 'string' || typeof o.color === 'string' || typeof o.externo === 'string') return true
+  if (typeof o.img === 'string') return true
   if (typeof o.fig === 'string' && typeof o.s === 'string') return true
   return Array.isArray(o.par) && o.par.length === 2 && o.par.every(esEstimulo)
 }
