@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import BotonLargo from '../../../boton-largo'
+import { useEtapasEnsayo } from '../../../etapas-ensayo'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
@@ -25,8 +26,6 @@ const AYUDAS = [
   { value: 'fisica_total', label: 'Física total' },
   { value: 'textual', label: 'Textual' },
 ]
-
-const PAUSA_ENTRE_ENSAYOS = 600
 
 // Nombre entre comillas («"Agua"»): palabra que se dice, no se ve
 export function esOido(e: { nombre: string; concepto_imagen: string | null }) {
@@ -71,6 +70,99 @@ function Tarjeta({ estimulo, url, lado: l }: { estimulo: EstimuloTablet; url: st
   )
 }
 
+// Un ensayo: pausa, comparaciones y después la muestra (se monta de nuevo en
+// cada ensayo). Los toques antes de que aparezca la muestra no cuentan.
+function EnsayoTablet({
+  origen,
+  comparativos,
+  fase,
+  ensayo,
+  imagenes,
+  onResponder,
+  onMuestra,
+}: {
+  origen: EstimuloTablet
+  comparativos: ComparativoTablet[]
+  fase: string
+  ensayo: number
+  imagenes: ImagenesBanco
+  onResponder: (correcto: boolean, respuesta: string | null) => void
+  onMuestra: () => void
+}) {
+  const muestraOida = esOido(origen)
+  const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
+  const etapa = useEtapasEnsayo(!respuestaOral, () => {
+    onMuestra()
+    if (muestraOida) decir(textoOido(origen.nombre))
+  })
+  const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
+  const ladoMuestra = lado(1, respuestaOral ? 44 : 26, 7)
+  const ladoAudio = lado(1, 16, 7)
+  const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
+  const conMuestra = etapa === 'muestra'
+
+  return (
+    <>
+      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${etapa === 'pausa' ? 'invisible' : ''}`}>
+        {/* El recuadro de la muestra ocupa su sitio desde el principio para que las opciones no se muevan */}
+        <div className="flex items-center justify-center rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
+          {muestraOida ? (
+            <button
+              type="button"
+              onClick={() => conMuestra && decir(textoOido(origen.nombre))}
+              style={{ width: ladoAudio, height: ladoAudio }}
+              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${conMuestra ? '' : 'invisible'}`}
+              aria-label="Escuchar de nuevo"
+            >
+              <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
+                🔊
+              </span>
+              <span className="text-slate-500" style={{ fontSize: `calc(${ladoAudio} * 0.1)` }}>
+                Escuchar
+              </span>
+            </button>
+          ) : (
+            <span
+              style={{ width: ladoMuestra, height: ladoMuestra }}
+              className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${conMuestra ? '' : 'invisible'}`}
+            >
+              <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} />
+            </span>
+          )}
+        </div>
+
+        {!respuestaOral && (
+          <>
+            <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>
+            <div className="flex flex-wrap justify-center gap-[2.5vmin]">
+              {comparativos.map((c) => (
+                <button
+                  key={c.claseId}
+                  type="button"
+                  onClick={() => conMuestra && onResponder(c.esCorrecto, textoOido(c.estimulo.nombre))}
+                  style={{ width: ladoOpcion, height: ladoOpcion }}
+                  className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98]"
+                >
+                  <Tarjeta estimulo={c.estimulo} url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)} lado={ladoOpcion} />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
+        {respuestaOral && conMuestra && (
+          <>
+            <BotonLargo onActivar={() => onResponder(true, null)}>✓ Correcto</BotonLargo>
+            <BotonLargo onActivar={() => onResponder(false, null)}>✗ Incorrecto</BotonLargo>
+          </>
+        )}
+      </div>
+    </>
+  )
+}
+
 export default function PantallaTablet({
   origen,
   comparativos,
@@ -79,6 +171,7 @@ export default function PantallaTablet({
   total,
   imagenes,
   onResponder,
+  onMuestra,
   onSalir,
 }: {
   origen: EstimuloTablet
@@ -88,30 +181,17 @@ export default function PantallaTablet({
   total: number
   imagenes: ImagenesBanco
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null) => void
+  // Aparece la muestra: desde aquí se mide la latencia
+  onMuestra: () => void
   onSalir: () => void
 }) {
   const [ayuda, setAyuda] = useState<string | null>(null)
   const [menuAyuda, setMenuAyuda] = useState(false)
-  const [enPausa, setEnPausa] = useState(false)
-
-  const muestraOida = esOido(origen)
-  const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
-  const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
-  const ladoMuestra = lado(1, respuestaOral ? 44 : 26, 7)
-  const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
-
-  // La muestra oída se dice al empezar cada ensayo
-  useEffect(() => {
-    if (muestraOida) decir(textoOido(origen.nombre))
-  }, [muestraOida, origen.nombre, ensayo])
 
   const responder = (correcto: boolean, respuesta: string | null) => {
-    if (enPausa) return
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda)
     onResponder(correcto, correcto && ayuda ? ayuda : 'independiente', respuesta)
     setAyuda(null)
-    setEnPausa(true)
-    setTimeout(() => setEnPausa(false), PAUSA_ENTRE_ENSAYOS)
   }
 
   return (
@@ -132,65 +212,16 @@ export default function PantallaTablet({
         </span>
       </div>
 
-      <div
-        className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 transition-opacity duration-200 ${
-          enPausa ? 'opacity-0' : 'opacity-100'
-        }`}
-      >
-        <div className="flex items-center justify-center rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
-          {muestraOida ? (
-            <button
-              type="button"
-              onClick={() => decir(textoOido(origen.nombre))}
-              style={{ width: lado(1, 16, 7), height: lado(1, 16, 7) }}
-              className="flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
-              aria-label="Escuchar de nuevo"
-            >
-              <span className="leading-none" style={{ fontSize: `calc(${lado(1, 16, 7)} * 0.38)` }}>
-                🔊
-              </span>
-              <span className="text-slate-500" style={{ fontSize: `calc(${lado(1, 16, 7)} * 0.1)` }}>
-                Escuchar
-              </span>
-            </button>
-          ) : (
-            <span
-              style={{ width: ladoMuestra, height: ladoMuestra }}
-              className="flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
-            >
-              <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} />
-            </span>
-          )}
-        </div>
-
-        {!respuestaOral && (
-          <>
-            <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>
-            <div className="flex flex-wrap justify-center gap-[2.5vmin]">
-              {comparativos.map((c) => (
-                <button
-                  key={`${ensayo}-${c.claseId}`}
-                  type="button"
-                  onClick={() => responder(c.esCorrecto, textoOido(c.estimulo.nombre))}
-                  style={{ width: ladoOpcion, height: ladoOpcion }}
-                  className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98]"
-                >
-                  <Tarjeta estimulo={c.estimulo} url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)} lado={ladoOpcion} />
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
-        {respuestaOral && (
-          <>
-            <BotonLargo onActivar={() => responder(true, null)}>✓ Correcto</BotonLargo>
-            <BotonLargo onActivar={() => responder(false, null)}>✗ Incorrecto</BotonLargo>
-          </>
-        )}
-      </div>
+      <EnsayoTablet
+        key={ensayo}
+        origen={origen}
+        comparativos={comparativos}
+        fase={fase}
+        ensayo={ensayo}
+        imagenes={imagenes}
+        onResponder={responder}
+        onMuestra={onMuestra}
+      />
 
       {menuAyuda && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">

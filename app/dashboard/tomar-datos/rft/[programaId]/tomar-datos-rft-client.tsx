@@ -991,6 +991,7 @@ export default function TomarDatosRftClient({
         total={secuencia.length}
         imagenes={imagenes}
         onResponder={(correcto, ayuda, respuestaAlumno) => registrar(correcto, ayuda, undefined, respuestaAlumno)}
+        onMuestra={() => cronometro.reiniciar()}
         onSalir={() => setEnTableta(false)}
       />
     )

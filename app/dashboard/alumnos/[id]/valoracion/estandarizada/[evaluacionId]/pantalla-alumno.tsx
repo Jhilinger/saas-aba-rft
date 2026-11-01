@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useCronometroEnsayo } from '../../../../../tomar-datos/cronometro'
 import Figura from '../figuras'
 import BotonLargo from '../../../../../boton-largo'
+import { useEtapasEnsayo } from '../../../../../etapas-ensayo'
 import { esCorrecta, ordenesDeOpciones, type Estimulo, type Paso } from '../guion'
 import { CRITERIO_BLOQUE, MAX_BLOQUES, type Ensayo } from '../logica'
 
@@ -15,7 +16,6 @@ export type ResultadoPantalla = { ensayos: Ensayo[]; noProcede: boolean }
 
 type Elemento = { paso: Paso; indice: number }
 
-const PAUSA_ENTRE_ENSAYOS = 700
 
 // Contenido de un estímulo dentro de una tarjeta de lado `lado` (expresión
 // CSS): emoji, figuras y textos se dimensionan como fracción de ese lado
@@ -103,6 +103,148 @@ function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
 }
 
+function decir(texto: string) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+  const frase = new SpeechSynthesisUtterance(texto)
+  frase.lang = 'es-ES'
+  window.speechSynthesis.cancel()
+  window.speechSynthesis.speak(frase)
+}
+
+// Un ensayo en pantalla: pausa, opciones y después la muestra (o la voz). Se
+// monta de nuevo en cada ensayo; los toques antes de la muestra no cuentan.
+function Escenario({
+  paso: p,
+  orden,
+  seleccion,
+  imagenes,
+  onTocar,
+  onRegistrar,
+  onSeguir,
+  onMuestra,
+}: {
+  paso: Paso
+  orden: number[]
+  seleccion: number[]
+  imagenes: Record<string, string>
+  onTocar: (indice: number) => void
+  onRegistrar: (correcto: boolean, respuesta?: number | number[]) => void
+  onSeguir: () => void
+  onMuestra: () => void
+}) {
+  const modelos = p.modelo === undefined ? [] : Array.isArray(p.modelo) ? p.modelo : [p.modelo]
+  const puntuaEvaluador = (p.fase === 'test' || p.fase === 'entrenamiento' || p.fase === 'comprobacion') && !p.opciones
+  const nOpciones = p.opciones?.length ?? 0
+  // Cuadrícula de respuesta múltiple: hasta 6 por fila; el resto, todas en una fila
+  const porFila = p.respuesta === 'multiple' ? Math.min(6, Math.ceil(nOpciones / 2)) : nOpciones
+  const ladoOpcion = lado(Math.max(porFila, 2), p.respuesta === 'multiple' ? 22 : 34)
+  // Sin opciones (respuesta oral u otra que puntúa el evaluador) el modelo se ve más grande
+  const ladoModelo = lado(Math.max(modelos.length, 1), modelos.length > 2 ? 20 : nOpciones === 0 ? 44 : 26, 7)
+  const ladoAudio = lado(1, 16, 7)
+  // Sin modelo visible, la muestra es la consigna oída: se puede volver a escuchar
+  const muestraAuditiva = modelos.length === 0 && nOpciones > 0
+  const etapa = useEtapasEnsayo(nOpciones > 0 && p.fase !== 'enunciado', onMuestra)
+  const activo = etapa === 'muestra'
+  // Un solo registro por ensayo aunque lleguen dos toques seguidos
+  const respondido = useRef(false)
+  const registrarUnaVez = (correcto: boolean, respuesta?: number | number[]) => {
+    if (!activo || respondido.current) return
+    respondido.current = true
+    onRegistrar(correcto, respuesta)
+  }
+  const tocar = (i: number) => {
+    if (!activo || respondido.current) return
+    // Respuesta única: el primer toque cierra el ensayo; ordenar, el último
+    if (p.respuesta !== 'multiple' && p.respuesta !== 'ordenar') respondido.current = true
+    if (p.respuesta === 'ordenar' && seleccion.length + 1 === nOpciones && !seleccion.includes(i)) respondido.current = true
+    onTocar(i)
+  }
+
+  return (
+    <>
+      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${etapa === 'pausa' ? 'invisible' : ''}`}>
+        {(modelos.length > 0 || muestraAuditiva) && (
+          <div className="flex flex-wrap items-center justify-center gap-[2.5vmin] rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
+            {modelos.length > 0 ? (
+              modelos.map((m, i) => (
+                <span
+                  key={i}
+                  style={{ width: ladoModelo, height: ladoModelo }}
+                  className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${activo ? '' : 'invisible'}`}
+                >
+                  <Contenido estimulo={m} lado={ladoModelo} imagenes={imagenes} />
+                </span>
+              ))
+            ) : (
+              <button
+                type="button"
+                onClick={() => activo && decir(p.consigna)}
+                style={{ width: ladoAudio, height: ladoAudio }}
+                className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${activo ? '' : 'invisible'}`}
+                aria-label="Escuchar de nuevo"
+              >
+                <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
+                  🔊
+                </span>
+                <span className="text-slate-500" style={{ fontSize: `calc(${ladoAudio} * 0.1)` }}>
+                  Escuchar
+                </span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {p.opciones && (modelos.length > 0 || muestraAuditiva) && <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>}
+
+        {p.opciones && (
+          <div className="flex flex-wrap justify-center gap-[2.5vmin]" style={{ maxWidth: `calc(${porFila} * (${ladoOpcion} + 2.5vmin))` }}>
+            {orden.map((i) => {
+              const marcada = seleccion.indexOf(i)
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => tocar(i)}
+                  style={{ width: ladoOpcion, height: ladoOpcion }}
+                  className={`relative flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                    marcada >= 0 ? 'border-indigo-500 ring-4 ring-indigo-200' : 'border-slate-200'
+                  }`}
+                >
+                  <Contenido estimulo={p.opciones![i]} lado={ladoOpcion} imagenes={imagenes} />
+                  {p.respuesta === 'ordenar' && marcada >= 0 && (
+                    <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-bold text-white">
+                      {marcada + 1}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
+        {p.respuesta === 'multiple' && (
+          <button
+            type="button"
+            onClick={() => registrarUnaVez(esCorrecta(p, seleccion), seleccion)}
+            className={`rounded-2xl bg-slate-700 px-10 py-3 text-xl font-bold text-white ${activo ? '' : 'invisible'}`}
+          >
+            Listo
+          </button>
+        )}
+      </div>
+
+      <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
+        {activo && p.fase === 'enunciado' && <BotonLargo onActivar={onSeguir}>Seguir</BotonLargo>}
+        {activo && puntuaEvaluador && (
+          <>
+            <BotonLargo onActivar={() => registrarUnaVez(true)}>✓ Correcto</BotonLargo>
+            <BotonLargo onActivar={() => registrarUnaVez(false)}>✗ Incorrecto</BotonLargo>
+          </>
+        )}
+      </div>
+    </>
+  )
+}
+
 export default function PantallaAlumno({
   codigo,
   pasos,
@@ -130,22 +272,13 @@ export default function PantallaAlumno({
   const [ensayos, setEnsayos] = useState<Ensayo[]>([])
   const [fallosComprobacion, setFallosComprobacion] = useState(0)
   const [bloques, setBloques] = useState(0)
-  const [enPausa, setEnPausa] = useState(false)
   const [seleccion, setSeleccion] = useState<number[]>([])
   const [menu, setMenu] = useState(false)
   const [voz, setVoz] = useState(false)
   const [paso, setPaso] = useState(0)
-  const cronometro = useCronometroEnsayo(enPausa ? null : paso)
+  const cronometro = useCronometroEnsayo(paso)
 
   const actual = cola[posicion]
-
-  useEffect(() => {
-    if (!voz || enPausa || !actual || typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    const frase = new SpeechSynthesisUtterance(actual.paso.consigna)
-    frase.lang = 'es-ES'
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(frase)
-  }, [voz, enPausa, actual, paso])
 
   // Pasa al siguiente elemento de la cola; al acabar un tramo decide el
   // siguiente (comprobación → entrenamiento por bloques → enunciados y test)
@@ -181,7 +314,7 @@ export default function PantallaAlumno({
   }
 
   const registrar = (correcto: boolean, respuesta?: number | number[]) => {
-    if (!actual || enPausa) return
+    if (!actual) return
     const latenciaMs = cronometro.leer() ?? undefined
     const { fase, control } = actual.paso
     let registrados = ensayos
@@ -196,15 +329,12 @@ export default function PantallaAlumno({
       registrados = [...ensayos, ensayo]
       setEnsayos(registrados)
     }
-    setEnPausa(true)
-    setTimeout(() => {
-      setEnPausa(false)
-      avanzar(registrados, fallos)
-    }, PAUSA_ENTRE_ENSAYOS)
+    // El siguiente ensayo empieza con la pausa (Escenario se monta de nuevo)
+    avanzar(registrados, fallos)
   }
 
   const tocar = (indiceOpcion: number) => {
-    if (!actual || enPausa) return
+    if (!actual) return
     const p = actual.paso
     if (p.respuesta === 'multiple') {
       setSeleccion((s) => (s.includes(indiceOpcion) ? s.filter((i) => i !== indiceOpcion) : [...s, indiceOpcion]))
@@ -228,25 +358,7 @@ export default function PantallaAlumno({
 
   if (!actual) return null
   const p = actual.paso
-  const modelos = p.modelo === undefined ? [] : Array.isArray(p.modelo) ? p.modelo : [p.modelo]
   const orden = ordenes[actual.indice] ?? []
-  const puntuaEvaluador = (p.fase === 'test' || p.fase === 'entrenamiento' || p.fase === 'comprobacion') && !p.opciones
-  const nOpciones = p.opciones?.length ?? 0
-  // Cuadrícula de respuesta múltiple: hasta 6 por fila; el resto, todas en una fila
-  const porFila = p.respuesta === 'multiple' ? Math.min(6, Math.ceil(nOpciones / 2)) : nOpciones
-  const ladoOpcion = lado(Math.max(porFila, 2), p.respuesta === 'multiple' ? 22 : 34)
-  // Sin opciones (respuesta oral u otra que puntúa el evaluador) el modelo se ve más grande
-  const ladoModelo = lado(Math.max(modelos.length, 1), modelos.length > 2 ? 20 : nOpciones === 0 ? 44 : 26, 7)
-  const ladoAudio = lado(1, 16, 7)
-  // Sin modelo visible, la muestra es la consigna oída: se puede volver a escuchar
-  const muestraAuditiva = modelos.length === 0 && nOpciones > 0
-  const escuchar = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    const frase = new SpeechSynthesisUtterance(p.consigna)
-    frase.lang = 'es-ES'
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(frase)
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#F5F2EC] select-none">
@@ -260,89 +372,20 @@ export default function PantallaAlumno({
         </BotonLargo>
       </div>
 
-      <div
-        className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 transition-opacity duration-200 ${
-          enPausa ? 'opacity-0' : 'opacity-100'
-        }`}
-      >
-        {(modelos.length > 0 || muestraAuditiva) && (
-          <div className="flex flex-wrap items-center justify-center gap-[2.5vmin] rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
-            {modelos.length > 0 ? (
-              modelos.map((m, i) => (
-                <span
-                  key={i}
-                  style={{ width: ladoModelo, height: ladoModelo }}
-                  className="flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
-                >
-                  <Contenido estimulo={m} lado={ladoModelo} imagenes={imagenes} />
-                </span>
-              ))
-            ) : (
-              <button
-                type="button"
-                onClick={escuchar}
-                style={{ width: ladoAudio, height: ladoAudio }}
-                className="flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
-                aria-label="Escuchar de nuevo"
-              >
-                <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
-                  🔊
-                </span>
-                <span className="text-slate-500" style={{ fontSize: `calc(${ladoAudio} * 0.1)` }}>
-                  Escuchar
-                </span>
-              </button>
-            )}
-          </div>
-        )}
-
-        {p.opciones && (modelos.length > 0 || muestraAuditiva) && <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>}
-
-        {p.opciones && (
-          <div className="flex flex-wrap justify-center gap-[2.5vmin]" style={{ maxWidth: `calc(${porFila} * (${ladoOpcion} + 2.5vmin))` }}>
-            {orden.map((i) => {
-              const marcada = seleccion.indexOf(i)
-              return (
-                <button
-                  key={`${paso}-${i}`}
-                  type="button"
-                  onClick={() => tocar(i)}
-                  style={{ width: ladoOpcion, height: ladoOpcion }}
-                  className={`relative flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
-                    marcada >= 0 ? 'border-indigo-500 ring-4 ring-indigo-200' : 'border-slate-200'
-                  }`}
-                >
-                  <Contenido estimulo={p.opciones![i]} lado={ladoOpcion} imagenes={imagenes} />
-                  {p.respuesta === 'ordenar' && marcada >= 0 && (
-                    <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-bold text-white">
-                      {marcada + 1}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        )}
-        {p.respuesta === 'multiple' && (
-          <button
-            type="button"
-            onClick={() => registrar(esCorrecta(p, seleccion), seleccion)}
-            className="rounded-2xl bg-slate-700 px-10 py-3 text-xl font-bold text-white"
-          >
-            Listo
-          </button>
-        )}
-      </div>
-
-      <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
-        {p.fase === 'enunciado' && <BotonLargo onActivar={() => avanzar(ensayos, fallosComprobacion)}>Seguir</BotonLargo>}
-        {puntuaEvaluador && (
-          <>
-            <BotonLargo onActivar={() => registrar(true)}>✓ Correcto</BotonLargo>
-            <BotonLargo onActivar={() => registrar(false)}>✗ Incorrecto</BotonLargo>
-          </>
-        )}
-      </div>
+      <Escenario
+        key={paso}
+        paso={p}
+        orden={orden}
+        seleccion={seleccion}
+        imagenes={imagenes}
+        onTocar={tocar}
+        onRegistrar={registrar}
+        onSeguir={() => avanzar(ensayos, fallosComprobacion)}
+        onMuestra={() => {
+          cronometro.reiniciar()
+          if (voz) decir(p.consigna)
+        }}
+      />
 
       {menu && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
