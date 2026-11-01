@@ -1,11 +1,11 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCronometroEnsayo } from '../../../../../tomar-datos/cronometro'
 import Figura from '../figuras'
 import BotonLargo from '../../../../../boton-largo'
 import { useEtapasEnsayo } from '../../../../../etapas-ensayo'
-import { decir } from '../../../../../voz'
+import { decirConsigna, desbloquearAudio, precargarConsigna } from '../../../../../voz'
 import AjustesVoz from '../../../../../ajustes-voz'
 import { esCorrecta, ordenesDeOpciones, type Estimulo, type Paso } from '../guion'
 import { CRITERIO_BLOQUE, MAX_BLOQUES, type Ensayo } from '../logica'
@@ -113,6 +113,7 @@ function Escenario({
   orden,
   seleccion,
   imagenes,
+  voz,
   onTocar,
   onRegistrar,
   onSeguir,
@@ -122,6 +123,7 @@ function Escenario({
   orden: number[]
   seleccion: number[]
   imagenes: Record<string, string>
+  voz: boolean
   onTocar: (indice: number) => void
   onRegistrar: (correcto: boolean, respuesta?: number | number[]) => void
   onSeguir: () => void
@@ -138,7 +140,14 @@ function Escenario({
   const ladoAudio = lado(1, 16, 7)
   // Sin modelo visible, la muestra es la consigna oída: se puede volver a escuchar
   const muestraAuditiva = modelos.length === 0 && nOpciones > 0
-  const etapa = useEtapasEnsayo(nOpciones > 0 && p.fase !== 'enunciado', onMuestra)
+  // La grabación se descarga durante la pausa para que suene con la muestra
+  useEffect(() => {
+    if (voz || muestraAuditiva) void precargarConsigna(p.consigna)
+  }, [voz, muestraAuditiva, p.consigna])
+  const etapa = useEtapasEnsayo(nOpciones > 0 && p.fase !== 'enunciado', () => {
+    onMuestra()
+    if (voz) void decirConsigna(p.consigna)
+  })
   const activo = etapa === 'muestra'
   // Un solo registro por ensayo aunque lleguen dos toques seguidos
   const respondido = useRef(false)
@@ -173,7 +182,11 @@ function Escenario({
             ) : (
               <button
                 type="button"
-                onClick={() => activo && decir(p.consigna)}
+                onClick={() => {
+                  if (!activo) return
+                  desbloquearAudio()
+                  void decirConsigna(p.consigna)
+                }}
                 style={{ width: ladoAudio, height: ladoAudio }}
                 className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${activo ? '' : 'invisible'}`}
                 aria-label="Escuchar de nuevo"
@@ -373,13 +386,11 @@ export default function PantallaAlumno({
         orden={orden}
         seleccion={seleccion}
         imagenes={imagenes}
+        voz={voz}
         onTocar={tocar}
         onRegistrar={registrar}
         onSeguir={() => avanzar(ensayos, fallosComprobacion)}
-        onMuestra={() => {
-          cronometro.reiniciar()
-          if (voz) decir(p.consigna)
-        }}
+        onMuestra={() => cronometro.reiniciar()}
       />
 
       {menu && (
@@ -393,9 +404,19 @@ export default function PantallaAlumno({
             <button onClick={repetir} className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left">
               Repetir este ensayo (no se registra)
             </button>
-            <button onClick={() => setVoz((v) => !v)} className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left">
-              Decir la consigna con voz sintética: {voz ? 'sí' : 'no'}
+            <button
+              onClick={() => {
+                desbloquearAudio()
+                setVoz((v) => !v)
+              }}
+              className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left"
+            >
+              Decir la consigna en voz alta: {voz ? 'sí' : 'no'}
             </button>
+            <p className="px-1 text-[11px] text-slate-500">
+              Suena la grabación de la consigna, igual para todos los alumnos. La voz del dispositivo solo se usa si una consigna no
+              está grabada.
+            </p>
             <AjustesVoz />
             <button onClick={() => alTerminar({ ensayos, noProcede: false })} className="w-full rounded-lg bg-slate-100 px-3 py-2 text-left">
               Terminar y conservar lo registrado
