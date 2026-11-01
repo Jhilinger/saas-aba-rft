@@ -17,36 +17,70 @@ type Elemento = { paso: Paso; indice: number }
 const PAUSA_ENTRE_ENSAYOS = 700
 const PULSACION_LARGA = 600
 
-function EstimuloVista({ estimulo, grande = false }: { estimulo: Estimulo; grande?: boolean }) {
-  const tam = grande ? 'h-36 w-36 sm:h-44 sm:w-44' : 'h-24 w-24 sm:h-32 sm:w-32'
+// Contenido de un estímulo dentro de una tarjeta de lado `lado` (expresión
+// CSS): emoji, figuras y textos se dimensionan como fracción de ese lado
+function Contenido({ estimulo, lado }: { estimulo: Estimulo; lado: string }) {
+  const f = (k: number) => `calc(${lado} * ${k})`
   if ('par' in estimulo) {
     return (
-      <span className="flex gap-2">
-        <EstimuloVista estimulo={estimulo.par[0]} />
-        <EstimuloVista estimulo={estimulo.par[1]} />
+      <span className="flex items-center justify-center" style={{ gap: f(0.05) }}>
+        {estimulo.par.map((e, i) => (
+          <span key={i} className="flex items-center justify-center rounded-xl bg-slate-50" style={{ width: f(0.46), height: f(0.46) }}>
+            <Contenido estimulo={e} lado={f(0.46)} />
+          </span>
+        ))}
       </span>
     )
   }
-  if ('externo' in estimulo) return <span className="text-xs text-slate-300">{estimulo.externo}</span>
-  if ('color' in estimulo) return <span className={`block rounded-2xl ${tam}`} style={{ backgroundColor: estimulo.color }} />
+  if ('externo' in estimulo) {
+    return (
+      <span className="px-2 text-center text-slate-400" style={{ fontSize: f(0.08) }}>
+        {estimulo.externo}
+      </span>
+    )
+  }
+  if ('color' in estimulo) {
+    return <span className="block rounded-2xl" style={{ width: f(0.8), height: f(0.8), backgroundColor: estimulo.color }} />
+  }
   if ('t' in estimulo) {
     return (
-      <span className="flex min-h-20 min-w-32 items-center justify-center rounded-2xl border-2 border-slate-300 bg-white px-5 py-3 text-center text-2xl font-bold tracking-wide text-slate-800 sm:text-3xl">
+      <span
+        className="text-center font-serif font-bold leading-tight text-slate-800"
+        style={{ fontSize: f(estimulo.t.length > 12 ? 0.11 : estimulo.t.length > 7 ? 0.15 : 0.2), padding: `0 ${f(0.06)}` }}
+      >
         {estimulo.t}
       </span>
     )
   }
   const etiqueta = 'etiqueta' in estimulo ? estimulo.etiqueta : undefined
   return (
-    <span className="flex flex-col items-center gap-1">
+    <span className="flex flex-col items-center justify-center" style={{ gap: f(0.03) }}>
       {'e' in estimulo ? (
-        <span className={`flex items-center justify-center leading-none ${grande ? 'text-8xl sm:text-9xl' : 'text-6xl sm:text-7xl'}`}>{estimulo.e}</span>
+        <span className="whitespace-nowrap leading-none" style={{ fontSize: f((etiqueta ? 0.46 : 0.6) / Math.max(1, numGrafemas(estimulo.e) * 0.85)) }}>
+          {estimulo.e}
+        </span>
       ) : (
-        <Figura tipo={estimulo.fig} semilla={estimulo.s} variante={estimulo.v} className={tam} />
+        <span style={{ width: f(etiqueta ? 0.66 : 0.82), height: f(etiqueta ? 0.66 : 0.82) }}>
+          <Figura tipo={estimulo.fig} semilla={estimulo.s} variante={estimulo.v} className="h-full w-full" />
+        </span>
       )}
-      {etiqueta && <span className="text-xl font-bold text-slate-700">{etiqueta}</span>}
+      {etiqueta && (
+        <span className="font-bold text-slate-700" style={{ fontSize: f(0.13) }}>
+          {etiqueta}
+        </span>
+      )}
     </span>
   )
+}
+
+// Emoji que forman el texto (🐕🍖 son 2): se reparten el ancho de la tarjeta
+function numGrafemas(texto: string) {
+  return [...new Intl.Segmenter('es', { granularity: 'grapheme' }).segment(texto)].length
+}
+
+// Lado de una tarjeta para que quepan `n` por fila sin desbordar la pantalla
+function lado(n: number, maxVh: number, margenRem = 4) {
+  return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
 }
 
 function BotonLargo({ children, onActivar, className = '' }: { children: React.ReactNode; onActivar: () => void; className?: string }) {
@@ -202,28 +236,75 @@ export default function PantallaAlumno({
   const modelos = p.modelo === undefined ? [] : Array.isArray(p.modelo) ? p.modelo : [p.modelo]
   const orden = ordenes[actual.indice] ?? []
   const puntuaEvaluador = (p.fase === 'test' || p.fase === 'entrenamiento' || p.fase === 'comprobacion') && !p.opciones
-  const grid = p.respuesta === 'multiple' ? 'grid-cols-3 sm:grid-cols-4' : (p.opciones?.length ?? 0) > 3 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3'
+  const nOpciones = p.opciones?.length ?? 0
+  // Cuadrícula de respuesta múltiple: hasta 6 por fila; el resto, todas en una fila
+  const porFila = p.respuesta === 'multiple' ? Math.min(6, Math.ceil(nOpciones / 2)) : nOpciones
+  const ladoOpcion = lado(Math.max(porFila, 2), p.respuesta === 'multiple' ? 22 : 34)
+  // Sin opciones (respuesta oral u otra que puntúa el evaluador) el modelo se ve más grande
+  const ladoModelo = lado(Math.max(modelos.length, 1), modelos.length > 2 ? 20 : nOpciones === 0 ? 44 : 26, 7)
+  const ladoAudio = lado(1, 16, 7)
+  // Sin modelo visible, la muestra es la consigna oída: se puede volver a escuchar
+  const muestraAuditiva = modelos.length === 0 && nOpciones > 0
+  const escuchar = () => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+    const frase = new SpeechSynthesisUtterance(p.consigna)
+    frase.lang = 'es-ES'
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(frase)
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
-      <div className="flex items-start justify-between gap-2 p-2">
-        <p className="max-w-[75%] text-xs text-slate-300">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#F5F2EC] select-none">
+      <div className="flex items-start justify-between gap-2 px-3 pt-2">
+        <p className="max-w-[75%] text-[11px] text-slate-300">
           {p.fase === 'enunciado' ? 'Enunciado' : p.fase === 'entrenamiento' ? `Entrenamiento · bloque ${bloques + 1}` : p.fase === 'comprobacion' ? 'Comprobación' : 'Test'}
-          {p.control && ' · control'} · {p.consigna}
+          {p.control && ' · control'} · {posicion + 1}/{cola.length} · {p.consigna}
         </p>
-        <BotonLargo onActivar={() => setMenu(true)}>Evaluador</BotonLargo>
+        <BotonLargo onActivar={() => setMenu(true)} className="!bg-transparent border border-slate-200">
+          Evaluador
+        </BotonLargo>
       </div>
 
-      <div className={`flex flex-1 flex-col items-center justify-center gap-8 overflow-y-auto p-4 transition-opacity ${enPausa ? 'opacity-0' : 'opacity-100'}`}>
-        {modelos.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {modelos.map((m, i) => (
-              <EstimuloVista key={i} estimulo={m} grande={modelos.length === 1 && !p.opciones?.length} />
-            ))}
+      <div
+        className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 transition-opacity duration-200 ${
+          enPausa ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        {(modelos.length > 0 || muestraAuditiva) && (
+          <div className="flex flex-wrap items-center justify-center gap-[2.5vmin] rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
+            {modelos.length > 0 ? (
+              modelos.map((m, i) => (
+                <span
+                  key={i}
+                  style={{ width: ladoModelo, height: ladoModelo }}
+                  className="flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
+                >
+                  <Contenido estimulo={m} lado={ladoModelo} />
+                </span>
+              ))
+            ) : (
+              <button
+                type="button"
+                onClick={escuchar}
+                style={{ width: ladoAudio, height: ladoAudio }}
+                className="flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white"
+                aria-label="Escuchar de nuevo"
+              >
+                <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
+                  🔊
+                </span>
+                <span className="text-slate-500" style={{ fontSize: `calc(${ladoAudio} * 0.1)` }}>
+                  Escuchar
+                </span>
+              </button>
+            )}
           </div>
         )}
+
+        {p.opciones && (modelos.length > 0 || muestraAuditiva) && <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>}
+
         {p.opciones && (
-          <div className={`grid w-full max-w-4xl gap-4 ${grid}`}>
+          <div className="flex flex-wrap justify-center gap-[2.5vmin]" style={{ maxWidth: `calc(${porFila} * (${ladoOpcion} + 2.5vmin))` }}>
             {orden.map((i) => {
               const marcada = seleccion.indexOf(i)
               return (
@@ -231,13 +312,14 @@ export default function PantallaAlumno({
                   key={`${paso}-${i}`}
                   type="button"
                   onClick={() => tocar(i)}
-                  className={`relative flex min-h-32 items-center justify-center rounded-2xl border-2 p-3 ${
-                    marcada >= 0 ? 'border-slate-400 bg-slate-50' : 'border-transparent'
+                  style={{ width: ladoOpcion, height: ladoOpcion }}
+                  className={`relative flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                    marcada >= 0 ? 'border-indigo-500 ring-4 ring-indigo-200' : 'border-slate-200'
                   }`}
                 >
-                  <EstimuloVista estimulo={p.opciones![i]} />
+                  <Contenido estimulo={p.opciones![i]} lado={ladoOpcion} />
                   {p.respuesta === 'ordenar' && marcada >= 0 && (
-                    <span className="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-500 text-sm font-bold text-white">
+                    <span className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-base font-bold text-white">
                       {marcada + 1}
                     </span>
                   )}
@@ -250,14 +332,14 @@ export default function PantallaAlumno({
           <button
             type="button"
             onClick={() => registrar(esCorrecta(p, seleccion), seleccion)}
-            className="rounded-2xl bg-slate-700 px-10 py-4 text-xl font-bold text-white"
+            className="rounded-2xl bg-slate-700 px-10 py-3 text-xl font-bold text-white"
           >
             Listo
           </button>
         )}
       </div>
 
-      <div className="flex justify-end gap-2 p-2">
+      <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
         {p.fase === 'enunciado' && <BotonLargo onActivar={() => avanzar(ensayos, fallosComprobacion)}>Seguir</BotonLargo>}
         {puntuaEvaluador && (
           <>
