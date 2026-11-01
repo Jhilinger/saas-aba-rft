@@ -147,7 +147,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
   } else if (base.tipo === 'rft') {
     const { data: clasesBase } = await supabase
       .from('clases_rft_base')
-      .select('id, nombre, grupo, orden, respuestas_esperadas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen)')
+      .select('id, nombre, grupo, orden, respuestas_esperadas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
       .eq('programa_base_id', programaBaseId)
       .order('orden')
 
@@ -172,6 +172,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
             nombre: e.nombre,
             posicion: e.posicion,
             concepto_imagen: e.concepto_imagen,
+            pantalla: e.pantalla,
           }))
         )
       }

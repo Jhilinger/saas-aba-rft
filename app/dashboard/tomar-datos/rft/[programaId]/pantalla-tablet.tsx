@@ -6,6 +6,8 @@ import { useEtapasEnsayo } from '../../../etapas-ensayo'
 import { decir } from '../../../voz'
 import AjustesVoz from '../../../ajustes-voz'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
+import ContenidoEstimulo from '../../../contenido-estimulo'
+import { parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
 // las comparaciones en tarjetas. El toque del alumno registra el ensayo; el
@@ -13,7 +15,8 @@ import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rf
 // mantener pulsados. Si las comparaciones son palabras que el alumno dice (ej.
 // test B→A), la pantalla solo muestra la muestra y el terapeuta puntúa.
 
-export type EstimuloTablet = { id: string; nombre: string; concepto_imagen: string | null }
+// pantalla: columna jsonb (texto, figura SVG, n imágenes…); se valida al pintar
+export type EstimuloTablet = { id: string; nombre: string; concepto_imagen: string | null; pantalla: unknown }
 export type ComparativoTablet = { claseId: string; estimulo: EstimuloTablet; esCorrecto: boolean }
 // concepto → ejemplar → URL pública
 export type ImagenesBanco = Record<string, Record<string, string>>
@@ -30,8 +33,13 @@ const AYUDAS = [
 ]
 
 // Nombre entre comillas («"Agua"»): palabra que se dice, no se ve
-export function esOido(e: { nombre: string; concepto_imagen: string | null }) {
-  return !e.concepto_imagen && /^["“«].*["”»]$/.test(e.nombre.trim())
+export function esOido(e: { nombre: string; concepto_imagen: string | null; pantalla: unknown }) {
+  return !esVisible(e) && /^["“«].*["”»]$/.test(e.nombre.trim())
+}
+
+// Se ve en la pantalla: foto del banco o presentación propia (texto, figura…)
+export function esVisible(e: { concepto_imagen: string | null; pantalla: unknown }) {
+  return !!e.concepto_imagen || parsearEstimuloPantalla(e.pantalla) !== null
 }
 
 function textoOido(nombre: string) {
@@ -53,7 +61,19 @@ function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
 }
 
-function Tarjeta({ estimulo, url, lado: l }: { estimulo: EstimuloTablet; url: string | null; lado: string }) {
+function Tarjeta({
+  estimulo,
+  url,
+  lado: l,
+  urlConcepto,
+}: {
+  estimulo: EstimuloTablet
+  url: string | null
+  lado: string
+  urlConcepto: (concepto: string) => string | null
+}) {
+  const pantalla = parsearEstimuloPantalla(estimulo.pantalla)
+  if (pantalla) return <ContenidoEstimulo estimulo={pantalla} lado={l} urlImagen={urlConcepto} />
   if (url) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={url} alt="" draggable={false} className="h-[88%] w-[88%] object-contain" />
@@ -94,6 +114,7 @@ function EnsayoTablet({
   const ladoMuestra = lado(1, respuestaOral ? 44 : 26, 7)
   const ladoAudio = lado(1, 16, 7)
   const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
+  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
   const conMuestra = etapa === 'muestra'
 
   return (
@@ -121,7 +142,7 @@ function EnsayoTablet({
               style={{ width: ladoMuestra, height: ladoMuestra }}
               className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${conMuestra ? '' : 'invisible'}`}
             >
-              <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} />
+              <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} urlConcepto={urlConcepto} />
             </span>
           )}
         </div>
@@ -138,7 +159,12 @@ function EnsayoTablet({
                   style={{ width: ladoOpcion, height: ladoOpcion }}
                   className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98]"
                 >
-                  <Tarjeta estimulo={c.estimulo} url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)} lado={ladoOpcion} />
+                  <Tarjeta
+                    estimulo={c.estimulo}
+                    url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                    lado={ladoOpcion}
+                    urlConcepto={urlConcepto}
+                  />
                 </button>
               ))}
             </div>

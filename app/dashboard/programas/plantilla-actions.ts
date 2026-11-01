@@ -64,6 +64,7 @@ export async function actualizarDesdePlantilla(
             nombre: e.nombre,
             posicion: e.posicion,
             concepto_imagen: e.concepto_imagen,
+            pantalla: e.pantalla,
           }))
         )
         if (estimulosError) return { error: estimulosError.message }

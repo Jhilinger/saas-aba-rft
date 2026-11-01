@@ -1,7 +1,9 @@
-import { aleatorio } from './guion'
+import { aleatorio } from './aleatorio'
 
-// Figuras generadas a partir de una semilla: siempre iguales, exclusivas de la
-// evaluación y sin depender de un banco de ilustraciones. viewBox 100×100.
+// Figuras generadas a partir de una semilla: siempre iguales y sin depender
+// de un banco de ilustraciones. Las usan la evaluación y la tableta RFT; las
+// de intervención llevan semillas con prefijo «rft-» para no coincidir nunca
+// con las de la evaluación. viewBox 100×100.
 
 const TONOS = [12, 35, 55, 95, 160, 195, 220, 265, 300, 335]
 
@@ -14,14 +16,16 @@ function poligono(rnd: () => number, cx: number, cy: number, r: number, lados: n
   return puntos.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ')
 }
 
-// familia: 0 polígono, 1 estrella, 2 contorno redondeado (al azar si no se fija)
-function Abstracta({ rnd, familia: fija }: { rnd: () => number; familia?: number }) {
+// familia: 0 polígono, 1 estrella, 2 contorno redondeado (al azar si no se fija);
+// tono: índice de TONOS (sin él, el añil de la evaluación)
+function Abstracta({ rnd, familia: fija, tono }: { rnd: () => number; familia?: number; tono?: number }) {
+  const relleno = tono === undefined ? '#4F46E5' : `hsl(${TONOS[tono % TONOS.length]} 60% 48%)`
   const azar = Math.floor(rnd() * 3)
   const familia = fija === undefined ? azar : fija % 3
   const lados = 5 + Math.floor(rnd() * 5)
   const conHueco = rnd() > 0.5
   let forma: React.ReactNode
-  if (familia === 0) forma = <polygon points={poligono(rnd, 50, 50, 42, lados, 0.55)} fill="#4F46E5" />
+  if (familia === 0) forma = <polygon points={poligono(rnd, 50, 50, 42, lados, 0.55)} fill={relleno} />
   else if (familia === 1) {
     // Estrella irregular: radios alternos
     const puntos = Array.from({ length: lados * 2 }, (_, i) => {
@@ -29,7 +33,7 @@ function Abstracta({ rnd, familia: fija }: { rnd: () => number; familia?: number
       const radio = i % 2 === 0 ? 40 + rnd() * 6 : 14 + rnd() * 12
       return `${(50 + Math.cos(angulo) * radio).toFixed(1)},${(50 + Math.sin(angulo) * radio).toFixed(1)}`
     })
-    forma = <polygon points={puntos.join(' ')} fill="#4F46E5" />
+    forma = <polygon points={puntos.join(' ')} fill={relleno} />
   } else {
     // Contorno redondeado con curvas entre puntos medios
     const puntos = Array.from({ length: lados }, (_, i) => {
@@ -43,7 +47,7 @@ function Abstracta({ rnd, familia: fija }: { rnd: () => number; familia?: number
       return `${((x1 + x2) / 2).toFixed(1)},${((y1 + y2) / 2).toFixed(1)}`
     }
     const d = `M${medio(lados - 1)} ` + puntos.map(([x, y], i) => `Q${x.toFixed(1)},${y.toFixed(1)} ${medio(i)}`).join(' ') + ' Z'
-    forma = <path d={d} fill="#4F46E5" />
+    forma = <path d={d} fill={relleno} />
   }
   return (
     <>
@@ -155,6 +159,27 @@ function Objeto({ rnd }: { rnd: () => number }) {
   )
 }
 
+// Figuras geométricas con nombre (la semilla es el nombre): mismo color y
+// tamaño parecido, para que solo cambie la forma
+const GEOMETRICAS: Record<string, React.ReactNode> = {
+  circulo: <circle cx={50} cy={50} r={38} />,
+  cuadrado: <rect x={16} y={16} width={68} height={68} />,
+  triangulo: <polygon points="50,10 90,84 10,84" />,
+  rectangulo: <rect x={8} y={28} width={84} height={44} />,
+  rombo: <polygon points="50,6 88,50 50,94 12,50" />,
+  ovalo: <ellipse cx={50} cy={50} rx={42} ry={28} />,
+  pentagono: <polygon points="50,8 90,38 75,88 25,88 10,38" />,
+  hexagono: <polygon points="28,12 72,12 94,50 72,88 28,88 6,50" />,
+  estrella: <polygon points="50,6 61,38 95,38 67,58 78,92 50,71 22,92 33,58 5,38 39,38" />,
+  corazon: <path d="M50,88 C14,62 6,40 18,24 C30,10 46,16 50,30 C54,16 70,10 82,24 C94,40 86,62 50,88 Z" />,
+  semicirculo: <path d="M8,66 A42,42 0 0 1 92,66 Z" />,
+  cruz: <polygon points="36,8 64,8 64,36 92,36 92,64 64,64 64,92 36,92 36,64 8,64 8,36 36,36" />,
+}
+
+function Geometrica({ nombre }: { nombre: string }) {
+  return <g fill="#4F46E5">{GEOMETRICAS[nombre] ?? GEOMETRICAS.circulo}</g>
+}
+
 function Personaje() {
   return (
     <g fill="#64748B">
@@ -170,21 +195,24 @@ export default function Figura({
   tipo,
   semilla,
   variante,
+  tono,
   className = '',
 }: {
   tipo: string
   semilla: string
   variante?: number
+  tono?: number
   className?: string
 }) {
   const rnd = aleatorio(`${tipo}:${semilla}`)
   return (
     <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
-      {tipo === 'abstracta' && <Abstracta rnd={rnd} familia={variante} />}
+      {tipo === 'abstracta' && <Abstracta rnd={rnd} familia={variante} tono={tono} />}
       {tipo === 'simbolo' && <Simbolo rnd={rnd} />}
       {tipo === 'criatura' && <Criatura rnd={rnd} />}
       {tipo === 'objeto' && <Objeto rnd={rnd} />}
       {tipo === 'personaje' && <Personaje />}
+      {tipo === 'geometrica' && <Geometrica nombre={semilla} />}
     </svg>
   )
 }

@@ -20,11 +20,11 @@ import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronome
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
-import PantallaTablet, { esOido, type ImagenesBanco } from './pantalla-tablet'
+import PantallaTablet, { esOido, esVisible, type ImagenesBanco } from './pantalla-tablet'
 import AyudaTermino from '../../../ayuda-termino'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
-type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
+type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla: unknown }
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
@@ -517,7 +517,7 @@ export default function TomarDatosRftClient({
     const validas = clasesCon(grupo, origen, destino)
     if (validas.length < 2) return false
     const estimulos = validas.flatMap((c) => [encontrarEstimulo(c, origen)!, encontrarEstimulo(c, destino)!])
-    return estimulos.every((e) => e.concepto_imagen || esOido(e)) && estimulos.some((e) => e.concepto_imagen)
+    return estimulos.every((e) => esVisible(e) || esOido(e)) && estimulos.some(esVisible)
   }
   const modoPara = (grupo: string, origen: string, destino: string, faseBloque: string) =>
     modo === 'tableta' && tabletaPosible(grupo, origen, destino, faseBloque) ? 'tableta' : 'material'

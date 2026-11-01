@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosRftClient from './tomar-datos-rft-client'
+import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 
 export default async function TomarDatosRftPage({
   params,
@@ -47,15 +48,19 @@ export default async function TomarDatosRftPage({
 
   const { data: clases } = await supabase
     .from('clases_rft')
-    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft(id, nombre, posicion, concepto_imagen)')
+    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft(id, nombre, posicion, concepto_imagen, pantalla)')
     .eq('programa_alumno_id', programaId)
     .order('grupo')
     .order('created_at')
 
   // Imágenes del banco de los conceptos que usan las clases (para la tableta)
   const conceptos = [
-    ...new Set((clases ?? []).flatMap((c) => c.estimulos_rft.map((e) => e.concepto_imagen).filter((x): x is string => !!x))),
-  ]
+    ...new Set(
+      (clases ?? []).flatMap((c) =>
+        c.estimulos_rft.flatMap((e) => [e.concepto_imagen, conceptosDePantalla(parsearEstimuloPantalla(e.pantalla))].flat())
+      )
+    ),
+  ].filter((x): x is string => !!x)
   const { data: filasImagenes } = conceptos.length
     ? await supabase.from('biblioteca_imagenes').select('concepto, ejemplar, ruta').in('concepto', conceptos)
     : { data: [] }

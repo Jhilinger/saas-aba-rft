@@ -9,16 +9,10 @@
 // opciones vienen en el orden correcto y se barajan. Sin opciones, el ensayo
 // lo puntúa el evaluador.
 
-export type Estimulo =
-  | { e: string; etiqueta?: string }
-  | { t: string }
-  // Imagen del banco (biblioteca_imagenes), ejemplar de evaluación
-  | { img: string; etiqueta?: string }
-  | { color: string }
-  // v: variante fija de la figura (ej. familia de forma de las abstractas)
-  | { fig: string; s: string; v?: number; etiqueta?: string }
-  | { externo: string }
-  | { par: [Estimulo, Estimulo] }
+import { aleatorio } from '../../../../aleatorio'
+import { esEstimulo, type EstimuloPantalla as Estimulo } from '../../../../estimulo-pantalla'
+
+export type { Estimulo }
 
 export type FasePaso = 'enunciado' | 'comprobacion' | 'entrenamiento' | 'test'
 
@@ -32,15 +26,6 @@ export type Paso = {
   correctas?: number[]
   control?: boolean
   variante?: 'vocal' | 'no_vocal'
-}
-
-function esEstimulo(v: unknown): v is Estimulo {
-  if (!v || typeof v !== 'object' || Array.isArray(v)) return false
-  const o = v as Record<string, unknown>
-  if (typeof o.e === 'string' || typeof o.t === 'string' || typeof o.color === 'string' || typeof o.externo === 'string') return true
-  if (typeof o.img === 'string') return true
-  if (typeof o.fig === 'string' && typeof o.s === 'string') return true
-  return Array.isArray(o.par) && o.par.length === 2 && o.par.every(esEstimulo)
 }
 
 const FASES: FasePaso[] = ['enunciado', 'comprobacion', 'entrenamiento', 'test']
@@ -72,22 +57,6 @@ export function parsearGuion(valor: unknown): Paso[] {
 
 export function pasosParaModalidad(pasos: Paso[], modalidad: 'vocal' | 'no_vocal') {
   return pasos.filter((p) => !p.variante || p.variante === modalidad)
-}
-
-// Generador pseudoaleatorio con semilla (mulberry32 sobre un hash del texto)
-export function aleatorio(semilla: string) {
-  let h = 1779033703 ^ semilla.length
-  for (let i = 0; i < semilla.length; i++) {
-    h = Math.imul(h ^ semilla.charCodeAt(i), 3432918353)
-    h = (h << 13) | (h >>> 19)
-  }
-  let a = h >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) | 0
-    let t = Math.imul(a ^ (a >>> 15), 1 | a)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
 }
 
 function barajar<T>(xs: T[], rnd: () => number) {

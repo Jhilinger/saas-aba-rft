@@ -1094,6 +1094,7 @@ export type Database = {
           id: string
           nombre: string
           orden: number
+          pantalla: Json | null
           posicion: string | null
         }
         Insert: {
@@ -1104,6 +1105,7 @@ export type Database = {
           id?: string
           nombre: string
           orden?: number
+          pantalla?: Json | null
           posicion?: string | null
         }
         Update: {
@@ -1114,6 +1116,7 @@ export type Database = {
           id?: string
           nombre?: string
           orden?: number
+          pantalla?: Json | null
           posicion?: string | null
         }
         Relationships: [
@@ -1134,6 +1137,7 @@ export type Database = {
           id: string
           nombre: string
           orden: number | null
+          pantalla: Json | null
           posicion: string | null
         }
         Insert: {
@@ -1143,6 +1147,7 @@ export type Database = {
           id?: string
           nombre: string
           orden?: number | null
+          pantalla?: Json | null
           posicion?: string | null
         }
         Update: {
@@ -1152,6 +1157,7 @@ export type Database = {
           id?: string
           nombre?: string
           orden?: number | null
+          pantalla?: Json | null
           posicion?: string | null
         }
         Relationships: [
