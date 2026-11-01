@@ -47,10 +47,22 @@ export default async function TomarDatosRftPage({
 
   const { data: clases } = await supabase
     .from('clases_rft')
-    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft(id, nombre, posicion)')
+    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft(id, nombre, posicion, concepto_imagen)')
     .eq('programa_alumno_id', programaId)
     .order('grupo')
     .order('created_at')
+
+  // Imágenes del banco de los conceptos que usan las clases (para la tableta)
+  const conceptos = [
+    ...new Set((clases ?? []).flatMap((c) => c.estimulos_rft.map((e) => e.concepto_imagen).filter((x): x is string => !!x))),
+  ]
+  const { data: filasImagenes } = conceptos.length
+    ? await supabase.from('biblioteca_imagenes').select('concepto, ejemplar, ruta').in('concepto', conceptos)
+    : { data: [] }
+  const imagenes: Record<string, Record<string, string>> = {}
+  for (const f of filasImagenes ?? []) {
+    imagenes[f.concepto] = { ...imagenes[f.concepto], [f.ejemplar]: supabase.storage.from('biblioteca').getPublicUrl(f.ruta).data.publicUrl }
+  }
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')
@@ -90,6 +102,7 @@ export default async function TomarDatosRftPage({
           respuesta_por_fase: programa.respuesta_por_fase,
         }}
         secuenciaPrograma={programa.secuencia_rft}
+        imagenes={imagenes}
       />
     </div>
   )

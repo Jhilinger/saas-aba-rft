@@ -1,0 +1,453 @@
+{
+  "descripcion": "Piloto del banco de imágenes: 4 programas de vocabulario × 4 grupos × 3 conceptos × 3 ejemplares, más un 4.º ejemplar reservado para la evaluación en los conceptos que comparte con ella.",
+  "programas": [
+    {
+      "programa": "Vincular Mutuamente Alimentos con sus Nombres",
+      "categoria": "alimentos",
+      "grupos": [
+        [
+          {
+            "concepto": "agua",
+            "ejemplares": [
+              "a clear glass of water",
+              "a plastic water bottle with no label",
+              "a glass jug of water"
+            ]
+          },
+          {
+            "concepto": "pan",
+            "ejemplares": [
+              "a Spanish baguette loaf of bread",
+              "a single slice of white sandwich bread",
+              "a small round bread roll"
+            ],
+            "evaluacion": "a rustic round loaf of country bread"
+          },
+          {
+            "concepto": "plátano",
+            "ejemplares": [
+              "a whole ripe yellow banana",
+              "a half-peeled yellow banana",
+              "a very ripe banana with brown spots"
+            ],
+            "evaluacion": "a slightly green banana"
+          }
+        ],
+        [
+          {
+            "concepto": "manzana",
+            "ejemplares": [
+              "a red apple",
+              "a green apple",
+              "a yellow apple"
+            ]
+          },
+          {
+            "concepto": "leche",
+            "ejemplares": [
+              "a glass of milk",
+              "a plain white milk carton with no brand or text",
+              "a glass bottle of milk"
+            ]
+          },
+          {
+            "concepto": "galleta",
+            "ejemplares": [
+              "a plain round golden biscuit",
+              "a chocolate chip cookie",
+              "a rectangular plain biscuit"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "huevo",
+            "ejemplares": [
+              "a white chicken egg",
+              "a brown chicken egg",
+              "a fried egg with a yellow yolk"
+            ]
+          },
+          {
+            "concepto": "queso",
+            "ejemplares": [
+              "a wedge of cured cheese",
+              "a single slice of yellow cheese",
+              "a small round fresh white cheese"
+            ]
+          },
+          {
+            "concepto": "naranja",
+            "ejemplares": [
+              "a whole orange",
+              "an orange with green leaves on the stem",
+              "half an orange cut open"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "yogur",
+            "ejemplares": [
+              "a plain white yogurt cup with no label",
+              "plain yogurt in a small glass jar",
+              "a pink strawberry yogurt cup with no label"
+            ]
+          },
+          {
+            "concepto": "fresa",
+            "ejemplares": [
+              "a single red strawberry",
+              "a strawberry cut in half",
+              "a single strawberry with large green leaves"
+            ]
+          },
+          {
+            "concepto": "macarrones",
+            "ejemplares": [
+              "a bowl of macaroni pasta with tomato sauce",
+              "uncooked dry macaroni pasta",
+              "a plate of cooked plain macaroni pasta"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "programa": "Vincular Mutuamente Animales de Granja con sus Nombres",
+      "categoria": "animales de granja",
+      "grupos": [
+        [
+          {
+            "concepto": "vaca",
+            "ejemplares": [
+              "a black and white dairy cow",
+              "a brown cow",
+              "a cow grazing with its head down"
+            ],
+            "evaluacion": "a light tan cow standing"
+          },
+          {
+            "concepto": "cerdo",
+            "ejemplares": [
+              "a pink pig",
+              "a pig with black spots",
+              "a small piglet"
+            ],
+            "evaluacion": "a dark brown pig"
+          },
+          {
+            "concepto": "gallina",
+            "ejemplares": [
+              "a brown hen",
+              "a white hen",
+              "a black hen"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "caballo",
+            "ejemplares": [
+              "a brown horse",
+              "a white horse",
+              "a black horse"
+            ]
+          },
+          {
+            "concepto": "oveja",
+            "ejemplares": [
+              "a white woolly sheep",
+              "a freshly sheared sheep",
+              "a young lamb"
+            ]
+          },
+          {
+            "concepto": "pato",
+            "ejemplares": [
+              "a white duck",
+              "a mallard duck with a green head",
+              "a yellow duckling"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "conejo",
+            "ejemplares": [
+              "a brown rabbit",
+              "a white rabbit",
+              "a grey rabbit"
+            ]
+          },
+          {
+            "concepto": "burro",
+            "ejemplares": [
+              "a grey donkey",
+              "a brown donkey",
+              "a small young donkey"
+            ]
+          },
+          {
+            "concepto": "cabra",
+            "ejemplares": [
+              "a white goat",
+              "a brown goat with horns",
+              "a young goat kid"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "gallo",
+            "ejemplares": [
+              "a colorful rooster",
+              "a white rooster",
+              "a black and white speckled rooster"
+            ]
+          },
+          {
+            "concepto": "pavo",
+            "ejemplares": [
+              "a turkey with its tail feathers fanned out",
+              "a brown turkey",
+              "a white turkey"
+            ]
+          },
+          {
+            "concepto": "pollito",
+            "ejemplares": [
+              "a yellow baby chick seen from the side",
+              "a yellow baby chick seen from the front",
+              "a brown baby chick"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "programa": "Vincular Mutuamente Vehículos con sus Nombres",
+      "categoria": "vehículos",
+      "grupos": [
+        [
+          {
+            "concepto": "coche",
+            "ejemplares": [
+              "a red car",
+              "a blue car",
+              "a white car"
+            ],
+            "evaluacion": "a yellow car"
+          },
+          {
+            "concepto": "avión",
+            "ejemplares": [
+              "a white passenger airplane",
+              "a small propeller airplane",
+              "a passenger airplane taking off"
+            ],
+            "evaluacion": "a passenger airplane with blue details"
+          },
+          {
+            "concepto": "barco",
+            "ejemplares": [
+              "a sailboat",
+              "a small blue fishing boat floating, without trailer",
+              "a large passenger ship"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "autobús",
+            "ejemplares": [
+              "a city bus",
+              "a yellow school bus",
+              "a double-decker bus"
+            ]
+          },
+          {
+            "concepto": "tren",
+            "ejemplares": [
+              "a modern passenger train",
+              "an old steam train",
+              "a commuter train"
+            ]
+          },
+          {
+            "concepto": "moto",
+            "ejemplares": [
+              "a red motorcycle",
+              "a scooter",
+              "a dirt bike"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "bicicleta",
+            "ejemplares": [
+              "a blue bicycle",
+              "a small children's bicycle",
+              "a city bicycle with a front basket"
+            ]
+          },
+          {
+            "concepto": "camión",
+            "ejemplares": [
+              "a cargo truck",
+              "a dump truck",
+              "a delivery truck with no text"
+            ]
+          },
+          {
+            "concepto": "helicóptero",
+            "ejemplares": [
+              "a red helicopter",
+              "a rescue helicopter with no text",
+              "a white helicopter"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "ambulancia",
+            "ejemplares": [
+              "a white ambulance with no text",
+              "a yellow ambulance with no text",
+              "an ambulance van with no text"
+            ]
+          },
+          {
+            "concepto": "tractor",
+            "ejemplares": [
+              "a green tractor",
+              "a red tractor",
+              "a tractor with a trailer"
+            ]
+          },
+          {
+            "concepto": "camión de bomberos",
+            "ejemplares": [
+              "a red fire truck with no text",
+              "a fire truck with a ladder and no text",
+              "a small red fire engine with no text"
+            ]
+          }
+        ]
+      ]
+    },
+    {
+      "programa": "Vincular Mutuamente Prendas de Vestir con sus Nombres",
+      "categoria": "prendas de vestir",
+      "grupos": [
+        [
+          {
+            "concepto": "camiseta",
+            "ejemplares": [
+              "a blue T-shirt",
+              "a red T-shirt",
+              "a striped T-shirt"
+            ],
+            "evaluacion": "a green T-shirt"
+          },
+          {
+            "concepto": "pantalón",
+            "ejemplares": [
+              "blue jeans",
+              "grey jogging trousers",
+              "a pair of shorts"
+            ]
+          },
+          {
+            "concepto": "zapatos",
+            "ejemplares": [
+              "a pair of sneakers",
+              "a pair of leather dress shoes",
+              "a pair of children's shoes with velcro straps"
+            ],
+            "evaluacion": "a pair of brown loafers"
+          }
+        ],
+        [
+          {
+            "concepto": "calcetines",
+            "ejemplares": [
+              "a pair of white socks",
+              "a pair of striped socks",
+              "a pair of colorful socks"
+            ]
+          },
+          {
+            "concepto": "chaqueta",
+            "ejemplares": [
+              "a denim jacket",
+              "a hooded sweatshirt",
+              "a knitted cardigan"
+            ]
+          },
+          {
+            "concepto": "gorro",
+            "ejemplares": [
+              "a wool beanie hat",
+              "a baseball cap with no logo",
+              "a knitted hat with a pompom"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "vestido",
+            "ejemplares": [
+              "a floral dress",
+              "a blue dress",
+              "a striped dress"
+            ]
+          },
+          {
+            "concepto": "falda",
+            "ejemplares": [
+              "a denim skirt",
+              "a plaid skirt",
+              "a red skirt"
+            ]
+          },
+          {
+            "concepto": "bufanda",
+            "ejemplares": [
+              "a red wool scarf",
+              "a striped scarf",
+              "a grey scarf"
+            ]
+          }
+        ],
+        [
+          {
+            "concepto": "pijama",
+            "ejemplares": [
+              "a two-piece pajama set",
+              "a pajama set with a star pattern",
+              "a striped pajama set"
+            ]
+          },
+          {
+            "concepto": "guantes",
+            "ejemplares": [
+              "a pair of wool gloves",
+              "a pair of mittens",
+              "a pair of colorful gloves"
+            ]
+          },
+          {
+            "concepto": "botas",
+            "ejemplares": [
+              "a pair of rain boots",
+              "a pair of hiking boots",
+              "a pair of fur-lined snow boots"
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

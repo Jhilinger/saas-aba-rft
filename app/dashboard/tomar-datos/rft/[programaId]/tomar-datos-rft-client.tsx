@@ -20,10 +20,11 @@ import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronome
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
+import PantallaTablet, { esOido, type ImagenesBanco } from './pantalla-tablet'
 import AyudaTermino from '../../../ayuda-termino'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
-type Estimulo = { id: string; nombre: string; posicion: string | null }
+type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
@@ -112,6 +113,32 @@ function ordenEstable(valor: string) {
   return [...valor].reduce((total, caracter) => total + caracter.charCodeAt(0), 0)
 }
 
+// Con material físico o en la tableta (solo si el bloque se puede presentar en pantalla)
+function SelectorModo({
+  disponible,
+  modo,
+  onCambiar,
+}: {
+  disponible: boolean
+  modo: 'material' | 'tableta'
+  onCambiar: (m: 'material' | 'tableta') => void
+}) {
+  if (!disponible) return null
+  return (
+    <span className="flex rounded-lg bg-white p-0.5 text-sm">
+      {(['material', 'tableta'] as const).map((m) => (
+        <button
+          key={m}
+          onClick={() => onCambiar(m)}
+          className={`rounded-md px-3 py-1.5 font-medium ${modo === m ? 'bg-slate-700 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+        >
+          {m === 'material' ? 'Con material' : '🖥 En tableta'}
+        </button>
+      ))}
+    </span>
+  )
+}
+
 function TarjetaRecomendacion({
   rec,
   conGrupo,
@@ -119,6 +146,7 @@ function TarjetaRecomendacion({
   tamanoBloque,
   onTamano,
   onEmpezar,
+  selectorModo,
 }: {
   rec: Recomendacion
   conGrupo: boolean
@@ -126,6 +154,7 @@ function TarjetaRecomendacion({
   tamanoBloque: number
   onTamano: (n: number) => void
   onEmpezar: () => void
+  selectorModo: React.ReactNode
 }) {
   return (
     <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
@@ -154,6 +183,7 @@ function TarjetaRecomendacion({
             {n} ensayos
           </button>
         ))}
+        {selectorModo}
         <Button onClick={onEmpezar} className="ml-auto px-6 py-3 text-base sm:py-2">
           Empezar
         </Button>
@@ -175,6 +205,7 @@ export default function TomarDatosRftClient({
   nivelRft,
   respuesta,
   secuenciaPrograma,
+  imagenes,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -189,6 +220,8 @@ export default function TomarDatosRftClient({
   respuesta: { tipo_respuesta: string; opciones_respuesta: string[] | null; respuesta_por_fase: Json }
   // Secuencia de bloques del programa (ver secuencia-rft.ts)
   secuenciaPrograma: Json
+  // Imágenes del banco por concepto y ejemplar (modo tableta)
+  imagenes: ImagenesBanco
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -201,6 +234,11 @@ export default function TomarDatosRftClient({
   const [tamanoBloque, setTamanoBloque] = useState(ensayosPorBloqueDefecto)
   // El terapeuta elige la combinación a mano en lugar de la recomendada
   const [manual, setManual] = useState(false)
+  // Modo del próximo bloque, y si la pantalla del alumno está abierta. El modo
+  // con que empezó el bloque se guarda con él (ref, como los controles)
+  const [modo, setModo] = useState<'material' | 'tableta'>('material')
+  const [enTableta, setEnTableta] = useState(false)
+  const modoBloqueRef = useRef<'material' | 'tableta'>('material')
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
@@ -312,7 +350,8 @@ export default function TomarDatosRftClient({
             })),
             notasActuales,
             duracionSegundos,
-            controlesRef.current
+            controlesRef.current,
+            modoBloqueRef.current
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -358,6 +397,7 @@ export default function TomarDatosRftClient({
       inicioBloque?: number | null
       duracionBloque?: number | null
       controles?: ControlRft[]
+      modo?: 'material' | 'tableta'
     }>(claveProgreso)
     if (guardado) {
       setGrupoSeleccionado(guardado.grupoSeleccionado)
@@ -372,6 +412,7 @@ export default function TomarDatosRftClient({
       setDuracionBloque(guardado.duracionBloque ?? null)
       controlesRef.current = guardado.controles ?? []
       setControles(guardado.controles ?? [])
+      modoBloqueRef.current = guardado.modo ?? 'material'
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
         const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
         const numComparativos = clasesDelGrupoGuardado.filter(
@@ -437,10 +478,12 @@ export default function TomarDatosRftClient({
       toast('Antes hay que dominar en entrenamiento una cadena de relaciones que conecte esas posiciones.', 'error')
       return
     }
-    iniciarBloque(clasesValidas)
+    iniciarBloque(clasesValidas, grupoSeleccionado ? modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) : 'material')
   }
 
-  const iniciarBloque = (validas: Clase[]) => {
+  const iniciarBloque = (validas: Clase[], modoInicial: 'material' | 'tableta' = modo) => {
+    modoBloqueRef.current = modoInicial
+    setEnTableta(modoInicial === 'tableta')
     setSecuencia(generarSecuenciaClases(validas, tamanoBloque))
     setInicioBloque(marcaDeTiempo())
     setDuracionBloque(null)
@@ -467,6 +510,18 @@ export default function TomarDatosRftClient({
   const clasesCon = (grupo: string, origen: string, destino: string) =>
     clases.filter((c) => c.grupo === grupo && encontrarEstimulo(c, origen) && encontrarEstimulo(c, destino))
 
+  // Se puede presentar en pantalla si el alumno elige un estímulo y todos los
+  // estímulos tienen imagen del banco o son palabras que se dicen
+  const tabletaPosible = (grupo: string, origen: string, destino: string, faseBloque: string) => {
+    if (configRespuesta(respuesta, faseBloque).tipo !== 'seleccion') return false
+    const validas = clasesCon(grupo, origen, destino)
+    if (validas.length < 2) return false
+    const estimulos = validas.flatMap((c) => [encontrarEstimulo(c, origen)!, encontrarEstimulo(c, destino)!])
+    return estimulos.every((e) => e.concepto_imagen || esOido(e)) && estimulos.some((e) => e.concepto_imagen)
+  }
+  const modoPara = (grupo: string, origen: string, destino: string, faseBloque: string) =>
+    modo === 'tableta' && tabletaPosible(grupo, origen, destino, faseBloque) ? 'tableta' : 'material'
+
   // Ejemplo con los estímulos reales de la primera clase que encaja
   const ejemploDe = (rec: Recomendacion) => {
     const clase = clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)[0]
@@ -491,7 +546,7 @@ export default function TomarDatosRftClient({
     setPosicionOrigen(rec.paso.origen)
     setPosicionDestino(rec.paso.destino)
     setTipoSonda('normal')
-    iniciarBloque(validas)
+    iniciarBloque(validas, modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase))
   }
 
   const registrar = (correcto: boolean, ayuda: string, pregunta?: string, respuestaAlumno?: string | null) => {
@@ -546,6 +601,7 @@ export default function TomarDatosRftClient({
       inicioBloque,
       duracionBloque,
       controles,
+      modo: modoBloqueRef.current,
     })
   }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso])
 
@@ -622,6 +678,13 @@ export default function TomarDatosRftClient({
             tamanoBloque={tamanoBloque}
             onTamano={setTamanoBloque}
             onEmpezar={() => empezarRecomendado(recomendacionGlobal)}
+            selectorModo={
+              <SelectorModo
+                disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
+                modo={modo}
+                onCambiar={setModo}
+              />
+            }
           />
         )}
         <p className="text-sm font-medium text-slate-600">
@@ -664,6 +727,13 @@ export default function TomarDatosRftClient({
           tamanoBloque={tamanoBloque}
           onTamano={setTamanoBloque}
           onEmpezar={() => empezarRecomendado(recomendacionGrupo)}
+          selectorModo={
+            <SelectorModo
+              disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
+              modo={modo}
+              onCambiar={setModo}
+            />
+          }
         />
         <button onClick={() => setManual(true)} className="text-sm font-medium text-slate-500 hover:text-slate-700">
           Elegir otra combinación o una sonda →
@@ -823,6 +893,15 @@ export default function TomarDatosRftClient({
           </div>
         )}
 
+        {grupoSeleccionado && posicionOrigen && posicionDestino && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
+          <div className="space-y-1">
+            <p className="text-sm text-slate-600">Presentación</p>
+            <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
+              <SelectorModo disponible modo={modo} onCambiar={setModo} />
+            </span>
+          </div>
+        )}
+
         <div className="space-y-1">
           <p className="text-sm text-slate-600">Tamaño del bloque</p>
           <div className="flex gap-2">
@@ -902,6 +981,21 @@ export default function TomarDatosRftClient({
     setControlAbierto(false)
   }
 
+  if (enTableta) {
+    return (
+      <PantallaTablet
+        origen={origenActual}
+        comparativos={comparativos}
+        fase={faseEfectiva}
+        ensayo={ensayos.length}
+        total={secuencia.length}
+        imagenes={imagenes}
+        onResponder={(correcto, ayuda, respuestaAlumno) => registrar(correcto, ayuda, undefined, respuestaAlumno)}
+        onSalir={() => setEnTableta(false)}
+      />
+    )
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {sinConexion && <BannerSinConexion />}
@@ -909,11 +1003,24 @@ export default function TomarDatosRftClient({
         <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
         </span>
-        {ensayos.length > 0 && (
-          <button onClick={deshacerUltimo} className="text-rose-700 hover:text-rose-800">
-            Deshacer último
-          </button>
-        )}
+        <span className="flex items-center gap-4">
+          {grupoSeleccionado && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
+            <button
+              onClick={() => {
+                modoBloqueRef.current = 'tableta'
+                setEnTableta(true)
+              }}
+              className="font-medium text-indigo-600 hover:text-indigo-800"
+            >
+              🖥 Pantalla del alumno
+            </button>
+          )}
+          {ensayos.length > 0 && (
+            <button onClick={deshacerUltimo} className="text-rose-700 hover:text-rose-800">
+              Deshacer último
+            </button>
+          )}
+        </span>
       </div>
       <div
         role="progressbar"

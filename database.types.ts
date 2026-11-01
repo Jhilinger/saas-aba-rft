@@ -171,6 +171,48 @@ export type Database = {
           },
         ]
       }
+      biblioteca_imagenes: {
+        Row: {
+          categoria: string
+          concepto: string
+          created_at: string
+          descripcion: string | null
+          ejemplar: string
+          id: string
+          modelo: string | null
+          nombre: string
+          prompt: string | null
+          ruta: string
+          uso: string
+        }
+        Insert: {
+          categoria: string
+          concepto: string
+          created_at?: string
+          descripcion?: string | null
+          ejemplar: string
+          id?: string
+          modelo?: string | null
+          nombre: string
+          prompt?: string | null
+          ruta: string
+          uso: string
+        }
+        Update: {
+          categoria?: string
+          concepto?: string
+          created_at?: string
+          descripcion?: string | null
+          ejemplar?: string
+          id?: string
+          modelo?: string | null
+          nombre?: string
+          prompt?: string | null
+          ruta?: string
+          uso?: string
+        }
+        Relationships: []
+      }
       bloques_analisis_tareas: {
         Row: {
           fecha: string
@@ -336,6 +378,7 @@ export type Database = {
           grupo: string | null
           id: string
           latencia_media_ms: number | null
+          modo: string
           notas: string | null
           num_comparativos: number
           porcentaje: number | null
@@ -356,6 +399,7 @@ export type Database = {
           grupo?: string | null
           id?: string
           latencia_media_ms?: number | null
+          modo?: string
           notas?: string | null
           num_comparativos?: number
           porcentaje?: number | null
@@ -376,6 +420,7 @@ export type Database = {
           grupo?: string | null
           id?: string
           latencia_media_ms?: number | null
+          modo?: string
           notas?: string | null
           num_comparativos?: number
           porcentaje?: number | null
@@ -1043,6 +1088,7 @@ export type Database = {
       estimulos_rft: {
         Row: {
           clase_id: string
+          concepto_imagen: string | null
           descripcion: string | null
           etiqueta: string
           id: string
@@ -1052,6 +1098,7 @@ export type Database = {
         }
         Insert: {
           clase_id: string
+          concepto_imagen?: string | null
           descripcion?: string | null
           etiqueta: string
           id?: string
@@ -1061,6 +1108,7 @@ export type Database = {
         }
         Update: {
           clase_id?: string
+          concepto_imagen?: string | null
           descripcion?: string | null
           etiqueta?: string
           id?: string
@@ -1081,6 +1129,7 @@ export type Database = {
       estimulos_rft_base: {
         Row: {
           clase_base_id: string
+          concepto_imagen: string | null
           etiqueta: string
           id: string
           nombre: string
@@ -1089,6 +1138,7 @@ export type Database = {
         }
         Insert: {
           clase_base_id: string
+          concepto_imagen?: string | null
           etiqueta: string
           id?: string
           nombre: string
@@ -1097,6 +1147,7 @@ export type Database = {
         }
         Update: {
           clase_base_id?: string
+          concepto_imagen?: string | null
           etiqueta?: string
           id?: string
           nombre?: string

@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# imágenes generadas, pendientes de revisión
+/scripts/imagenes/salida/
+/scripts/imagenes/web/

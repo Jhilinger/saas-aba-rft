@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useCronometroEnsayo } from '../../../../../tomar-datos/cronometro'
 import Figura from '../figuras'
+import BotonLargo from '../../../../../boton-largo'
 import { esCorrecta, ordenesDeOpciones, type Estimulo, type Paso } from '../guion'
 import { CRITERIO_BLOQUE, MAX_BLOQUES, type Ensayo } from '../logica'
 
@@ -15,7 +16,6 @@ export type ResultadoPantalla = { ensayos: Ensayo[]; noProcede: boolean }
 type Elemento = { paso: Paso; indice: number }
 
 const PAUSA_ENTRE_ENSAYOS = 700
-const PULSACION_LARGA = 600
 
 // Contenido de un estímulo dentro de una tarjeta de lado `lado` (expresión
 // CSS): emoji, figuras y textos se dimensionan como fracción de ese lado
@@ -81,34 +81,6 @@ function numGrafemas(texto: string) {
 // Lado de una tarjeta para que quepan `n` por fila sin desbordar la pantalla
 function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
-}
-
-function BotonLargo({ children, onActivar, className = '' }: { children: React.ReactNode; onActivar: () => void; className?: string }) {
-  const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const [pulsando, setPulsando] = useState(false)
-  const soltar = () => {
-    if (temporizador.current) clearTimeout(temporizador.current)
-    temporizador.current = null
-    setPulsando(false)
-  }
-  return (
-    <button
-      type="button"
-      onPointerDown={() => {
-        setPulsando(true)
-        temporizador.current = setTimeout(() => {
-          soltar()
-          onActivar()
-        }, PULSACION_LARGA)
-      }}
-      onPointerUp={soltar}
-      onPointerLeave={soltar}
-      onContextMenu={(e) => e.preventDefault()}
-      className={`select-none rounded-lg px-3 py-2 text-xs font-medium transition-colors ${pulsando ? 'bg-slate-300 text-slate-700' : 'bg-slate-100 text-slate-400'} ${className}`}
-    >
-      {children}
-    </button>
-  )
 }
 
 export default function PantallaAlumno({

@@ -60,7 +60,8 @@ export async function guardarBloqueRft(
   ensayos: EnsayoInput[],
   notas?: string,
   duracionSegundos?: number | null,
-  controles: ControlInput[] = []
+  controles: ControlInput[] = [],
+  modo: 'material' | 'tableta' = 'material'
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -133,6 +134,7 @@ export async function guardarBloqueRft(
       posicion_destino: posicionDestino,
       num_comparativos: numComparativos,
       total_ensayos: totalEnsayos,
+      modo: modo === 'tableta' ? 'tableta' : 'material',
       aciertos,
       notas: notas?.trim() || null,
     })
