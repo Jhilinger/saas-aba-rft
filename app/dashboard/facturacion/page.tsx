@@ -1,4 +1,4 @@
-import { formatearImporte } from '@/utils/tarifas'
+import { alumnosFacturados, formatearImporte, MINIMO_ALUMNOS } from '@/utils/tarifas'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import BotonPortal from './boton-portal'
@@ -36,7 +36,7 @@ export default async function FacturacionPage() {
 
   const { data: clinica } = await supabase
     .from('clinicas')
-    .select('nombre, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, sin_facturacion, moneda, plan')
+    .select('nombre, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, sin_facturacion, moneda')
     .eq('id', clinicaId)
     .single()
 
@@ -54,7 +54,7 @@ export default async function FacturacionPage() {
   }
 
   const totalEstimado =
-    Number(clinica.precio_fijo_mensual) + Number(clinica.precio_por_alumno) * (alumnosActivos ?? 0)
+    Number(clinica.precio_fijo_mensual) + Number(clinica.precio_por_alumno) * alumnosFacturados(alumnosActivos ?? 0)
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
@@ -79,17 +79,22 @@ export default async function FacturacionPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-slate-500">Cuota fija</p>
-                <p className="text-slate-700">{clinica.plan === 'independiente' ? 'Sin cuota (terapeuta independiente)' : `${formatearImporte(Number(clinica.precio_fijo_mensual), clinica.moneda)}/mes`}</p>
-              </div>
+              {Number(clinica.precio_fijo_mensual) > 0 && (
+                <div>
+                  <p className="text-slate-500">Cuota fija</p>
+                  <p className="text-slate-700">{formatearImporte(Number(clinica.precio_fijo_mensual), clinica.moneda)}/mes</p>
+                </div>
+              )}
               <div>
                 <p className="text-slate-500">Por alumno</p>
                 <p className="text-slate-700">{formatearImporte(Number(clinica.precio_por_alumno), clinica.moneda)}/mes</p>
               </div>
               <div>
                 <p className="text-slate-500">Alumnos activos</p>
-                <p className="text-slate-700">{alumnosActivos ?? 0}</p>
+                <p className="text-slate-700">
+                  {alumnosActivos ?? 0}
+                  {(alumnosActivos ?? 0) < MINIMO_ALUMNOS && <span className="text-slate-500"> (se facturan {MINIMO_ALUMNOS} como mínimo)</span>}
+                </p>
               </div>
               <div>
                 <p className="text-slate-500">Total estimado</p>

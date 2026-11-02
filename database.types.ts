@@ -696,7 +696,6 @@ export type Database = {
           nombre: string
           pais: string
           pais_codigo: string | null
-          plan: string
           precio_fijo_mensual: number
           precio_por_alumno: number
           sin_facturacion: boolean
@@ -719,7 +718,6 @@ export type Database = {
           nombre: string
           pais?: string
           pais_codigo?: string | null
-          plan?: string
           precio_fijo_mensual?: number
           precio_por_alumno?: number
           sin_facturacion?: boolean
@@ -742,7 +740,6 @@ export type Database = {
           nombre?: string
           pais?: string
           pais_codigo?: string | null
-          plan?: string
           precio_fijo_mensual?: number
           precio_por_alumno?: number
           sin_facturacion?: boolean

@@ -128,7 +128,7 @@ const BLOQUES_FUNCIONALIDAD = [
       },
       {
         titulo: 'Facturación sencilla',
-        texto: 'Suscripción por alumno activo: pagas por los alumnos que atiendes.',
+        texto: 'Sin cuota fija: pagas solo por los alumnos activos que atiendes.',
         Icono: Receipt,
       },
     ],
@@ -386,7 +386,7 @@ export default async function Home() {
               Contextos Clínicos y de la Salud, Universidad de Almería
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-700">
-              Desde hace 16 años dirijo <strong>ABA Almería</strong>, centro dedicado a
+              Desde hace 20 años dirijo <strong>ABA Almería</strong>, centro dedicado a
               niños con autismo, donde he sido pionero en habla hispana en el desarrollo
               de programas basados en la Teoría del Marco Relacional (RFT). También
               dirijo <strong>Eureka Psicología</strong>, centrado en terapia para adultos
@@ -396,7 +396,7 @@ export default async function Home() {
             <p className="mt-3 text-base leading-relaxed text-slate-700">
               He impartido formaciones y presentado en congresos nacionales e
               internacionales sobre RFT y ACT. Abacontext nace de esa misma experiencia
-              clínica de 16 años — y de mi otra faceta como desarrollador de software —
+              clínica de 20 años — y de mi otra faceta como desarrollador de software —
               para dar a cualquier profesional guiado por la evidencia, y a las familias
               que los acompañan, ese mismo camino hacia lo relacional.
             </p>
@@ -408,8 +408,8 @@ export default async function Home() {
       <section className="mx-auto max-w-lg px-4 py-20 text-center sm:px-8">
         <h2 className="text-2xl font-bold text-slate-900">Precio simple</h2>
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8">
-          <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-600">/mes</span></p>
-          <p className="mt-1 text-sm text-slate-600">+ 4€/mes por cada alumno activo</p>
+          <p className="text-4xl font-bold text-slate-900">12€<span className="text-base font-normal text-slate-600">/mes por alumno activo</span></p>
+          <p className="mt-1 text-sm text-slate-600">Sin cuota fija · mínimo 3 alumnos</p>
           <p className="mt-1 text-xs text-slate-500">Precio en España. En Latinoamérica, precio adaptado a cada país: lo verás al registrarte.</p>
           <p
             className="mt-3 inline-block rounded-full px-3 py-1 text-xs font-semibold"

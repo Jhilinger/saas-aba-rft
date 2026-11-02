@@ -3,7 +3,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sincronizarAlumnosStripe } from '@/utils/stripe-sync'
-import { MAX_ALUMNOS_INDEPENDIENTE } from '@/utils/tarifas'
 
 async function getPerfilActual() {
   const supabase = await createClient()
@@ -19,20 +18,6 @@ async function getPerfilActual() {
   return perfil
 }
 
-// Plan de terapeuta independiente: como mucho MAX_ALUMNOS_INDEPENDIENTE activos
-async function superaLimitePlan(supabase: Awaited<ReturnType<typeof createClient>>, clinicaId: string) {
-  const { data: clinica } = await supabase.from('clinicas').select('plan').eq('id', clinicaId).single()
-  if (clinica?.plan !== 'independiente') return false
-  const { count } = await supabase
-    .from('alumnos')
-    .select('id', { count: 'exact', head: true })
-    .eq('clinica_id', clinicaId)
-    .eq('activo', true)
-  return (count ?? 0) >= MAX_ALUMNOS_INDEPENDIENTE
-}
-
-const AVISO_LIMITE = `El plan de terapeuta independiente admite hasta ${MAX_ALUMNOS_INDEPENDIENTE} alumnos activos. Archiva alguno o pasa al plan de clínica.`
-
 export async function crearAlumno(formData: FormData) {
   const supabase = await createClient()
   const perfilActual = await getPerfilActual()
@@ -44,8 +29,6 @@ export async function crearAlumno(formData: FormData) {
   const fecha_nacimiento = formData.get('fecha_nacimiento') as string
   const terapeutaIds = formData.getAll('terapeuta_ids') as string[]
   const terapeutaPrincipalId = (formData.get('terapeuta_principal_id') as string) || null
-
-  if (await superaLimitePlan(supabase, perfilActual.clinica_id)) return { error: AVISO_LIMITE }
 
   const { data: alumno, error } = await supabase
     .from('alumnos')
@@ -100,9 +83,6 @@ export async function archivarAlumno(id: string) {
 
 export async function reactivarAlumno(id: string) {
   const supabase = await createClient()
-
-  const { data: actual } = await supabase.from('alumnos').select('clinica_id').eq('id', id).single()
-  if (actual && (await superaLimitePlan(supabase, actual.clinica_id))) return { error: AVISO_LIMITE }
 
   const { data: alumno, error } = await supabase
     .from('alumnos')

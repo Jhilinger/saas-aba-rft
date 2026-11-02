@@ -41,7 +41,8 @@ export async function POST(req: NextRequest) {
 
       const subscriptionId = session.subscription as string
       const suscripcion = await stripe.subscriptions.retrieve(subscriptionId)
-      // Ítem «por alumno»: el precio que eligió el registro según país y plan
+      // Ítem «por alumno»: el precio que eligió el registro según el país.
+      // Las suscripciones antiguas tenían además un ítem de cuota fija
       const precioAlumno = metadata.precio_alumno ?? process.env.STRIPE_PRICE_POR_ALUMNO
       const itemAlumno = suscripcion.items.data.find((i) => i.price.id === precioAlumno)
       const itemCuota = suscripcion.items.data.find((i) => i.price.id !== precioAlumno)
@@ -63,7 +64,6 @@ export async function POST(req: NextRequest) {
           pais: metadata.pais ?? 'España',
           pais_codigo: metadata.pais_codigo ?? null,
           escalon: metadata.escalon ?? null,
-          plan: metadata.plan === 'independiente' ? 'independiente' : 'clinica',
           moneda: (itemAlumno?.price.currency ?? 'eur').toUpperCase(),
           telefono: metadata.telefono ?? null,
           ciudad: metadata.ciudad ?? null,

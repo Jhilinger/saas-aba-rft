@@ -7,5 +7,7 @@ export const revalidate = 3600
 
 export default async function RegistroPage() {
   const tarifas = await tarifasVisibles()
-  return <RegistroForm paises={PAISES.map(({ codigo, nombre }) => ({ codigo, nombre }))} tarifas={tarifas} />
+  // Solo los países con precio configurado en Stripe
+  const paises = PAISES.filter((p) => tarifas[p.codigo]).map(({ codigo, nombre }) => ({ codigo, nombre }))
+  return <RegistroForm paises={paises} tarifas={tarifas} />
 }

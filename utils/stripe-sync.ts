@@ -1,8 +1,10 @@
 import { stripe } from '@/utils/stripe'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { alumnosFacturados } from '@/utils/tarifas'
 
 // Actualiza en Stripe la cantidad del ítem "por alumno" de la suscripción
-// de una clínica, para que coincida con su nº real de alumnos activos.
+// de una clínica, para que coincida con su nº real de alumnos activos
+// (con el mínimo facturado).
 // No hace nada si la clínica no tiene suscripción de Stripe (sin_facturacion=true).
 export async function sincronizarAlumnosStripe(clinicaId: string) {
   const admin = createAdminClient()
@@ -25,7 +27,7 @@ export async function sincronizarAlumnosStripe(clinicaId: string) {
 
   try {
     await stripe.subscriptionItems.update(clinica.stripe_subscription_item_alumno_id, {
-      quantity: count ?? 0,
+      quantity: alumnosFacturados(count ?? 0),
     })
   } catch (err) {
     // No bloqueamos la acción del usuario (crear/archivar un alumno) si
