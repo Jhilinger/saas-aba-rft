@@ -410,6 +410,7 @@ export default async function Home() {
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8">
           <p className="text-4xl font-bold text-slate-900">30€<span className="text-base font-normal text-slate-600">/mes</span></p>
           <p className="mt-1 text-sm text-slate-600">+ 4€/mes por cada alumno activo</p>
+          <p className="mt-1 text-xs text-slate-500">Precio en España. En Latinoamérica, precio adaptado a cada país: lo verás al registrarte.</p>
           <p
             className="mt-3 inline-block rounded-full px-3 py-1 text-xs font-semibold"
             style={{ backgroundColor: 'var(--brand-primary-soft)', color: 'var(--brand-primary-dark)' }}

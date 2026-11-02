@@ -20,7 +20,7 @@ const PREGUNTAS = [
   {
     pregunta: '¿Cuánto cuesta?',
     respuesta:
-      '30€/mes de cuota fija, más 4€/mes por cada alumno activo. Sin permanencia: puedes cancelar cuando quieras desde tu propio panel.',
+      'En España, 30€/mes de cuota fija, más 4€/mes por cada alumno activo. En Latinoamérica el precio se adapta a cada país y lo verás al registrarte; también hay un plan para terapeutas independientes sin cuota fija. Sin permanencia: puedes cancelar cuando quieras desde tu propio panel.',
   },
   {
     pregunta: '¿Puedo migrar mis datos desde Excel u otra herramienta?',

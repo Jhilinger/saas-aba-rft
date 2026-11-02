@@ -1,3 +1,4 @@
+import { formatearImporte } from '@/utils/tarifas'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import BotonPortal from './boton-portal'
@@ -35,7 +36,7 @@ export default async function FacturacionPage() {
 
   const { data: clinica } = await supabase
     .from('clinicas')
-    .select('nombre, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, sin_facturacion')
+    .select('nombre, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, sin_facturacion, moneda, plan')
     .eq('id', clinicaId)
     .single()
 
@@ -80,11 +81,11 @@ export default async function FacturacionPage() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-slate-500">Cuota fija</p>
-                <p className="text-slate-700">{clinica.precio_fijo_mensual} €/mes</p>
+                <p className="text-slate-700">{clinica.plan === 'independiente' ? 'Sin cuota (terapeuta independiente)' : `${formatearImporte(Number(clinica.precio_fijo_mensual), clinica.moneda)}/mes`}</p>
               </div>
               <div>
                 <p className="text-slate-500">Por alumno</p>
-                <p className="text-slate-700">{clinica.precio_por_alumno} €/mes</p>
+                <p className="text-slate-700">{formatearImporte(Number(clinica.precio_por_alumno), clinica.moneda)}/mes</p>
               </div>
               <div>
                 <p className="text-slate-500">Alumnos activos</p>
@@ -92,7 +93,7 @@ export default async function FacturacionPage() {
               </div>
               <div>
                 <p className="text-slate-500">Total estimado</p>
-                <p className="text-slate-700 font-semibold">{totalEstimado.toFixed(2)} €/mes</p>
+                <p className="text-slate-700 font-semibold">{formatearImporte(totalEstimado, clinica.moneda)}/mes</p>
               </div>
             </div>
           </Panel>

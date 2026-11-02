@@ -688,11 +688,15 @@ export type Database = {
           ciudad: string | null
           created_at: string
           diseno_pei: string
+          escalon: string | null
           estado_suscripcion: string
           id: string
           logo_url: string | null
+          moneda: string
           nombre: string
           pais: string
+          pais_codigo: string | null
+          plan: string
           precio_fijo_mensual: number
           precio_por_alumno: number
           sin_facturacion: boolean
@@ -707,11 +711,15 @@ export type Database = {
           ciudad?: string | null
           created_at?: string
           diseno_pei?: string
+          escalon?: string | null
           estado_suscripcion?: string
           id?: string
           logo_url?: string | null
+          moneda?: string
           nombre: string
           pais?: string
+          pais_codigo?: string | null
+          plan?: string
           precio_fijo_mensual?: number
           precio_por_alumno?: number
           sin_facturacion?: boolean
@@ -726,11 +734,15 @@ export type Database = {
           ciudad?: string | null
           created_at?: string
           diseno_pei?: string
+          escalon?: string | null
           estado_suscripcion?: string
           id?: string
           logo_url?: string | null
+          moneda?: string
           nombre?: string
           pais?: string
+          pais_codigo?: string | null
+          plan?: string
           precio_fijo_mensual?: number
           precio_por_alumno?: number
           sin_facturacion?: boolean

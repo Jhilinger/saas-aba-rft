@@ -3,6 +3,7 @@
 import { stripe } from '@/utils/stripe'
 import { createAdminClient } from '@/utils/supabase/admin'
 import type Stripe from 'stripe'
+import { paisPorCodigo, preciosStripe, type Plan } from '@/utils/tarifas'
 
 const URL_BASE = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
@@ -11,7 +12,9 @@ export async function iniciarRegistro(formData: FormData) {
   const nombreAdmin = formData.get('nombre_admin') as string
   const emailAdmin = formData.get('email_admin') as string
   const telefono = formData.get('telefono') as string
-  const pais = formData.get('pais') as string
+  const paisCodigo = formData.get('pais_codigo') as string
+  const pais = paisPorCodigo(paisCodigo)?.nombre ?? ''
+  const plan: Plan = formData.get('plan') === 'independiente' ? 'independiente' : 'clinica'
   const ciudad = formData.get('ciudad') as string
   const aceptaTerminos = formData.get('acepta_terminos') === 'on'
 
@@ -40,25 +43,32 @@ export async function iniciarRegistro(formData: FormData) {
     email_admin: emailAdmin,
     telefono,
     pais,
+    pais_codigo: paisCodigo,
+    plan,
     ciudad,
     terminos_aceptados_en: new Date().toISOString(),
   }
+
+  // Precios del escalón del país (o los de España si aún no están en Stripe)
+  const precios = preciosStripe(paisCodigo, plan)
+  if (!precios) return { error: 'Ese tipo de cuenta no está disponible en tu país.' }
 
   let session: Stripe.Checkout.Session
   try {
     session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [
-        { price: process.env.STRIPE_PRICE_CUOTA_FIJA!, quantity: 1 },
-        { price: process.env.STRIPE_PRICE_POR_ALUMNO!, quantity: 1 },
+        ...(precios.cuota ? [{ price: precios.cuota, quantity: 1 }] : []),
+        { price: precios.alumno, quantity: 1 },
       ],
       customer_email: emailAdmin,
       success_url: `${URL_BASE}/registro/completado?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${URL_BASE}/registro`,
-      metadata: metadataComun,
-            subscription_data: {
+      metadata: { ...metadataComun, escalon: precios.escalon, precio_alumno: precios.alumno },
+      subscription_data: {
         trial_period_days: 14,
-        ...(pais === 'España' ? { default_tax_rates: [process.env.STRIPE_TAX_RATE_ID!] } : {}),
+        // IVA español solo en España; los impuestos de otros países, pendientes del asesor
+        ...(paisCodigo === 'ES' ? { default_tax_rates: [process.env.STRIPE_TAX_RATE_ID!] } : {}),
         metadata: metadataComun,
       },
     })

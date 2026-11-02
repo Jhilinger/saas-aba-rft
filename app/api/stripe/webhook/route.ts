@@ -41,9 +41,11 @@ export async function POST(req: NextRequest) {
 
       const subscriptionId = session.subscription as string
       const suscripcion = await stripe.subscriptions.retrieve(subscriptionId)
-      const itemAlumno = suscripcion.items.data.find(
-        (i) => i.price.id === process.env.STRIPE_PRICE_POR_ALUMNO
-      )
+      // Ítem «por alumno»: el precio que eligió el registro según país y plan
+      const precioAlumno = metadata.precio_alumno ?? process.env.STRIPE_PRICE_POR_ALUMNO
+      const itemAlumno = suscripcion.items.data.find((i) => i.price.id === precioAlumno)
+      const itemCuota = suscripcion.items.data.find((i) => i.price.id !== precioAlumno)
+      const importe = (i?: Stripe.SubscriptionItem) => (i?.price.unit_amount ?? 0) / 100
 
       // Evitamos duplicados si Stripe reintenta el mismo evento
       const { data: yaExiste } = await admin
@@ -58,12 +60,17 @@ export async function POST(req: NextRequest) {
         .from('clinicas')
         .insert({
           nombre: metadata.nombre_clinica,
-          pais: metadata.pais ?? 'ES',
+          pais: metadata.pais ?? 'España',
+          pais_codigo: metadata.pais_codigo ?? null,
+          escalon: metadata.escalon ?? null,
+          plan: metadata.plan === 'independiente' ? 'independiente' : 'clinica',
+          moneda: (itemAlumno?.price.currency ?? 'eur').toUpperCase(),
           telefono: metadata.telefono ?? null,
           ciudad: metadata.ciudad ?? null,
           terminos_aceptados_at: metadata.terminos_aceptados_en ?? new Date().toISOString(),
-          precio_fijo_mensual: 30,
-          precio_por_alumno: 4,
+          // Importes reales de la suscripción, no fijados en el código
+          precio_fijo_mensual: importe(itemCuota),
+          precio_por_alumno: importe(itemAlumno),
           sin_facturacion: false,
           estado_suscripcion: suscripcion.status,
           stripe_customer_id: session.customer as string,
