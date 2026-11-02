@@ -1,0 +1,3677 @@
+{
+ "descripcion": "Banco de imágenes de los programas RFT (inventario 2026-11)",
+ "programas": [
+  {
+   "programa": "Inventario · animales salvajes",
+   "categoria": "animales salvajes",
+   "grupos": [
+    [
+     {
+      "concepto": "León",
+      "ejemplares": [
+       "a lion",
+       "a lion, a different model, color or variety from the first one",
+       "a single lion, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Jirafa",
+      "ejemplares": [
+       "a giraffe",
+       "a giraffe, a different model, color or variety from the first one",
+       "a single giraffe, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Elefante",
+      "ejemplares": [
+       "an elephant",
+       "an elephant, a different model, color or variety from the first one",
+       "a single elephant, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tigre",
+      "ejemplares": [
+       "a tiger",
+       "a tiger, a different model, color or variety from the first one",
+       "a single tiger, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cebra",
+      "ejemplares": [
+       "a zebra",
+       "a zebra, a different model, color or variety from the first one",
+       "a single zebra, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Mono",
+      "ejemplares": [
+       "a monkey",
+       "a monkey, a different model, color or variety from the first one",
+       "a single monkey, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Oso",
+      "ejemplares": [
+       "a brown bear",
+       "a brown bear, a different model, color or variety from the first one",
+       "a single brown bear, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Hipopótamo",
+      "ejemplares": [
+       "a hippopotamus",
+       "a hippopotamus, a different model, color or variety from the first one",
+       "a single hippopotamus, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cocodrilo",
+      "ejemplares": [
+       "a crocodile",
+       "a crocodile, a different model, color or variety from the first one",
+       "a single crocodile, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Rinoceronte",
+      "ejemplares": [
+       "a rhinoceros",
+       "a rhinoceros, a different model, color or variety from the first one",
+       "a single rhinoceros, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Canguro",
+      "ejemplares": [
+       "a kangaroo",
+       "a kangaroo, a different model, color or variety from the first one",
+       "a single kangaroo, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Búho",
+      "ejemplares": [
+       "an owl",
+       "an owl, a different model, color or variety from the first one",
+       "a single owl, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lobo",
+      "ejemplares": [
+       "a wolf",
+       "a wolf, a different model, color or variety from the first one",
+       "a single wolf, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Camello",
+      "ejemplares": [
+       "a camel",
+       "a camel, a different model, color or variety from the first one",
+       "a single camel, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Koala",
+      "ejemplares": [
+       "a koala",
+       "a koala, a different model, color or variety from the first one",
+       "a single koala, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Gorila",
+      "ejemplares": [
+       "a gorilla",
+       "a gorilla, a different model, color or variety from the first one",
+       "a single gorilla, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Ciervo",
+      "ejemplares": [
+       "a deer with antlers",
+       "a deer with antlers, a different model, color or variety from the first one",
+       "a single deer with antlers, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Serpiente",
+      "ejemplares": [
+       "a snake",
+       "a snake, a different model, color or variety from the first one",
+       "a single snake, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Panda",
+      "ejemplares": [
+       "a giant panda",
+       "a giant panda, a different model, color or variety from the first one",
+       "a single giant panda, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Águila",
+      "ejemplares": [
+       "an eagle",
+       "an eagle, a different model, color or variety from the first one",
+       "a single eagle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Leopardo",
+      "ejemplares": [
+       "a leopard",
+       "a leopard, a different model, color or variety from the first one",
+       "a single leopard, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Zorro",
+      "ejemplares": [
+       "a red fox",
+       "a red fox, a different model, color or variety from the first one",
+       "a single red fox, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Avestruz",
+      "ejemplares": [
+       "an ostrich",
+       "an ostrich, a different model, color or variety from the first one",
+       "a single ostrich, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tortuga",
+      "ejemplares": [
+       "a land tortoise",
+       "a land tortoise, a different model, color or variety from the first one",
+       "a single land tortoise, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · animales marinos",
+   "categoria": "animales marinos",
+   "grupos": [
+    [
+     {
+      "concepto": "Pulpo",
+      "ejemplares": [
+       "an octopus",
+       "an octopus, a different model, color or variety from the first one",
+       "a single octopus, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Ballena",
+      "ejemplares": [
+       "a whale",
+       "a whale, a different model, color or variety from the first one",
+       "a single whale, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Medusa",
+      "ejemplares": [
+       "a jellyfish",
+       "a jellyfish, a different model, color or variety from the first one",
+       "a single jellyfish, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tiburón",
+      "ejemplares": [
+       "a shark",
+       "a shark, a different model, color or variety from the first one",
+       "a single shark, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Estrella de mar",
+      "ejemplares": [
+       "a starfish",
+       "a starfish, a different model, color or variety from the first one",
+       "a single starfish, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cangrejo",
+      "ejemplares": [
+       "a crab",
+       "a crab, a different model, color or variety from the first one",
+       "a single crab, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Delfín",
+      "ejemplares": [
+       "a dolphin",
+       "a dolphin, a different model, color or variety from the first one",
+       "a single dolphin, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Caballito de mar",
+      "ejemplares": [
+       "a seahorse",
+       "a seahorse, a different model, color or variety from the first one",
+       "a single seahorse, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Langosta",
+      "ejemplares": [
+       "a lobster",
+       "a lobster, a different model, color or variety from the first one",
+       "a single lobster, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Foca",
+      "ejemplares": [
+       "a seal",
+       "a seal, a different model, color or variety from the first one",
+       "a single seal, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pez payaso",
+      "ejemplares": [
+       "a clownfish",
+       "a clownfish, a different model, color or variety from the first one",
+       "a single clownfish, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Calamar",
+      "ejemplares": [
+       "a squid",
+       "a squid, a different model, color or variety from the first one",
+       "a single squid, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tortuga marina",
+      "ejemplares": [
+       "a sea turtle",
+       "a sea turtle, a different model, color or variety from the first one",
+       "a single sea turtle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Gamba",
+      "ejemplares": [
+       "a shrimp",
+       "a shrimp, a different model, color or variety from the first one",
+       "a single shrimp, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Raya",
+      "ejemplares": [
+       "a stingray",
+       "a stingray, a different model, color or variety from the first one",
+       "a single stingray, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Morsa",
+      "ejemplares": [
+       "a walrus",
+       "a walrus, a different model, color or variety from the first one",
+       "a single walrus, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Erizo de mar",
+      "ejemplares": [
+       "a sea urchin",
+       "a sea urchin, a different model, color or variety from the first one",
+       "a single sea urchin, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pez espada",
+      "ejemplares": [
+       "a swordfish",
+       "a swordfish, a different model, color or variety from the first one",
+       "a single swordfish, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · partes del cuerpo",
+   "categoria": "partes del cuerpo",
+   "grupos": [
+    [
+     {
+      "concepto": "Mano",
+      "ejemplares": [
+       "a child's hand",
+       "an adult's hand",
+       "a child's hand, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Ojo",
+      "ejemplares": [
+       "a close-up of a child's eye",
+       "a close-up of an adult's eye",
+       "a close-up of a child's eye, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Pelo",
+      "ejemplares": [
+       "a close-up of a child's hair seen from behind",
+       "a close-up of an adult's hair seen from behind",
+       "a close-up of a child's hair seen from behind, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Nariz",
+      "ejemplares": [
+       "a close-up of a child's nose",
+       "a close-up of an adult's nose",
+       "a close-up of a child's nose, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Pie",
+      "ejemplares": [
+       "a child's bare foot",
+       "an adult's bare foot",
+       "a child's bare foot, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Oreja",
+      "ejemplares": [
+       "a close-up of a child's ear",
+       "a close-up of an adult's ear",
+       "a close-up of a child's ear, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Boca",
+      "ejemplares": [
+       "a close-up of a child's smiling mouth",
+       "a close-up of an adult's smiling mouth",
+       "a close-up of a child's smiling mouth, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Rodilla",
+      "ejemplares": [
+       "a close-up of a child's knee",
+       "a close-up of an adult's knee",
+       "a close-up of a child's knee, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Brazo",
+      "ejemplares": [
+       "a child's arm",
+       "an adult's arm",
+       "a child's arm, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Dedo",
+      "ejemplares": [
+       "a child's hand pointing with the index finger",
+       "an adult's hand pointing with the index finger",
+       "a child's hand pointing with the index finger, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Barriga",
+      "ejemplares": [
+       "a child's belly",
+       "an adult's belly",
+       "a child's belly, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Cuello",
+      "ejemplares": [
+       "a close-up of a child's neck",
+       "a close-up of an adult's neck",
+       "a close-up of a child's neck, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Diente",
+      "ejemplares": [
+       "a close-up of a child's teeth",
+       "a close-up of an adult's teeth",
+       "a close-up of a child's teeth, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Pierna",
+      "ejemplares": [
+       "a child's leg",
+       "an adult's leg",
+       "a child's leg, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Codo",
+      "ejemplares": [
+       "a close-up of a child's elbow",
+       "a close-up of an adult's elbow",
+       "a close-up of a child's elbow, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Lengua",
+      "ejemplares": [
+       "a child sticking out the tongue, close-up of the mouth",
+       "an adult sticking out the tongue, close-up of the mouth",
+       "a child sticking out the tongue, close-up of the mouth, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Espalda",
+      "ejemplares": [
+       "a child's back",
+       "an adult's back",
+       "a child's back, a child with a different skin tone"
+      ]
+     },
+     {
+      "concepto": "Uña",
+      "ejemplares": [
+       "a close-up of a child's fingernails",
+       "a close-up of an adult's fingernails",
+       "a close-up of a child's fingernails, a child with a different skin tone"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · utensilios de cocina",
+   "categoria": "utensilios de cocina",
+   "grupos": [
+    [
+     {
+      "concepto": "Cuchara",
+      "ejemplares": [
+       "a spoon",
+       "a spoon, a different model, color or variety from the first one",
+       "a single spoon, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Plato",
+      "ejemplares": [
+       "a plate",
+       "a plate, a different model, color or variety from the first one",
+       "a single plate, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Vaso",
+      "ejemplares": [
+       "a drinking glass",
+       "a drinking glass, a different model, color or variety from the first one",
+       "a single drinking glass, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tenedor",
+      "ejemplares": [
+       "a fork",
+       "a fork, a different model, color or variety from the first one",
+       "a single fork, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Olla",
+      "ejemplares": [
+       "a cooking pot",
+       "a cooking pot, a different model, color or variety from the first one",
+       "a single cooking pot, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Taza",
+      "ejemplares": [
+       "a cup",
+       "a cup, a different model, color or variety from the first one",
+       "a single cup, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cuchillo",
+      "ejemplares": [
+       "a kitchen knife",
+       "a kitchen knife, a different model, color or variety from the first one",
+       "a single kitchen knife, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sartén",
+      "ejemplares": [
+       "a frying pan",
+       "a frying pan, a different model, color or variety from the first one",
+       "a single frying pan, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Jarra",
+      "ejemplares": [
+       "a water jug",
+       "a water jug, a different model, color or variety from the first one",
+       "a single water jug, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Bol",
+      "ejemplares": [
+       "a bowl",
+       "a bowl, a different model, color or variety from the first one",
+       "a single bowl, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Colador",
+      "ejemplares": [
+       "a kitchen strainer",
+       "a kitchen strainer, a different model, color or variety from the first one",
+       "a single kitchen strainer, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Rodillo",
+      "ejemplares": [
+       "a rolling pin",
+       "a rolling pin, a different model, color or variety from the first one",
+       "a single rolling pin, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Espátula",
+      "ejemplares": [
+       "a kitchen spatula",
+       "a kitchen spatula, a different model, color or variety from the first one",
+       "a single kitchen spatula, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tetera",
+      "ejemplares": [
+       "a teapot",
+       "a teapot, a different model, color or variety from the first one",
+       "a single teapot, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Embudo",
+      "ejemplares": [
+       "a funnel",
+       "a funnel, a different model, color or variety from the first one",
+       "a single funnel, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cazo",
+      "ejemplares": [
+       "a small saucepan",
+       "a small saucepan, a different model, color or variety from the first one",
+       "a single small saucepan, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Rallador",
+      "ejemplares": [
+       "a cheese grater",
+       "a cheese grater, a different model, color or variety from the first one",
+       "a single cheese grater, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Servilleta",
+      "ejemplares": [
+       "a folded napkin",
+       "a folded napkin, a different model, color or variety from the first one",
+       "a single folded napkin, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · plantas",
+   "categoria": "plantas",
+   "grupos": [
+    [
+     {
+      "concepto": "Girasol",
+      "ejemplares": [
+       "a sunflower",
+       "a sunflower, a different model, color or variety from the first one",
+       "a single sunflower, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cactus",
+      "ejemplares": [
+       "a cactus in a pot",
+       "a cactus in a pot, a different model, color or variety from the first one",
+       "a single cactus in a pot, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pino",
+      "ejemplares": [
+       "a pine tree, a full-size tree",
+       "a pine tree, a different full-size specimen",
+       "a pine tree, another full-size specimen of a different shape"
+      ]
+     },
+     {
+      "concepto": "Rosa",
+      "ejemplares": [
+       "a red rose",
+       "a red rose, a different model, color or variety from the first one",
+       "a single red rose, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Palmera",
+      "ejemplares": [
+       "a tall palm tree with a long trunk, a full-size tree",
+       "a tall palm tree with a long trunk, a different full-size specimen",
+       "a tall palm tree with a long trunk, another full-size specimen of a different shape"
+      ]
+     },
+     {
+      "concepto": "Helecho",
+      "ejemplares": [
+       "a fern",
+       "a fern, a different model, color or variety from the first one",
+       "a single fern, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Margarita",
+      "ejemplares": [
+       "a daisy",
+       "a daisy, a different model, color or variety from the first one",
+       "a single daisy, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Roble",
+      "ejemplares": [
+       "an oak tree, a full-size tree",
+       "an oak tree, a different full-size specimen",
+       "an oak tree, another full-size specimen of a different shape"
+      ]
+     },
+     {
+      "concepto": "Bambú",
+      "ejemplares": [
+       "bamboo stalks",
+       "bamboo stalks, a different model, color or variety from the first one",
+       "a single bamboo stalks, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tulipán",
+      "ejemplares": [
+       "a tulip",
+       "a tulip, a different model, color or variety from the first one",
+       "a single tulip, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Olivo",
+      "ejemplares": [
+       "an olive tree, a full-size tree",
+       "an olive tree, a different full-size specimen",
+       "an olive tree, another full-size specimen of a different shape"
+      ]
+     },
+     {
+      "concepto": "Trébol",
+      "ejemplares": [
+       "a clover plant",
+       "a clover plant, a different model, color or variety from the first one",
+       "a single clover plant, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lavanda",
+      "ejemplares": [
+       "a lavender plant",
+       "a lavender plant, a different model, color or variety from the first one",
+       "a single lavender plant, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sauce",
+      "ejemplares": [
+       "a weeping willow tree, a full-size tree",
+       "a weeping willow tree, a different full-size specimen",
+       "a weeping willow tree, another full-size specimen of a different shape"
+      ]
+     },
+     {
+      "concepto": "Maíz",
+      "ejemplares": [
+       "a corn plant with a cob",
+       "a corn plant with a cob, a different model, color or variety from the first one",
+       "a single corn plant with a cob, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · material escolar",
+   "categoria": "material escolar",
+   "grupos": [
+    [
+     {
+      "concepto": "Lápiz",
+      "ejemplares": [
+       "a pencil",
+       "a pencil, a different model, color or variety from the first one",
+       "a single pencil, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Libro",
+      "ejemplares": [
+       "a closed book",
+       "a closed book, a different model, color or variety from the first one",
+       "a single closed book, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tijeras",
+      "ejemplares": [
+       "a pair of children's scissors",
+       "a pair of children's scissors, a different model, color or variety from the first one",
+       "a single pair of children's scissors, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Goma",
+      "ejemplares": [
+       "an eraser",
+       "an eraser, a different model, color or variety from the first one",
+       "a single eraser, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Mochila",
+      "ejemplares": [
+       "a school backpack",
+       "a school backpack, a different model, color or variety from the first one",
+       "a single school backpack, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Regla",
+      "ejemplares": [
+       "a ruler",
+       "a ruler, a different model, color or variety from the first one",
+       "a single ruler, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pegamento",
+      "ejemplares": [
+       "a glue stick",
+       "a glue stick, a different model, color or variety from the first one",
+       "a single glue stick, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Estuche",
+      "ejemplares": [
+       "a pencil case",
+       "a pencil case, a different model, color or variety from the first one",
+       "a single pencil case, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sacapuntas",
+      "ejemplares": [
+       "a pencil sharpener",
+       "a pencil sharpener, a different model, color or variety from the first one",
+       "a single pencil sharpener, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cuaderno",
+      "ejemplares": [
+       "a notebook",
+       "a notebook, a different model, color or variety from the first one",
+       "a single notebook, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pincel",
+      "ejemplares": [
+       "a paintbrush",
+       "a paintbrush, a different model, color or variety from the first one",
+       "a single paintbrush, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Rotulador",
+      "ejemplares": [
+       "a felt-tip marker",
+       "a felt-tip marker, a different model, color or variety from the first one",
+       "a single felt-tip marker, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Ceras",
+      "ejemplares": [
+       "a box of wax crayons",
+       "a box of wax crayons, a different model, color or variety from the first one",
+       "a single box of wax crayons, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Carpeta",
+      "ejemplares": [
+       "a folder",
+       "a folder, a different model, color or variety from the first one",
+       "a single folder, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Compás",
+      "ejemplares": [
+       "a drawing compass",
+       "a drawing compass, a different model, color or variety from the first one",
+       "a single drawing compass, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Plastilina",
+      "ejemplares": [
+       "colored modelling clay",
+       "colored modelling clay, a different model, color or variety from the first one",
+       "a single colored modelling clay, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pizarra",
+      "ejemplares": [
+       "a small chalkboard",
+       "a small chalkboard, a different model, color or variety from the first one",
+       "a single small chalkboard, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Grapadora",
+      "ejemplares": [
+       "a stapler",
+       "a stapler, a different model, color or variety from the first one",
+       "a single stapler, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · dependencias de la casa",
+   "categoria": "dependencias de la casa",
+   "grupos": [
+    [
+     {
+      "concepto": "Cocina",
+      "ejemplares": [
+       "a home kitchen",
+       "a home kitchen, a different place and composition",
+       "a home kitchen, another different example"
+      ]
+     },
+     {
+      "concepto": "Baño",
+      "ejemplares": [
+       "a home bathroom",
+       "a home bathroom, a different place and composition",
+       "a home bathroom, another different example"
+      ]
+     },
+     {
+      "concepto": "Dormitorio",
+      "ejemplares": [
+       "a bedroom with a bed",
+       "a bedroom with a bed, a different place and composition",
+       "a bedroom with a bed, another different example"
+      ]
+     },
+     {
+      "concepto": "Salón",
+      "ejemplares": [
+       "a living room with a sofa",
+       "a living room with a sofa, a different place and composition",
+       "a living room with a sofa, another different example"
+      ]
+     },
+     {
+      "concepto": "Garaje",
+      "ejemplares": [
+       "a home garage with a car",
+       "a home garage with a car, a different place and composition",
+       "a home garage with a car, another different example"
+      ]
+     },
+     {
+      "concepto": "Jardín",
+      "ejemplares": [
+       "a garden of a house",
+       "a garden of a house, a different place and composition",
+       "a garden of a house, another different example"
+      ]
+     },
+     {
+      "concepto": "Comedor",
+      "ejemplares": [
+       "a dining room with a table and chairs",
+       "a dining room with a table and chairs, a different place and composition",
+       "a dining room with a table and chairs, another different example"
+      ]
+     },
+     {
+      "concepto": "Terraza",
+      "ejemplares": [
+       "a balcony terrace with plants",
+       "a balcony terrace with plants, a different place and composition",
+       "a balcony terrace with plants, another different example"
+      ]
+     },
+     {
+      "concepto": "Lavadero",
+      "ejemplares": [
+       "a laundry room with a washing machine",
+       "a laundry room with a washing machine, a different place and composition",
+       "a laundry room with a washing machine, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · herramientas",
+   "categoria": "herramientas",
+   "grupos": [
+    [
+     {
+      "concepto": "Martillo",
+      "ejemplares": [
+       "a hammer",
+       "a hammer, a different model, color or variety from the first one",
+       "a single hammer, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Destornillador",
+      "ejemplares": [
+       "a screwdriver",
+       "a screwdriver, a different model, color or variety from the first one",
+       "a single screwdriver, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sierra",
+      "ejemplares": [
+       "a hand saw",
+       "a hand saw, a different model, color or variety from the first one",
+       "a single hand saw, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Llave inglesa",
+      "ejemplares": [
+       "an adjustable wrench",
+       "an adjustable wrench, a different model, color or variety from the first one",
+       "a single adjustable wrench, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Taladro",
+      "ejemplares": [
+       "an electric drill",
+       "an electric drill, a different model, color or variety from the first one",
+       "a single electric drill, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pala",
+      "ejemplares": [
+       "a shovel",
+       "a shovel, a different model, color or variety from the first one",
+       "a single shovel, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Alicates",
+      "ejemplares": [
+       "pliers",
+       "pliers, a different model, color or variety from the first one",
+       "a single pliers, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Rastrillo",
+      "ejemplares": [
+       "a garden rake",
+       "a garden rake, a different model, color or variety from the first one",
+       "a single garden rake, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Brocha",
+      "ejemplares": [
+       "a paint brush for walls",
+       "a paint brush for walls, a different model, color or variety from the first one",
+       "a single paint brush for walls, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Metro",
+      "ejemplares": [
+       "a tape measure",
+       "a tape measure, a different model, color or variety from the first one",
+       "a single tape measure, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Escalera",
+      "ejemplares": [
+       "a step ladder",
+       "a step ladder, a different model, color or variety from the first one",
+       "a single step ladder, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Carretilla",
+      "ejemplares": [
+       "a wheelbarrow",
+       "a wheelbarrow, a different model, color or variety from the first one",
+       "a single wheelbarrow, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · electrodomésticos",
+   "categoria": "electrodomésticos",
+   "grupos": [
+    [
+     {
+      "concepto": "Televisión",
+      "ejemplares": [
+       "a television",
+       "a television, a different model, color or variety from the first one",
+       "a single television, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Frigorífico",
+      "ejemplares": [
+       "a refrigerator",
+       "a refrigerator, a different model, color or variety from the first one",
+       "a single refrigerator, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lavadora",
+      "ejemplares": [
+       "a washing machine",
+       "a washing machine, a different model, color or variety from the first one",
+       "a single washing machine, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Microondas",
+      "ejemplares": [
+       "a microwave oven",
+       "a microwave oven, a different model, color or variety from the first one",
+       "a single microwave oven, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Aspiradora",
+      "ejemplares": [
+       "a vacuum cleaner",
+       "a vacuum cleaner, a different model, color or variety from the first one",
+       "a single vacuum cleaner, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Secador",
+      "ejemplares": [
+       "a hair dryer",
+       "a hair dryer, a different model, color or variety from the first one",
+       "a single hair dryer, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Horno",
+      "ejemplares": [
+       "a kitchen oven",
+       "a kitchen oven, a different model, color or variety from the first one",
+       "a single kitchen oven, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Plancha",
+      "ejemplares": [
+       "a clothes iron",
+       "a clothes iron, a different model, color or variety from the first one",
+       "a single clothes iron, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Tostadora",
+      "ejemplares": [
+       "a toaster",
+       "a toaster, a different model, color or variety from the first one",
+       "a single toaster, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Batidora",
+      "ejemplares": [
+       "a hand blender",
+       "a hand blender, a different model, color or variety from the first one",
+       "a single hand blender, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Ventilador",
+      "ejemplares": [
+       "an electric fan",
+       "an electric fan, a different model, color or variety from the first one",
+       "a single electric fan, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lavavajillas",
+      "ejemplares": [
+       "a dishwasher",
+       "a dishwasher, a different model, color or variety from the first one",
+       "a single dishwasher, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cafetera",
+      "ejemplares": [
+       "a coffee maker",
+       "a coffee maker, a different model, color or variety from the first one",
+       "a single coffee maker, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Exprimidor",
+      "ejemplares": [
+       "an electric citrus juicer",
+       "an electric citrus juicer, a different model, color or variety from the first one",
+       "a single electric citrus juicer, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Radio",
+      "ejemplares": [
+       "a radio",
+       "a radio, a different model, color or variety from the first one",
+       "a single radio, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · muebles",
+   "categoria": "muebles",
+   "grupos": [
+    [
+     {
+      "concepto": "Silla",
+      "ejemplares": [
+       "a simple dining chair with four legs and a backrest, no armrests",
+       "a simple dining chair with four legs and a backrest, no armrests, a different model, color or variety from the first one",
+       "a single simple dining chair with four legs and a backrest, no armrests, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Mesa",
+      "ejemplares": [
+       "a table",
+       "a table, a different model, color or variety from the first one",
+       "a single table, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cama",
+      "ejemplares": [
+       "a bed",
+       "a bed, a different model, color or variety from the first one",
+       "a single bed, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sofá",
+      "ejemplares": [
+       "a sofa",
+       "a sofa, a different model, color or variety from the first one",
+       "a single sofa, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Armario",
+      "ejemplares": [
+       "a wardrobe",
+       "a wardrobe, a different model, color or variety from the first one",
+       "a single wardrobe, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Estantería",
+      "ejemplares": [
+       "a bookshelf",
+       "a bookshelf, a different model, color or variety from the first one",
+       "a single bookshelf, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lámpara",
+      "ejemplares": [
+       "a floor lamp",
+       "a floor lamp, a different model, color or variety from the first one",
+       "a single floor lamp, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cómoda",
+      "ejemplares": [
+       "a chest of drawers",
+       "a chest of drawers, a different model, color or variety from the first one",
+       "a single chest of drawers, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Escritorio",
+      "ejemplares": [
+       "a desk",
+       "a desk, a different model, color or variety from the first one",
+       "a single desk, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Mesita de noche",
+      "ejemplares": [
+       "a bedside table",
+       "a bedside table, a different model, color or variety from the first one",
+       "a single bedside table, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Taburete",
+      "ejemplares": [
+       "a stool",
+       "a stool, a different model, color or variety from the first one",
+       "a single stool, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Perchero",
+      "ejemplares": [
+       "a coat stand",
+       "a coat stand, a different model, color or variety from the first one",
+       "a single coat stand, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cuna",
+      "ejemplares": [
+       "a baby crib",
+       "a baby crib, a different model, color or variety from the first one",
+       "a single baby crib, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Banco",
+      "ejemplares": [
+       "a wooden park bench with a backrest",
+       "a park bench with a backrest, a different model and color",
+       "a long wooden bench with a backrest and armrests, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Espejo",
+      "ejemplares": [
+       "a wall mirror",
+       "a wall mirror, a different model, color or variety from the first one",
+       "a single wall mirror, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Baúl",
+      "ejemplares": [
+       "a wooden chest",
+       "a wooden chest, a different model, color or variety from the first one",
+       "a single wooden chest, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Mecedora",
+      "ejemplares": [
+       "a rocking chair",
+       "a rocking chair, a different model, color or variety from the first one",
+       "a single rocking chair, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sillón",
+      "ejemplares": [
+       "an armchair",
+       "an armchair, a different model, color or variety from the first one",
+       "a single armchair, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · características",
+   "categoria": "características",
+   "grupos": [
+    [
+     {
+      "concepto": "Mojado",
+      "ejemplares": [
+       "a wet T-shirt, clearly wet, dripping with water",
+       "a wet dog, clearly wet, dripping with water",
+       "a wet umbrella, clearly wet, dripping with water"
+      ]
+     },
+     {
+      "concepto": "Roto",
+      "ejemplares": [
+       "a broken toy, clearly broken",
+       "a broken cup, clearly broken",
+       "a torn book, clearly broken"
+      ]
+     },
+     {
+      "concepto": "Sucio",
+      "ejemplares": [
+       "muddy shoes, clearly dirty",
+       "a dirty plate, clearly dirty",
+       "a stained T-shirt, clearly dirty"
+      ]
+     },
+     {
+      "concepto": "Abierto",
+      "ejemplares": [
+       "an open door, clearly open",
+       "an open box, clearly open",
+       "an open book, clearly open"
+      ]
+     },
+     {
+      "concepto": "Lleno",
+      "ejemplares": [
+       "a glass filled to the brim with orange juice, clearly full",
+       "a basket full to the top with apples, clearly full",
+       "a glass filled to the brim with milk, clearly full"
+      ]
+     },
+     {
+      "concepto": "Encendido",
+      "ejemplares": [
+       "a lit lamp, clearly switched on",
+       "a lit candle, clearly switched on",
+       "a TV that is on, clearly switched on"
+      ]
+     },
+     {
+      "concepto": "Limpio",
+      "ejemplares": [
+       "a clean plate, clearly clean and shiny",
+       "clean white shoes, clearly clean and shiny",
+       "a clean plate, clearly clean and shiny"
+      ]
+     },
+     {
+      "concepto": "Cerrado",
+      "ejemplares": [
+       "a closed door, clearly closed",
+       "a closed box, clearly closed",
+       "a closed door, clearly closed"
+      ]
+     },
+     {
+      "concepto": "Vacío",
+      "ejemplares": [
+       "an empty glass, clearly empty",
+       "an empty box, clearly empty",
+       "an empty glass, clearly empty"
+      ]
+     },
+     {
+      "concepto": "Seco",
+      "ejemplares": [
+       "dry leaves, clearly dry",
+       "a dry towel, clearly dry",
+       "dry leaves, clearly dry"
+      ]
+     },
+     {
+      "concepto": "Apagado",
+      "ejemplares": [
+       "an intact table lamp that is switched off, the bulb dark, in perfect condition",
+       "a TV that is off, black screen, clearly switched off",
+       "an intact floor lamp that is switched off, the bulb dark, in perfect condition"
+      ]
+     },
+     {
+      "concepto": "Arrugado",
+      "ejemplares": [
+       "a crumpled sheet of paper, clearly wrinkled",
+       "a creased shirt, clearly wrinkled",
+       "a crumpled sheet of paper, clearly wrinkled"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · profesiones",
+   "categoria": "profesiones",
+   "grupos": [
+    [
+     {
+      "concepto": "Bombero",
+      "ejemplares": [
+       "a firefighter in uniform (the person shown is a woman about 30 years old)",
+       "a firefighter in uniform (the person shown is a man about 45 years old)",
+       "a firefighter in uniform (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Médico",
+      "ejemplares": [
+       "a doctor in a white coat with a stethoscope (the person shown is a woman about 30 years old)",
+       "a doctor in a white coat with a stethoscope (the person shown is a man about 45 years old)",
+       "a doctor in a white coat with a stethoscope (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Panadero",
+      "ejemplares": [
+       "a baker with bread (the person shown is a woman about 30 years old)",
+       "a baker with bread (the person shown is a man about 45 years old)",
+       "a baker with bread (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Policía",
+      "ejemplares": [
+       "a police officer (the person shown is a woman about 30 years old)",
+       "a police officer (the person shown is a man about 45 years old)",
+       "a police officer (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Maestra",
+      "ejemplares": [
+       "a teacher in front of a blackboard (the person shown is a woman about 30 years old)",
+       "a teacher in front of a blackboard (the person shown is a man about 45 years old)",
+       "a teacher in front of a blackboard (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Peluquero",
+      "ejemplares": [
+       "a hairdresser cutting hair (the person shown is a woman about 30 years old)",
+       "a hairdresser cutting hair (the person shown is a man about 45 years old)",
+       "a hairdresser cutting hair (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Cartero",
+      "ejemplares": [
+       "a postman with a bag of letters (the person shown is a woman about 30 years old)",
+       "a postman with a bag of letters (the person shown is a man about 45 years old)",
+       "a postman with a bag of letters (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Cocinero",
+      "ejemplares": [
+       "a chef in a white hat (the person shown is a woman about 30 years old)",
+       "a chef in a white hat (the person shown is a man about 45 years old)",
+       "a chef in a white hat (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Agricultor",
+      "ejemplares": [
+       "a farmer in a field (the person shown is a woman about 30 years old)",
+       "a farmer in a field (the person shown is a man about 45 years old)",
+       "a farmer in a field (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Dentista",
+      "ejemplares": [
+       "a dentist with dental tools (the person shown is a woman about 30 years old)",
+       "a dentist with dental tools (the person shown is a man about 45 years old)",
+       "a dentist with dental tools (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Pintor",
+      "ejemplares": [
+       "a house painter with a roller (the person shown is a woman about 30 years old)",
+       "a house painter with a roller (the person shown is a man about 45 years old)",
+       "a house painter with a roller (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Conductor de autobús",
+      "ejemplares": [
+       "a bus driver at the wheel (the person shown is a woman about 30 years old)",
+       "a bus driver at the wheel (the person shown is a man about 45 years old)",
+       "a bus driver at the wheel (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Veterinario",
+      "ejemplares": [
+       "a vet examining a dog (the person shown is a woman about 30 years old)",
+       "a vet examining a dog (the person shown is a man about 45 years old)",
+       "a vet examining a dog (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Albañil",
+      "ejemplares": [
+       "a construction worker laying bricks (the person shown is a woman about 30 years old)",
+       "a construction worker laying bricks (the person shown is a man about 45 years old)",
+       "a construction worker laying bricks (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Piloto",
+      "ejemplares": [
+       "an airline pilot in uniform (the person shown is a woman about 30 years old)",
+       "an airline pilot in uniform (the person shown is a man about 45 years old)",
+       "an airline pilot in uniform (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Carpintero",
+      "ejemplares": [
+       "a carpenter working wood (the person shown is a woman about 30 years old)",
+       "a carpenter working wood (the person shown is a man about 45 years old)",
+       "a carpenter working wood (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Enfermera",
+      "ejemplares": [
+       "a nurse (the person shown is a woman about 30 years old)",
+       "a nurse (the person shown is a man about 45 years old)",
+       "a nurse (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Fontanero",
+      "ejemplares": [
+       "a plumber fixing a pipe (the person shown is a woman about 30 years old)",
+       "a plumber fixing a pipe (the person shown is a man about 45 years old)",
+       "a plumber fixing a pipe (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Mecánico",
+      "ejemplares": [
+       "a car mechanic (the person shown is a woman about 30 years old)",
+       "a car mechanic (the person shown is a man about 45 years old)",
+       "a car mechanic (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Jardinero",
+      "ejemplares": [
+       "a gardener watering plants (the person shown is a woman about 30 years old)",
+       "a gardener watering plants (the person shown is a man about 45 years old)",
+       "a gardener watering plants (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Pescador",
+      "ejemplares": [
+       "a fisherman with a fishing rod (the person shown is a woman about 30 years old)",
+       "a fisherman with a fishing rod (the person shown is a man about 45 years old)",
+       "a fisherman with a fishing rod (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Astronauta",
+      "ejemplares": [
+       "an astronaut in a space suit (the person shown is a woman about 30 years old)",
+       "an astronaut in a space suit (the person shown is a man about 45 years old)",
+       "an astronaut in a space suit (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Socorrista",
+      "ejemplares": [
+       "a lifeguard on a beach (the person shown is a woman about 30 years old)",
+       "a lifeguard on a beach (the person shown is a man about 45 years old)",
+       "a lifeguard on a beach (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Músico",
+      "ejemplares": [
+       "a musician playing (the person shown is a woman about 30 years old)",
+       "a musician playing (the person shown is a man about 45 years old)",
+       "a musician playing (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · instrumentos musicales",
+   "categoria": "instrumentos musicales",
+   "grupos": [
+    [
+     {
+      "concepto": "Tambor",
+      "ejemplares": [
+       "a drum",
+       "a drum, a different model, color or variety from the first one",
+       "a single drum, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Trompeta",
+      "ejemplares": [
+       "a trumpet",
+       "a trumpet, a different model, color or variety from the first one",
+       "a single trumpet, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Guitarra",
+      "ejemplares": [
+       "a guitar",
+       "a guitar, a different model, color or variety from the first one",
+       "a single guitar, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Piano",
+      "ejemplares": [
+       "a piano",
+       "a piano, a different model, color or variety from the first one",
+       "a single piano, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Violín",
+      "ejemplares": [
+       "a violin",
+       "a violin, a different model, color or variety from the first one",
+       "a single violin, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Flauta",
+      "ejemplares": [
+       "a recorder flute",
+       "a recorder flute, a different model, color or variety from the first one",
+       "a single recorder flute, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Xilófono",
+      "ejemplares": [
+       "a xylophone",
+       "a xylophone, a different model, color or variety from the first one",
+       "a single xylophone, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Maracas",
+      "ejemplares": [
+       "a pair of maracas",
+       "a pair of maracas, a different model, color or variety from the first one",
+       "a single pair of maracas, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Arpa",
+      "ejemplares": [
+       "a harp",
+       "a harp, a different model, color or variety from the first one",
+       "a single harp, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Saxofón",
+      "ejemplares": [
+       "a saxophone",
+       "a saxophone, a different model, color or variety from the first one",
+       "a single saxophone, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pandereta",
+      "ejemplares": [
+       "a tambourine",
+       "a tambourine, a different model, color or variety from the first one",
+       "a single tambourine, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Acordeón",
+      "ejemplares": [
+       "an accordion",
+       "an accordion, a different model, color or variety from the first one",
+       "a single accordion, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Batería",
+      "ejemplares": [
+       "a drum kit",
+       "a drum kit, a different model, color or variety from the first one",
+       "a single drum kit, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Triángulo",
+      "ejemplares": [
+       "a musical triangle",
+       "a musical triangle, a different model, color or variety from the first one",
+       "a single musical triangle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Violonchelo",
+      "ejemplares": [
+       "a cello",
+       "a cello, a different model, color or variety from the first one",
+       "a single cello, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · deportes",
+   "categoria": "deportes",
+   "grupos": [
+    [
+     {
+      "concepto": "Fútbol",
+      "ejemplares": [
+       "a girl about 7 years old playing football (soccer)",
+       "a man about 35 years old playing football (soccer)",
+       "a boy about 10 years old with a different skin tone playing football (soccer)"
+      ]
+     },
+     {
+      "concepto": "Natación",
+      "ejemplares": [
+       "a girl about 7 years old swimming in a pool",
+       "a man about 35 years old swimming in a pool",
+       "a boy about 10 years old with a different skin tone swimming in a pool"
+      ]
+     },
+     {
+      "concepto": "Baloncesto",
+      "ejemplares": [
+       "a girl about 7 years old shooting a basketball into a hoop",
+       "a man about 35 years old shooting a basketball into a hoop",
+       "a boy about 10 years old with a different skin tone shooting a basketball into a hoop"
+      ]
+     },
+     {
+      "concepto": "Tenis",
+      "ejemplares": [
+       "a girl about 7 years old playing tennis",
+       "a man about 35 years old playing tennis",
+       "a boy about 10 years old with a different skin tone playing tennis"
+      ]
+     },
+     {
+      "concepto": "Ciclismo",
+      "ejemplares": [
+       "a cyclist racing on a road bike (the person shown is a girl about 7 years old)",
+       "a cyclist racing on a road bike (the person shown is a man about 35 years old)",
+       "a cyclist racing on a road bike (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Esquí",
+      "ejemplares": [
+       "a girl about 7 years old skiing on snow",
+       "a man about 35 years old skiing on snow",
+       "a boy about 10 years old with a different skin tone skiing on snow"
+      ]
+     },
+     {
+      "concepto": "Atletismo",
+      "ejemplares": [
+       "a runner on an athletics track (the person shown is a girl about 7 years old)",
+       "a runner on an athletics track (the person shown is a man about 35 years old)",
+       "a runner on an athletics track (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Gimnasia",
+      "ejemplares": [
+       "a gymnast doing a cartwheel (the person shown is a girl about 7 years old)",
+       "a gymnast doing a cartwheel (the person shown is a man about 35 years old)",
+       "a gymnast doing a cartwheel (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Golf",
+      "ejemplares": [
+       "a girl about 7 years old playing golf",
+       "a man about 35 years old playing golf",
+       "a boy about 10 years old with a different skin tone playing golf"
+      ]
+     },
+     {
+      "concepto": "Judo",
+      "ejemplares": [
+       "two children practising judo (the person shown is a girl about 7 years old)",
+       "two children practising judo (the person shown is a man about 35 years old)",
+       "two children practising judo (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Patinaje",
+      "ejemplares": [
+       "a girl about 7 years old roller skating",
+       "a man about 35 years old roller skating",
+       "a boy about 10 years old with a different skin tone roller skating"
+      ]
+     },
+     {
+      "concepto": "Balonmano",
+      "ejemplares": [
+       "a girl about 7 years old throwing a handball",
+       "a man about 35 years old throwing a handball",
+       "a boy about 10 years old with a different skin tone throwing a handball"
+      ]
+     },
+     {
+      "concepto": "Vela",
+      "ejemplares": [
+       "a small sailing boat on the sea (the person shown is a girl about 7 years old)",
+       "a small sailing boat on the sea (the person shown is a man about 35 years old)",
+       "a small sailing boat on the sea (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Escalada",
+      "ejemplares": [
+       "a girl about 7 years old rock climbing",
+       "a man about 35 years old rock climbing",
+       "a boy about 10 years old with a different skin tone rock climbing"
+      ]
+     },
+     {
+      "concepto": "Voleibol",
+      "ejemplares": [
+       "people playing volleyball (the person shown is a girl about 7 years old)",
+       "people playing volleyball (the person shown is a man about 35 years old)",
+       "people playing volleyball (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · universo",
+   "categoria": "universo",
+   "grupos": [
+    [
+     {
+      "concepto": "Sol",
+      "ejemplares": [
+       "the sun",
+       "the sun, a different place and composition",
+       "the sun, another different example"
+      ]
+     },
+     {
+      "concepto": "Luna",
+      "ejemplares": [
+       "the full moon in the night sky",
+       "the full moon in the night sky, a different place and composition",
+       "the full moon in the night sky, another different example"
+      ]
+     },
+     {
+      "concepto": "Estrella",
+      "ejemplares": [
+       "a bright star in the night sky",
+       "a bright star in the night sky, a different place and composition",
+       "a bright star in the night sky, another different example"
+      ]
+     },
+     {
+      "concepto": "Tierra",
+      "ejemplares": [
+       "planet Earth seen from space",
+       "planet Earth seen from space, a different place and composition",
+       "planet Earth seen from space, another different example"
+      ]
+     },
+     {
+      "concepto": "Cohete",
+      "ejemplares": [
+       "a space rocket",
+       "a space rocket, a different place and composition",
+       "a space rocket, another different example"
+      ]
+     },
+     {
+      "concepto": "Saturno",
+      "ejemplares": [
+       "the planet Saturn with its rings",
+       "the planet Saturn with its rings, a different place and composition",
+       "the planet Saturn with its rings, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · tiempo atmosférico",
+   "categoria": "tiempo atmosférico",
+   "grupos": [
+    [
+     {
+      "concepto": "Soleado",
+      "ejemplares": [
+       "a sunny day landscape",
+       "a sunny day landscape, a different place and composition",
+       "a sunny day landscape, another different example"
+      ]
+     },
+     {
+      "concepto": "Lluvioso",
+      "ejemplares": [
+       "heavy rain falling on a city street, rain streaks clearly visible, big puddles with splashes, wet shiny pavement",
+       "heavy rain falling on a country road, rain streaks clearly visible, puddles with splashes",
+       "raindrops pouring down a window with a rainy garden behind, rain clearly visible"
+      ]
+     },
+     {
+      "concepto": "Nevado",
+      "ejemplares": [
+       "a snowy day landscape",
+       "a snowy day landscape, a different place and composition",
+       "a snowy day landscape, another different example"
+      ]
+     },
+     {
+      "concepto": "Nublado",
+      "ejemplares": [
+       "a dry green meadow under a completely overcast sky of thick grey clouds, no rain",
+       "a calm town square under a heavy grey cloudy sky, dry ground, no rain",
+       "a beach under a sky completely covered by big grey clouds, no rain"
+      ]
+     },
+     {
+      "concepto": "Ventoso",
+      "ejemplares": [
+       "a windy day with trees bending",
+       "a windy day with trees bending, a different place and composition",
+       "a windy day with trees bending, another different example"
+      ]
+     },
+     {
+      "concepto": "Tormenta",
+      "ejemplares": [
+       "a thunderstorm with lightning",
+       "a thunderstorm with lightning, a different place and composition",
+       "a thunderstorm with lightning, another different example"
+      ]
+     },
+     {
+      "concepto": "Niebla",
+      "ejemplares": [
+       "a foggy day landscape",
+       "a street with lampposts and trees fading into thick white fog, only the nearest ones visible",
+       "a foggy day landscape, another different example"
+      ]
+     },
+     {
+      "concepto": "Granizo",
+      "ejemplares": [
+       "close-up of many white hailstones, round balls of ice, piled on a green lawn",
+       "round white hailstones bouncing on a car bonnet, close-up",
+       "a hand-sized pile of round white hailstones on a wooden table outside, close-up, the ice balls clearly visible"
+      ]
+     },
+     {
+      "concepto": "Arcoíris",
+      "ejemplares": [
+       "a rainbow in the sky",
+       "a rainbow in the sky, a different place and composition",
+       "a rainbow in the sky, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · estaciones",
+   "categoria": "estaciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Verano",
+      "ejemplares": [
+       "a summer scene: beach and sun",
+       "a summer scene: beach and sun, a different place and composition",
+       "a summer scene: beach and sun, another different example"
+      ]
+     },
+     {
+      "concepto": "Otoño",
+      "ejemplares": [
+       "an autumn scene: fallen dry leaves",
+       "an autumn scene: fallen dry leaves, a different place and composition",
+       "an autumn scene: fallen dry leaves, another different example"
+      ]
+     },
+     {
+      "concepto": "Invierno",
+      "ejemplares": [
+       "a winter scene: bare trees and warm clothes",
+       "a winter scene: bare trees and warm clothes, a different place and composition",
+       "a winter scene: bare trees and warm clothes, another different example"
+      ]
+     },
+     {
+      "concepto": "Primavera",
+      "ejemplares": [
+       "a spring scene: blooming flowers",
+       "a spring scene: blooming flowers, a different place and composition",
+       "a spring scene: blooming flowers, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · emociones",
+   "categoria": "emociones",
+   "grupos": [
+    [
+     {
+      "concepto": "Contento",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly happy",
+       "the face of a man about 35 years old who is clearly happy",
+       "the face of a boy about 10 years old with a different skin tone who is clearly happy"
+      ]
+     },
+     {
+      "concepto": "Triste",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly sad",
+       "the face of a man about 35 years old who is clearly sad",
+       "the face of a boy about 10 years old with a different skin tone who is clearly sad"
+      ]
+     },
+     {
+      "concepto": "Enfadado",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly angry",
+       "the face of a man about 35 years old who is clearly angry",
+       "the face of a boy about 10 years old with a different skin tone who is clearly angry"
+      ]
+     },
+     {
+      "concepto": "Asustado",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly scared",
+       "the face of a man about 35 years old who is clearly scared",
+       "the face of a boy about 10 years old with a different skin tone who is clearly scared"
+      ]
+     },
+     {
+      "concepto": "Sorprendido",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly surprised",
+       "the face of a man about 35 years old who is clearly surprised",
+       "the face of a boy about 10 years old with a different skin tone who is clearly surprised"
+      ]
+     },
+     {
+      "concepto": "Asco",
+      "ejemplares": [
+       "the face of a girl about 7 years old showing clear disgust",
+       "the face of a man about 35 years old showing clear disgust",
+       "the face of a boy about 10 years old with a different skin tone showing clear disgust"
+      ]
+     },
+     {
+      "concepto": "Tranquilo",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is calm and relaxed",
+       "the face of a man about 35 years old who is calm and relaxed",
+       "the face of a boy about 10 years old with a different skin tone who is calm and relaxed"
+      ]
+     },
+     {
+      "concepto": "Aburrido",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly bored",
+       "the face of a man about 35 years old who is clearly bored",
+       "the face of a boy about 10 years old with a different skin tone who is clearly bored"
+      ]
+     },
+     {
+      "concepto": "Nervioso",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly nervous",
+       "the face of a man about 35 years old who is clearly nervous",
+       "the face of a boy about 10 years old with a different skin tone who is clearly nervous"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · sensaciones",
+   "categoria": "sensaciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Frío",
+      "ejemplares": [
+       "a girl about 7 years old shivering with cold, wrapped in a scarf",
+       "a man about 35 years old shivering with cold, wrapped in a scarf",
+       "a boy about 10 years old with a different skin tone shivering with cold, wrapped in a scarf"
+      ]
+     },
+     {
+      "concepto": "Calor",
+      "ejemplares": [
+       "a girl about 7 years old sweating and hot, fanning themselves",
+       "a man about 35 years old sweating and hot, fanning themselves",
+       "a boy about 10 years old with a different skin tone sweating and hot, fanning themselves"
+      ]
+     },
+     {
+      "concepto": "Sueño",
+      "ejemplares": [
+       "a girl about 7 years old yawning, very sleepy",
+       "a man about 35 years old yawning, very sleepy",
+       "a boy about 10 years old with a different skin tone yawning, very sleepy"
+      ]
+     },
+     {
+      "concepto": "Hambre",
+      "ejemplares": [
+       "a girl about 7 years old hungry, holding the tummy and looking at food",
+       "a man about 35 years old hungry, holding the tummy and looking at food",
+       "a boy about 10 years old with a different skin tone hungry, holding the tummy and looking at food"
+      ]
+     },
+     {
+      "concepto": "Sed",
+      "ejemplares": [
+       "a thirsty child drinking a big glass of water (the person shown is a girl about 7 years old)",
+       "a thirsty child drinking a big glass of water (the person shown is a man about 35 years old)",
+       "a thirsty child drinking a big glass of water (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Dolor",
+      "ejemplares": [
+       "a girl about 7 years old with a tummy ache holding the belly",
+       "a man about 35 years old with a tummy ache holding the belly",
+       "a boy about 10 years old with a different skin tone with a tummy ache holding the belly"
+      ]
+     },
+     {
+      "concepto": "Cansancio",
+      "ejemplares": [
+       "a girl about 7 years old exhausted after running, sitting down out of breath",
+       "a man about 35 years old exhausted after running, sitting down out of breath",
+       "a boy about 10 years old with a different skin tone exhausted after running, sitting down out of breath"
+      ]
+     },
+     {
+      "concepto": "Picor",
+      "ejemplares": [
+       "a girl about 7 years old scratching an itchy arm",
+       "a man about 35 years old scratching an itchy arm",
+       "a boy about 10 years old with a different skin tone scratching an itchy arm"
+      ]
+     },
+     {
+      "concepto": "Mareo",
+      "ejemplares": [
+       "a dizzy child holding the head (the person shown is a girl about 7 years old)",
+       "a dizzy child holding the head (the person shown is a man about 35 years old)",
+       "a dizzy child holding the head (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · acciones",
+   "categoria": "acciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Correr",
+      "ejemplares": [
+       "a girl about 7 years old running",
+       "a man about 35 years old running",
+       "a boy about 10 years old with a different skin tone running"
+      ]
+     },
+     {
+      "concepto": "Comer",
+      "ejemplares": [
+       "a girl about 7 years old eating",
+       "a man about 35 years old eating",
+       "a boy about 10 years old with a different skin tone eating"
+      ]
+     },
+     {
+      "concepto": "Dormir",
+      "ejemplares": [
+       "a girl about 7 years old sleeping in bed",
+       "a man about 35 years old sleeping in bed",
+       "a boy about 10 years old with a different skin tone sleeping in bed"
+      ]
+     },
+     {
+      "concepto": "Saltar",
+      "ejemplares": [
+       "a girl about 7 years old jumping",
+       "a man about 35 years old jumping",
+       "a boy about 10 years old with a different skin tone jumping"
+      ]
+     },
+     {
+      "concepto": "Beber",
+      "ejemplares": [
+       "a girl about 7 years old drinking from a glass",
+       "a man about 35 years old drinking from a glass",
+       "a boy about 10 years old with a different skin tone drinking from a glass"
+      ]
+     },
+     {
+      "concepto": "Leer",
+      "ejemplares": [
+       "a girl about 7 years old reading a book",
+       "a man about 35 years old reading a book",
+       "a boy about 10 years old with a different skin tone reading a book"
+      ]
+     },
+     {
+      "concepto": "Nadar",
+      "ejemplares": [
+       "a girl about 7 years old swimming",
+       "a man about 35 years old swimming",
+       "a boy about 10 years old with a different skin tone swimming"
+      ]
+     },
+     {
+      "concepto": "Pintar",
+      "ejemplares": [
+       "a girl about 7 years old painting a picture",
+       "a man about 35 years old painting a picture",
+       "a boy about 10 years old with a different skin tone painting a picture"
+      ]
+     },
+     {
+      "concepto": "Llorar",
+      "ejemplares": [
+       "a girl about 7 years old crying",
+       "a man about 35 years old crying",
+       "a boy about 10 years old with a different skin tone crying"
+      ]
+     },
+     {
+      "concepto": "Bailar",
+      "ejemplares": [
+       "a girl about 7 years old dancing",
+       "a man about 35 years old dancing",
+       "a boy about 10 years old with a different skin tone dancing"
+      ]
+     },
+     {
+      "concepto": "Escribir",
+      "ejemplares": [
+       "a girl about 7 years old writing in a notebook",
+       "a man about 35 years old writing in a notebook",
+       "a boy about 10 years old with a different skin tone writing in a notebook"
+      ]
+     },
+     {
+      "concepto": "Lavarse las manos",
+      "ejemplares": [
+       "a girl about 7 years old washing hands at a sink",
+       "a man about 35 years old washing hands at a sink",
+       "a boy about 10 years old with a different skin tone washing hands at a sink"
+      ]
+     },
+     {
+      "concepto": "Cantar",
+      "ejemplares": [
+       "a girl about 7 years old singing",
+       "a man about 35 years old singing",
+       "a boy about 10 years old with a different skin tone singing"
+      ]
+     },
+     {
+      "concepto": "Barrer",
+      "ejemplares": [
+       "a girl about 7 years old sweeping with a broom",
+       "a man about 35 years old sweeping with a broom",
+       "a boy about 10 years old with a different skin tone sweeping with a broom"
+      ]
+     },
+     {
+      "concepto": "Abrazar",
+      "ejemplares": [
+       "two children hugging (the person shown is a girl about 7 years old)",
+       "two children hugging (the person shown is a man about 35 years old)",
+       "two children hugging (the person shown is a boy about 10 years old with a different skin tone)"
+      ]
+     },
+     {
+      "concepto": "Jugar",
+      "ejemplares": [
+       "a girl about 7 years old playing with toys",
+       "a man about 35 years old playing with toys",
+       "a boy about 10 years old with a different skin tone playing with toys"
+      ]
+     },
+     {
+      "concepto": "Cocinar",
+      "ejemplares": [
+       "a girl about 7 years old cooking at the stove",
+       "a man about 35 years old cooking at the stove",
+       "a boy about 10 years old with a different skin tone cooking at the stove"
+      ]
+     },
+     {
+      "concepto": "Peinarse",
+      "ejemplares": [
+       "a girl about 7 years old combing their hair",
+       "a man about 35 years old combing their hair",
+       "a boy about 10 years old with a different skin tone combing their hair"
+      ]
+     },
+     {
+      "concepto": "Montar en bici",
+      "ejemplares": [
+       "a girl about 7 years old riding a bicycle",
+       "a man about 35 years old riding a bicycle",
+       "a boy about 10 years old with a different skin tone riding a bicycle"
+      ]
+     },
+     {
+      "concepto": "Ducharse",
+      "ejemplares": [
+       "a girl about 7 years old taking a shower",
+       "a man about 35 years old taking a shower",
+       "a boy about 10 years old with a different skin tone taking a shower"
+      ]
+     },
+     {
+      "concepto": "Aplaudir",
+      "ejemplares": [
+       "a girl about 7 years old clapping hands",
+       "a man about 35 years old clapping hands",
+       "a boy about 10 years old with a different skin tone clapping hands"
+      ]
+     },
+     {
+      "concepto": "Subir escaleras",
+      "ejemplares": [
+       "a girl about 7 years old climbing stairs",
+       "a man about 35 years old climbing stairs",
+       "a boy about 10 years old with a different skin tone climbing stairs"
+      ]
+     },
+     {
+      "concepto": "Cortar",
+      "ejemplares": [
+       "a girl about 7 years old cutting paper with scissors",
+       "a man about 35 years old cutting paper with scissors",
+       "a boy about 10 years old with a different skin tone cutting paper with scissors"
+      ]
+     },
+     {
+      "concepto": "Soplar",
+      "ejemplares": [
+       "a girl about 7 years old blowing out a candle",
+       "a man about 35 years old blowing out a candle",
+       "a boy about 10 years old with a different skin tone blowing out a candle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · cuentos",
+   "categoria": "cuentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Caperucita Roja",
+      "ejemplares": [
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text",
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text, a different scene from the same tale",
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Los tres cerditos",
+      "ejemplares": [
+       "a children's illustration of the three little pigs and their houses, no text",
+       "a children's illustration of the three little pigs and their houses, no text, a different scene from the same tale",
+       "a children's illustration of the three little pigs and their houses, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Ricitos de Oro",
+      "ejemplares": [
+       "a children's illustration of Goldilocks with the three bears' bowls, no text",
+       "a children's illustration of Goldilocks with the three bears' bowls, no text, a different scene from the same tale",
+       "a children's illustration of Goldilocks with the three bears' bowls, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Blancanieves",
+      "ejemplares": [
+       "a children's illustration of a fairy-tale princess with black hair and a red apple in the forest, with seven little bearded miners, no text",
+       "a children's illustration of a fairy-tale princess with black hair and a red apple in the forest, with seven little bearded miners, no text, a different scene from the same tale",
+       "a children's illustration of a fairy-tale princess with black hair and a red apple in the forest, with seven little bearded miners, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Pinocho",
+      "ejemplares": [
+       "a children's illustration of Pinocchio, a wooden puppet boy with a long nose, original style, no text",
+       "a children's illustration of Pinocchio, a wooden puppet boy with a long nose, original style, no text, a different scene from the same tale",
+       "a children's illustration of Pinocchio, a wooden puppet boy with a long nose, original style, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Cenicienta",
+      "ejemplares": [
+       "a children's illustration of a fairy-tale girl in a ball gown running down palace stairs at midnight, losing one glass shoe, a pumpkin-shaped carriage behind, no text",
+       "a children's illustration of a fairy-tale girl in a ball gown running down palace stairs at midnight, losing one glass shoe, a pumpkin-shaped carriage behind, no text, a different scene from the same tale",
+       "a children's illustration of a fairy-tale girl in a ball gown running down palace stairs at midnight, losing one glass shoe, a pumpkin-shaped carriage behind, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "Hansel y Gretel",
+      "ejemplares": [
+       "a children's illustration of Hansel and Gretel at the gingerbread house, no text",
+       "a children's illustration of Hansel and Gretel at the gingerbread house, no text, a different scene from the same tale",
+       "a children's illustration of Hansel and Gretel at the gingerbread house, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "El patito feo",
+      "ejemplares": [
+       "a children's illustration of the ugly duckling, no text",
+       "a children's illustration of the ugly duckling, no text, a different scene from the same tale",
+       "a children's illustration of the ugly duckling, no text, another key scene from the same tale"
+      ]
+     },
+     {
+      "concepto": "El gato con botas",
+      "ejemplares": [
+       "a children's illustration of a clever cat wearing tall boots and a feathered hat, standing on two legs, no text",
+       "a children's illustration of a clever cat wearing tall boots and a feathered hat, standing on two legs, no text, a different scene from the same tale",
+       "a children's illustration of a clever cat wearing tall boots and a feathered hat, standing on two legs, no text, another key scene from the same tale"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · objetos",
+   "categoria": "objetos",
+   "grupos": [
+    [
+     {
+      "concepto": "Peluche",
+      "ejemplares": [
+       "a teddy bear",
+       "a teddy bear, a different model, color or variety from the first one",
+       "a single teddy bear, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Coche de juguete",
+      "ejemplares": [
+       "a toy car",
+       "a toy car, a different model, color or variety from the first one",
+       "a single toy car, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pelota",
+      "ejemplares": [
+       "a ball",
+       "a ball, a different model, color or variety from the first one",
+       "a plain rubber play ball for children, a third different color"
+      ]
+     },
+     {
+      "concepto": "Pompas de jabón",
+      "ejemplares": [
+       "soap bubbles and a bubble wand",
+       "soap bubbles and a bubble wand, a different model, color or variety from the first one",
+       "a single soap bubbles and a bubble wand, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Muñeca",
+      "ejemplares": [
+       "a doll",
+       "a doll, a different model, color or variety from the first one",
+       "a single doll, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Globo",
+      "ejemplares": [
+       "a balloon",
+       "a balloon, a different model, color or variety from the first one",
+       "a single balloon, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Puzle",
+      "ejemplares": [
+       "a children's jigsaw puzzle",
+       "a children's jigsaw puzzle, a different model, color or variety from the first one",
+       "a single children's jigsaw puzzle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Peine",
+      "ejemplares": [
+       "a comb",
+       "a comb, a different model, color or variety from the first one",
+       "a single comb, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Escoba",
+      "ejemplares": [
+       "a broom",
+       "a broom, a different model, color or variety from the first one",
+       "a single broom, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Jabón",
+      "ejemplares": [
+       "a bar of soap",
+       "a bar of soap, a different model, color or variety from the first one",
+       "a single bar of soap, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Paraguas",
+      "ejemplares": [
+       "an umbrella",
+       "an umbrella, a different model, color or variety from the first one",
+       "a single umbrella, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Llave",
+      "ejemplares": [
+       "a house key",
+       "a house key, a different model, color or variety from the first one",
+       "a single house key, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Toalla",
+      "ejemplares": [
+       "a towel",
+       "a towel, a different model, color or variety from the first one",
+       "a single towel, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cepillo de dientes",
+      "ejemplares": [
+       "a toothbrush",
+       "a toothbrush, a different model, color or variety from the first one",
+       "a single toothbrush, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Teléfono",
+      "ejemplares": [
+       "a mobile phone",
+       "a mobile phone, a different model, color or variety from the first one",
+       "a single mobile phone, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Abrigo",
+      "ejemplares": [
+       "a winter coat",
+       "a winter coat, a different model, color or variety from the first one",
+       "a single winter coat, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Gafas",
+      "ejemplares": [
+       "a pair of glasses",
+       "a pair of glasses, a different model, color or variety from the first one",
+       "a single pair of glasses, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Grifo",
+      "ejemplares": [
+       "a water tap",
+       "a water tap, a different model, color or variety from the first one",
+       "a single water tap, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Bicicleta",
+      "ejemplares": [
+       "a bicycle",
+       "a bicycle, a different model, color or variety from the first one",
+       "a single bicycle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Reloj",
+      "ejemplares": [
+       "a wall clock",
+       "a wall clock, a different model, color or variety from the first one",
+       "a single wall clock, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Linterna",
+      "ejemplares": [
+       "a flashlight",
+       "a flashlight, a different model, color or variety from the first one",
+       "a single flashlight, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cuento",
+      "ejemplares": [
+       "a children's picture book",
+       "a children's picture book, a different model, color or variety from the first one",
+       "a single children's picture book, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cubo y pala",
+      "ejemplares": [
+       "a toy bucket and spade",
+       "a toy bucket and spade, a different model, color or variety from the first one",
+       "a single toy bucket and spade, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pinturas",
+      "ejemplares": [
+       "a set of colored pencils",
+       "a set of colored pencils, a different model, color or variety from the first one",
+       "a single set of colored pencils, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · alimentos",
+   "categoria": "alimentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Gominolas",
+      "ejemplares": [
+       "gummy candies",
+       "gummy candies, a different model, color or variety from the first one",
+       "a single gummy candies, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Zumo",
+      "ejemplares": [
+       "a glass of orange juice",
+       "a glass of orange juice, a different model, color or variety from the first one",
+       "a single glass of orange juice, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Helado",
+      "ejemplares": [
+       "an ice cream cone",
+       "an ice cream cone, a different model, color or variety from the first one",
+       "a single ice cream cone, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Chocolate",
+      "ejemplares": [
+       "a bar of chocolate",
+       "a bar of chocolate, a different model, color or variety from the first one",
+       "a single bar of chocolate, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Patatas fritas",
+      "ejemplares": [
+       "a bag of potato chips",
+       "a bag of potato chips, a different model, color or variety from the first one",
+       "a single bag of potato chips, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lechuga",
+      "ejemplares": [
+       "a lettuce",
+       "a lettuce, a different model, color or variety from the first one",
+       "a single lettuce, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Limón",
+      "ejemplares": [
+       "a lemon",
+       "a lemon, a different model, color or variety from the first one",
+       "a single lemon, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Miel",
+      "ejemplares": [
+       "a jar of honey",
+       "a jar of honey, a different model, color or variety from the first one",
+       "a single jar of honey, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · transportes",
+   "categoria": "transportes",
+   "grupos": [
+    [
+     {
+      "concepto": "Barco en el mar",
+      "ejemplares": [
+       "a boat sailing on the sea",
+       "a boat sailing on the sea, a different place and composition",
+       "a boat sailing on the sea, another different example"
+      ]
+     },
+     {
+      "concepto": "Coche en la carretera",
+      "ejemplares": [
+       "a car driving on a road",
+       "a car driving on a road, a different place and composition",
+       "a car driving on a road, another different example"
+      ]
+     },
+     {
+      "concepto": "Avión en el cielo",
+      "ejemplares": [
+       "an airplane flying in the sky",
+       "an airplane flying in the sky, a different place and composition",
+       "an airplane flying in the sky, another different example"
+      ]
+     },
+     {
+      "concepto": "Tren en las vías",
+      "ejemplares": [
+       "a train on railway tracks",
+       "a train on railway tracks, a different place and composition",
+       "a train on railway tracks, another different example"
+      ]
+     },
+     {
+      "concepto": "Bicicleta",
+      "ejemplares": [
+       "a child riding a bicycle on a path",
+       "a child riding a bicycle on a path, a different place and composition",
+       "a child riding a bicycle on a path, another different example"
+      ]
+     },
+     {
+      "concepto": "Caballo",
+      "ejemplares": [
+       "a person riding a horse",
+       "a person riding a horse, a different place and composition",
+       "a person riding a horse, another different example"
+      ]
+     },
+     {
+      "concepto": "Submarino",
+      "ejemplares": [
+       "a submarine under the sea",
+       "a submarine under the sea, a different place and composition",
+       "a submarine under the sea, another different example"
+      ]
+     },
+     {
+      "concepto": "Globo aerostático",
+      "ejemplares": [
+       "a hot air balloon in the sky",
+       "a hot air balloon in the sky, a different place and composition",
+       "a hot air balloon in the sky, another different example"
+      ]
+     },
+     {
+      "concepto": "Patinete",
+      "ejemplares": [
+       "a child riding a kick scooter",
+       "a child riding a kick scooter, a different place and composition",
+       "a child riding a kick scooter, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · peligros",
+   "categoria": "peligros",
+   "grupos": [
+    [
+     {
+      "concepto": "Fuego",
+      "ejemplares": [
+       "a fire with flames",
+       "a fire with flames, a different model, color or variety from the first one",
+       "a single fire with flames, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Enchufe",
+      "ejemplares": [
+       "an electrical wall socket",
+       "an electrical wall socket, a different model, color or variety from the first one",
+       "a single electrical wall socket, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cuchillo",
+      "ejemplares": [
+       "a sharp knife",
+       "a sharp knife, a different model, color or variety from the first one",
+       "a single sharp knife, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Plancha caliente",
+      "ejemplares": [
+       "a hot clothes iron with steam",
+       "a hot clothes iron with steam, a different model, color or variety from the first one",
+       "a single hot clothes iron with steam, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Medicamentos",
+      "ejemplares": [
+       "pills and medicine bottles",
+       "pills and medicine bottles, a different model, color or variety from the first one",
+       "a single pills and medicine bottles, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Lejía",
+      "ejemplares": [
+       "a bottle of bleach",
+       "a bottle of bleach, a different model, color or variety from the first one",
+       "a single bottle of bleach, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Sartén caliente",
+      "ejemplares": [
+       "a hot frying pan on a stove",
+       "a hot frying pan on a stove, a different model, color or variety from the first one",
+       "a single hot frying pan on a stove, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cristal roto",
+      "ejemplares": [
+       "broken glass shards",
+       "broken glass shards, a different model, color or variety from the first one",
+       "a single broken glass shards, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Vela encendida",
+      "ejemplares": [
+       "a lit candle",
+       "a lit candle, a different model, color or variety from the first one",
+       "a single lit candle, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Avispa",
+      "ejemplares": [
+       "a wasp",
+       "a wasp, a different model, color or variety from the first one",
+       "a single wasp, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Horno encendido",
+      "ejemplares": [
+       "a hot oven with the door open",
+       "a hot oven with the door open, a different model, color or variety from the first one",
+       "a single hot oven with the door open, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Agua hirviendo",
+      "ejemplares": [
+       "a pot of boiling water",
+       "a pot of boiling water, a different model, color or variety from the first one",
+       "a single pot of boiling water, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Estufa encendida",
+      "ejemplares": [
+       "a glowing electric heater",
+       "a glowing electric heater, a different model, color or variety from the first one",
+       "a single glowing electric heater, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Abeja",
+      "ejemplares": [
+       "a bee",
+       "a bee, a different model, color or variety from the first one",
+       "a single bee, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cúter",
+      "ejemplares": [
+       "a box cutter with the blade out",
+       "a box cutter with the blade out, a different model, color or variety from the first one",
+       "a single box cutter with the blade out, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Cerillas",
+      "ejemplares": [
+       "a box of matches with a lit match",
+       "a box of matches with a lit match, a different model, color or variety from the first one",
+       "a single box of matches with a lit match, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · lugares",
+   "categoria": "lugares",
+   "grupos": [
+    [
+     {
+      "concepto": "Parque",
+      "ejemplares": [
+       "a playground in a park",
+       "a playground in a park, a different place and composition",
+       "a playground in a park, another different example"
+      ]
+     },
+     {
+      "concepto": "Colegio",
+      "ejemplares": [
+       "a primary school classroom",
+       "a primary school classroom, a different place and composition",
+       "a primary school classroom, another different example"
+      ]
+     },
+     {
+      "concepto": "Supermercado",
+      "ejemplares": [
+       "a supermarket aisle",
+       "a supermarket aisle, a different place and composition",
+       "a supermarket aisle, another different example"
+      ]
+     },
+     {
+      "concepto": "Piscina",
+      "ejemplares": [
+       "a swimming pool",
+       "a swimming pool, a different place and composition",
+       "a swimming pool, another different example"
+      ]
+     },
+     {
+      "concepto": "Hospital",
+      "ejemplares": [
+       "a hospital building",
+       "a hospital building, a different place and composition",
+       "a hospital building, another different example"
+      ]
+     },
+     {
+      "concepto": "Biblioteca",
+      "ejemplares": [
+       "a library with shelves of books",
+       "a library with shelves of books, a different place and composition",
+       "a library with shelves of books, another different example"
+      ]
+     },
+     {
+      "concepto": "Playa",
+      "ejemplares": [
+       "a sandy beach",
+       "a sandy beach, a different place and composition",
+       "a sandy beach, another different example"
+      ]
+     },
+     {
+      "concepto": "Peluquería",
+      "ejemplares": [
+       "a hair salon",
+       "a hair salon, a different place and composition",
+       "a hair salon, another different example"
+      ]
+     },
+     {
+      "concepto": "Restaurante",
+      "ejemplares": [
+       "a restaurant with tables",
+       "a restaurant with tables, a different place and composition",
+       "a restaurant with tables, another different example"
+      ]
+     },
+     {
+      "concepto": "Cine",
+      "ejemplares": [
+       "a cinema screen and seats",
+       "a cinema screen and seats, a different place and composition",
+       "a cinema screen and seats, another different example"
+      ]
+     },
+     {
+      "concepto": "Zoo",
+      "ejemplares": [
+       "a zoo with animals",
+       "a zoo with animals, a different place and composition",
+       "a zoo with animals, another different example"
+      ]
+     },
+     {
+      "concepto": "Estación de tren",
+      "ejemplares": [
+       "a train station platform",
+       "a train station platform, a different place and composition",
+       "a train station platform, another different example"
+      ]
+     },
+     {
+      "concepto": "Panadería",
+      "ejemplares": [
+       "a bakery shop with bread",
+       "a bakery shop with bread, a different place and composition",
+       "a bakery shop with bread, another different example"
+      ]
+     },
+     {
+      "concepto": "Granja",
+      "ejemplares": [
+       "a farm with a barn",
+       "a farm with a barn, a different place and composition",
+       "a farm with a barn, another different example"
+      ]
+     },
+     {
+      "concepto": "Aeropuerto",
+      "ejemplares": [
+       "an airport with planes",
+       "an airport with planes, a different place and composition",
+       "an airport with planes, another different example"
+      ]
+     },
+     {
+      "concepto": "Farmacia",
+      "ejemplares": [
+       "a pharmacy shop",
+       "a pharmacy shop, a different place and composition",
+       "a pharmacy shop, another different example"
+      ]
+     },
+     {
+      "concepto": "Polideportivo",
+      "ejemplares": [
+       "a sports hall",
+       "a sports hall, a different place and composition",
+       "a sports hall, another different example"
+      ]
+     },
+     {
+      "concepto": "Gasolinera",
+      "ejemplares": [
+       "a petrol station",
+       "a petrol station, a different place and composition",
+       "a petrol station, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · momentos",
+   "categoria": "momentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Noche",
+      "ejemplares": [
+       "night: dark sky with moon and a child in bed",
+       "night: dark sky with moon and a child in bed, a different place and composition",
+       "night: dark sky with moon and a child in bed, another different example"
+      ]
+     },
+     {
+      "concepto": "Mañana",
+      "ejemplares": [
+       "early morning: sunrise and breakfast on the table",
+       "early morning: sunrise and breakfast on the table, a different place and composition",
+       "early morning: sunrise and breakfast on the table, another different example"
+      ]
+     },
+     {
+      "concepto": "Cumpleaños",
+      "ejemplares": [
+       "a birthday cake with lit candles",
+       "a birthday cake with lit candles, a different place and composition",
+       "a birthday cake with lit candles, another different example"
+      ]
+     },
+     {
+      "concepto": "Lluvia",
+      "ejemplares": [
+       "a child with an umbrella in the rain",
+       "a child with an umbrella in the rain, a different place and composition",
+       "a child with an umbrella in the rain, another different example"
+      ]
+     },
+     {
+      "concepto": "Navidad",
+      "ejemplares": [
+       "a decorated Christmas tree with presents",
+       "a decorated Christmas tree with presents, a different place and composition",
+       "a decorated Christmas tree with presents, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · escenas",
+   "categoria": "escenas",
+   "grupos": [
+    [
+     {
+      "concepto": "Mamá come sopa",
+      "ejemplares": [
+       "a mother eating soup",
+       "a mother eating soup, a different place and composition",
+       "a mother eating soup, another different example"
+      ]
+     },
+     {
+      "concepto": "Papá lee un libro",
+      "ejemplares": [
+       "a father reading a book",
+       "a father reading a book, a different place and composition",
+       "a father reading a book, another different example"
+      ]
+     },
+     {
+      "concepto": "El niño duerme",
+      "ejemplares": [
+       "a boy sleeping in bed",
+       "a boy sleeping in bed, a different place and composition",
+       "a boy sleeping in bed, another different example"
+      ]
+     },
+     {
+      "concepto": "El perro corre",
+      "ejemplares": [
+       "a dog running",
+       "a dog running, a different place and composition",
+       "a dog running, another different example"
+      ]
+     },
+     {
+      "concepto": "La niña bebe agua",
+      "ejemplares": [
+       "a girl drinking water",
+       "a girl drinking water, a different place and composition",
+       "a girl drinking water, another different example"
+      ]
+     },
+     {
+      "concepto": "Papá lava el coche",
+      "ejemplares": [
+       "a father washing the car",
+       "a father washing the car, a different place and composition",
+       "a father washing the car, another different example"
+      ]
+     },
+     {
+      "concepto": "El gato salta",
+      "ejemplares": [
+       "a cat jumping",
+       "a cat jumping, a different place and composition",
+       "a cat jumping, another different example"
+      ]
+     },
+     {
+      "concepto": "Mamá pinta una casa",
+      "ejemplares": [
+       "a mother painting a picture of a house",
+       "a mother painting a picture of a house, a different place and composition",
+       "a mother painting a picture of a house, another different example"
+      ]
+     },
+     {
+      "concepto": "El bebé llora",
+      "ejemplares": [
+       "a baby crying",
+       "a baby crying, a different place and composition",
+       "a baby crying, another different example"
+      ]
+     },
+     {
+      "concepto": "La vaca come hierba",
+      "ejemplares": [
+       "a cow eating grass",
+       "a cow eating grass, a different place and composition",
+       "a cow eating grass, another different example"
+      ]
+     },
+     {
+      "concepto": "El niño nada",
+      "ejemplares": [
+       "a boy swimming",
+       "a boy swimming, a different place and composition",
+       "a boy swimming, another different example"
+      ]
+     },
+     {
+      "concepto": "La abuela canta",
+      "ejemplares": [
+       "a grandmother singing",
+       "a grandmother singing, a different place and composition",
+       "a grandmother singing, another different example"
+      ]
+     },
+     {
+      "concepto": "El pájaro vuela",
+      "ejemplares": [
+       "a bird flying",
+       "a bird flying, a different place and composition",
+       "a bird flying, another different example"
+      ]
+     },
+     {
+      "concepto": "Papá cocina",
+      "ejemplares": [
+       "a father cooking",
+       "a father cooking, a different place and composition",
+       "a father cooking, another different example"
+      ]
+     },
+     {
+      "concepto": "La niña ríe",
+      "ejemplares": [
+       "a girl laughing",
+       "a girl laughing, a different place and composition",
+       "a girl laughing, another different example"
+      ]
+     },
+     {
+      "concepto": "El sol brilla",
+      "ejemplares": [
+       "the sun shining brightly",
+       "the sun shining brightly, a different place and composition",
+       "the sun shining brightly, another different example"
+      ]
+     },
+     {
+      "concepto": "El niño come una manzana",
+      "ejemplares": [
+       "a boy eating an apple",
+       "a boy eating an apple, a different place and composition",
+       "a boy eating an apple, another different example"
+      ]
+     },
+     {
+      "concepto": "Mamá abre la puerta",
+      "ejemplares": [
+       "a mother opening a door",
+       "a mother opening a door, a different place and composition",
+       "a mother opening a door, another different example"
+      ]
+     },
+     {
+      "concepto": "La pelota es roja",
+      "ejemplares": [
+       "a red ball",
+       "a red ball, a different place and composition",
+       "a red ball, another different example"
+      ]
+     },
+     {
+      "concepto": "El abuelo camina",
+      "ejemplares": [
+       "a grandfather walking with a cane",
+       "a grandfather walking with a cane, a different place and composition",
+       "a grandfather walking with a cane, another different example"
+      ]
+     },
+     {
+      "concepto": "La niña dibuja un sol",
+      "ejemplares": [
+       "a girl drawing a sun on paper",
+       "a girl drawing a sun on paper, a different place and composition",
+       "a girl drawing a sun on paper, another different example"
+      ]
+     },
+     {
+      "concepto": "El tren pasa",
+      "ejemplares": [
+       "a train passing by",
+       "a train passing by, a different place and composition",
+       "a train passing by, another different example"
+      ]
+     },
+     {
+      "concepto": "La maestra escribe",
+      "ejemplares": [
+       "a teacher writing on a blackboard",
+       "a teacher writing on a blackboard, a different place and composition",
+       "a teacher writing on a blackboard, another different example"
+      ]
+     },
+     {
+      "concepto": "El león ruge",
+      "ejemplares": [
+       "a lion roaring",
+       "a lion roaring, a different place and composition",
+       "a lion roaring, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · animales de granja",
+   "categoria": "animales de granja",
+   "grupos": [
+    [
+     {
+      "concepto": "Gato",
+      "ejemplares": [
+       "a cat",
+       "a cat, a different model, color or variety from the first one",
+       "a single cat, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Perro",
+      "ejemplares": [
+       "a dog",
+       "a dog, a different model, color or variety from the first one",
+       "a single dog, different-looking again, seen from a different angle"
+      ]
+     },
+     {
+      "concepto": "Pez",
+      "ejemplares": [
+       "a goldfish",
+       "a goldfish, a different model, color or variety from the first one",
+       "a single goldfish, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · señales",
+   "categoria": "señales",
+   "grupos": [
+    [
+     {
+      "concepto": "Señal de para",
+      "ejemplares": [
+       "a red stop sign",
+       "a red stop sign, a different person or a different version",
+       "a red stop sign, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de ven",
+      "ejemplares": [
+       "an adult making a beckoning \"come here\" gesture with the hand",
+       "an adult making a beckoning \"come here\" gesture with the hand, a different person or a different version",
+       "an adult making a beckoning \"come here\" gesture with the hand, another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de siéntate",
+      "ejemplares": [
+       "a simple pictogram of a person sitting on a chair",
+       "a simple pictogram of a person sitting on a chair, a different person or a different version",
+       "a simple pictogram of a person sitting on a chair, another different version"
+      ]
+     },
+     {
+      "concepto": "Semáforo en rojo",
+      "ejemplares": [
+       "a pedestrian traffic light showing red",
+       "a pedestrian traffic light showing red, a different person or a different version",
+       "a pedestrian traffic light showing red, another different version"
+      ]
+     },
+     {
+      "concepto": "Mano levantada (para)",
+      "ejemplares": [
+       "an adult raising the palm forward meaning stop",
+       "an adult raising the palm forward meaning stop, a different person or a different version",
+       "an adult raising the palm forward meaning stop, another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de siéntate (banco)",
+      "ejemplares": [
+       "a simple pictogram of a person sitting on a bench",
+       "a simple pictogram of a person sitting on a bench, a different person or a different version",
+       "a simple pictogram of a person sitting on a bench, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de silencio",
+      "ejemplares": [
+       "an adult with the index finger on the lips meaning silence",
+       "an adult with the index finger on the lips meaning silence, a different person or a different version",
+       "an adult with the index finger on the lips meaning silence, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de mira",
+      "ejemplares": [
+       "an adult pointing to their own eyes meaning look",
+       "an adult pointing to their own eyes meaning look, a different person or a different version",
+       "an adult pointing to their own eyes meaning look, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de dame",
+      "ejemplares": [
+       "an adult holding out an open hand meaning give me",
+       "an adult holding out an open hand meaning give me, a different person or a different version",
+       "an adult holding out an open hand meaning give me, another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de silencio",
+      "ejemplares": [
+       "a simple pictogram meaning silence (finger on lips)",
+       "a simple pictogram meaning silence (finger on lips), a different person or a different version",
+       "a simple pictogram meaning silence (finger on lips), another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de mira",
+      "ejemplares": [
+       "a simple pictogram meaning look (an eye)",
+       "a simple pictogram meaning look (an eye), a different person or a different version",
+       "a simple pictogram meaning look (an eye), another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de dame",
+      "ejemplares": [
+       "a simple pictogram meaning give me (open hand)",
+       "a simple pictogram meaning give me (open hand), a different person or a different version",
+       "a simple pictogram meaning give me (open hand), another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de levántate",
+      "ejemplares": [
+       "an adult raising both palms upward meaning stand up",
+       "an adult raising both palms upward meaning stand up, a different person or a different version",
+       "an adult raising both palms upward meaning stand up, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de espera",
+      "ejemplares": [
+       "an adult holding up the index finger meaning wait",
+       "an adult holding up the index finger meaning wait, a different person or a different version",
+       "an adult holding up the index finger meaning wait, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de coge",
+      "ejemplares": [
+       "an adult pointing at an object meaning pick it up",
+       "an adult pointing at an object meaning pick it up, a different person or a different version",
+       "an adult pointing at an object meaning pick it up, another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de levántate",
+      "ejemplares": [
+       "a simple pictogram of a person standing up from a chair",
+       "a simple pictogram of a person standing up from a chair, a different person or a different version",
+       "a simple pictogram of a person standing up from a chair, another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de espera",
+      "ejemplares": [
+       "a simple pictogram meaning wait (a raised hand and a clock)",
+       "a simple pictogram meaning wait (a raised hand and a clock), a different person or a different version",
+       "a simple pictogram meaning wait (a raised hand and a clock), another different version"
+      ]
+     },
+     {
+      "concepto": "Pictograma de coge",
+      "ejemplares": [
+       "a simple pictogram of a hand picking up an object",
+       "a simple pictogram of a hand picking up an object, a different person or a different version",
+       "a simple pictogram of a hand picking up an object, another different version"
+      ]
+     },
+     {
+      "concepto": "Semáforo en verde",
+      "ejemplares": [
+       "a pedestrian traffic light showing green",
+       "a pedestrian traffic light showing green, a different person or a different version",
+       "a pedestrian traffic light showing green, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de adiós",
+      "ejemplares": [
+       "an adult waving goodbye",
+       "an adult waving goodbye, a different person or a different version",
+       "an adult waving goodbye, another different version"
+      ]
+     },
+     {
+      "concepto": "Gesto de hola",
+      "ejemplares": [
+       "an adult waving hello with a smile",
+       "an adult waving hello with a smile, a different person or a different version",
+       "an adult waving hello with a smile, another different version"
+      ]
+     }
+    ]
+   ]
+  }
+ ]
+}

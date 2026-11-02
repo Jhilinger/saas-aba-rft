@@ -17,6 +17,9 @@ const salida = path.join(aqui, 'salida')
 const web = path.join(aqui, 'web')
 const LADO = 768
 const MINIATURA = 220
+// Fotos con escenario (no de estudio): no se aclaran ni se blanquea el fondo,
+// que mancharía el cielo, el agua o las paredes
+const CON_ESCENARIO = new Set(['acciones', 'profesiones', 'deportes', 'sensaciones', 'lugares', 'dependencias de la casa', 'estaciones', 'tiempo atmosférico', 'momentos', 'transportes', 'escenas', 'universo', 'cuentos'])
 
 // Tono del fondo: mediana del brillo de ocho recuadros del borde (esquinas y
 // puntos medios). El generador suele dejar un degradado, más claro en las
@@ -48,7 +51,8 @@ async function main() {
     const origen = sharp(path.join(salida, relativo))
     const fondo = await brilloFondo(origen)
     // Solo se aclara si el fondo ya es claro (no se toca una foto mal generada)
-    const factor = fondo > 200 ? Math.min(255 / fondo, 1.2) : 1
+    const estudio = !CON_ESCENARIO.has(info.categoria)
+    const factor = estudio && fondo > 200 ? Math.min(255 / fondo, 1.2) : 1
     const destino = path.join(web, relativo.replace(/\.jpg$/, '.webp'))
     await mkdir(path.dirname(destino), { recursive: true })
     // Tras aclarar, los píxeles casi blancos y sin color pasan a blanco puro:
@@ -60,7 +64,7 @@ async function main() {
       .removeAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true })
-    for (let i = 0; i < data.length; i += 3) {
+    for (let i = 0; estudio && i < data.length; i += 3) {
       const minimo = Math.min(data[i], data[i + 1], data[i + 2])
       const maximo = Math.max(data[i], data[i + 1], data[i + 2])
       if (minimo >= 236 && maximo - minimo <= 10) data[i] = data[i + 1] = data[i + 2] = 255

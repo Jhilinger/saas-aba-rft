@@ -1,0 +1,7201 @@
+{
+ "programas": [
+  {
+   "programa": "Vincular Mutuamente Animales Salvajes con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "León",
+      "concepto": "animales-salvajes/leon"
+     },
+     {
+      "oido": "Jirafa",
+      "concepto": "animales-salvajes/jirafa"
+     },
+     {
+      "oido": "Elefante",
+      "concepto": "animales-salvajes/elefante"
+     }
+    ],
+    [
+     {
+      "oido": "Tigre",
+      "concepto": "animales-salvajes/tigre"
+     },
+     {
+      "oido": "Cebra",
+      "concepto": "animales-salvajes/cebra"
+     },
+     {
+      "oido": "Mono",
+      "concepto": "animales-salvajes/mono"
+     }
+    ],
+    [
+     {
+      "oido": "Oso",
+      "concepto": "animales-salvajes/oso"
+     },
+     {
+      "oido": "Hipopótamo",
+      "concepto": "animales-salvajes/hipopotamo"
+     },
+     {
+      "oido": "Cocodrilo",
+      "concepto": "animales-salvajes/cocodrilo"
+     }
+    ],
+    [
+     {
+      "oido": "Rinoceronte",
+      "concepto": "animales-salvajes/rinoceronte"
+     },
+     {
+      "oido": "Canguro",
+      "concepto": "animales-salvajes/canguro"
+     },
+     {
+      "oido": "Búho",
+      "concepto": "animales-salvajes/buho"
+     }
+    ],
+    [
+     {
+      "oido": "Lobo",
+      "concepto": "animales-salvajes/lobo"
+     },
+     {
+      "oido": "Camello",
+      "concepto": "animales-salvajes/camello"
+     },
+     {
+      "oido": "Koala",
+      "concepto": "animales-salvajes/koala"
+     }
+    ],
+    [
+     {
+      "oido": "Gorila",
+      "concepto": "animales-salvajes/gorila"
+     },
+     {
+      "oido": "Ciervo",
+      "concepto": "animales-salvajes/ciervo"
+     },
+     {
+      "oido": "Serpiente",
+      "concepto": "animales-salvajes/serpiente"
+     }
+    ],
+    [
+     {
+      "oido": "Panda",
+      "concepto": "animales-salvajes/panda"
+     },
+     {
+      "oido": "Águila",
+      "concepto": "animales-salvajes/aguila"
+     },
+     {
+      "oido": "Leopardo",
+      "concepto": "animales-salvajes/leopardo"
+     }
+    ],
+    [
+     {
+      "oido": "Zorro",
+      "concepto": "animales-salvajes/zorro"
+     },
+     {
+      "oido": "Avestruz",
+      "concepto": "animales-salvajes/avestruz"
+     },
+     {
+      "oido": "Tortuga",
+      "concepto": "animales-salvajes/tortuga"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Animales Marinos con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Pulpo",
+      "concepto": "animales-marinos/pulpo"
+     },
+     {
+      "oido": "Ballena",
+      "concepto": "animales-marinos/ballena"
+     },
+     {
+      "oido": "Medusa",
+      "concepto": "animales-marinos/medusa"
+     }
+    ],
+    [
+     {
+      "oido": "Tiburón",
+      "concepto": "animales-marinos/tiburon"
+     },
+     {
+      "oido": "Estrella de mar",
+      "concepto": "animales-marinos/estrella-de-mar"
+     },
+     {
+      "oido": "Cangrejo",
+      "concepto": "animales-marinos/cangrejo"
+     }
+    ],
+    [
+     {
+      "oido": "Delfín",
+      "concepto": "animales-marinos/delfin"
+     },
+     {
+      "oido": "Caballito de mar",
+      "concepto": "animales-marinos/caballito-de-mar"
+     },
+     {
+      "oido": "Langosta",
+      "concepto": "animales-marinos/langosta"
+     }
+    ],
+    [
+     {
+      "oido": "Foca",
+      "concepto": "animales-marinos/foca"
+     },
+     {
+      "oido": "Pez payaso",
+      "concepto": "animales-marinos/pez-payaso"
+     },
+     {
+      "oido": "Calamar",
+      "concepto": "animales-marinos/calamar"
+     }
+    ],
+    [
+     {
+      "oido": "Tortuga marina",
+      "concepto": "animales-marinos/tortuga-marina"
+     },
+     {
+      "oido": "Gamba",
+      "concepto": "animales-marinos/gamba"
+     },
+     {
+      "oido": "Raya",
+      "concepto": "animales-marinos/raya"
+     }
+    ],
+    [
+     {
+      "oido": "Morsa",
+      "concepto": "animales-marinos/morsa"
+     },
+     {
+      "oido": "Erizo de mar",
+      "concepto": "animales-marinos/erizo-de-mar"
+     },
+     {
+      "oido": "Pez espada",
+      "concepto": "animales-marinos/pez-espada"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Partes del Cuerpo con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Mano",
+      "concepto": "partes-del-cuerpo/mano"
+     },
+     {
+      "oido": "Ojo",
+      "concepto": "partes-del-cuerpo/ojo"
+     },
+     {
+      "oido": "Pelo",
+      "concepto": "partes-del-cuerpo/pelo"
+     }
+    ],
+    [
+     {
+      "oido": "Nariz",
+      "concepto": "partes-del-cuerpo/nariz"
+     },
+     {
+      "oido": "Pie",
+      "concepto": "partes-del-cuerpo/pie"
+     },
+     {
+      "oido": "Oreja",
+      "concepto": "partes-del-cuerpo/oreja"
+     }
+    ],
+    [
+     {
+      "oido": "Boca",
+      "concepto": "partes-del-cuerpo/boca"
+     },
+     {
+      "oido": "Rodilla",
+      "concepto": "partes-del-cuerpo/rodilla"
+     },
+     {
+      "oido": "Brazo",
+      "concepto": "partes-del-cuerpo/brazo"
+     }
+    ],
+    [
+     {
+      "oido": "Dedo",
+      "concepto": "partes-del-cuerpo/dedo"
+     },
+     {
+      "oido": "Barriga",
+      "concepto": "partes-del-cuerpo/barriga"
+     },
+     {
+      "oido": "Cuello",
+      "concepto": "partes-del-cuerpo/cuello"
+     }
+    ],
+    [
+     {
+      "oido": "Diente",
+      "concepto": "partes-del-cuerpo/diente"
+     },
+     {
+      "oido": "Pierna",
+      "concepto": "partes-del-cuerpo/pierna"
+     },
+     {
+      "oido": "Codo",
+      "concepto": "partes-del-cuerpo/codo"
+     }
+    ],
+    [
+     {
+      "oido": "Lengua",
+      "concepto": "partes-del-cuerpo/lengua"
+     },
+     {
+      "oido": "Espalda",
+      "concepto": "partes-del-cuerpo/espalda"
+     },
+     {
+      "oido": "Uña",
+      "concepto": "partes-del-cuerpo/una"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Utensilios de Cocina con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Cuchara",
+      "concepto": "utensilios-de-cocina/cuchara"
+     },
+     {
+      "oido": "Plato",
+      "concepto": "utensilios-de-cocina/plato"
+     },
+     {
+      "oido": "Vaso",
+      "concepto": "utensilios-de-cocina/vaso"
+     }
+    ],
+    [
+     {
+      "oido": "Tenedor",
+      "concepto": "utensilios-de-cocina/tenedor"
+     },
+     {
+      "oido": "Olla",
+      "concepto": "utensilios-de-cocina/olla"
+     },
+     {
+      "oido": "Taza",
+      "concepto": "utensilios-de-cocina/taza"
+     }
+    ],
+    [
+     {
+      "oido": "Cuchillo",
+      "concepto": "utensilios-de-cocina/cuchillo"
+     },
+     {
+      "oido": "Sartén",
+      "concepto": "utensilios-de-cocina/sarten"
+     },
+     {
+      "oido": "Jarra",
+      "concepto": "utensilios-de-cocina/jarra"
+     }
+    ],
+    [
+     {
+      "oido": "Bol",
+      "concepto": "utensilios-de-cocina/bol"
+     },
+     {
+      "oido": "Colador",
+      "concepto": "utensilios-de-cocina/colador"
+     },
+     {
+      "oido": "Rodillo",
+      "concepto": "utensilios-de-cocina/rodillo"
+     }
+    ],
+    [
+     {
+      "oido": "Espátula",
+      "concepto": "utensilios-de-cocina/espatula"
+     },
+     {
+      "oido": "Tetera",
+      "concepto": "utensilios-de-cocina/tetera"
+     },
+     {
+      "oido": "Embudo",
+      "concepto": "utensilios-de-cocina/embudo"
+     }
+    ],
+    [
+     {
+      "oido": "Cazo",
+      "concepto": "utensilios-de-cocina/cazo"
+     },
+     {
+      "oido": "Rallador",
+      "concepto": "utensilios-de-cocina/rallador"
+     },
+     {
+      "oido": "Servilleta",
+      "concepto": "utensilios-de-cocina/servilleta"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Plantas con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Girasol",
+      "concepto": "plantas/girasol"
+     },
+     {
+      "oido": "Cactus",
+      "concepto": "plantas/cactus"
+     },
+     {
+      "oido": "Pino",
+      "concepto": "plantas/pino"
+     }
+    ],
+    [
+     {
+      "oido": "Rosa",
+      "concepto": "plantas/rosa"
+     },
+     {
+      "oido": "Palmera",
+      "concepto": "plantas/palmera"
+     },
+     {
+      "oido": "Helecho",
+      "concepto": "plantas/helecho"
+     }
+    ],
+    [
+     {
+      "oido": "Margarita",
+      "concepto": "plantas/margarita"
+     },
+     {
+      "oido": "Roble",
+      "concepto": "plantas/roble"
+     },
+     {
+      "oido": "Bambú",
+      "concepto": "plantas/bambu"
+     }
+    ],
+    [
+     {
+      "oido": "Tulipán",
+      "concepto": "plantas/tulipan"
+     },
+     {
+      "oido": "Olivo",
+      "concepto": "plantas/olivo"
+     },
+     {
+      "oido": "Trébol",
+      "concepto": "plantas/trebol"
+     }
+    ],
+    [
+     {
+      "oido": "Lavanda",
+      "concepto": "plantas/lavanda"
+     },
+     {
+      "oido": "Sauce",
+      "concepto": "plantas/sauce"
+     },
+     {
+      "oido": "Maíz",
+      "concepto": "plantas/maiz"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Materiales Escolares con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Lápiz",
+      "concepto": "material-escolar/lapiz"
+     },
+     {
+      "oido": "Libro",
+      "concepto": "material-escolar/libro"
+     },
+     {
+      "oido": "Tijeras",
+      "concepto": "material-escolar/tijeras"
+     }
+    ],
+    [
+     {
+      "oido": "Goma",
+      "concepto": "material-escolar/goma"
+     },
+     {
+      "oido": "Mochila",
+      "concepto": "material-escolar/mochila"
+     },
+     {
+      "oido": "Regla",
+      "concepto": "material-escolar/regla"
+     }
+    ],
+    [
+     {
+      "oido": "Pegamento",
+      "concepto": "material-escolar/pegamento"
+     },
+     {
+      "oido": "Estuche",
+      "concepto": "material-escolar/estuche"
+     },
+     {
+      "oido": "Sacapuntas",
+      "concepto": "material-escolar/sacapuntas"
+     }
+    ],
+    [
+     {
+      "oido": "Cuaderno",
+      "concepto": "material-escolar/cuaderno"
+     },
+     {
+      "oido": "Pincel",
+      "concepto": "material-escolar/pincel"
+     },
+     {
+      "oido": "Rotulador",
+      "concepto": "material-escolar/rotulador"
+     }
+    ],
+    [
+     {
+      "oido": "Ceras",
+      "concepto": "material-escolar/ceras"
+     },
+     {
+      "oido": "Carpeta",
+      "concepto": "material-escolar/carpeta"
+     },
+     {
+      "oido": "Compás",
+      "concepto": "material-escolar/compas"
+     }
+    ],
+    [
+     {
+      "oido": "Plastilina",
+      "concepto": "material-escolar/plastilina"
+     },
+     {
+      "oido": "Pizarra",
+      "concepto": "material-escolar/pizarra"
+     },
+     {
+      "oido": "Grapadora",
+      "concepto": "material-escolar/grapadora"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Dependencias de una Casa con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Cocina",
+      "concepto": "dependencias-de-la-casa/cocina"
+     },
+     {
+      "oido": "Baño",
+      "concepto": "dependencias-de-la-casa/bano"
+     },
+     {
+      "oido": "Dormitorio",
+      "concepto": "dependencias-de-la-casa/dormitorio"
+     }
+    ],
+    [
+     {
+      "oido": "Salón",
+      "concepto": "dependencias-de-la-casa/salon"
+     },
+     {
+      "oido": "Garaje",
+      "concepto": "dependencias-de-la-casa/garaje"
+     },
+     {
+      "oido": "Jardín",
+      "concepto": "dependencias-de-la-casa/jardin"
+     }
+    ],
+    [
+     {
+      "oido": "Comedor",
+      "concepto": "dependencias-de-la-casa/comedor"
+     },
+     {
+      "oido": "Terraza",
+      "concepto": "dependencias-de-la-casa/terraza"
+     },
+     {
+      "oido": "Lavadero",
+      "concepto": "dependencias-de-la-casa/lavadero"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Herramientas con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Martillo",
+      "concepto": "herramientas/martillo"
+     },
+     {
+      "oido": "Destornillador",
+      "concepto": "herramientas/destornillador"
+     },
+     {
+      "oido": "Sierra",
+      "concepto": "herramientas/sierra"
+     }
+    ],
+    [
+     {
+      "oido": "Llave inglesa",
+      "concepto": "herramientas/llave-inglesa"
+     },
+     {
+      "oido": "Taladro",
+      "concepto": "herramientas/taladro"
+     },
+     {
+      "oido": "Pala",
+      "concepto": "herramientas/pala"
+     }
+    ],
+    [
+     {
+      "oido": "Alicates",
+      "concepto": "herramientas/alicates"
+     },
+     {
+      "oido": "Rastrillo",
+      "concepto": "herramientas/rastrillo"
+     },
+     {
+      "oido": "Brocha",
+      "concepto": "herramientas/brocha"
+     }
+    ],
+    [
+     {
+      "oido": "Metro",
+      "concepto": "herramientas/metro"
+     },
+     {
+      "oido": "Escalera",
+      "concepto": "herramientas/escalera"
+     },
+     {
+      "oido": "Carretilla",
+      "concepto": "herramientas/carretilla"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Electrodomésticos con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Televisión",
+      "concepto": "electrodomesticos/television"
+     },
+     {
+      "oido": "Frigorífico",
+      "concepto": "electrodomesticos/frigorifico"
+     },
+     {
+      "oido": "Lavadora",
+      "concepto": "electrodomesticos/lavadora"
+     }
+    ],
+    [
+     {
+      "oido": "Microondas",
+      "concepto": "electrodomesticos/microondas"
+     },
+     {
+      "oido": "Aspiradora",
+      "concepto": "electrodomesticos/aspiradora"
+     },
+     {
+      "oido": "Secador",
+      "concepto": "electrodomesticos/secador"
+     }
+    ],
+    [
+     {
+      "oido": "Horno",
+      "concepto": "electrodomesticos/horno"
+     },
+     {
+      "oido": "Plancha",
+      "concepto": "electrodomesticos/plancha"
+     },
+     {
+      "oido": "Tostadora",
+      "concepto": "electrodomesticos/tostadora"
+     }
+    ],
+    [
+     {
+      "oido": "Batidora",
+      "concepto": "electrodomesticos/batidora"
+     },
+     {
+      "oido": "Ventilador",
+      "concepto": "electrodomesticos/ventilador"
+     },
+     {
+      "oido": "Lavavajillas",
+      "concepto": "electrodomesticos/lavavajillas"
+     }
+    ],
+    [
+     {
+      "oido": "Cafetera",
+      "concepto": "electrodomesticos/cafetera"
+     },
+     {
+      "oido": "Exprimidor",
+      "concepto": "electrodomesticos/exprimidor"
+     },
+     {
+      "oido": "Radio",
+      "concepto": "electrodomesticos/radio"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Muebles con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Silla",
+      "concepto": "muebles/silla"
+     },
+     {
+      "oido": "Mesa",
+      "concepto": "muebles/mesa"
+     },
+     {
+      "oido": "Cama",
+      "concepto": "muebles/cama"
+     }
+    ],
+    [
+     {
+      "oido": "Sofá",
+      "concepto": "muebles/sofa"
+     },
+     {
+      "oido": "Armario",
+      "concepto": "muebles/armario"
+     },
+     {
+      "oido": "Estantería",
+      "concepto": "muebles/estanteria"
+     }
+    ],
+    [
+     {
+      "oido": "Lámpara",
+      "concepto": "muebles/lampara"
+     },
+     {
+      "oido": "Cómoda",
+      "concepto": "muebles/comoda"
+     },
+     {
+      "oido": "Escritorio",
+      "concepto": "muebles/escritorio"
+     }
+    ],
+    [
+     {
+      "oido": "Mesita de noche",
+      "concepto": "muebles/mesita-de-noche"
+     },
+     {
+      "oido": "Taburete",
+      "concepto": "muebles/taburete"
+     },
+     {
+      "oido": "Perchero",
+      "concepto": "muebles/perchero"
+     }
+    ],
+    [
+     {
+      "oido": "Cuna",
+      "concepto": "muebles/cuna"
+     },
+     {
+      "oido": "Banco",
+      "concepto": "muebles/banco"
+     },
+     {
+      "oido": "Espejo",
+      "concepto": "muebles/espejo"
+     }
+    ],
+    [
+     {
+      "oido": "Baúl",
+      "concepto": "muebles/baul"
+     },
+     {
+      "oido": "Mecedora",
+      "concepto": "muebles/mecedora"
+     },
+     {
+      "oido": "Sillón",
+      "concepto": "muebles/sillon"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Características con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Mojado",
+      "concepto": "caracteristicas/mojado"
+     },
+     {
+      "oido": "Roto",
+      "concepto": "caracteristicas/roto"
+     },
+     {
+      "oido": "Sucio",
+      "concepto": "caracteristicas/sucio"
+     }
+    ],
+    [
+     {
+      "oido": "Abierto",
+      "concepto": "caracteristicas/abierto"
+     },
+     {
+      "oido": "Lleno",
+      "concepto": "caracteristicas/lleno"
+     },
+     {
+      "oido": "Encendido",
+      "concepto": "caracteristicas/encendido"
+     }
+    ],
+    [
+     {
+      "oido": "Limpio",
+      "concepto": "caracteristicas/limpio"
+     },
+     {
+      "oido": "Cerrado",
+      "concepto": "caracteristicas/cerrado"
+     },
+     {
+      "oido": "Vacío",
+      "concepto": "caracteristicas/vacio"
+     }
+    ],
+    [
+     {
+      "oido": "Seco",
+      "concepto": "caracteristicas/seco"
+     },
+     {
+      "oido": "Apagado",
+      "concepto": "caracteristicas/apagado"
+     },
+     {
+      "oido": "Arrugado",
+      "concepto": "caracteristicas/arrugado"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Profesiones con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Bombero",
+      "concepto": "profesiones/bombero"
+     },
+     {
+      "oido": "Médico",
+      "concepto": "profesiones/medico"
+     },
+     {
+      "oido": "Panadero",
+      "concepto": "profesiones/panadero"
+     }
+    ],
+    [
+     {
+      "oido": "Policía",
+      "concepto": "profesiones/policia"
+     },
+     {
+      "oido": "Maestra",
+      "concepto": "profesiones/maestra"
+     },
+     {
+      "oido": "Peluquero",
+      "concepto": "profesiones/peluquero"
+     }
+    ],
+    [
+     {
+      "oido": "Cartero",
+      "concepto": "profesiones/cartero"
+     },
+     {
+      "oido": "Cocinero",
+      "concepto": "profesiones/cocinero"
+     },
+     {
+      "oido": "Agricultor",
+      "concepto": "profesiones/agricultor"
+     }
+    ],
+    [
+     {
+      "oido": "Dentista",
+      "concepto": "profesiones/dentista"
+     },
+     {
+      "oido": "Pintor",
+      "concepto": "profesiones/pintor"
+     },
+     {
+      "oido": "Conductor de autobús",
+      "concepto": "profesiones/conductor-de-autobus"
+     }
+    ],
+    [
+     {
+      "oido": "Veterinario",
+      "concepto": "profesiones/veterinario"
+     },
+     {
+      "oido": "Albañil",
+      "concepto": "profesiones/albanil"
+     },
+     {
+      "oido": "Piloto",
+      "concepto": "profesiones/piloto"
+     }
+    ],
+    [
+     {
+      "oido": "Carpintero",
+      "concepto": "profesiones/carpintero"
+     },
+     {
+      "oido": "Enfermera",
+      "concepto": "profesiones/enfermera"
+     },
+     {
+      "oido": "Fontanero",
+      "concepto": "profesiones/fontanero"
+     }
+    ],
+    [
+     {
+      "oido": "Mecánico",
+      "concepto": "profesiones/mecanico"
+     },
+     {
+      "oido": "Jardinero",
+      "concepto": "profesiones/jardinero"
+     },
+     {
+      "oido": "Pescador",
+      "concepto": "profesiones/pescador"
+     }
+    ],
+    [
+     {
+      "oido": "Astronauta",
+      "concepto": "profesiones/astronauta"
+     },
+     {
+      "oido": "Socorrista",
+      "concepto": "profesiones/socorrista"
+     },
+     {
+      "oido": "Músico",
+      "concepto": "profesiones/musico"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Instrumentos Musicales con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Tambor",
+      "concepto": "instrumentos-musicales/tambor"
+     },
+     {
+      "oido": "Trompeta",
+      "concepto": "instrumentos-musicales/trompeta"
+     },
+     {
+      "oido": "Guitarra",
+      "concepto": "instrumentos-musicales/guitarra"
+     }
+    ],
+    [
+     {
+      "oido": "Piano",
+      "concepto": "instrumentos-musicales/piano"
+     },
+     {
+      "oido": "Violín",
+      "concepto": "instrumentos-musicales/violin"
+     },
+     {
+      "oido": "Flauta",
+      "concepto": "instrumentos-musicales/flauta"
+     }
+    ],
+    [
+     {
+      "oido": "Xilófono",
+      "concepto": "instrumentos-musicales/xilofono"
+     },
+     {
+      "oido": "Maracas",
+      "concepto": "instrumentos-musicales/maracas"
+     },
+     {
+      "oido": "Arpa",
+      "concepto": "instrumentos-musicales/arpa"
+     }
+    ],
+    [
+     {
+      "oido": "Saxofón",
+      "concepto": "instrumentos-musicales/saxofon"
+     },
+     {
+      "oido": "Pandereta",
+      "concepto": "instrumentos-musicales/pandereta"
+     },
+     {
+      "oido": "Acordeón",
+      "concepto": "instrumentos-musicales/acordeon"
+     }
+    ],
+    [
+     {
+      "oido": "Batería",
+      "concepto": "instrumentos-musicales/bateria"
+     },
+     {
+      "oido": "Triángulo",
+      "concepto": "instrumentos-musicales/triangulo"
+     },
+     {
+      "oido": "Violonchelo",
+      "concepto": "instrumentos-musicales/violonchelo"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Deportes con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Fútbol",
+      "concepto": "deportes/futbol"
+     },
+     {
+      "oido": "Natación",
+      "concepto": "deportes/natacion"
+     },
+     {
+      "oido": "Baloncesto",
+      "concepto": "deportes/baloncesto"
+     }
+    ],
+    [
+     {
+      "oido": "Tenis",
+      "concepto": "deportes/tenis"
+     },
+     {
+      "oido": "Ciclismo",
+      "concepto": "deportes/ciclismo"
+     },
+     {
+      "oido": "Esquí",
+      "concepto": "deportes/esqui"
+     }
+    ],
+    [
+     {
+      "oido": "Atletismo",
+      "concepto": "deportes/atletismo"
+     },
+     {
+      "oido": "Gimnasia",
+      "concepto": "deportes/gimnasia"
+     },
+     {
+      "oido": "Golf",
+      "concepto": "deportes/golf"
+     }
+    ],
+    [
+     {
+      "oido": "Judo",
+      "concepto": "deportes/judo"
+     },
+     {
+      "oido": "Patinaje",
+      "concepto": "deportes/patinaje"
+     },
+     {
+      "oido": "Balonmano",
+      "concepto": "deportes/balonmano"
+     }
+    ],
+    [
+     {
+      "oido": "Vela",
+      "concepto": "deportes/vela"
+     },
+     {
+      "oido": "Escalada",
+      "concepto": "deportes/escalada"
+     },
+     {
+      "oido": "Voleibol",
+      "concepto": "deportes/voleibol"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Partes del Universo con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Sol",
+      "concepto": "universo/sol"
+     },
+     {
+      "oido": "Luna",
+      "concepto": "universo/luna"
+     },
+     {
+      "oido": "Estrella",
+      "concepto": "universo/estrella"
+     }
+    ],
+    [
+     {
+      "oido": "Tierra",
+      "concepto": "universo/tierra"
+     },
+     {
+      "oido": "Cohete",
+      "concepto": "universo/cohete"
+     },
+     {
+      "oido": "Saturno",
+      "concepto": "universo/saturno"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Climas con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Soleado",
+      "concepto": "tiempo-atmosferico/soleado"
+     },
+     {
+      "oido": "Lluvioso",
+      "concepto": "tiempo-atmosferico/lluvioso"
+     },
+     {
+      "oido": "Nevado",
+      "concepto": "tiempo-atmosferico/nevado"
+     }
+    ],
+    [
+     {
+      "oido": "Nublado",
+      "concepto": "tiempo-atmosferico/nublado"
+     },
+     {
+      "oido": "Ventoso",
+      "concepto": "tiempo-atmosferico/ventoso"
+     },
+     {
+      "oido": "Tormenta",
+      "concepto": "tiempo-atmosferico/tormenta"
+     }
+    ],
+    [
+     {
+      "oido": "Niebla",
+      "concepto": "tiempo-atmosferico/niebla"
+     },
+     {
+      "oido": "Granizo",
+      "concepto": "tiempo-atmosferico/granizo"
+     },
+     {
+      "oido": "Arcoíris",
+      "concepto": "tiempo-atmosferico/arcoiris"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Estaciones del Año con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Verano",
+      "concepto": "estaciones/verano"
+     },
+     {
+      "oido": "Otoño",
+      "concepto": "estaciones/otono"
+     },
+     {
+      "oido": "Invierno",
+      "concepto": "estaciones/invierno"
+     }
+    ],
+    [
+     {
+      "oido": "Primavera",
+      "concepto": "estaciones/primavera"
+     },
+     {
+      "oido": "Verano",
+      "concepto": "estaciones/verano"
+     },
+     {
+      "oido": "Invierno",
+      "concepto": "estaciones/invierno"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Emociones con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Contento",
+      "concepto": "emociones/contento"
+     },
+     {
+      "oido": "Triste",
+      "concepto": "emociones/triste"
+     },
+     {
+      "oido": "Enfadado",
+      "concepto": "emociones/enfadado"
+     }
+    ],
+    [
+     {
+      "oido": "Asustado",
+      "concepto": "emociones/asustado"
+     },
+     {
+      "oido": "Sorprendido",
+      "concepto": "emociones/sorprendido"
+     },
+     {
+      "oido": "Asco",
+      "concepto": "emociones/asco"
+     }
+    ],
+    [
+     {
+      "oido": "Tranquilo",
+      "concepto": "emociones/tranquilo"
+     },
+     {
+      "oido": "Aburrido",
+      "concepto": "emociones/aburrido"
+     },
+     {
+      "oido": "Nervioso",
+      "concepto": "emociones/nervioso"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Sensaciones Corporales con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Frío",
+      "concepto": "sensaciones/frio"
+     },
+     {
+      "oido": "Calor",
+      "concepto": "sensaciones/calor"
+     },
+     {
+      "oido": "Sueño",
+      "concepto": "sensaciones/sueno"
+     }
+    ],
+    [
+     {
+      "oido": "Hambre",
+      "concepto": "sensaciones/hambre"
+     },
+     {
+      "oido": "Sed",
+      "concepto": "sensaciones/sed"
+     },
+     {
+      "oido": "Dolor",
+      "concepto": "sensaciones/dolor"
+     }
+    ],
+    [
+     {
+      "oido": "Cansancio",
+      "concepto": "sensaciones/cansancio"
+     },
+     {
+      "oido": "Picor",
+      "concepto": "sensaciones/picor"
+     },
+     {
+      "oido": "Mareo",
+      "concepto": "sensaciones/mareo"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Acciones con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Correr",
+      "concepto": "acciones/correr"
+     },
+     {
+      "oido": "Comer",
+      "concepto": "acciones/comer"
+     },
+     {
+      "oido": "Dormir",
+      "concepto": "acciones/dormir"
+     }
+    ],
+    [
+     {
+      "oido": "Saltar",
+      "concepto": "acciones/saltar"
+     },
+     {
+      "oido": "Beber",
+      "concepto": "acciones/beber"
+     },
+     {
+      "oido": "Leer",
+      "concepto": "acciones/leer"
+     }
+    ],
+    [
+     {
+      "oido": "Nadar",
+      "concepto": "acciones/nadar"
+     },
+     {
+      "oido": "Pintar",
+      "concepto": "acciones/pintar"
+     },
+     {
+      "oido": "Llorar",
+      "concepto": "acciones/llorar"
+     }
+    ],
+    [
+     {
+      "oido": "Bailar",
+      "concepto": "acciones/bailar"
+     },
+     {
+      "oido": "Escribir",
+      "concepto": "acciones/escribir"
+     },
+     {
+      "oido": "Lavarse las manos",
+      "concepto": "acciones/lavarse-las-manos"
+     }
+    ],
+    [
+     {
+      "oido": "Cantar",
+      "concepto": "acciones/cantar"
+     },
+     {
+      "oido": "Barrer",
+      "concepto": "acciones/barrer"
+     },
+     {
+      "oido": "Abrazar",
+      "concepto": "acciones/abrazar"
+     }
+    ],
+    [
+     {
+      "oido": "Jugar",
+      "concepto": "acciones/jugar"
+     },
+     {
+      "oido": "Cocinar",
+      "concepto": "acciones/cocinar"
+     },
+     {
+      "oido": "Peinarse",
+      "concepto": "acciones/peinarse"
+     }
+    ],
+    [
+     {
+      "oido": "Montar en bici",
+      "concepto": "acciones/montar-en-bici"
+     },
+     {
+      "oido": "Ducharse",
+      "concepto": "acciones/ducharse"
+     },
+     {
+      "oido": "Aplaudir",
+      "concepto": "acciones/aplaudir"
+     }
+    ],
+    [
+     {
+      "oido": "Subir escaleras",
+      "concepto": "acciones/subir-escaleras"
+     },
+     {
+      "oido": "Cortar",
+      "concepto": "acciones/cortar"
+     },
+     {
+      "oido": "Soplar",
+      "concepto": "acciones/soplar"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Cuentos con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Caperucita Roja",
+      "concepto": "cuentos/caperucita-roja"
+     },
+     {
+      "oido": "Los tres cerditos",
+      "concepto": "cuentos/los-tres-cerditos"
+     },
+     {
+      "oido": "Ricitos de Oro",
+      "concepto": "cuentos/ricitos-de-oro"
+     }
+    ],
+    [
+     {
+      "oido": "Blancanieves",
+      "concepto": "cuentos/blancanieves"
+     },
+     {
+      "oido": "Pinocho",
+      "concepto": "cuentos/pinocho"
+     },
+     {
+      "oido": "Cenicienta",
+      "concepto": "cuentos/cenicienta"
+     }
+    ],
+    [
+     {
+      "oido": "Hansel y Gretel",
+      "concepto": "cuentos/hansel-y-gretel"
+     },
+     {
+      "oido": "El patito feo",
+      "concepto": "cuentos/el-patito-feo"
+     },
+     {
+      "oido": "El gato con botas",
+      "concepto": "cuentos/el-gato-con-botas"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+   "tipo": "nombre",
+   "grupos": [
+    [
+     {
+      "oido": "Galleta",
+      "concepto": "alimentos/galleta"
+     },
+     {
+      "oido": "Peluche",
+      "concepto": "objetos/peluche"
+     },
+     {
+      "oido": "Pan",
+      "concepto": "alimentos/pan"
+     }
+    ],
+    [
+     {
+      "oido": "Gominolas",
+      "concepto": "alimentos/gominolas"
+     },
+     {
+      "oido": "Coche de juguete",
+      "concepto": "objetos/coche-de-juguete"
+     },
+     {
+      "oido": "Zumo",
+      "concepto": "alimentos/zumo"
+     }
+    ],
+    [
+     {
+      "oido": "Pelota",
+      "concepto": "objetos/pelota"
+     },
+     {
+      "oido": "Helado",
+      "concepto": "alimentos/helado"
+     },
+     {
+      "oido": "Pompas de jabón",
+      "concepto": "objetos/pompas-de-jabon"
+     }
+    ],
+    [
+     {
+      "oido": "Chocolate",
+      "concepto": "alimentos/chocolate"
+     },
+     {
+      "oido": "Muñeca",
+      "concepto": "objetos/muneca"
+     },
+     {
+      "oido": "Patatas fritas",
+      "concepto": "alimentos/patatas-fritas"
+     }
+    ],
+    [
+     {
+      "oido": "Plastilina",
+      "concepto": "material-escolar/plastilina"
+     },
+     {
+      "oido": "Globo",
+      "concepto": "objetos/globo"
+     },
+     {
+      "oido": "Puzle",
+      "concepto": "objetos/puzle"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas sobre Funciones de los Objetos",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Tijeras",
+      "concepto": "material-escolar/tijeras",
+      "respuesta": "Para cortar"
+     },
+     {
+      "oido": "Vaso",
+      "concepto": "utensilios-de-cocina/vaso",
+      "respuesta": "Para beber"
+     },
+     {
+      "oido": "Cama",
+      "concepto": "muebles/cama",
+      "respuesta": "Para dormir"
+     }
+    ],
+    [
+     {
+      "oido": "Lápiz",
+      "concepto": "material-escolar/lapiz",
+      "respuesta": "Para escribir"
+     },
+     {
+      "oido": "Peine",
+      "concepto": "objetos/peine",
+      "respuesta": "Para peinarse"
+     },
+     {
+      "oido": "Escoba",
+      "concepto": "objetos/escoba",
+      "respuesta": "Para barrer"
+     }
+    ],
+    [
+     {
+      "oido": "Cuchara",
+      "concepto": "utensilios-de-cocina/cuchara",
+      "respuesta": "Para comer"
+     },
+     {
+      "oido": "Jabón",
+      "concepto": "objetos/jabon",
+      "respuesta": "Para lavarse las manos"
+     },
+     {
+      "oido": "Paraguas",
+      "concepto": "objetos/paraguas",
+      "respuesta": "Para no mojarse"
+     }
+    ],
+    [
+     {
+      "oido": "Llave",
+      "concepto": "objetos/llave",
+      "respuesta": "Para abrir la puerta"
+     },
+     {
+      "oido": "Toalla",
+      "concepto": "objetos/toalla",
+      "respuesta": "Para secarse"
+     },
+     {
+      "oido": "Cepillo de dientes",
+      "concepto": "objetos/cepillo-de-dientes",
+      "respuesta": "Para lavarse los dientes"
+     }
+    ],
+    [
+     {
+      "oido": "Teléfono",
+      "concepto": "objetos/telefono",
+      "respuesta": "Para llamar"
+     },
+     {
+      "oido": "Silla",
+      "concepto": "muebles/silla",
+      "respuesta": "Para sentarse"
+     },
+     {
+      "oido": "Abrigo",
+      "concepto": "objetos/abrigo",
+      "respuesta": "Para no tener frío"
+     }
+    ],
+    [
+     {
+      "oido": "Pelota",
+      "concepto": "objetos/pelota",
+      "respuesta": "Para jugar"
+     },
+     {
+      "oido": "Gafas",
+      "concepto": "objetos/gafas",
+      "respuesta": "Para ver mejor"
+     },
+     {
+      "oido": "Grifo",
+      "concepto": "objetos/grifo",
+      "respuesta": "Para sacar agua"
+     }
+    ],
+    [
+     {
+      "oido": "Bicicleta",
+      "concepto": "objetos/bicicleta",
+      "respuesta": "Para montar"
+     },
+     {
+      "oido": "Reloj",
+      "concepto": "objetos/reloj",
+      "respuesta": "Para saber la hora"
+     },
+     {
+      "oido": "Linterna",
+      "concepto": "objetos/linterna",
+      "respuesta": "Para alumbrar"
+     }
+    ],
+    [
+     {
+      "oido": "Libro",
+      "concepto": "material-escolar/libro",
+      "respuesta": "Para leer"
+     },
+     {
+      "oido": "Frigorífico",
+      "concepto": "electrodomesticos/frigorifico",
+      "respuesta": "Para enfriar la comida"
+     },
+     {
+      "oido": "Martillo",
+      "concepto": "herramientas/martillo",
+      "respuesta": "Para clavar"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+   "tipo": "funcion",
+   "grupos": [
+    [
+     {
+      "oido": "Para cortar",
+      "concepto": "material-escolar/tijeras"
+     },
+     {
+      "oido": "Para beber",
+      "concepto": "utensilios-de-cocina/vaso"
+     },
+     {
+      "oido": "Para dormir",
+      "concepto": "muebles/cama"
+     }
+    ],
+    [
+     {
+      "oido": "Para escribir",
+      "concepto": "material-escolar/lapiz"
+     },
+     {
+      "oido": "Para peinarse",
+      "concepto": "objetos/peine"
+     },
+     {
+      "oido": "Para barrer",
+      "concepto": "objetos/escoba"
+     }
+    ],
+    [
+     {
+      "oido": "Para comer",
+      "concepto": "utensilios-de-cocina/cuchara"
+     },
+     {
+      "oido": "Para lavarse las manos",
+      "concepto": "objetos/jabon"
+     },
+     {
+      "oido": "Para no mojarse",
+      "concepto": "objetos/paraguas"
+     }
+    ],
+    [
+     {
+      "oido": "Para abrir la puerta",
+      "concepto": "objetos/llave"
+     },
+     {
+      "oido": "Para secarse",
+      "concepto": "objetos/toalla"
+     },
+     {
+      "oido": "Para lavarse los dientes",
+      "concepto": "objetos/cepillo-de-dientes"
+     }
+    ],
+    [
+     {
+      "oido": "Para llamar",
+      "concepto": "objetos/telefono"
+     },
+     {
+      "oido": "Para sentarse",
+      "concepto": "muebles/silla"
+     },
+     {
+      "oido": "Para no tener frío",
+      "concepto": "objetos/abrigo"
+     }
+    ],
+    [
+     {
+      "oido": "Para jugar",
+      "concepto": "objetos/pelota"
+     },
+     {
+      "oido": "Para ver mejor",
+      "concepto": "objetos/gafas"
+     },
+     {
+      "oido": "Para sacar agua",
+      "concepto": "objetos/grifo"
+     }
+    ],
+    [
+     {
+      "oido": "Para montar",
+      "concepto": "objetos/bicicleta"
+     },
+     {
+      "oido": "Para saber la hora",
+      "concepto": "objetos/reloj"
+     },
+     {
+      "oido": "Para alumbrar",
+      "concepto": "objetos/linterna"
+     }
+    ],
+    [
+     {
+      "oido": "Para leer",
+      "concepto": "material-escolar/libro"
+     },
+     {
+      "oido": "Para enfriar la comida",
+      "concepto": "electrodomesticos/frigorifico"
+     },
+     {
+      "oido": "Para clavar",
+      "concepto": "herramientas/martillo"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas ¿Quién?",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Bombero",
+      "concepto": "profesiones/bombero",
+      "respuesta": "Apaga el fuego"
+     },
+     {
+      "oido": "Médico",
+      "concepto": "profesiones/medico",
+      "respuesta": "Cura a los enfermos"
+     },
+     {
+      "oido": "Panadero",
+      "concepto": "profesiones/panadero",
+      "respuesta": "Hace el pan"
+     }
+    ],
+    [
+     {
+      "oido": "Policía",
+      "concepto": "profesiones/policia",
+      "respuesta": "Detiene a los ladrones"
+     },
+     {
+      "oido": "Maestra",
+      "concepto": "profesiones/maestra",
+      "respuesta": "Enseña a los niños"
+     },
+     {
+      "oido": "Peluquero",
+      "concepto": "profesiones/peluquero",
+      "respuesta": "Corta el pelo"
+     }
+    ],
+    [
+     {
+      "oido": "Cartero",
+      "concepto": "profesiones/cartero",
+      "respuesta": "Reparte las cartas"
+     },
+     {
+      "oido": "Cocinero",
+      "concepto": "profesiones/cocinero",
+      "respuesta": "Cocina la comida"
+     },
+     {
+      "oido": "Agricultor",
+      "concepto": "profesiones/agricultor",
+      "respuesta": "Cultiva la tierra"
+     }
+    ],
+    [
+     {
+      "oido": "Dentista",
+      "concepto": "profesiones/dentista",
+      "respuesta": "Cuida los dientes"
+     },
+     {
+      "oido": "Pintor",
+      "concepto": "profesiones/pintor",
+      "respuesta": "Pinta las paredes"
+     },
+     {
+      "oido": "Conductor de autobús",
+      "concepto": "profesiones/conductor-de-autobus",
+      "respuesta": "Conduce el autobús"
+     }
+    ],
+    [
+     {
+      "oido": "Veterinario",
+      "concepto": "profesiones/veterinario",
+      "respuesta": "Cura a los animales"
+     },
+     {
+      "oido": "Albañil",
+      "concepto": "profesiones/albanil",
+      "respuesta": "Construye casas"
+     },
+     {
+      "oido": "Piloto",
+      "concepto": "profesiones/piloto",
+      "respuesta": "Pilota el avión"
+     }
+    ],
+    [
+     {
+      "oido": "Carpintero",
+      "concepto": "profesiones/carpintero",
+      "respuesta": "Hace muebles de madera"
+     },
+     {
+      "oido": "Enfermera",
+      "concepto": "profesiones/enfermera",
+      "respuesta": "Pone las vacunas"
+     },
+     {
+      "oido": "Fontanero",
+      "concepto": "profesiones/fontanero",
+      "respuesta": "Arregla los grifos"
+     }
+    ],
+    [
+     {
+      "oido": "Mecánico",
+      "concepto": "profesiones/mecanico",
+      "respuesta": "Arregla los coches"
+     },
+     {
+      "oido": "Jardinero",
+      "concepto": "profesiones/jardinero",
+      "respuesta": "Cuida las plantas"
+     },
+     {
+      "oido": "Pescador",
+      "concepto": "profesiones/pescador",
+      "respuesta": "Pesca peces"
+     }
+    ],
+    [
+     {
+      "oido": "Astronauta",
+      "concepto": "profesiones/astronauta",
+      "respuesta": "Viaja al espacio"
+     },
+     {
+      "oido": "Socorrista",
+      "concepto": "profesiones/socorrista",
+      "respuesta": "Vigila la playa"
+     },
+     {
+      "oido": "Músico",
+      "concepto": "profesiones/musico",
+      "respuesta": "Toca música"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas sobre Características",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Plátano",
+      "concepto": "alimentos/platano",
+      "respuesta": "Amarillo"
+     },
+     {
+      "oido": "Fresa",
+      "concepto": "alimentos/fresa",
+      "respuesta": "Roja"
+     },
+     {
+      "oido": "Lechuga",
+      "concepto": "alimentos/lechuga",
+      "respuesta": "Verde"
+     }
+    ],
+    [
+     {
+      "oido": "Nieve",
+      "concepto": "tiempo-atmosferico/nevado",
+      "respuesta": "Blanca"
+     },
+     {
+      "oido": "Chocolate",
+      "concepto": "alimentos/chocolate",
+      "respuesta": "Marrón"
+     },
+     {
+      "oido": "Mar",
+      "concepto": "transportes/barco-en-el-mar",
+      "respuesta": "Azul"
+     }
+    ],
+    [
+     {
+      "oido": "Pelota",
+      "concepto": "objetos/pelota",
+      "respuesta": "Redonda"
+     },
+     {
+      "oido": "Helado",
+      "concepto": "alimentos/helado",
+      "respuesta": "Frío"
+     },
+     {
+      "oido": "Fuego",
+      "concepto": "peligros/fuego",
+      "respuesta": "Caliente"
+     }
+    ],
+    [
+     {
+      "oido": "Peluche",
+      "concepto": "objetos/peluche",
+      "respuesta": "Suave"
+     },
+     {
+      "oido": "Cactus",
+      "concepto": "plantas/cactus",
+      "respuesta": "Pincha"
+     },
+     {
+      "oido": "Limón",
+      "concepto": "alimentos/limon",
+      "respuesta": "Ácido"
+     }
+    ],
+    [
+     {
+      "oido": "Elefante",
+      "concepto": "animales-salvajes/elefante",
+      "respuesta": "Grande"
+     },
+     {
+      "oido": "Serpiente",
+      "concepto": "animales-salvajes/serpiente",
+      "respuesta": "Larga"
+     },
+     {
+      "oido": "Miel",
+      "concepto": "alimentos/miel",
+      "respuesta": "Dulce"
+     }
+    ],
+    [
+     {
+      "oido": "Tortuga",
+      "concepto": "animales-salvajes/tortuga",
+      "respuesta": "Lenta"
+     },
+     {
+      "oido": "Cohete",
+      "concepto": "universo/cohete",
+      "respuesta": "Rápido"
+     },
+     {
+      "oido": "Globo",
+      "concepto": "objetos/globo",
+      "respuesta": "Ligero"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas ¿Dónde?",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Cocina",
+      "concepto": "dependencias-de-la-casa/cocina",
+      "respuesta": "Cocinar"
+     },
+     {
+      "oido": "Baño",
+      "concepto": "dependencias-de-la-casa/bano",
+      "respuesta": "Ducharnos"
+     },
+     {
+      "oido": "Dormitorio",
+      "concepto": "dependencias-de-la-casa/dormitorio",
+      "respuesta": "Dormir"
+     }
+    ],
+    [
+     {
+      "oido": "Parque",
+      "concepto": "lugares/parque",
+      "respuesta": "Jugar en los columpios"
+     },
+     {
+      "oido": "Colegio",
+      "concepto": "lugares/colegio",
+      "respuesta": "Aprender"
+     },
+     {
+      "oido": "Supermercado",
+      "concepto": "lugares/supermercado",
+      "respuesta": "Comprar comida"
+     }
+    ],
+    [
+     {
+      "oido": "Piscina",
+      "concepto": "lugares/piscina",
+      "respuesta": "Nadar"
+     },
+     {
+      "oido": "Hospital",
+      "concepto": "lugares/hospital",
+      "respuesta": "Curarnos"
+     },
+     {
+      "oido": "Biblioteca",
+      "concepto": "lugares/biblioteca",
+      "respuesta": "Coger libros"
+     }
+    ],
+    [
+     {
+      "oido": "Playa",
+      "concepto": "lugares/playa",
+      "respuesta": "Hacer castillos de arena"
+     },
+     {
+      "oido": "Peluquería",
+      "concepto": "lugares/peluqueria",
+      "respuesta": "Cortarnos el pelo"
+     },
+     {
+      "oido": "Restaurante",
+      "concepto": "lugares/restaurante",
+      "respuesta": "Comer fuera de casa"
+     }
+    ],
+    [
+     {
+      "oido": "Cine",
+      "concepto": "lugares/cine",
+      "respuesta": "Ver películas"
+     },
+     {
+      "oido": "Zoo",
+      "concepto": "lugares/zoo",
+      "respuesta": "Ver animales"
+     },
+     {
+      "oido": "Estación de tren",
+      "concepto": "lugares/estacion-de-tren",
+      "respuesta": "Coger el tren"
+     }
+    ],
+    [
+     {
+      "oido": "Panadería",
+      "concepto": "lugares/panaderia",
+      "respuesta": "Comprar el pan"
+     },
+     {
+      "oido": "Granja",
+      "concepto": "lugares/granja",
+      "respuesta": "Ver vacas y gallinas"
+     },
+     {
+      "oido": "Aeropuerto",
+      "concepto": "lugares/aeropuerto",
+      "respuesta": "Coger el avión"
+     }
+    ],
+    [
+     {
+      "oido": "Farmacia",
+      "concepto": "lugares/farmacia",
+      "respuesta": "Comprar medicinas"
+     },
+     {
+      "oido": "Polideportivo",
+      "concepto": "lugares/polideportivo",
+      "respuesta": "Hacer deporte"
+     },
+     {
+      "oido": "Gasolinera",
+      "concepto": "lugares/gasolinera",
+      "respuesta": "Echar gasolina"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas ¿Cuándo?",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Verano",
+      "concepto": "estaciones/verano",
+      "respuesta": "Vamos a la playa"
+     },
+     {
+      "oido": "Otoño",
+      "concepto": "estaciones/otono",
+      "respuesta": "Se caen las hojas"
+     },
+     {
+      "oido": "Invierno",
+      "concepto": "estaciones/invierno",
+      "respuesta": "Nos ponemos el abrigo"
+     }
+    ],
+    [
+     {
+      "oido": "Primavera",
+      "concepto": "estaciones/primavera",
+      "respuesta": "Salen las flores"
+     },
+     {
+      "oido": "Por la noche",
+      "concepto": "momentos/noche",
+      "respuesta": "Dormimos"
+     },
+     {
+      "oido": "Por la mañana",
+      "concepto": "momentos/manana",
+      "respuesta": "Desayunamos"
+     }
+    ],
+    [
+     {
+      "oido": "En mi cumpleaños",
+      "concepto": "momentos/cumpleanos",
+      "respuesta": "Soplo las velas"
+     },
+     {
+      "oido": "Cuando llueve",
+      "concepto": "momentos/lluvia",
+      "respuesta": "Abrimos el paraguas"
+     },
+     {
+      "oido": "En Navidad",
+      "concepto": "momentos/navidad",
+      "respuesta": "Abrimos regalos"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Responder a Preguntas ¿Cómo?",
+   "tipo": "pregunta",
+   "grupos": [
+    [
+     {
+      "oido": "Coche",
+      "concepto": "transportes/coche-en-la-carretera",
+      "respuesta": "Por la carretera"
+     },
+     {
+      "oido": "Avión",
+      "concepto": "transportes/avion-en-el-cielo",
+      "respuesta": "Por el aire"
+     },
+     {
+      "oido": "Barco",
+      "concepto": "transportes/barco-en-el-mar",
+      "respuesta": "Por el mar"
+     }
+    ],
+    [
+     {
+      "oido": "Tren",
+      "concepto": "transportes/tren-en-las-vias",
+      "respuesta": "Por las vías"
+     },
+     {
+      "oido": "Bicicleta",
+      "concepto": "transportes/bicicleta",
+      "respuesta": "Pedaleando"
+     },
+     {
+      "oido": "Caballo",
+      "concepto": "transportes/caballo",
+      "respuesta": "Montando a caballo"
+     }
+    ],
+    [
+     {
+      "oido": "Submarino",
+      "concepto": "transportes/submarino",
+      "respuesta": "Por debajo del agua"
+     },
+     {
+      "oido": "Globo",
+      "concepto": "transportes/globo-aerostatico",
+      "respuesta": "Flotando en el aire"
+     },
+     {
+      "oido": "Patinete",
+      "concepto": "transportes/patinete",
+      "respuesta": "Empujando con el pie"
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Igualar Imágenes",
+   "tipo": "igualar",
+   "grupos": [
+    [
+     {
+      "concepto": "objetos/pelota"
+     },
+     {
+      "concepto": "vehiculos/coche"
+     },
+     {
+      "concepto": "alimentos/manzana"
+     }
+    ],
+    [
+     {
+      "concepto": "animales-salvajes/leon"
+     },
+     {
+      "concepto": "prendas-de-vestir/zapatos"
+     },
+     {
+      "concepto": "utensilios-de-cocina/vaso"
+     }
+    ],
+    [
+     {
+      "concepto": "objetos/paraguas"
+     },
+     {
+      "concepto": "animales-de-granja/vaca"
+     },
+     {
+      "concepto": "material-escolar/lapiz"
+     }
+    ],
+    [
+     {
+      "concepto": "muebles/silla"
+     },
+     {
+      "concepto": "alimentos/platano"
+     },
+     {
+      "concepto": "instrumentos-musicales/guitarra"
+     }
+    ],
+    [
+     {
+      "concepto": "objetos/llave"
+     },
+     {
+      "concepto": "animales-marinos/pulpo"
+     },
+     {
+      "concepto": "prendas-de-vestir/camiseta"
+     }
+    ],
+    [
+     {
+      "concepto": "plantas/girasol"
+     },
+     {
+      "concepto": "objetos/reloj"
+     },
+     {
+      "concepto": "vehiculos/avion"
+     }
+    ],
+    [
+     {
+      "concepto": "utensilios-de-cocina/taza"
+     },
+     {
+      "concepto": "objetos/peluche"
+     },
+     {
+      "concepto": "herramientas/martillo"
+     }
+    ],
+    [
+     {
+      "concepto": "electrodomesticos/tostadora"
+     },
+     {
+      "concepto": "animales-de-granja/caballo"
+     },
+     {
+      "concepto": "objetos/globo"
+     }
+    ]
+   ]
+  }
+ ],
+ "anclas": {
+  "Leer Oraciones y Textos": [
+   {
+    "nombre": "Imagen de mamá comiendo sopa",
+    "grupo": "Grupo 1",
+    "concepto": "escenas/mama-come-sopa"
+   },
+   {
+    "nombre": "Imagen de papá leyendo un libro",
+    "grupo": "Grupo 1",
+    "concepto": "escenas/papa-lee-un-libro"
+   },
+   {
+    "nombre": "Imagen de un niño durmiendo",
+    "grupo": "Grupo 1",
+    "concepto": "escenas/el-nino-duerme"
+   },
+   {
+    "nombre": "Imagen de un perro corriendo",
+    "grupo": "Grupo 2",
+    "concepto": "escenas/el-perro-corre"
+   },
+   {
+    "nombre": "Imagen de una niña bebiendo agua",
+    "grupo": "Grupo 2",
+    "concepto": "escenas/la-nina-bebe-agua"
+   },
+   {
+    "nombre": "Imagen de papá lavando el coche",
+    "grupo": "Grupo 2",
+    "concepto": "escenas/papa-lava-el-coche"
+   },
+   {
+    "nombre": "Imagen de un gato saltando",
+    "grupo": "Grupo 3",
+    "concepto": "escenas/el-gato-salta"
+   },
+   {
+    "nombre": "Imagen de mamá pintando una casa",
+    "grupo": "Grupo 3",
+    "concepto": "escenas/mama-pinta-una-casa"
+   },
+   {
+    "nombre": "Imagen de un bebé llorando",
+    "grupo": "Grupo 3",
+    "concepto": "escenas/el-bebe-llora"
+   },
+   {
+    "nombre": "Imagen de una vaca comiendo hierba",
+    "grupo": "Grupo 4",
+    "concepto": "escenas/la-vaca-come-hierba"
+   },
+   {
+    "nombre": "Imagen de un niño nadando",
+    "grupo": "Grupo 4",
+    "concepto": "escenas/el-nino-nada"
+   },
+   {
+    "nombre": "Imagen de la abuela cantando",
+    "grupo": "Grupo 4",
+    "concepto": "escenas/la-abuela-canta"
+   },
+   {
+    "nombre": "Imagen de un pájaro volando",
+    "grupo": "Grupo 5",
+    "concepto": "escenas/el-pajaro-vuela"
+   },
+   {
+    "nombre": "Imagen de papá cocinando",
+    "grupo": "Grupo 5",
+    "concepto": "escenas/papa-cocina"
+   },
+   {
+    "nombre": "Imagen de una niña riendo",
+    "grupo": "Grupo 5",
+    "concepto": "escenas/la-nina-rie"
+   },
+   {
+    "nombre": "Imagen de el sol brillando",
+    "grupo": "Grupo 6",
+    "concepto": "escenas/el-sol-brilla"
+   },
+   {
+    "nombre": "Imagen de un niño comiendo una manzana",
+    "grupo": "Grupo 6",
+    "concepto": "escenas/el-nino-come-una-manzana"
+   },
+   {
+    "nombre": "Imagen de mamá abriendo la puerta",
+    "grupo": "Grupo 6",
+    "concepto": "escenas/mama-abre-la-puerta"
+   },
+   {
+    "nombre": "Imagen de una pelota roja",
+    "grupo": "Grupo 7",
+    "concepto": "escenas/la-pelota-es-roja"
+   },
+   {
+    "nombre": "Imagen de el abuelo caminando",
+    "grupo": "Grupo 7",
+    "concepto": "escenas/el-abuelo-camina"
+   },
+   {
+    "nombre": "Imagen de una niña dibujando un sol",
+    "grupo": "Grupo 7",
+    "concepto": "escenas/la-nina-dibuja-un-sol"
+   },
+   {
+    "nombre": "Imagen de un tren pasando",
+    "grupo": "Grupo 8",
+    "concepto": "escenas/el-tren-pasa"
+   },
+   {
+    "nombre": "Imagen de la maestra escribiendo",
+    "grupo": "Grupo 8",
+    "concepto": "escenas/la-maestra-escribe"
+   },
+   {
+    "nombre": "Imagen de un león rugiendo",
+    "grupo": "Grupo 8",
+    "concepto": "escenas/el-leon-ruge"
+   }
+  ],
+  "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias": [
+   {
+    "nombre": "Coche",
+    "grupo": "Grupo 1",
+    "concepto": "vehiculos/coche"
+   },
+   {
+    "nombre": "Pelota",
+    "grupo": "Grupo 1",
+    "concepto": "objetos/pelota"
+   },
+   {
+    "nombre": "Sol",
+    "grupo": "Grupo 1",
+    "concepto": "universo/sol"
+   },
+   {
+    "nombre": "Gato",
+    "grupo": "Grupo 2",
+    "concepto": "animales-de-granja/gato"
+   },
+   {
+    "nombre": "Vaso",
+    "grupo": "Grupo 2",
+    "concepto": "utensilios-de-cocina/vaso"
+   },
+   {
+    "nombre": "Cuchara",
+    "grupo": "Grupo 2",
+    "concepto": "utensilios-de-cocina/cuchara"
+   },
+   {
+    "nombre": "Perro",
+    "grupo": "Grupo 3",
+    "concepto": "animales-de-granja/perro"
+   },
+   {
+    "nombre": "Manzana",
+    "grupo": "Grupo 3",
+    "concepto": "alimentos/manzana"
+   },
+   {
+    "nombre": "Zapato",
+    "grupo": "Grupo 3",
+    "concepto": "prendas-de-vestir/zapatos"
+   },
+   {
+    "nombre": "Cama",
+    "grupo": "Grupo 4",
+    "concepto": "muebles/cama"
+   },
+   {
+    "nombre": "Tijeras",
+    "grupo": "Grupo 4",
+    "concepto": "material-escolar/tijeras"
+   },
+   {
+    "nombre": "Pez",
+    "grupo": "Grupo 4",
+    "concepto": "animales-de-granja/pez"
+   },
+   {
+    "nombre": "Plátano",
+    "grupo": "Grupo 5",
+    "concepto": "alimentos/platano"
+   },
+   {
+    "nombre": "Silla",
+    "grupo": "Grupo 5",
+    "concepto": "muebles/silla"
+   },
+   {
+    "nombre": "Libro",
+    "grupo": "Grupo 5",
+    "concepto": "material-escolar/libro"
+   },
+   {
+    "nombre": "Vaca",
+    "grupo": "Grupo 6",
+    "concepto": "animales-de-granja/vaca"
+   },
+   {
+    "nombre": "Camiseta",
+    "grupo": "Grupo 6",
+    "concepto": "prendas-de-vestir/camiseta"
+   },
+   {
+    "nombre": "Avión",
+    "grupo": "Grupo 6",
+    "concepto": "vehiculos/avion"
+   },
+   {
+    "nombre": "Galleta",
+    "grupo": "Grupo 7",
+    "concepto": "alimentos/galleta"
+   },
+   {
+    "nombre": "Barco",
+    "grupo": "Grupo 7",
+    "concepto": "vehiculos/barco"
+   },
+   {
+    "nombre": "Llave",
+    "grupo": "Grupo 7",
+    "concepto": "objetos/llave"
+   },
+   {
+    "nombre": "Caballo",
+    "grupo": "Grupo 8",
+    "concepto": "animales-de-granja/caballo"
+   },
+   {
+    "nombre": "Lápiz",
+    "grupo": "Grupo 8",
+    "concepto": "material-escolar/lapiz"
+   },
+   {
+    "nombre": "Reloj",
+    "grupo": "Grupo 8",
+    "concepto": "objetos/reloj"
+   }
+  ],
+  "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias": [
+   {
+    "nombre": "Imagen de fuego",
+    "grupo": "Grupo 1",
+    "concepto": "peligros/fuego"
+   },
+   {
+    "nombre": "Imagen de enchufe",
+    "grupo": "Grupo 1",
+    "concepto": "peligros/enchufe"
+   },
+   {
+    "nombre": "Pelota (seguro)",
+    "grupo": "Grupo 1",
+    "concepto": "objetos/pelota"
+   },
+   {
+    "nombre": "Imagen de cuchillo",
+    "grupo": "Grupo 2",
+    "concepto": "peligros/cuchillo"
+   },
+   {
+    "nombre": "Imagen de plancha caliente",
+    "grupo": "Grupo 2",
+    "concepto": "peligros/plancha-caliente"
+   },
+   {
+    "nombre": "Peluche (seguro)",
+    "grupo": "Grupo 2",
+    "concepto": "objetos/peluche"
+   },
+   {
+    "nombre": "Imagen de medicamentos",
+    "grupo": "Grupo 3",
+    "concepto": "peligros/medicamentos"
+   },
+   {
+    "nombre": "Imagen de lejía",
+    "grupo": "Grupo 3",
+    "concepto": "peligros/lejia"
+   },
+   {
+    "nombre": "Globo (seguro)",
+    "grupo": "Grupo 3",
+    "concepto": "objetos/globo"
+   },
+   {
+    "nombre": "Imagen de sartén caliente",
+    "grupo": "Grupo 4",
+    "concepto": "peligros/sarten-caliente"
+   },
+   {
+    "nombre": "Imagen de cristal roto",
+    "grupo": "Grupo 4",
+    "concepto": "peligros/cristal-roto"
+   },
+   {
+    "nombre": "Cuento (seguro)",
+    "grupo": "Grupo 4",
+    "concepto": "objetos/cuento"
+   },
+   {
+    "nombre": "Imagen de vela encendida",
+    "grupo": "Grupo 5",
+    "concepto": "peligros/vela-encendida"
+   },
+   {
+    "nombre": "Imagen de avispa",
+    "grupo": "Grupo 5",
+    "concepto": "peligros/avispa"
+   },
+   {
+    "nombre": "Cubo y pala (seguro)",
+    "grupo": "Grupo 5",
+    "concepto": "objetos/cubo-y-pala"
+   },
+   {
+    "nombre": "Imagen de horno encendido",
+    "grupo": "Grupo 6",
+    "concepto": "peligros/horno-encendido"
+   },
+   {
+    "nombre": "Imagen de agua hirviendo",
+    "grupo": "Grupo 6",
+    "concepto": "peligros/agua-hirviendo"
+   },
+   {
+    "nombre": "Muñeca (seguro)",
+    "grupo": "Grupo 6",
+    "concepto": "objetos/muneca"
+   },
+   {
+    "nombre": "Imagen de estufa encendida",
+    "grupo": "Grupo 7",
+    "concepto": "peligros/estufa-encendida"
+   },
+   {
+    "nombre": "Imagen de abeja",
+    "grupo": "Grupo 7",
+    "concepto": "peligros/abeja"
+   },
+   {
+    "nombre": "Coche de juguete (seguro)",
+    "grupo": "Grupo 7",
+    "concepto": "objetos/coche-de-juguete"
+   },
+   {
+    "nombre": "Imagen de cúter",
+    "grupo": "Grupo 8",
+    "concepto": "peligros/cuter"
+   },
+   {
+    "nombre": "Imagen de cerillas",
+    "grupo": "Grupo 8",
+    "concepto": "peligros/cerillas"
+   },
+   {
+    "nombre": "Pinturas (seguro)",
+    "grupo": "Grupo 8",
+    "concepto": "objetos/pinturas"
+   }
+  ],
+  "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias": [
+   {
+    "nombre": "Señal de \"para\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/senal-de-para"
+   },
+   {
+    "nombre": "Gesto de \"ven\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/pictograma-de-sientate"
+   },
+   {
+    "nombre": "Semáforo en rojo (\"para\")",
+    "grupo": "Grupo 2",
+    "concepto": "senales/semaforo-en-rojo"
+   },
+   {
+    "nombre": "Gesto de \"ven\" (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\" (otra silla)",
+    "grupo": "Grupo 2",
+    "concepto": "senales/pictograma-de-sientate"
+   },
+   {
+    "nombre": "Mano levantada con la palma hacia delante (\"para\")",
+    "grupo": "Grupo 3",
+    "concepto": "senales/mano-levantada-para"
+   },
+   {
+    "nombre": "Gesto de \"ven\" (tercera persona)",
+    "grupo": "Grupo 3",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\" (banco)",
+    "grupo": "Grupo 3",
+    "concepto": "senales/pictograma-de-sientate-banco"
+   },
+   {
+    "nombre": "Gesto de \"silencio\" (dedo en los labios)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-silencio"
+   },
+   {
+    "nombre": "Gesto de \"mira\" (señalar los ojos)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-mira"
+   },
+   {
+    "nombre": "Gesto de \"dame\" (mano abierta)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-dame"
+   },
+   {
+    "nombre": "Pictograma de \"silencio\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-silencio"
+   },
+   {
+    "nombre": "Pictograma de \"mira\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-mira"
+   },
+   {
+    "nombre": "Pictograma de \"dame\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-dame"
+   },
+   {
+    "nombre": "Gesto de \"levántate\" (palmas hacia arriba)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-levantate"
+   },
+   {
+    "nombre": "Gesto de \"espera\" (dedo índice levantado)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-espera"
+   },
+   {
+    "nombre": "Gesto de \"coge\" (señalar el objeto)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-coge"
+   },
+   {
+    "nombre": "Pictograma de \"levántate\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-levantate"
+   },
+   {
+    "nombre": "Pictograma de \"espera\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-espera"
+   },
+   {
+    "nombre": "Pictograma de \"coge\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-coge"
+   },
+   {
+    "nombre": "Semáforo en verde (\"pasa\")",
+    "grupo": "Grupo 8",
+    "concepto": "senales/semaforo-en-verde"
+   },
+   {
+    "nombre": "Gesto de \"adiós\"",
+    "grupo": "Grupo 8",
+    "concepto": "senales/gesto-de-adios"
+   },
+   {
+    "nombre": "Gesto de \"hola\"",
+    "grupo": "Grupo 8",
+    "concepto": "senales/gesto-de-hola"
+   }
+  ],
+  "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias": [
+   {
+    "nombre": "Cara contenta",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara asustada",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/asco"
+   },
+   {
+    "nombre": "Cara asustada (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/asco"
+   },
+   {
+    "nombre": "Cara asustada (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/asco"
+   }
+  ],
+  "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios": [
+   {
+    "nombre": "Coche",
+    "grupo": "Grupo 1",
+    "concepto": "vehiculos/coche"
+   },
+   {
+    "nombre": "Pelota",
+    "grupo": "Grupo 1",
+    "concepto": "objetos/pelota"
+   },
+   {
+    "nombre": "Sol",
+    "grupo": "Grupo 1",
+    "concepto": "universo/sol"
+   },
+   {
+    "nombre": "Manzana",
+    "grupo": "Grupo 2",
+    "concepto": "alimentos/manzana"
+   },
+   {
+    "nombre": "Perro",
+    "grupo": "Grupo 2",
+    "concepto": "animales-de-granja/perro"
+   },
+   {
+    "nombre": "Zapato",
+    "grupo": "Grupo 2",
+    "concepto": "prendas-de-vestir/zapatos"
+   },
+   {
+    "nombre": "Cama",
+    "grupo": "Grupo 3",
+    "concepto": "muebles/cama"
+   },
+   {
+    "nombre": "Tijeras",
+    "grupo": "Grupo 3",
+    "concepto": "material-escolar/tijeras"
+   },
+   {
+    "nombre": "Pez",
+    "grupo": "Grupo 3",
+    "concepto": "animales-de-granja/pez"
+   },
+   {
+    "nombre": "Gato",
+    "grupo": "Grupo 4",
+    "concepto": "animales-de-granja/gato"
+   },
+   {
+    "nombre": "Vaso",
+    "grupo": "Grupo 4",
+    "concepto": "utensilios-de-cocina/vaso"
+   },
+   {
+    "nombre": "Cuchara",
+    "grupo": "Grupo 4",
+    "concepto": "utensilios-de-cocina/cuchara"
+   },
+   {
+    "nombre": "Plátano",
+    "grupo": "Grupo 5",
+    "concepto": "alimentos/platano"
+   },
+   {
+    "nombre": "Silla",
+    "grupo": "Grupo 5",
+    "concepto": "muebles/silla"
+   },
+   {
+    "nombre": "Libro",
+    "grupo": "Grupo 5",
+    "concepto": "material-escolar/libro"
+   },
+   {
+    "nombre": "Vaca",
+    "grupo": "Grupo 6",
+    "concepto": "animales-de-granja/vaca"
+   },
+   {
+    "nombre": "Camiseta",
+    "grupo": "Grupo 6",
+    "concepto": "prendas-de-vestir/camiseta"
+   },
+   {
+    "nombre": "Avión",
+    "grupo": "Grupo 6",
+    "concepto": "vehiculos/avion"
+   },
+   {
+    "nombre": "Galleta",
+    "grupo": "Grupo 7",
+    "concepto": "alimentos/galleta"
+   },
+   {
+    "nombre": "Barco",
+    "grupo": "Grupo 7",
+    "concepto": "vehiculos/barco"
+   },
+   {
+    "nombre": "Llave",
+    "grupo": "Grupo 7",
+    "concepto": "objetos/llave"
+   },
+   {
+    "nombre": "Caballo",
+    "grupo": "Grupo 8",
+    "concepto": "animales-de-granja/caballo"
+   },
+   {
+    "nombre": "Lápiz",
+    "grupo": "Grupo 8",
+    "concepto": "material-escolar/lapiz"
+   },
+   {
+    "nombre": "Reloj",
+    "grupo": "Grupo 8",
+    "concepto": "objetos/reloj"
+   }
+  ],
+  "Transferir Funciones de Evitación a Estímulos Arbitrarios": [
+   {
+    "nombre": "Imagen de fuego",
+    "grupo": "Grupo 1",
+    "concepto": "peligros/fuego"
+   },
+   {
+    "nombre": "Imagen de enchufe",
+    "grupo": "Grupo 1",
+    "concepto": "peligros/enchufe"
+   },
+   {
+    "nombre": "Pelota (seguro)",
+    "grupo": "Grupo 1",
+    "concepto": "objetos/pelota"
+   },
+   {
+    "nombre": "Imagen de cuchillo",
+    "grupo": "Grupo 2",
+    "concepto": "peligros/cuchillo"
+   },
+   {
+    "nombre": "Imagen de plancha caliente",
+    "grupo": "Grupo 2",
+    "concepto": "peligros/plancha-caliente"
+   },
+   {
+    "nombre": "Peluche (seguro)",
+    "grupo": "Grupo 2",
+    "concepto": "objetos/peluche"
+   },
+   {
+    "nombre": "Imagen de medicamentos",
+    "grupo": "Grupo 3",
+    "concepto": "peligros/medicamentos"
+   },
+   {
+    "nombre": "Imagen de lejía",
+    "grupo": "Grupo 3",
+    "concepto": "peligros/lejia"
+   },
+   {
+    "nombre": "Globo (seguro)",
+    "grupo": "Grupo 3",
+    "concepto": "objetos/globo"
+   },
+   {
+    "nombre": "Imagen de sartén caliente",
+    "grupo": "Grupo 4",
+    "concepto": "peligros/sarten-caliente"
+   },
+   {
+    "nombre": "Imagen de cristal roto",
+    "grupo": "Grupo 4",
+    "concepto": "peligros/cristal-roto"
+   },
+   {
+    "nombre": "Cuento (seguro)",
+    "grupo": "Grupo 4",
+    "concepto": "objetos/cuento"
+   },
+   {
+    "nombre": "Imagen de vela encendida",
+    "grupo": "Grupo 5",
+    "concepto": "peligros/vela-encendida"
+   },
+   {
+    "nombre": "Imagen de avispa",
+    "grupo": "Grupo 5",
+    "concepto": "peligros/avispa"
+   },
+   {
+    "nombre": "Cubo y pala (seguro)",
+    "grupo": "Grupo 5",
+    "concepto": "objetos/cubo-y-pala"
+   },
+   {
+    "nombre": "Imagen de horno encendido",
+    "grupo": "Grupo 6",
+    "concepto": "peligros/horno-encendido"
+   },
+   {
+    "nombre": "Imagen de agua hirviendo",
+    "grupo": "Grupo 6",
+    "concepto": "peligros/agua-hirviendo"
+   },
+   {
+    "nombre": "Muñeca (seguro)",
+    "grupo": "Grupo 6",
+    "concepto": "objetos/muneca"
+   },
+   {
+    "nombre": "Imagen de estufa encendida",
+    "grupo": "Grupo 7",
+    "concepto": "peligros/estufa-encendida"
+   },
+   {
+    "nombre": "Imagen de abeja",
+    "grupo": "Grupo 7",
+    "concepto": "peligros/abeja"
+   },
+   {
+    "nombre": "Coche de juguete (seguro)",
+    "grupo": "Grupo 7",
+    "concepto": "objetos/coche-de-juguete"
+   },
+   {
+    "nombre": "Imagen de cúter",
+    "grupo": "Grupo 8",
+    "concepto": "peligros/cuter"
+   },
+   {
+    "nombre": "Imagen de cerillas",
+    "grupo": "Grupo 8",
+    "concepto": "peligros/cerillas"
+   },
+   {
+    "nombre": "Pinturas (seguro)",
+    "grupo": "Grupo 8",
+    "concepto": "objetos/pinturas"
+   }
+  ],
+  "Transferir Funciones Discriminativas a Estímulos Arbitrarios": [
+   {
+    "nombre": "Señal de \"para\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/senal-de-para"
+   },
+   {
+    "nombre": "Gesto de \"ven\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\"",
+    "grupo": "Grupo 1",
+    "concepto": "senales/pictograma-de-sientate"
+   },
+   {
+    "nombre": "Semáforo en rojo (\"para\")",
+    "grupo": "Grupo 2",
+    "concepto": "senales/semaforo-en-rojo"
+   },
+   {
+    "nombre": "Gesto de \"ven\" (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\" (otra silla)",
+    "grupo": "Grupo 2",
+    "concepto": "senales/pictograma-de-sientate"
+   },
+   {
+    "nombre": "Mano levantada con la palma hacia delante (\"para\")",
+    "grupo": "Grupo 3",
+    "concepto": "senales/mano-levantada-para"
+   },
+   {
+    "nombre": "Gesto de \"ven\" (tercera persona)",
+    "grupo": "Grupo 3",
+    "concepto": "senales/gesto-de-ven"
+   },
+   {
+    "nombre": "Pictograma de \"siéntate\" (banco)",
+    "grupo": "Grupo 3",
+    "concepto": "senales/pictograma-de-sientate-banco"
+   },
+   {
+    "nombre": "Gesto de \"silencio\" (dedo en los labios)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-silencio"
+   },
+   {
+    "nombre": "Gesto de \"mira\" (señalar los ojos)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-mira"
+   },
+   {
+    "nombre": "Gesto de \"dame\" (mano abierta)",
+    "grupo": "Grupo 4",
+    "concepto": "senales/gesto-de-dame"
+   },
+   {
+    "nombre": "Pictograma de \"silencio\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-silencio"
+   },
+   {
+    "nombre": "Pictograma de \"mira\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-mira"
+   },
+   {
+    "nombre": "Pictograma de \"dame\"",
+    "grupo": "Grupo 5",
+    "concepto": "senales/pictograma-de-dame"
+   },
+   {
+    "nombre": "Gesto de \"levántate\" (palmas hacia arriba)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-levantate"
+   },
+   {
+    "nombre": "Gesto de \"espera\" (dedo índice levantado)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-espera"
+   },
+   {
+    "nombre": "Gesto de \"coge\" (señalar el objeto)",
+    "grupo": "Grupo 6",
+    "concepto": "senales/gesto-de-coge"
+   },
+   {
+    "nombre": "Pictograma de \"levántate\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-levantate"
+   },
+   {
+    "nombre": "Pictograma de \"espera\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-espera"
+   },
+   {
+    "nombre": "Pictograma de \"coge\"",
+    "grupo": "Grupo 7",
+    "concepto": "senales/pictograma-de-coge"
+   },
+   {
+    "nombre": "Semáforo en verde (\"pasa\")",
+    "grupo": "Grupo 8",
+    "concepto": "senales/semaforo-en-verde"
+   },
+   {
+    "nombre": "Gesto de \"adiós\"",
+    "grupo": "Grupo 8",
+    "concepto": "senales/gesto-de-adios"
+   },
+   {
+    "nombre": "Gesto de \"hola\"",
+    "grupo": "Grupo 8",
+    "concepto": "senales/gesto-de-hola"
+   }
+  ],
+  "Transferir Funciones Emocionales a Estímulos Arbitrarios": [
+   {
+    "nombre": "Cara contenta",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada",
+    "grupo": "Grupo 1",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (otra persona)",
+    "grupo": "Grupo 2",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (niño)",
+    "grupo": "Grupo 3",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (abuela)",
+    "grupo": "Grupo 4",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara contenta (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/contento"
+   },
+   {
+    "nombre": "Cara triste (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/triste"
+   },
+   {
+    "nombre": "Cara enfadada (dibujo)",
+    "grupo": "Grupo 5",
+    "concepto": "emociones/enfadado"
+   },
+   {
+    "nombre": "Cara asustada",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco",
+    "grupo": "Grupo 6",
+    "concepto": "emociones/asco"
+   },
+   {
+    "nombre": "Cara asustada (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco (otra persona)",
+    "grupo": "Grupo 7",
+    "concepto": "emociones/asco"
+   },
+   {
+    "nombre": "Cara asustada (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/asustado"
+   },
+   {
+    "nombre": "Cara sorprendida (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/sorprendido"
+   },
+   {
+    "nombre": "Cara de asco (niño)",
+    "grupo": "Grupo 8",
+    "concepto": "emociones/asco"
+   }
+  ]
+ },
+ "conceptos": {
+  "animales-salvajes/leon": {
+   "categoria": "animales salvajes",
+   "nombre": "León",
+   "en": "a lion",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "animales-salvajes/jirafa": {
+   "categoria": "animales salvajes",
+   "nombre": "Jirafa",
+   "en": "a giraffe",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/elefante": {
+   "categoria": "animales salvajes",
+   "nombre": "Elefante",
+   "en": "an elephant",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "animales-salvajes/tigre": {
+   "categoria": "animales salvajes",
+   "nombre": "Tigre",
+   "en": "a tiger",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/cebra": {
+   "categoria": "animales salvajes",
+   "nombre": "Cebra",
+   "en": "a zebra",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/mono": {
+   "categoria": "animales salvajes",
+   "nombre": "Mono",
+   "en": "a monkey",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/oso": {
+   "categoria": "animales salvajes",
+   "nombre": "Oso",
+   "en": "a brown bear",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/hipopotamo": {
+   "categoria": "animales salvajes",
+   "nombre": "Hipopótamo",
+   "en": "a hippopotamus",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/cocodrilo": {
+   "categoria": "animales salvajes",
+   "nombre": "Cocodrilo",
+   "en": "a crocodile",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/rinoceronte": {
+   "categoria": "animales salvajes",
+   "nombre": "Rinoceronte",
+   "en": "a rhinoceros",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/canguro": {
+   "categoria": "animales salvajes",
+   "nombre": "Canguro",
+   "en": "a kangaroo",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/buho": {
+   "categoria": "animales salvajes",
+   "nombre": "Búho",
+   "en": "an owl",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/lobo": {
+   "categoria": "animales salvajes",
+   "nombre": "Lobo",
+   "en": "a wolf",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/camello": {
+   "categoria": "animales salvajes",
+   "nombre": "Camello",
+   "en": "a camel",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/koala": {
+   "categoria": "animales salvajes",
+   "nombre": "Koala",
+   "en": "a koala",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/gorila": {
+   "categoria": "animales salvajes",
+   "nombre": "Gorila",
+   "en": "a gorilla",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/ciervo": {
+   "categoria": "animales salvajes",
+   "nombre": "Ciervo",
+   "en": "a deer with antlers",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/serpiente": {
+   "categoria": "animales salvajes",
+   "nombre": "Serpiente",
+   "en": "a snake",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "animales-salvajes/panda": {
+   "categoria": "animales salvajes",
+   "nombre": "Panda",
+   "en": "a giant panda",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/aguila": {
+   "categoria": "animales salvajes",
+   "nombre": "Águila",
+   "en": "an eagle",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/leopardo": {
+   "categoria": "animales salvajes",
+   "nombre": "Leopardo",
+   "en": "a leopard",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/zorro": {
+   "categoria": "animales salvajes",
+   "nombre": "Zorro",
+   "en": "a red fox",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/avestruz": {
+   "categoria": "animales salvajes",
+   "nombre": "Avestruz",
+   "en": "an ostrich",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres"
+   ]
+  },
+  "animales-salvajes/tortuga": {
+   "categoria": "animales salvajes",
+   "nombre": "Tortuga",
+   "en": "a land tortoise",
+   "programas": [
+    "Vincular Mutuamente Animales Salvajes con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "animales-marinos/pulpo": {
+   "categoria": "animales marinos",
+   "nombre": "Pulpo",
+   "en": "an octopus",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "animales-marinos/ballena": {
+   "categoria": "animales marinos",
+   "nombre": "Ballena",
+   "en": "a whale",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/medusa": {
+   "categoria": "animales marinos",
+   "nombre": "Medusa",
+   "en": "a jellyfish",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/tiburon": {
+   "categoria": "animales marinos",
+   "nombre": "Tiburón",
+   "en": "a shark",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/estrella-de-mar": {
+   "categoria": "animales marinos",
+   "nombre": "Estrella de mar",
+   "en": "a starfish",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/cangrejo": {
+   "categoria": "animales marinos",
+   "nombre": "Cangrejo",
+   "en": "a crab",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/delfin": {
+   "categoria": "animales marinos",
+   "nombre": "Delfín",
+   "en": "a dolphin",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/caballito-de-mar": {
+   "categoria": "animales marinos",
+   "nombre": "Caballito de mar",
+   "en": "a seahorse",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/langosta": {
+   "categoria": "animales marinos",
+   "nombre": "Langosta",
+   "en": "a lobster",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/foca": {
+   "categoria": "animales marinos",
+   "nombre": "Foca",
+   "en": "a seal",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/pez-payaso": {
+   "categoria": "animales marinos",
+   "nombre": "Pez payaso",
+   "en": "a clownfish",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/calamar": {
+   "categoria": "animales marinos",
+   "nombre": "Calamar",
+   "en": "a squid",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/tortuga-marina": {
+   "categoria": "animales marinos",
+   "nombre": "Tortuga marina",
+   "en": "a sea turtle",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/gamba": {
+   "categoria": "animales marinos",
+   "nombre": "Gamba",
+   "en": "a shrimp",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/raya": {
+   "categoria": "animales marinos",
+   "nombre": "Raya",
+   "en": "a stingray",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/morsa": {
+   "categoria": "animales marinos",
+   "nombre": "Morsa",
+   "en": "a walrus",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/erizo-de-mar": {
+   "categoria": "animales marinos",
+   "nombre": "Erizo de mar",
+   "en": "a sea urchin",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "animales-marinos/pez-espada": {
+   "categoria": "animales marinos",
+   "nombre": "Pez espada",
+   "en": "a swordfish",
+   "programas": [
+    "Vincular Mutuamente Animales Marinos con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/mano": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Mano",
+   "en": "a child's hand",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/ojo": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Ojo",
+   "en": "a close-up of a child's eye",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/pelo": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Pelo",
+   "en": "a close-up of a child's hair seen from behind",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/nariz": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Nariz",
+   "en": "a close-up of a child's nose",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/pie": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Pie",
+   "en": "a child's bare foot",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/oreja": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Oreja",
+   "en": "a close-up of a child's ear",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/boca": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Boca",
+   "en": "a close-up of a child's smiling mouth",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/rodilla": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Rodilla",
+   "en": "a close-up of a child's knee",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/brazo": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Brazo",
+   "en": "a child's arm",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/dedo": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Dedo",
+   "en": "a child's hand pointing with the index finger",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/barriga": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Barriga",
+   "en": "a child's belly",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/cuello": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Cuello",
+   "en": "a close-up of a child's neck",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/diente": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Diente",
+   "en": "a close-up of a child's teeth",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/pierna": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Pierna",
+   "en": "a child's leg",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/codo": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Codo",
+   "en": "a close-up of a child's elbow",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/lengua": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Lengua",
+   "en": "a child sticking out the tongue, close-up of the mouth",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/espalda": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Espalda",
+   "en": "a child's back",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "partes-del-cuerpo/una": {
+   "categoria": "partes del cuerpo",
+   "nombre": "Uña",
+   "en": "a close-up of a child's fingernails",
+   "programas": [
+    "Vincular Mutuamente Partes del Cuerpo con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/cuchara": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Cuchara",
+   "en": "a spoon",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "utensilios-de-cocina/plato": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Plato",
+   "en": "a plate",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/vaso": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Vaso",
+   "en": "a drinking glass",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "utensilios-de-cocina/tenedor": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Tenedor",
+   "en": "a fork",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/olla": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Olla",
+   "en": "a cooking pot",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/taza": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Taza",
+   "en": "a cup",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "utensilios-de-cocina/cuchillo": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Cuchillo",
+   "en": "a kitchen knife",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/sarten": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Sartén",
+   "en": "a frying pan",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/jarra": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Jarra",
+   "en": "a water jug",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/bol": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Bol",
+   "en": "a bowl",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/colador": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Colador",
+   "en": "a kitchen strainer",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/rodillo": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Rodillo",
+   "en": "a rolling pin",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/espatula": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Espátula",
+   "en": "a kitchen spatula",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/tetera": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Tetera",
+   "en": "a teapot",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/embudo": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Embudo",
+   "en": "a funnel",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/cazo": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Cazo",
+   "en": "a small saucepan",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/rallador": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Rallador",
+   "en": "a cheese grater",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "utensilios-de-cocina/servilleta": {
+   "categoria": "utensilios de cocina",
+   "nombre": "Servilleta",
+   "en": "a folded napkin",
+   "programas": [
+    "Vincular Mutuamente Utensilios de Cocina con sus Nombres"
+   ]
+  },
+  "plantas/girasol": {
+   "categoria": "plantas",
+   "nombre": "Girasol",
+   "en": "a sunflower",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "plantas/cactus": {
+   "categoria": "plantas",
+   "nombre": "Cactus",
+   "en": "a cactus in a pot",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "plantas/pino": {
+   "categoria": "plantas",
+   "nombre": "Pino",
+   "en": "a pine tree",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/rosa": {
+   "categoria": "plantas",
+   "nombre": "Rosa",
+   "en": "a red rose",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/palmera": {
+   "categoria": "plantas",
+   "nombre": "Palmera",
+   "en": "a palm tree",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/helecho": {
+   "categoria": "plantas",
+   "nombre": "Helecho",
+   "en": "a fern",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/margarita": {
+   "categoria": "plantas",
+   "nombre": "Margarita",
+   "en": "a daisy",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/roble": {
+   "categoria": "plantas",
+   "nombre": "Roble",
+   "en": "an oak tree",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/bambu": {
+   "categoria": "plantas",
+   "nombre": "Bambú",
+   "en": "bamboo stalks",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/tulipan": {
+   "categoria": "plantas",
+   "nombre": "Tulipán",
+   "en": "a tulip",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/olivo": {
+   "categoria": "plantas",
+   "nombre": "Olivo",
+   "en": "an olive tree",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/trebol": {
+   "categoria": "plantas",
+   "nombre": "Trébol",
+   "en": "a clover plant",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/lavanda": {
+   "categoria": "plantas",
+   "nombre": "Lavanda",
+   "en": "a lavender plant",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/sauce": {
+   "categoria": "plantas",
+   "nombre": "Sauce",
+   "en": "a weeping willow tree",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "plantas/maiz": {
+   "categoria": "plantas",
+   "nombre": "Maíz",
+   "en": "a corn plant with a cob",
+   "programas": [
+    "Vincular Mutuamente Plantas con sus Nombres"
+   ]
+  },
+  "material-escolar/lapiz": {
+   "categoria": "material escolar",
+   "nombre": "Lápiz",
+   "en": "a pencil",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "material-escolar/libro": {
+   "categoria": "material escolar",
+   "nombre": "Libro",
+   "en": "a closed book",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "material-escolar/tijeras": {
+   "categoria": "material escolar",
+   "nombre": "Tijeras",
+   "en": "a pair of children's scissors",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "material-escolar/goma": {
+   "categoria": "material escolar",
+   "nombre": "Goma",
+   "en": "an eraser",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/mochila": {
+   "categoria": "material escolar",
+   "nombre": "Mochila",
+   "en": "a school backpack",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/regla": {
+   "categoria": "material escolar",
+   "nombre": "Regla",
+   "en": "a ruler",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/pegamento": {
+   "categoria": "material escolar",
+   "nombre": "Pegamento",
+   "en": "a glue stick",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/estuche": {
+   "categoria": "material escolar",
+   "nombre": "Estuche",
+   "en": "a pencil case",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/sacapuntas": {
+   "categoria": "material escolar",
+   "nombre": "Sacapuntas",
+   "en": "a pencil sharpener",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/cuaderno": {
+   "categoria": "material escolar",
+   "nombre": "Cuaderno",
+   "en": "a notebook",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/pincel": {
+   "categoria": "material escolar",
+   "nombre": "Pincel",
+   "en": "a paintbrush",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/rotulador": {
+   "categoria": "material escolar",
+   "nombre": "Rotulador",
+   "en": "a felt-tip marker",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/ceras": {
+   "categoria": "material escolar",
+   "nombre": "Ceras",
+   "en": "a box of wax crayons",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/carpeta": {
+   "categoria": "material escolar",
+   "nombre": "Carpeta",
+   "en": "a folder",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/compas": {
+   "categoria": "material escolar",
+   "nombre": "Compás",
+   "en": "a drawing compass",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/plastilina": {
+   "categoria": "material escolar",
+   "nombre": "Plastilina",
+   "en": "colored modelling clay",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres",
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "material-escolar/pizarra": {
+   "categoria": "material escolar",
+   "nombre": "Pizarra",
+   "en": "a small chalkboard",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "material-escolar/grapadora": {
+   "categoria": "material escolar",
+   "nombre": "Grapadora",
+   "en": "a stapler",
+   "programas": [
+    "Vincular Mutuamente Materiales Escolares con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/cocina": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Cocina",
+   "en": "a home kitchen",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres",
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "dependencias-de-la-casa/bano": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Baño",
+   "en": "a home bathroom",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres",
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "dependencias-de-la-casa/dormitorio": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Dormitorio",
+   "en": "a bedroom with a bed",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres",
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "dependencias-de-la-casa/salon": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Salón",
+   "en": "a living room with a sofa",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/garaje": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Garaje",
+   "en": "a home garage with a car",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/jardin": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Jardín",
+   "en": "a garden of a house",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/comedor": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Comedor",
+   "en": "a dining room with a table and chairs",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/terraza": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Terraza",
+   "en": "a balcony terrace with plants",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "dependencias-de-la-casa/lavadero": {
+   "categoria": "dependencias de la casa",
+   "nombre": "Lavadero",
+   "en": "a laundry room with a washing machine",
+   "programas": [
+    "Vincular Mutuamente Dependencias de una Casa con sus Nombres"
+   ]
+  },
+  "herramientas/martillo": {
+   "categoria": "herramientas",
+   "nombre": "Martillo",
+   "en": "a hammer",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "herramientas/destornillador": {
+   "categoria": "herramientas",
+   "nombre": "Destornillador",
+   "en": "a screwdriver",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/sierra": {
+   "categoria": "herramientas",
+   "nombre": "Sierra",
+   "en": "a hand saw",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/llave-inglesa": {
+   "categoria": "herramientas",
+   "nombre": "Llave inglesa",
+   "en": "an adjustable wrench",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/taladro": {
+   "categoria": "herramientas",
+   "nombre": "Taladro",
+   "en": "an electric drill",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/pala": {
+   "categoria": "herramientas",
+   "nombre": "Pala",
+   "en": "a shovel",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/alicates": {
+   "categoria": "herramientas",
+   "nombre": "Alicates",
+   "en": "pliers",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/rastrillo": {
+   "categoria": "herramientas",
+   "nombre": "Rastrillo",
+   "en": "a garden rake",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/brocha": {
+   "categoria": "herramientas",
+   "nombre": "Brocha",
+   "en": "a paint brush for walls",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/metro": {
+   "categoria": "herramientas",
+   "nombre": "Metro",
+   "en": "a tape measure",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/escalera": {
+   "categoria": "herramientas",
+   "nombre": "Escalera",
+   "en": "a step ladder",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "herramientas/carretilla": {
+   "categoria": "herramientas",
+   "nombre": "Carretilla",
+   "en": "a wheelbarrow",
+   "programas": [
+    "Vincular Mutuamente Herramientas con sus Nombres"
+   ]
+  },
+  "electrodomesticos/television": {
+   "categoria": "electrodomésticos",
+   "nombre": "Televisión",
+   "en": "a television",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/frigorifico": {
+   "categoria": "electrodomésticos",
+   "nombre": "Frigorífico",
+   "en": "a refrigerator",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/lavadora": {
+   "categoria": "electrodomésticos",
+   "nombre": "Lavadora",
+   "en": "a washing machine",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/microondas": {
+   "categoria": "electrodomésticos",
+   "nombre": "Microondas",
+   "en": "a microwave oven",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/aspiradora": {
+   "categoria": "electrodomésticos",
+   "nombre": "Aspiradora",
+   "en": "a vacuum cleaner",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/secador": {
+   "categoria": "electrodomésticos",
+   "nombre": "Secador",
+   "en": "a hair dryer",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/horno": {
+   "categoria": "electrodomésticos",
+   "nombre": "Horno",
+   "en": "a kitchen oven",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/plancha": {
+   "categoria": "electrodomésticos",
+   "nombre": "Plancha",
+   "en": "a clothes iron",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/tostadora": {
+   "categoria": "electrodomésticos",
+   "nombre": "Tostadora",
+   "en": "a toaster",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "electrodomesticos/batidora": {
+   "categoria": "electrodomésticos",
+   "nombre": "Batidora",
+   "en": "a hand blender",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/ventilador": {
+   "categoria": "electrodomésticos",
+   "nombre": "Ventilador",
+   "en": "an electric fan",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/lavavajillas": {
+   "categoria": "electrodomésticos",
+   "nombre": "Lavavajillas",
+   "en": "a dishwasher",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/cafetera": {
+   "categoria": "electrodomésticos",
+   "nombre": "Cafetera",
+   "en": "a coffee maker",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/exprimidor": {
+   "categoria": "electrodomésticos",
+   "nombre": "Exprimidor",
+   "en": "an electric citrus juicer",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "electrodomesticos/radio": {
+   "categoria": "electrodomésticos",
+   "nombre": "Radio",
+   "en": "a radio",
+   "programas": [
+    "Vincular Mutuamente Electrodomésticos con sus Nombres"
+   ]
+  },
+  "muebles/silla": {
+   "categoria": "muebles",
+   "nombre": "Silla",
+   "en": "a simple dining chair with four legs and a backrest, no armrests",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "muebles/mesa": {
+   "categoria": "muebles",
+   "nombre": "Mesa",
+   "en": "a table",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/cama": {
+   "categoria": "muebles",
+   "nombre": "Cama",
+   "en": "a bed",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "muebles/sofa": {
+   "categoria": "muebles",
+   "nombre": "Sofá",
+   "en": "a sofa",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/armario": {
+   "categoria": "muebles",
+   "nombre": "Armario",
+   "en": "a wardrobe",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/estanteria": {
+   "categoria": "muebles",
+   "nombre": "Estantería",
+   "en": "a bookshelf",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/lampara": {
+   "categoria": "muebles",
+   "nombre": "Lámpara",
+   "en": "a floor lamp",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/comoda": {
+   "categoria": "muebles",
+   "nombre": "Cómoda",
+   "en": "a chest of drawers",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/escritorio": {
+   "categoria": "muebles",
+   "nombre": "Escritorio",
+   "en": "a desk",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/mesita-de-noche": {
+   "categoria": "muebles",
+   "nombre": "Mesita de noche",
+   "en": "a bedside table",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/taburete": {
+   "categoria": "muebles",
+   "nombre": "Taburete",
+   "en": "a stool",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/perchero": {
+   "categoria": "muebles",
+   "nombre": "Perchero",
+   "en": "a coat stand",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/cuna": {
+   "categoria": "muebles",
+   "nombre": "Cuna",
+   "en": "a baby crib",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/banco": {
+   "categoria": "muebles",
+   "nombre": "Banco",
+   "en": "a wooden bench",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/espejo": {
+   "categoria": "muebles",
+   "nombre": "Espejo",
+   "en": "a wall mirror",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/baul": {
+   "categoria": "muebles",
+   "nombre": "Baúl",
+   "en": "a wooden chest",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/mecedora": {
+   "categoria": "muebles",
+   "nombre": "Mecedora",
+   "en": "a rocking chair",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "muebles/sillon": {
+   "categoria": "muebles",
+   "nombre": "Sillón",
+   "en": "an armchair",
+   "programas": [
+    "Vincular Mutuamente Muebles con sus Nombres"
+   ]
+  },
+  "caracteristicas/mojado": {
+   "categoria": "características",
+   "nombre": "Mojado",
+   "en": "something wet, dripping with water (a wet T-shirt, a wet dog, a wet umbrella…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/roto": {
+   "categoria": "características",
+   "nombre": "Roto",
+   "en": "something broken (a broken toy, a broken cup, a torn book…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/sucio": {
+   "categoria": "características",
+   "nombre": "Sucio",
+   "en": "something dirty (muddy shoes, a dirty plate, a stained T-shirt…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/abierto": {
+   "categoria": "características",
+   "nombre": "Abierto",
+   "en": "something open (an open door, an open box, an open book…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/lleno": {
+   "categoria": "características",
+   "nombre": "Lleno",
+   "en": "something full (a full glass of water, a full basket…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/encendido": {
+   "categoria": "características",
+   "nombre": "Encendido",
+   "en": "something switched on (a lit lamp, a lit candle, a TV that is on…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/limpio": {
+   "categoria": "características",
+   "nombre": "Limpio",
+   "en": "something clean and shiny (a clean plate, clean white shoes…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/cerrado": {
+   "categoria": "características",
+   "nombre": "Cerrado",
+   "en": "something closed (a closed door, a closed box…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/vacio": {
+   "categoria": "características",
+   "nombre": "Vacío",
+   "en": "something empty (an empty glass, an empty box…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/seco": {
+   "categoria": "características",
+   "nombre": "Seco",
+   "en": "something dry (dry leaves, a dry towel…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/apagado": {
+   "categoria": "características",
+   "nombre": "Apagado",
+   "en": "something switched off (an unlit lamp, a TV that is off…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "caracteristicas/arrugado": {
+   "categoria": "características",
+   "nombre": "Arrugado",
+   "en": "something wrinkled (a crumpled sheet of paper, a creased shirt…)",
+   "programas": [
+    "Vincular Mutuamente Características con sus Nombres"
+   ]
+  },
+  "profesiones/bombero": {
+   "categoria": "profesiones",
+   "nombre": "Bombero",
+   "en": "a firefighter in uniform",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/medico": {
+   "categoria": "profesiones",
+   "nombre": "Médico",
+   "en": "a doctor in a white coat with a stethoscope",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/panadero": {
+   "categoria": "profesiones",
+   "nombre": "Panadero",
+   "en": "a baker with bread",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/policia": {
+   "categoria": "profesiones",
+   "nombre": "Policía",
+   "en": "a police officer",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/maestra": {
+   "categoria": "profesiones",
+   "nombre": "Maestra",
+   "en": "a teacher in front of a blackboard",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/peluquero": {
+   "categoria": "profesiones",
+   "nombre": "Peluquero",
+   "en": "a hairdresser cutting hair",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/cartero": {
+   "categoria": "profesiones",
+   "nombre": "Cartero",
+   "en": "a postman with a bag of letters",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/cocinero": {
+   "categoria": "profesiones",
+   "nombre": "Cocinero",
+   "en": "a chef in a white hat",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/agricultor": {
+   "categoria": "profesiones",
+   "nombre": "Agricultor",
+   "en": "a farmer in a field",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/dentista": {
+   "categoria": "profesiones",
+   "nombre": "Dentista",
+   "en": "a dentist with dental tools",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/pintor": {
+   "categoria": "profesiones",
+   "nombre": "Pintor",
+   "en": "a house painter with a roller",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/conductor-de-autobus": {
+   "categoria": "profesiones",
+   "nombre": "Conductor de autobús",
+   "en": "a bus driver at the wheel",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/veterinario": {
+   "categoria": "profesiones",
+   "nombre": "Veterinario",
+   "en": "a vet examining a dog",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/albanil": {
+   "categoria": "profesiones",
+   "nombre": "Albañil",
+   "en": "a construction worker laying bricks",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/piloto": {
+   "categoria": "profesiones",
+   "nombre": "Piloto",
+   "en": "an airline pilot in uniform",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/carpintero": {
+   "categoria": "profesiones",
+   "nombre": "Carpintero",
+   "en": "a carpenter working wood",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/enfermera": {
+   "categoria": "profesiones",
+   "nombre": "Enfermera",
+   "en": "a nurse",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/fontanero": {
+   "categoria": "profesiones",
+   "nombre": "Fontanero",
+   "en": "a plumber fixing a pipe",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/mecanico": {
+   "categoria": "profesiones",
+   "nombre": "Mecánico",
+   "en": "a car mechanic",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/jardinero": {
+   "categoria": "profesiones",
+   "nombre": "Jardinero",
+   "en": "a gardener watering plants",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/pescador": {
+   "categoria": "profesiones",
+   "nombre": "Pescador",
+   "en": "a fisherman with a fishing rod",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/astronauta": {
+   "categoria": "profesiones",
+   "nombre": "Astronauta",
+   "en": "an astronaut in a space suit",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/socorrista": {
+   "categoria": "profesiones",
+   "nombre": "Socorrista",
+   "en": "a lifeguard on a beach",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "profesiones/musico": {
+   "categoria": "profesiones",
+   "nombre": "Músico",
+   "en": "a musician playing",
+   "programas": [
+    "Vincular Mutuamente Profesiones con sus Nombres",
+    "Responder a Preguntas ¿Quién?"
+   ]
+  },
+  "instrumentos-musicales/tambor": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Tambor",
+   "en": "a drum",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/trompeta": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Trompeta",
+   "en": "a trumpet",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/guitarra": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Guitarra",
+   "en": "a guitar",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "instrumentos-musicales/piano": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Piano",
+   "en": "a piano",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/violin": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Violín",
+   "en": "a violin",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/flauta": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Flauta",
+   "en": "a recorder flute",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/xilofono": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Xilófono",
+   "en": "a xylophone",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/maracas": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Maracas",
+   "en": "a pair of maracas",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/arpa": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Arpa",
+   "en": "a harp",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/saxofon": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Saxofón",
+   "en": "a saxophone",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/pandereta": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Pandereta",
+   "en": "a tambourine",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/acordeon": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Acordeón",
+   "en": "an accordion",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/bateria": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Batería",
+   "en": "a drum kit",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/triangulo": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Triángulo",
+   "en": "a musical triangle",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "instrumentos-musicales/violonchelo": {
+   "categoria": "instrumentos musicales",
+   "nombre": "Violonchelo",
+   "en": "a cello",
+   "programas": [
+    "Vincular Mutuamente Instrumentos Musicales con sus Nombres"
+   ]
+  },
+  "deportes/futbol": {
+   "categoria": "deportes",
+   "nombre": "Fútbol",
+   "en": "a child playing football (soccer)",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/natacion": {
+   "categoria": "deportes",
+   "nombre": "Natación",
+   "en": "a person swimming in a pool",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/baloncesto": {
+   "categoria": "deportes",
+   "nombre": "Baloncesto",
+   "en": "a person shooting a basketball into a hoop",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/tenis": {
+   "categoria": "deportes",
+   "nombre": "Tenis",
+   "en": "a person playing tennis",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/ciclismo": {
+   "categoria": "deportes",
+   "nombre": "Ciclismo",
+   "en": "a cyclist racing on a road bike",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/esqui": {
+   "categoria": "deportes",
+   "nombre": "Esquí",
+   "en": "a person skiing on snow",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/atletismo": {
+   "categoria": "deportes",
+   "nombre": "Atletismo",
+   "en": "a runner on an athletics track",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/gimnasia": {
+   "categoria": "deportes",
+   "nombre": "Gimnasia",
+   "en": "a gymnast doing a cartwheel",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/golf": {
+   "categoria": "deportes",
+   "nombre": "Golf",
+   "en": "a person playing golf",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/judo": {
+   "categoria": "deportes",
+   "nombre": "Judo",
+   "en": "two children practising judo",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/patinaje": {
+   "categoria": "deportes",
+   "nombre": "Patinaje",
+   "en": "a person roller skating",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/balonmano": {
+   "categoria": "deportes",
+   "nombre": "Balonmano",
+   "en": "a person throwing a handball",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/vela": {
+   "categoria": "deportes",
+   "nombre": "Vela",
+   "en": "a small sailing boat on the sea",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/escalada": {
+   "categoria": "deportes",
+   "nombre": "Escalada",
+   "en": "a person rock climbing",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "deportes/voleibol": {
+   "categoria": "deportes",
+   "nombre": "Voleibol",
+   "en": "people playing volleyball",
+   "programas": [
+    "Vincular Mutuamente Deportes con sus Nombres"
+   ]
+  },
+  "universo/sol": {
+   "categoria": "universo",
+   "nombre": "Sol",
+   "en": "the sun",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "universo/luna": {
+   "categoria": "universo",
+   "nombre": "Luna",
+   "en": "the full moon in the night sky",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres"
+   ]
+  },
+  "universo/estrella": {
+   "categoria": "universo",
+   "nombre": "Estrella",
+   "en": "a bright star in the night sky",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres"
+   ]
+  },
+  "universo/tierra": {
+   "categoria": "universo",
+   "nombre": "Tierra",
+   "en": "planet Earth seen from space",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres"
+   ]
+  },
+  "universo/cohete": {
+   "categoria": "universo",
+   "nombre": "Cohete",
+   "en": "a space rocket",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "universo/saturno": {
+   "categoria": "universo",
+   "nombre": "Saturno",
+   "en": "the planet Saturn with its rings",
+   "programas": [
+    "Vincular Mutuamente Partes del Universo con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/soleado": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Soleado",
+   "en": "a sunny day landscape",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/lluvioso": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Lluvioso",
+   "en": "a rainy day landscape",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/nevado": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Nevado",
+   "en": "a snowy day landscape",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "tiempo-atmosferico/nublado": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Nublado",
+   "en": "a cloudy grey day landscape",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/ventoso": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Ventoso",
+   "en": "a windy day with trees bending",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/tormenta": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Tormenta",
+   "en": "a thunderstorm with lightning",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/niebla": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Niebla",
+   "en": "a foggy day landscape",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/granizo": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Granizo",
+   "en": "hail falling on the ground",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "tiempo-atmosferico/arcoiris": {
+   "categoria": "tiempo atmosférico",
+   "nombre": "Arcoíris",
+   "en": "a rainbow in the sky",
+   "programas": [
+    "Vincular Mutuamente Climas con sus Nombres"
+   ]
+  },
+  "estaciones/verano": {
+   "categoria": "estaciones",
+   "nombre": "Verano",
+   "en": "a summer scene: beach and sun",
+   "programas": [
+    "Vincular Mutuamente Estaciones del Año con sus Nombres",
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "estaciones/otono": {
+   "categoria": "estaciones",
+   "nombre": "Otoño",
+   "en": "an autumn scene: fallen dry leaves",
+   "programas": [
+    "Vincular Mutuamente Estaciones del Año con sus Nombres",
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "estaciones/invierno": {
+   "categoria": "estaciones",
+   "nombre": "Invierno",
+   "en": "a winter scene: bare trees and warm clothes",
+   "programas": [
+    "Vincular Mutuamente Estaciones del Año con sus Nombres",
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "estaciones/primavera": {
+   "categoria": "estaciones",
+   "nombre": "Primavera",
+   "en": "a spring scene: blooming flowers",
+   "programas": [
+    "Vincular Mutuamente Estaciones del Año con sus Nombres",
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "emociones/contento": {
+   "categoria": "emociones",
+   "nombre": "Contento",
+   "en": "the face of a person who is clearly happy",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/triste": {
+   "categoria": "emociones",
+   "nombre": "Triste",
+   "en": "the face of a person who is clearly sad",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/enfadado": {
+   "categoria": "emociones",
+   "nombre": "Enfadado",
+   "en": "the face of a person who is clearly angry",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/asustado": {
+   "categoria": "emociones",
+   "nombre": "Asustado",
+   "en": "the face of a person who is clearly scared",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/sorprendido": {
+   "categoria": "emociones",
+   "nombre": "Sorprendido",
+   "en": "the face of a person who is clearly surprised",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/asco": {
+   "categoria": "emociones",
+   "nombre": "Asco",
+   "en": "the face of a person showing clear disgust",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Emocionales a Estímulos Arbitrarios"
+   ]
+  },
+  "emociones/tranquilo": {
+   "categoria": "emociones",
+   "nombre": "Tranquilo",
+   "en": "the face of a person who is calm and relaxed",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres"
+   ]
+  },
+  "emociones/aburrido": {
+   "categoria": "emociones",
+   "nombre": "Aburrido",
+   "en": "the face of a person who is clearly bored",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres"
+   ]
+  },
+  "emociones/nervioso": {
+   "categoria": "emociones",
+   "nombre": "Nervioso",
+   "en": "the face of a person who is clearly nervous",
+   "programas": [
+    "Vincular Mutuamente Emociones con sus Nombres"
+   ]
+  },
+  "sensaciones/frio": {
+   "categoria": "sensaciones",
+   "nombre": "Frío",
+   "en": "a child shivering with cold, wrapped in a scarf",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/calor": {
+   "categoria": "sensaciones",
+   "nombre": "Calor",
+   "en": "a child sweating and hot, fanning themselves",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/sueno": {
+   "categoria": "sensaciones",
+   "nombre": "Sueño",
+   "en": "a child yawning, very sleepy",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/hambre": {
+   "categoria": "sensaciones",
+   "nombre": "Hambre",
+   "en": "a child hungry, holding the tummy and looking at food",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/sed": {
+   "categoria": "sensaciones",
+   "nombre": "Sed",
+   "en": "a thirsty child drinking a big glass of water",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/dolor": {
+   "categoria": "sensaciones",
+   "nombre": "Dolor",
+   "en": "a child with a tummy ache holding the belly",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/cansancio": {
+   "categoria": "sensaciones",
+   "nombre": "Cansancio",
+   "en": "a child exhausted after running, sitting down out of breath",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/picor": {
+   "categoria": "sensaciones",
+   "nombre": "Picor",
+   "en": "a child scratching an itchy arm",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "sensaciones/mareo": {
+   "categoria": "sensaciones",
+   "nombre": "Mareo",
+   "en": "a dizzy child holding the head",
+   "programas": [
+    "Vincular Mutuamente Sensaciones Corporales con sus Nombres"
+   ]
+  },
+  "acciones/correr": {
+   "categoria": "acciones",
+   "nombre": "Correr",
+   "en": "a child running",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/comer": {
+   "categoria": "acciones",
+   "nombre": "Comer",
+   "en": "a child eating",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/dormir": {
+   "categoria": "acciones",
+   "nombre": "Dormir",
+   "en": "a child sleeping in bed",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/saltar": {
+   "categoria": "acciones",
+   "nombre": "Saltar",
+   "en": "a child jumping",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/beber": {
+   "categoria": "acciones",
+   "nombre": "Beber",
+   "en": "a child drinking from a glass",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/leer": {
+   "categoria": "acciones",
+   "nombre": "Leer",
+   "en": "a child reading a book",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/nadar": {
+   "categoria": "acciones",
+   "nombre": "Nadar",
+   "en": "a child swimming",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/pintar": {
+   "categoria": "acciones",
+   "nombre": "Pintar",
+   "en": "a child painting a picture",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/llorar": {
+   "categoria": "acciones",
+   "nombre": "Llorar",
+   "en": "a child crying",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/bailar": {
+   "categoria": "acciones",
+   "nombre": "Bailar",
+   "en": "a child dancing",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/escribir": {
+   "categoria": "acciones",
+   "nombre": "Escribir",
+   "en": "a child writing in a notebook",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/lavarse-las-manos": {
+   "categoria": "acciones",
+   "nombre": "Lavarse las manos",
+   "en": "a child washing hands at a sink",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/cantar": {
+   "categoria": "acciones",
+   "nombre": "Cantar",
+   "en": "a child singing",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/barrer": {
+   "categoria": "acciones",
+   "nombre": "Barrer",
+   "en": "a child sweeping with a broom",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/abrazar": {
+   "categoria": "acciones",
+   "nombre": "Abrazar",
+   "en": "two children hugging",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/jugar": {
+   "categoria": "acciones",
+   "nombre": "Jugar",
+   "en": "a child playing with toys",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/cocinar": {
+   "categoria": "acciones",
+   "nombre": "Cocinar",
+   "en": "an adult cooking at the stove",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/peinarse": {
+   "categoria": "acciones",
+   "nombre": "Peinarse",
+   "en": "a child combing their hair",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/montar-en-bici": {
+   "categoria": "acciones",
+   "nombre": "Montar en bici",
+   "en": "a child riding a bicycle",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/ducharse": {
+   "categoria": "acciones",
+   "nombre": "Ducharse",
+   "en": "a child taking a shower",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/aplaudir": {
+   "categoria": "acciones",
+   "nombre": "Aplaudir",
+   "en": "a child clapping hands",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/subir-escaleras": {
+   "categoria": "acciones",
+   "nombre": "Subir escaleras",
+   "en": "a child climbing stairs",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/cortar": {
+   "categoria": "acciones",
+   "nombre": "Cortar",
+   "en": "a child cutting paper with scissors",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "acciones/soplar": {
+   "categoria": "acciones",
+   "nombre": "Soplar",
+   "en": "a child blowing out a candle",
+   "programas": [
+    "Vincular Mutuamente Acciones con sus Nombres"
+   ]
+  },
+  "cuentos/caperucita-roja": {
+   "categoria": "cuentos",
+   "nombre": "Caperucita Roja",
+   "en": "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/los-tres-cerditos": {
+   "categoria": "cuentos",
+   "nombre": "Los tres cerditos",
+   "en": "a children's illustration of the three little pigs and their houses, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/ricitos-de-oro": {
+   "categoria": "cuentos",
+   "nombre": "Ricitos de Oro",
+   "en": "a children's illustration of Goldilocks with the three bears' bowls, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/blancanieves": {
+   "categoria": "cuentos",
+   "nombre": "Blancanieves",
+   "en": "a children's illustration of a fairy-tale princess with black hair and a red apple in the forest, with seven little bearded miners, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/pinocho": {
+   "categoria": "cuentos",
+   "nombre": "Pinocho",
+   "en": "a children's illustration of Pinocchio, a wooden puppet boy with a long nose, original style, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/cenicienta": {
+   "categoria": "cuentos",
+   "nombre": "Cenicienta",
+   "en": "a children's illustration of a fairy-tale girl in a ball gown running down palace stairs at midnight, losing one glass shoe, a pumpkin-shaped carriage behind, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/hansel-y-gretel": {
+   "categoria": "cuentos",
+   "nombre": "Hansel y Gretel",
+   "en": "a children's illustration of Hansel and Gretel at the gingerbread house, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/el-patito-feo": {
+   "categoria": "cuentos",
+   "nombre": "El patito feo",
+   "en": "a children's illustration of the ugly duckling, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "cuentos/el-gato-con-botas": {
+   "categoria": "cuentos",
+   "nombre": "El gato con botas",
+   "en": "a children's illustration of a clever cat wearing tall boots and a feathered hat, standing on two legs, no text",
+   "programas": [
+    "Vincular Mutuamente Cuentos con sus Nombres"
+   ]
+  },
+  "objetos/peluche": {
+   "categoria": "objetos",
+   "nombre": "Peluche",
+   "en": "a teddy bear",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Responder a Preguntas sobre Características",
+    "Igualar Imágenes",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "alimentos/gominolas": {
+   "categoria": "alimentos",
+   "nombre": "Gominolas",
+   "en": "gummy candies",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "objetos/coche-de-juguete": {
+   "categoria": "objetos",
+   "nombre": "Coche de juguete",
+   "en": "a toy car",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "alimentos/zumo": {
+   "categoria": "alimentos",
+   "nombre": "Zumo",
+   "en": "a glass of orange juice",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "objetos/pelota": {
+   "categoria": "objetos",
+   "nombre": "Pelota",
+   "en": "a ball",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Responder a Preguntas sobre Características",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "alimentos/helado": {
+   "categoria": "alimentos",
+   "nombre": "Helado",
+   "en": "an ice cream cone",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "objetos/pompas-de-jabon": {
+   "categoria": "objetos",
+   "nombre": "Pompas de jabón",
+   "en": "soap bubbles and a bubble wand",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "alimentos/chocolate": {
+   "categoria": "alimentos",
+   "nombre": "Chocolate",
+   "en": "a bar of chocolate",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "objetos/muneca": {
+   "categoria": "objetos",
+   "nombre": "Muñeca",
+   "en": "a doll",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "alimentos/patatas-fritas": {
+   "categoria": "alimentos",
+   "nombre": "Patatas fritas",
+   "en": "a bag of potato chips",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "objetos/globo": {
+   "categoria": "objetos",
+   "nombre": "Globo",
+   "en": "a balloon",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres",
+    "Responder a Preguntas sobre Características",
+    "Igualar Imágenes",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/puzle": {
+   "categoria": "objetos",
+   "nombre": "Puzle",
+   "en": "a children's jigsaw puzzle",
+   "programas": [
+    "Vincular Mutuamente Estímulos Preferidos con sus Nombres"
+   ]
+  },
+  "objetos/peine": {
+   "categoria": "objetos",
+   "nombre": "Peine",
+   "en": "a comb",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/escoba": {
+   "categoria": "objetos",
+   "nombre": "Escoba",
+   "en": "a broom",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/jabon": {
+   "categoria": "objetos",
+   "nombre": "Jabón",
+   "en": "a bar of soap",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/paraguas": {
+   "categoria": "objetos",
+   "nombre": "Paraguas",
+   "en": "an umbrella",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes"
+   ]
+  },
+  "objetos/llave": {
+   "categoria": "objetos",
+   "nombre": "Llave",
+   "en": "a house key",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/toalla": {
+   "categoria": "objetos",
+   "nombre": "Toalla",
+   "en": "a towel",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/cepillo-de-dientes": {
+   "categoria": "objetos",
+   "nombre": "Cepillo de dientes",
+   "en": "a toothbrush",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/telefono": {
+   "categoria": "objetos",
+   "nombre": "Teléfono",
+   "en": "a mobile phone",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/abrigo": {
+   "categoria": "objetos",
+   "nombre": "Abrigo",
+   "en": "a winter coat",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/gafas": {
+   "categoria": "objetos",
+   "nombre": "Gafas",
+   "en": "a pair of glasses",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/grifo": {
+   "categoria": "objetos",
+   "nombre": "Grifo",
+   "en": "a water tap",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/bicicleta": {
+   "categoria": "objetos",
+   "nombre": "Bicicleta",
+   "en": "a bicycle",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "objetos/reloj": {
+   "categoria": "objetos",
+   "nombre": "Reloj",
+   "en": "a wall clock",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres",
+    "Igualar Imágenes",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/linterna": {
+   "categoria": "objetos",
+   "nombre": "Linterna",
+   "en": "a flashlight",
+   "programas": [
+    "Responder a Preguntas sobre Funciones de los Objetos",
+    "Vincular Mutuamente Funciones de los Objetos con sus Nombres"
+   ]
+  },
+  "alimentos/lechuga": {
+   "categoria": "alimentos",
+   "nombre": "Lechuga",
+   "en": "a lettuce",
+   "programas": [
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "transportes/barco-en-el-mar": {
+   "categoria": "transportes",
+   "nombre": "Barco en el mar",
+   "en": "a boat sailing on the sea",
+   "programas": [
+    "Responder a Preguntas sobre Características",
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "peligros/fuego": {
+   "categoria": "peligros",
+   "nombre": "Fuego",
+   "en": "a fire with flames",
+   "programas": [
+    "Responder a Preguntas sobre Características",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "alimentos/limon": {
+   "categoria": "alimentos",
+   "nombre": "Limón",
+   "en": "a lemon",
+   "programas": [
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "alimentos/miel": {
+   "categoria": "alimentos",
+   "nombre": "Miel",
+   "en": "a jar of honey",
+   "programas": [
+    "Responder a Preguntas sobre Características"
+   ]
+  },
+  "lugares/parque": {
+   "categoria": "lugares",
+   "nombre": "Parque",
+   "en": "a playground in a park",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/colegio": {
+   "categoria": "lugares",
+   "nombre": "Colegio",
+   "en": "a primary school classroom",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/supermercado": {
+   "categoria": "lugares",
+   "nombre": "Supermercado",
+   "en": "a supermarket aisle",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/piscina": {
+   "categoria": "lugares",
+   "nombre": "Piscina",
+   "en": "a swimming pool",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/hospital": {
+   "categoria": "lugares",
+   "nombre": "Hospital",
+   "en": "a hospital building",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/biblioteca": {
+   "categoria": "lugares",
+   "nombre": "Biblioteca",
+   "en": "a library with shelves of books",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/playa": {
+   "categoria": "lugares",
+   "nombre": "Playa",
+   "en": "a sandy beach",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/peluqueria": {
+   "categoria": "lugares",
+   "nombre": "Peluquería",
+   "en": "a hair salon",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/restaurante": {
+   "categoria": "lugares",
+   "nombre": "Restaurante",
+   "en": "a restaurant with tables",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/cine": {
+   "categoria": "lugares",
+   "nombre": "Cine",
+   "en": "a cinema screen and seats",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/zoo": {
+   "categoria": "lugares",
+   "nombre": "Zoo",
+   "en": "a zoo with animals",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/estacion-de-tren": {
+   "categoria": "lugares",
+   "nombre": "Estación de tren",
+   "en": "a train station platform",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/panaderia": {
+   "categoria": "lugares",
+   "nombre": "Panadería",
+   "en": "a bakery shop with bread",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/granja": {
+   "categoria": "lugares",
+   "nombre": "Granja",
+   "en": "a farm with a barn",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/aeropuerto": {
+   "categoria": "lugares",
+   "nombre": "Aeropuerto",
+   "en": "an airport with planes",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/farmacia": {
+   "categoria": "lugares",
+   "nombre": "Farmacia",
+   "en": "a pharmacy shop",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/polideportivo": {
+   "categoria": "lugares",
+   "nombre": "Polideportivo",
+   "en": "a sports hall",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "lugares/gasolinera": {
+   "categoria": "lugares",
+   "nombre": "Gasolinera",
+   "en": "a petrol station",
+   "programas": [
+    "Responder a Preguntas ¿Dónde?"
+   ]
+  },
+  "momentos/noche": {
+   "categoria": "momentos",
+   "nombre": "Noche",
+   "en": "night: dark sky with moon and a child in bed",
+   "programas": [
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "momentos/manana": {
+   "categoria": "momentos",
+   "nombre": "Mañana",
+   "en": "early morning: sunrise and breakfast on the table",
+   "programas": [
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "momentos/cumpleanos": {
+   "categoria": "momentos",
+   "nombre": "Cumpleaños",
+   "en": "a birthday cake with lit candles",
+   "programas": [
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "momentos/lluvia": {
+   "categoria": "momentos",
+   "nombre": "Lluvia",
+   "en": "a child with an umbrella in the rain",
+   "programas": [
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "momentos/navidad": {
+   "categoria": "momentos",
+   "nombre": "Navidad",
+   "en": "a decorated Christmas tree with presents",
+   "programas": [
+    "Responder a Preguntas ¿Cuándo?"
+   ]
+  },
+  "transportes/coche-en-la-carretera": {
+   "categoria": "transportes",
+   "nombre": "Coche en la carretera",
+   "en": "a car driving on a road",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/avion-en-el-cielo": {
+   "categoria": "transportes",
+   "nombre": "Avión en el cielo",
+   "en": "an airplane flying in the sky",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/tren-en-las-vias": {
+   "categoria": "transportes",
+   "nombre": "Tren en las vías",
+   "en": "a train on railway tracks",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/bicicleta": {
+   "categoria": "transportes",
+   "nombre": "Bicicleta",
+   "en": "a child riding a bicycle on a path",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/caballo": {
+   "categoria": "transportes",
+   "nombre": "Caballo",
+   "en": "a person riding a horse",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/submarino": {
+   "categoria": "transportes",
+   "nombre": "Submarino",
+   "en": "a submarine under the sea",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/globo-aerostatico": {
+   "categoria": "transportes",
+   "nombre": "Globo aerostático",
+   "en": "a hot air balloon in the sky",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "transportes/patinete": {
+   "categoria": "transportes",
+   "nombre": "Patinete",
+   "en": "a child riding a kick scooter",
+   "programas": [
+    "Responder a Preguntas ¿Cómo?"
+   ]
+  },
+  "escenas/mama-come-sopa": {
+   "categoria": "escenas",
+   "nombre": "Mamá come sopa",
+   "en": "a mother eating soup",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/papa-lee-un-libro": {
+   "categoria": "escenas",
+   "nombre": "Papá lee un libro",
+   "en": "a father reading a book",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-nino-duerme": {
+   "categoria": "escenas",
+   "nombre": "El niño duerme",
+   "en": "a boy sleeping in bed",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-perro-corre": {
+   "categoria": "escenas",
+   "nombre": "El perro corre",
+   "en": "a dog running",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-nina-bebe-agua": {
+   "categoria": "escenas",
+   "nombre": "La niña bebe agua",
+   "en": "a girl drinking water",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/papa-lava-el-coche": {
+   "categoria": "escenas",
+   "nombre": "Papá lava el coche",
+   "en": "a father washing the car",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-gato-salta": {
+   "categoria": "escenas",
+   "nombre": "El gato salta",
+   "en": "a cat jumping",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/mama-pinta-una-casa": {
+   "categoria": "escenas",
+   "nombre": "Mamá pinta una casa",
+   "en": "a mother painting a picture of a house",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-bebe-llora": {
+   "categoria": "escenas",
+   "nombre": "El bebé llora",
+   "en": "a baby crying",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-vaca-come-hierba": {
+   "categoria": "escenas",
+   "nombre": "La vaca come hierba",
+   "en": "a cow eating grass",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-nino-nada": {
+   "categoria": "escenas",
+   "nombre": "El niño nada",
+   "en": "a boy swimming",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-abuela-canta": {
+   "categoria": "escenas",
+   "nombre": "La abuela canta",
+   "en": "a grandmother singing",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-pajaro-vuela": {
+   "categoria": "escenas",
+   "nombre": "El pájaro vuela",
+   "en": "a bird flying",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/papa-cocina": {
+   "categoria": "escenas",
+   "nombre": "Papá cocina",
+   "en": "a father cooking",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-nina-rie": {
+   "categoria": "escenas",
+   "nombre": "La niña ríe",
+   "en": "a girl laughing",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-sol-brilla": {
+   "categoria": "escenas",
+   "nombre": "El sol brilla",
+   "en": "the sun shining brightly",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-nino-come-una-manzana": {
+   "categoria": "escenas",
+   "nombre": "El niño come una manzana",
+   "en": "a boy eating an apple",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/mama-abre-la-puerta": {
+   "categoria": "escenas",
+   "nombre": "Mamá abre la puerta",
+   "en": "a mother opening a door",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-pelota-es-roja": {
+   "categoria": "escenas",
+   "nombre": "La pelota es roja",
+   "en": "a red ball",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-abuelo-camina": {
+   "categoria": "escenas",
+   "nombre": "El abuelo camina",
+   "en": "a grandfather walking with a cane",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-nina-dibuja-un-sol": {
+   "categoria": "escenas",
+   "nombre": "La niña dibuja un sol",
+   "en": "a girl drawing a sun on paper",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-tren-pasa": {
+   "categoria": "escenas",
+   "nombre": "El tren pasa",
+   "en": "a train passing by",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/la-maestra-escribe": {
+   "categoria": "escenas",
+   "nombre": "La maestra escribe",
+   "en": "a teacher writing on a blackboard",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "escenas/el-leon-ruge": {
+   "categoria": "escenas",
+   "nombre": "El león ruge",
+   "en": "a lion roaring",
+   "programas": [
+    "Leer Oraciones y Textos"
+   ]
+  },
+  "animales-de-granja/gato": {
+   "categoria": "animales de granja",
+   "nombre": "Gato",
+   "en": "a cat",
+   "programas": [
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "animales-de-granja/perro": {
+   "categoria": "animales de granja",
+   "nombre": "Perro",
+   "en": "a dog",
+   "programas": [
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "animales-de-granja/pez": {
+   "categoria": "animales de granja",
+   "nombre": "Pez",
+   "en": "a goldfish",
+   "programas": [
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Objetos Conocidos a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/enchufe": {
+   "categoria": "peligros",
+   "nombre": "Enchufe",
+   "en": "an electrical wall socket",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/cuchillo": {
+   "categoria": "peligros",
+   "nombre": "Cuchillo",
+   "en": "a sharp knife",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/plancha-caliente": {
+   "categoria": "peligros",
+   "nombre": "Plancha caliente",
+   "en": "a hot clothes iron with steam",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/medicamentos": {
+   "categoria": "peligros",
+   "nombre": "Medicamentos",
+   "en": "pills and medicine bottles",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/lejia": {
+   "categoria": "peligros",
+   "nombre": "Lejía",
+   "en": "a bottle of bleach",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/sarten-caliente": {
+   "categoria": "peligros",
+   "nombre": "Sartén caliente",
+   "en": "a hot frying pan on a stove",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/cristal-roto": {
+   "categoria": "peligros",
+   "nombre": "Cristal roto",
+   "en": "broken glass shards",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/cuento": {
+   "categoria": "objetos",
+   "nombre": "Cuento",
+   "en": "a children's picture book",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/vela-encendida": {
+   "categoria": "peligros",
+   "nombre": "Vela encendida",
+   "en": "a lit candle",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/avispa": {
+   "categoria": "peligros",
+   "nombre": "Avispa",
+   "en": "a wasp",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/cubo-y-pala": {
+   "categoria": "objetos",
+   "nombre": "Cubo y pala",
+   "en": "a toy bucket and spade",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/horno-encendido": {
+   "categoria": "peligros",
+   "nombre": "Horno encendido",
+   "en": "a hot oven with the door open",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/agua-hirviendo": {
+   "categoria": "peligros",
+   "nombre": "Agua hirviendo",
+   "en": "a pot of boiling water",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/estufa-encendida": {
+   "categoria": "peligros",
+   "nombre": "Estufa encendida",
+   "en": "a glowing electric heater",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/abeja": {
+   "categoria": "peligros",
+   "nombre": "Abeja",
+   "en": "a bee",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/cuter": {
+   "categoria": "peligros",
+   "nombre": "Cúter",
+   "en": "a box cutter with the blade out",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "peligros/cerillas": {
+   "categoria": "peligros",
+   "nombre": "Cerillas",
+   "en": "a box of matches with a lit match",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "objetos/pinturas": {
+   "categoria": "objetos",
+   "nombre": "Pinturas",
+   "en": "a set of colored pencils",
+   "programas": [
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones de Evitación a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/senal-de-para": {
+   "categoria": "señales",
+   "nombre": "Señal de para",
+   "en": "a red stop sign",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-ven": {
+   "categoria": "señales",
+   "nombre": "Gesto de ven",
+   "en": "an adult making a beckoning \"come here\" gesture with the hand",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-sientate": {
+   "categoria": "señales",
+   "nombre": "Pictograma de siéntate",
+   "en": "a simple pictogram of a person sitting on a chair",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/semaforo-en-rojo": {
+   "categoria": "señales",
+   "nombre": "Semáforo en rojo",
+   "en": "a pedestrian traffic light showing red",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/mano-levantada-para": {
+   "categoria": "señales",
+   "nombre": "Mano levantada (para)",
+   "en": "an adult raising the palm forward meaning stop",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-sientate-banco": {
+   "categoria": "señales",
+   "nombre": "Pictograma de siéntate (banco)",
+   "en": "a simple pictogram of a person sitting on a bench",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-silencio": {
+   "categoria": "señales",
+   "nombre": "Gesto de silencio",
+   "en": "an adult with the index finger on the lips meaning silence",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-mira": {
+   "categoria": "señales",
+   "nombre": "Gesto de mira",
+   "en": "an adult pointing to their own eyes meaning look",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-dame": {
+   "categoria": "señales",
+   "nombre": "Gesto de dame",
+   "en": "an adult holding out an open hand meaning give me",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-silencio": {
+   "categoria": "señales",
+   "nombre": "Pictograma de silencio",
+   "en": "a simple pictogram meaning silence (finger on lips)",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-mira": {
+   "categoria": "señales",
+   "nombre": "Pictograma de mira",
+   "en": "a simple pictogram meaning look (an eye)",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-dame": {
+   "categoria": "señales",
+   "nombre": "Pictograma de dame",
+   "en": "a simple pictogram meaning give me (open hand)",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-levantate": {
+   "categoria": "señales",
+   "nombre": "Gesto de levántate",
+   "en": "an adult raising both palms upward meaning stand up",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-espera": {
+   "categoria": "señales",
+   "nombre": "Gesto de espera",
+   "en": "an adult holding up the index finger meaning wait",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-coge": {
+   "categoria": "señales",
+   "nombre": "Gesto de coge",
+   "en": "an adult pointing at an object meaning pick it up",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-levantate": {
+   "categoria": "señales",
+   "nombre": "Pictograma de levántate",
+   "en": "a simple pictogram of a person standing up from a chair",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-espera": {
+   "categoria": "señales",
+   "nombre": "Pictograma de espera",
+   "en": "a simple pictogram meaning wait (a raised hand and a clock)",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/pictograma-de-coge": {
+   "categoria": "señales",
+   "nombre": "Pictograma de coge",
+   "en": "a simple pictogram of a hand picking up an object",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/semaforo-en-verde": {
+   "categoria": "señales",
+   "nombre": "Semáforo en verde",
+   "en": "a pedestrian traffic light showing green",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-adios": {
+   "categoria": "señales",
+   "nombre": "Gesto de adiós",
+   "en": "an adult waving goodbye",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  },
+  "senales/gesto-de-hola": {
+   "categoria": "señales",
+   "nombre": "Gesto de hola",
+   "en": "an adult waving hello with a smile",
+   "programas": [
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios en Redes Combinatorias",
+    "Transferir Funciones Discriminativas a Estímulos Arbitrarios"
+   ]
+  }
+ },
+ "banco": [
+  "vehiculos/coche",
+  "vehiculos/avion",
+  "vehiculos/barco",
+  "alimentos/manzana",
+  "alimentos/platano",
+  "alimentos/fresa",
+  "alimentos/galleta",
+  "alimentos/pan",
+  "animales-de-granja/vaca",
+  "animales-de-granja/caballo",
+  "prendas-de-vestir/camiseta",
+  "prendas-de-vestir/zapatos"
+ ],
+ "sinAncla": [
+  "Transferir Funciones a través de Relaciones Temporales · Tocar la mesa",
+  "Transferir Funciones a través de Relaciones Temporales · Saltar",
+  "Transferir Funciones a través de Relaciones Temporales · Coger el lápiz",
+  "Transferir Funciones a través de Relaciones Temporales · Sentarse",
+  "Transferir Funciones a través de Relaciones Temporales · Abrir la caja",
+  "Transferir Funciones a través de Relaciones Temporales · Aplaudir"
+ ]
+}

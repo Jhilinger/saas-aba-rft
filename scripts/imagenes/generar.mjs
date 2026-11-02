@@ -40,6 +40,20 @@ const ESTILO_CATEGORIA = {
   vehículos: 'Show the whole vehicle from a three-quarter side view. No road, scenery or visible people.',
   'prendas de vestir': 'Show the garment laid flat or on an invisible mannequin, never worn by a person. Paired items are shown as a pair.',
   'evaluación objetos': 'Animals are shown whole and standing naturally; objects are shown whole.',
+  'animales salvajes': 'Show the whole body of the animal in a natural pose. No ground, scenery or other animals.',
+  'animales marinos': 'Show the whole animal. No water, sand or scenery.',
+  'animales de granja': 'Show the whole body of the animal, standing naturally, preferably seen from the side. No ground, grass, fences or scenery.',
+  plantas: 'Show the whole plant (with its pot if it has one). Trees are shown as a whole full-size tree standing alone, not a bonsai and not in a pot. No garden or scenery.',
+  'material escolar': 'Show the object whole, as a child would use it at school.',
+  herramientas: 'Show the tool whole.',
+  'electrodomésticos': 'Show the whole appliance, front three-quarter view, not built into any kitchen.',
+  muebles: 'Show the whole piece of furniture, three-quarter view, with nothing on it. No room.',
+  'utensilios de cocina': 'Show the utensil whole and empty.',
+  'instrumentos musicales': 'Show the whole instrument, nobody playing it.',
+  objetos: 'Show the object whole.',
+  alimentos: 'Show the food on its own, without plates, cutlery or tablecloth unless the description itself includes a container.',
+  peligros: 'The danger must be obvious at a glance. Show only what is described.',
+  'características': 'The state (wet, broken, dirty, open, full…) must be obvious at a glance.',
 }
 
 // Categorías con personas, acciones o varias piezas: plantilla propia, sin la
@@ -55,6 +69,30 @@ const PLANTILLA = {
     `A clear, simple realistic photograph of ${d}, centered on a pure white background, soft even lighting. ` +
     'Only the elements described. No people except, if needed, a hand. No text, letters, numbers or logos. Square composition.',
 }
+// Categorías del inventario con personas o escenas: mismas plantillas
+const escena = PLANTILLA['evaluación escenas']
+Object.assign(PLANTILLA, {
+  emociones: PLANTILLA['evaluación emociones'],
+  profesiones: (d) => `A realistic photograph of ${d}, whole body, the profession obvious at a glance from clothes and tools. Plain, light, uncluttered background. Friendly look. No text, letters or logos. Square composition.`,
+  acciones: (d) => `A realistic photograph of ${d}. The action must be obvious at a glance; the person is large and centered. Plain, light, uncluttered background. No text, letters or logos. Square composition.`,
+  deportes: escena,
+  sensaciones: (d) => `A realistic photograph of ${d}. The feeling must be obvious at a glance from face and body. Plain, light background. No text, letters or logos. Square composition.`,
+  'partes del cuerpo': (d) => `A realistic close-up photograph of ${d}, on a pure white background, soft even lighting. Only that body part, clearly recognizable. Natural and tasteful. No text, letters or logos. Square composition.`,
+  lugares: (d) => `A clear, realistic photograph of ${d}, easy to recognize at a glance, bright and tidy, without people in the foreground. No readable text, signs or logos. Square composition.`,
+  'dependencias de la casa': (d) => `A clear, realistic photograph of ${d} in an ordinary family home, bright and tidy, easy to recognize at a glance. No people. No text or logos. Square composition.`,
+  estaciones: escena,
+  'tiempo atmosférico': (d) => `A realistic landscape photograph of ${d}; the weather must be obvious at a glance. No people, no text. Square composition.`,
+  momentos: escena,
+  transportes: escena,
+  escenas: escena,
+  universo: (d) => `A clear, realistic image of ${d}, centered, easy to recognize at a glance, on a plain background. No text. Square composition.`,
+  cuentos: (d) => `${d}. Warm, colorful picture-book illustration for young children, simple and clear, one main scene. Original style, not imitating any studio. No text, no title, no letters. Square composition.`,
+  'señales': (d) => /pictogram/i.test(d)
+    ? `${d}. Flat pictogram in the style of an augmentative communication symbol: thick black outlines, flat bright colors, white background, no shading. No text or letters. Square composition.`
+    : /sign|traffic light/i.test(d)
+      ? `A realistic photograph of ${d}, centered on a plain light background, easy to recognize at a glance. No other text. Square composition.`
+      : `A realistic photograph of ${d}, upper body facing the camera, the gesture obvious at a glance, on a pure white background. Friendly look. No text or logos. Square composition.`,
+})
 
 function prompt(categoria, descripcion) {
   if (PLANTILLA[categoria]) return PLANTILLA[categoria](descripcion)

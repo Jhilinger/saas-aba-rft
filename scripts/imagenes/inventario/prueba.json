@@ -1,0 +1,485 @@
+{
+ "descripcion": "Prueba de estilo: primer concepto de cada categoría",
+ "programas": [
+  {
+   "programa": "Inventario · animales salvajes",
+   "categoria": "animales salvajes",
+   "grupos": [
+    [
+     {
+      "concepto": "León",
+      "ejemplares": [
+       "a lion",
+       "a lion, a different model, color or variety from the first one",
+       "a single lion, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · animales marinos",
+   "categoria": "animales marinos",
+   "grupos": [
+    [
+     {
+      "concepto": "Pulpo",
+      "ejemplares": [
+       "an octopus",
+       "an octopus, a different model, color or variety from the first one",
+       "a single octopus, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · partes del cuerpo",
+   "categoria": "partes del cuerpo",
+   "grupos": [
+    [
+     {
+      "concepto": "Mano",
+      "ejemplares": [
+       "a child's hand",
+       "an adult's hand",
+       "a child's hand, a child with a different skin tone"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · utensilios de cocina",
+   "categoria": "utensilios de cocina",
+   "grupos": [
+    [
+     {
+      "concepto": "Cuchara",
+      "ejemplares": [
+       "a spoon",
+       "a spoon, a different model, color or variety from the first one",
+       "a single spoon, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · plantas",
+   "categoria": "plantas",
+   "grupos": [
+    [
+     {
+      "concepto": "Girasol",
+      "ejemplares": [
+       "a sunflower",
+       "a sunflower, a different model, color or variety from the first one",
+       "a single sunflower, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · material escolar",
+   "categoria": "material escolar",
+   "grupos": [
+    [
+     {
+      "concepto": "Lápiz",
+      "ejemplares": [
+       "a pencil",
+       "a pencil, a different model, color or variety from the first one",
+       "a single pencil, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · dependencias de la casa",
+   "categoria": "dependencias de la casa",
+   "grupos": [
+    [
+     {
+      "concepto": "Cocina",
+      "ejemplares": [
+       "a home kitchen",
+       "a home kitchen, a different place and composition",
+       "a home kitchen, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · herramientas",
+   "categoria": "herramientas",
+   "grupos": [
+    [
+     {
+      "concepto": "Martillo",
+      "ejemplares": [
+       "a hammer",
+       "a hammer, a different model, color or variety from the first one",
+       "a single hammer, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · electrodomésticos",
+   "categoria": "electrodomésticos",
+   "grupos": [
+    [
+     {
+      "concepto": "Televisión",
+      "ejemplares": [
+       "a television",
+       "a television, a different model, color or variety from the first one",
+       "a single television, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · muebles",
+   "categoria": "muebles",
+   "grupos": [
+    [
+     {
+      "concepto": "Silla",
+      "ejemplares": [
+       "a simple dining chair with four legs and a backrest, no armrests",
+       "a simple dining chair with four legs and a backrest, no armrests, a different model, color or variety from the first one",
+       "a single simple dining chair with four legs and a backrest, no armrests, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · características",
+   "categoria": "características",
+   "grupos": [
+    [
+     {
+      "concepto": "Mojado",
+      "ejemplares": [
+       "a wet T-shirt, clearly wet, dripping with water",
+       "a wet dog, clearly wet, dripping with water",
+       "a wet umbrella, clearly wet, dripping with water"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · profesiones",
+   "categoria": "profesiones",
+   "grupos": [
+    [
+     {
+      "concepto": "Bombero",
+      "ejemplares": [
+       "a firefighter in uniform (the person shown is a woman about 30 years old)",
+       "a firefighter in uniform (the person shown is a man about 45 years old)",
+       "a firefighter in uniform (the person shown is a man about 55 years old with a different skin tone)"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · instrumentos musicales",
+   "categoria": "instrumentos musicales",
+   "grupos": [
+    [
+     {
+      "concepto": "Tambor",
+      "ejemplares": [
+       "a drum",
+       "a drum, a different model, color or variety from the first one",
+       "a single drum, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · deportes",
+   "categoria": "deportes",
+   "grupos": [
+    [
+     {
+      "concepto": "Fútbol",
+      "ejemplares": [
+       "a girl about 7 years old playing football (soccer)",
+       "a man about 35 years old playing football (soccer)",
+       "a boy about 10 years old with a different skin tone playing football (soccer)"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · universo",
+   "categoria": "universo",
+   "grupos": [
+    [
+     {
+      "concepto": "Sol",
+      "ejemplares": [
+       "the sun",
+       "the sun, a different place and composition",
+       "the sun, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · tiempo atmosférico",
+   "categoria": "tiempo atmosférico",
+   "grupos": [
+    [
+     {
+      "concepto": "Soleado",
+      "ejemplares": [
+       "a sunny day landscape",
+       "a sunny day landscape, a different place and composition",
+       "a sunny day landscape, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · estaciones",
+   "categoria": "estaciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Verano",
+      "ejemplares": [
+       "a summer scene: beach and sun",
+       "a summer scene: beach and sun, a different place and composition",
+       "a summer scene: beach and sun, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · emociones",
+   "categoria": "emociones",
+   "grupos": [
+    [
+     {
+      "concepto": "Contento",
+      "ejemplares": [
+       "the face of a girl about 7 years old who is clearly happy",
+       "the face of a man about 35 years old who is clearly happy",
+       "the face of a boy about 10 years old with a different skin tone who is clearly happy"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · sensaciones",
+   "categoria": "sensaciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Frío",
+      "ejemplares": [
+       "a girl about 7 years old shivering with cold, wrapped in a scarf",
+       "a man about 35 years old shivering with cold, wrapped in a scarf",
+       "a boy about 10 years old with a different skin tone shivering with cold, wrapped in a scarf"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · acciones",
+   "categoria": "acciones",
+   "grupos": [
+    [
+     {
+      "concepto": "Correr",
+      "ejemplares": [
+       "a girl about 7 years old running",
+       "a man about 35 years old running",
+       "a boy about 10 years old with a different skin tone running"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · cuentos",
+   "categoria": "cuentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Caperucita Roja",
+      "ejemplares": [
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text",
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text, a different scene from the same tale",
+       "a children's illustration of Little Red Riding Hood with the wolf in the forest, no text, another key scene from the same tale"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · objetos",
+   "categoria": "objetos",
+   "grupos": [
+    [
+     {
+      "concepto": "Peluche",
+      "ejemplares": [
+       "a teddy bear",
+       "a teddy bear, a different model, color or variety from the first one",
+       "a single teddy bear, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · alimentos",
+   "categoria": "alimentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Gominolas",
+      "ejemplares": [
+       "gummy candies",
+       "gummy candies, a different model, color or variety from the first one",
+       "a single gummy candies, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · transportes",
+   "categoria": "transportes",
+   "grupos": [
+    [
+     {
+      "concepto": "Barco en el mar",
+      "ejemplares": [
+       "a boat sailing on the sea",
+       "a boat sailing on the sea, a different place and composition",
+       "a boat sailing on the sea, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · peligros",
+   "categoria": "peligros",
+   "grupos": [
+    [
+     {
+      "concepto": "Fuego",
+      "ejemplares": [
+       "a fire with flames",
+       "a fire with flames, a different model, color or variety from the first one",
+       "a single fire with flames, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · lugares",
+   "categoria": "lugares",
+   "grupos": [
+    [
+     {
+      "concepto": "Parque",
+      "ejemplares": [
+       "a playground in a park",
+       "a playground in a park, a different place and composition",
+       "a playground in a park, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · momentos",
+   "categoria": "momentos",
+   "grupos": [
+    [
+     {
+      "concepto": "Noche",
+      "ejemplares": [
+       "night: dark sky with moon and a child in bed",
+       "night: dark sky with moon and a child in bed, a different place and composition",
+       "night: dark sky with moon and a child in bed, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · escenas",
+   "categoria": "escenas",
+   "grupos": [
+    [
+     {
+      "concepto": "Mamá come sopa",
+      "ejemplares": [
+       "a mother eating soup",
+       "a mother eating soup, a different place and composition",
+       "a mother eating soup, another different example"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · animales de granja",
+   "categoria": "animales de granja",
+   "grupos": [
+    [
+     {
+      "concepto": "Gato",
+      "ejemplares": [
+       "a cat",
+       "a cat, a different model, color or variety from the first one",
+       "a single cat, different-looking again, seen from a different angle"
+      ]
+     }
+    ]
+   ]
+  },
+  {
+   "programa": "Inventario · señales",
+   "categoria": "señales",
+   "grupos": [
+    [
+     {
+      "concepto": "Señal de para",
+      "ejemplares": [
+       "a red stop sign",
+       "a red stop sign, a different person or a different version",
+       "a red stop sign, another different version"
+      ]
+     }
+    ]
+   ]
+  }
+ ]
+}
