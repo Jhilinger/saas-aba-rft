@@ -449,6 +449,9 @@ export default async function Home() {
             <Link href="/legal/terminos" className="hover:text-slate-600">
               Términos
             </Link>
+            <Link href="/legal/reembolsos" className="hover:text-slate-600">
+              Reembolsos
+            </Link>
             <Link href="/legal/aviso-legal" className="hover:text-slate-600">
               Aviso Legal
             </Link>

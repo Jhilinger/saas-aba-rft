@@ -63,9 +63,9 @@ export default function TerminosPage() {
         <section>
           <h2 className="mb-2 text-lg font-semibold text-slate-900">4. Precio y forma de pago</h2>
           <p>
-            El servicio se factura mediante suscripción mensual, compuesta por una
-            cuota fija más un importe variable por cada alumno activo, según las
-            condiciones vigentes en el momento de la contratación. El pago se gestiona
+            El servicio se factura mediante suscripción mensual por alumno activo,
+            con un mínimo facturado, según el precio vigente para el país del cliente
+            en el momento de la contratación. El pago se gestiona
             a través de Stripe. La suscripción se renueva automáticamente cada mes
             salvo cancelación por parte del cliente, que puede hacerse en cualquier
             momento desde el propio panel.
@@ -73,6 +73,12 @@ export default function TerminosPage() {
           <p className="mt-2">
             El impago o la falta de renovación puede conllevar la suspensión o
             cancelación del acceso al servicio.
+          </p>
+          <p className="mt-2">
+            Las condiciones de reembolso se recogen en la{' '}
+            <Link href="/legal/reembolsos" className="text-indigo-600 underline underline-offset-2 hover:text-indigo-800">
+              Política de Reembolsos
+            </Link>.
           </p>
         </section>
 
