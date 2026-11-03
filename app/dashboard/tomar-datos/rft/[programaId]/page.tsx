@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosRftClient from './tomar-datos-rft-client'
 import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-pantalla'
+import { cargarImagenes } from '../../../imagenes-estimulo'
 
 export default async function TomarDatosRftPage({
   params,
@@ -53,7 +54,7 @@ export default async function TomarDatosRftPage({
     .order('grupo')
     .order('created_at')
 
-  // Imágenes del banco de los conceptos que usan las clases (para la tableta)
+  // Imágenes (del banco o propias del centro) de los conceptos que usan las clases
   const conceptos = [
     ...new Set(
       (clases ?? []).flatMap((c) =>
@@ -61,13 +62,7 @@ export default async function TomarDatosRftPage({
       )
     ),
   ].filter((x): x is string => !!x)
-  const { data: filasImagenes } = conceptos.length
-    ? await supabase.from('biblioteca_imagenes').select('concepto, ejemplar, ruta').in('concepto', conceptos)
-    : { data: [] }
-  const imagenes: Record<string, Record<string, string>> = {}
-  for (const f of filasImagenes ?? []) {
-    imagenes[f.concepto] = { ...imagenes[f.concepto], [f.ejemplar]: supabase.storage.from('biblioteca').getPublicUrl(f.ruta).data.publicUrl }
-  }
+  const imagenes = await cargarImagenes(supabase, conceptos)
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')

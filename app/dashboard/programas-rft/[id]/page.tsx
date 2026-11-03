@@ -12,6 +12,7 @@ import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
 import PanelAlertas from '../../panel-alertas'
 import { cargarAlertas } from '../../cargar-alertas'
+import { cargarImagenes } from '../../imagenes-estimulo'
 
 const NOMBRE_FASE: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
@@ -43,7 +44,7 @@ export default async function ProgramaRftPage({
 
   const { data: perfil } = await supabase
     .from('perfiles')
-    .select('rol')
+    .select('rol, clinica_id')
     .eq('id', user.id)
     .single()
 
@@ -134,11 +135,12 @@ export default async function ProgramaRftPage({
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, estimulos_rft(id, etiqueta, nombre, posicion), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, estimulos_rft(id, etiqueta, nombre, posicion, concepto_imagen), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')
     .order('created_at', { ascending: false })
+  const imagenes = await cargarImagenes(supabase, (clases ?? []).flatMap((c) => c.estimulos_rft.map((e) => e.concepto_imagen)))
 
   const { porFase, distribucionPorGrupo } = await obtenerEvolucionRft(id)
 
@@ -204,6 +206,8 @@ export default async function ProgramaRftPage({
         nivelRft={programa.nivel_rft}
         conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)}
         soloLectura={!disena}
+        imagenes={imagenes}
+        conImagenes={disena && !!perfil.clinica_id}
       />
 
       {bloquesFluidez && bloquesFluidez.length > 0 && (

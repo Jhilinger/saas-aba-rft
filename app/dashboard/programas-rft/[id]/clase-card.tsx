@@ -18,8 +18,10 @@ import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 import AyudaTermino from '../../ayuda-termino'
+import ImagenEstimulo from '../../imagen-estimulo'
+import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
 type Relacion = {
   id: string
   estimulo_origen_id: string
@@ -59,6 +61,8 @@ export default function ClaseCard({
   nivelRft,
   conRespuestasEsperadas = false,
   soloLectura = false,
+  imagenes = {},
+  conImagenes = false,
 }: {
   clase: Clase
   programaAlumnoId: string
@@ -68,6 +72,9 @@ export default function ClaseCard({
   conRespuestasEsperadas?: boolean
   // Sin permiso de diseño: se consulta, pero no se cambian clases ni estímulos
   soloLectura?: boolean
+  imagenes?: ImagenesBanco
+  // Se pueden subir imágenes propias del centro
+  conImagenes?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const posicionesPermitidas = POSICIONES_POR_NIVEL[nivel]
@@ -167,6 +174,8 @@ export default function ClaseCard({
                 )}
                 {' '}— {e.nombre}
               </span>
+              <span className="flex items-center gap-3">
+              <ImagenEstimulo tabla="estimulos_rft" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
               {!soloLectura && (
               <button
                 onClick={() => {
@@ -205,6 +214,7 @@ export default function ClaseCard({
                 Quitar
               </button>
               )}
+              </span>
             </li>
           ))}
           {clase.estimulos_rft.length === 0 && (

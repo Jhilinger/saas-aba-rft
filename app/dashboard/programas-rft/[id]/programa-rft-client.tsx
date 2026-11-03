@@ -4,13 +4,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 import NuevaClaseForm from './nueva-clase-form'
 import ClaseCard from './clase-card'
+import type { ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 import EvolucionRftChart from './evolucion-rft-chart'
 import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import type { DistribucionAyuda } from '../../ayuda-tipos'
 import { Panel } from '../../../ui'
 import AyudaTermino from '../../ayuda-termino'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
 type Clase = {
   id: string
@@ -56,6 +57,8 @@ export default function ProgramaRftClient({
   nivelRft,
   conRespuestasEsperadas,
   soloLectura = false,
+  imagenes,
+  conImagenes,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -68,6 +71,8 @@ export default function ProgramaRftClient({
   nivelRft: string | null
   conRespuestasEsperadas: boolean
   soloLectura?: boolean
+  imagenes: ImagenesBanco
+  conImagenes: boolean
 }) {
   const [tab, setTab] = useState<'evolucion' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -269,6 +274,8 @@ export default function ProgramaRftClient({
                 nivelRft={nivelRft}
                 conRespuestasEsperadas={conRespuestasEsperadas}
                 soloLectura={soloLectura}
+                imagenes={imagenes}
+                conImagenes={conImagenes}
               />
             ))}
           </div>

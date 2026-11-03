@@ -13,6 +13,7 @@ import RequisitosPrograma from './requisitos-programa'
 import { usaRespuestasSinSeleccion } from '../../respuestas-rft'
 import { Breadcrumb, Panel } from '../../../ui'
 import { cargarEstructuraCurriculo, crearCodificador } from '../estructura'
+import { cargarImagenes } from '../../imagenes-estimulo'
 
 export default async function ProgramaDetallePage({
   params,
@@ -79,9 +80,13 @@ export default async function ProgramaDetallePage({
 
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
-    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft_base(id, etiqueta, nombre, posicion)')
+    .select('id, nombre, grupo, respuestas_esperadas, estimulos_rft_base(id, etiqueta, nombre, posicion, concepto_imagen)')
     .eq('programa_base_id', id)
     .order('orden')
+
+  const imagenes = await cargarImagenes(supabase, (clasesRft ?? []).flatMap((c) => c.estimulos_rft_base.map((e) => e.concepto_imagen)))
+  // Las imágenes propias son del centro: no en el currículo global
+  const conImagenes = !soloLectura && !!perfil.clinica_id && programa.clinica_id === perfil.clinica_id
 
   const { data: pasosTarea } = await supabase
     .from('pasos_tarea_base')
@@ -240,7 +245,7 @@ export default async function ProgramaDetallePage({
 
           <div className="space-y-4">
             {clasesRft?.map((c) => (
-              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} />
+              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} imagenes={imagenes} conImagenes={conImagenes} />
             ))}
           </div>
 

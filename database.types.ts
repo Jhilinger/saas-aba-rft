@@ -174,6 +174,7 @@ export type Database = {
       biblioteca_imagenes: {
         Row: {
           categoria: string
+          clinica_id: string | null
           concepto: string
           created_at: string
           descripcion: string | null
@@ -187,6 +188,7 @@ export type Database = {
         }
         Insert: {
           categoria: string
+          clinica_id?: string | null
           concepto: string
           created_at?: string
           descripcion?: string | null
@@ -200,6 +202,7 @@ export type Database = {
         }
         Update: {
           categoria?: string
+          clinica_id?: string | null
           concepto?: string
           created_at?: string
           descripcion?: string | null
@@ -211,7 +214,15 @@ export type Database = {
           ruta?: string
           uso?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "biblioteca_imagenes_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinicas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bloques_analisis_tareas: {
         Row: {
