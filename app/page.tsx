@@ -24,7 +24,7 @@ const CIFRAS = [
 const DOLORES = [
   { texto: 'Hojas de registro en papel que alguien tiene que pasar a limpio.', Icono: PenLine },
   { texto: 'Gráficos en Excel que se actualizan cuando hay tiempo… o nunca.', Icono: FileSpreadsheet },
-  { texto: 'Programas de RFT que te inventas tú: estímulos, relaciones y criterios.', Icono: Puzzle },
+  { texto: 'Programas de RFT montados desde cero, sin una secuencia de referencia que seguir.', Icono: Puzzle },
   { texto: 'Informes para las familias redactados a mano, uno por uno.', Icono: FileText },
 ]
 
@@ -85,48 +85,6 @@ function MaquetaTableta() {
             <Estimulo src="vaca-eval" marcado />
             <Estimulo src="platano-1" />
           </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Recreación del currículo: un programa con sus estímulos
-function MaquetaCurriculo() {
-  const niveles = ['Nivel 1', 'Nivel 2', 'Nivel 3', 'Nivel 4']
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-6">
-      <div className="flex flex-wrap gap-1.5">
-        {niveles.map((n, i) => (
-          <span
-            key={n}
-            className="rounded-full px-3 py-1 text-xs font-semibold"
-            style={i === 1 ? { backgroundColor: 'var(--brand-primary)', color: 'white' } : { backgroundColor: 'var(--brand-primary-soft)', color: 'var(--brand-primary-dark)' }}
-          >
-            {n}
-          </span>
-        ))}
-      </div>
-      <div className="mt-4 rounded-xl border border-slate-200 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Relacional · Coordinación</p>
-            <p className="mt-0.5 font-semibold text-slate-800">Categorías: animales y alimentos</p>
-          </div>
-          <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold" style={{ backgroundColor: 'var(--brand-accent-soft)', color: '#aa5541' }}>
-            En curso
-          </span>
-        </div>
-        <div className="mt-4 grid grid-cols-4 gap-2 sm:gap-3">
-          {['elefante-1', 'jirafa-1', 'buho-1', 'caballo-2', 'manzana-1', 'platano-1', 'autobus-1', 'ambulancia-1'].map((s) => (
-            <div key={s} className="flex aspect-square items-center justify-center rounded-lg border border-slate-100 bg-white">
-              <Image src={`/landing/${s}.webp`} alt="" width={96} height={96} className="h-[85%] w-[85%] object-contain" />
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-          <span>Criterio: 90% en 2 sesiones</span>
-          <span className="font-semibold text-slate-700">Grupo 2 de 4</span>
         </div>
       </div>
     </div>
@@ -206,6 +164,106 @@ function MaquetaGrafico() {
   )
 }
 
+const BENEFICIOS = [
+  { titulo: 'Lenguaje con comprensión', texto: 'El alumno no repite: entiende que la palabra, la imagen y el objeto «van juntos» y lo usa en situaciones nuevas.' },
+  { titulo: 'Aprendizaje que se multiplica', texto: 'Cada relación enseñada hace emerger otras sin entrenarlas. Se avanza más con menos ensayos.' },
+  { titulo: 'Base de habilidades complejas', texto: 'Comparar, ordenar en el tiempo, categorizar o seguir reglas «si… entonces» son formas de relacionar.' },
+  { titulo: 'Cognición social', texto: 'Toma de perspectiva, analogías, metáforas y lenguaje figurado: la conducta verbal compleja que más cuesta enseñar.' },
+]
+
+const NIVELES = [
+  { numero: 1, nombre: 'Fundamentos', texto: 'Atención conjunta, peticiones, correspondencia y primeras claves de coordinación.' },
+  { numero: 2, nombre: 'Coordinación y equivalencia', texto: 'Vínculo mutuo y combinatorio, lectura funcional y transformación de funciones.' },
+  { numero: 3, nombre: 'Marcos relacionales', texto: 'Distinción, oposición, comparación, espacio, tiempo, jerarquía y condicionalidad.' },
+  { numero: 4, nombre: 'Deícticos y cognición social', texto: 'Toma de perspectiva, analogías y metáforas, lenguaje figurado, ACT y autorregulación.' },
+]
+
+// Esquema del aprendizaje derivado: se enseñan dos relaciones y emergen cuatro
+function MaquetaDerivacion() {
+  const nodo = 'absolute flex flex-col items-center justify-center gap-1 rounded-2xl border-2 bg-white shadow-md'
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-6">
+      <div className="relative mx-auto aspect-[5/4] w-full max-w-md">
+        <svg viewBox="0 0 100 80" className="absolute inset-0 h-full w-full" aria-hidden>
+          <defs>
+            <marker id="flecha" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--brand-primary)" />
+            </marker>
+            <marker id="flecha-derivada" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--brand-accent)" />
+            </marker>
+          </defs>
+          <line x1="30" y1="15" x2="70" y2="15" stroke="var(--brand-primary)" strokeWidth="1.2" markerEnd="url(#flecha)" />
+          <line x1="70" y1="20" x2="30" y2="20" stroke="var(--brand-accent)" strokeWidth="1" strokeDasharray="2 1.5" markerEnd="url(#flecha-derivada)" />
+          <line x1="78" y1="30" x2="58" y2="56" stroke="var(--brand-primary)" strokeWidth="1.2" markerEnd="url(#flecha)" />
+          <line x1="54" y1="54" x2="73" y2="29" stroke="var(--brand-accent)" strokeWidth="1" strokeDasharray="2 1.5" markerEnd="url(#flecha-derivada)" />
+          <line x1="22" y1="30" x2="42" y2="56" stroke="var(--brand-accent)" strokeWidth="1" strokeDasharray="2 1.5" markerStart="url(#flecha-derivada)" markerEnd="url(#flecha-derivada)" />
+        </svg>
+        <div className={`${nodo} left-0 top-0 h-[34%] w-[28%] border-slate-200`}>
+          <Image src="/landing/vaca-1.webp" alt="" width={96} height={96} className="h-[70%] w-[70%] object-contain" />
+          <span className="text-[10px] font-semibold text-slate-500">imagen</span>
+        </div>
+        <div className={`${nodo} right-0 top-0 h-[34%] w-[28%] border-slate-200`}>
+          <span className="font-serif text-lg font-bold text-slate-800 sm:text-2xl">vaca</span>
+          <span className="text-[10px] font-semibold text-slate-500">palabra escrita</span>
+        </div>
+        <div className={`${nodo} bottom-0 left-1/2 h-[34%] w-[28%] -translate-x-1/2 border-slate-200`}>
+          <span className="text-2xl sm:text-3xl" aria-hidden>🔊</span>
+          <span className="text-[10px] font-semibold text-slate-500">«vaca», oída</span>
+        </div>
+      </div>
+      <div className="mt-5 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-slate-600 sm:text-sm">
+        <span className="flex items-center gap-2"><span className="h-0.5 w-6" style={{ backgroundColor: 'var(--brand-primary)' }} /> 2 relaciones enseñadas</span>
+        <span className="flex items-center gap-2"><span className="h-0.5 w-6 border-t-2 border-dashed" style={{ borderColor: 'var(--brand-accent)' }} /> 4 que emergen sin enseñarlas</span>
+      </div>
+    </div>
+  )
+}
+
+// Los cuatro niveles del currículo como una escalera
+function EscaleraNiveles() {
+  const alturas = ['lg:mt-24', 'lg:mt-16', 'lg:mt-8', 'lg:mt-0']
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+      {NIVELES.map((n, i) => (
+        <div
+          key={n.numero}
+          className={`rounded-2xl border bg-white p-5 shadow-sm ${alturas[i]}`}
+          style={{ borderColor: i === 3 ? 'var(--brand-accent)' : 'var(--brand-primary-soft)' }}
+        >
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white"
+            style={{ backgroundColor: i === 3 ? 'var(--brand-accent)' : 'var(--brand-primary)', opacity: 0.55 + i * 0.15 }}
+          >
+            {n.numero}
+          </span>
+          <p className="mt-3 font-semibold text-slate-800">Nivel {n.numero} · {n.nombre}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{n.texto}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function FormaDeTrabajo({ eyebrow, titulo, texto, items, children, acento }: {
+  eyebrow: string
+  titulo: string
+  texto: string
+  items: string[]
+  children?: React.ReactNode
+  acento?: boolean
+}) {
+  return (
+    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: acento ? '#aa5541' : 'var(--brand-primary)' }}>{eyebrow}</p>
+      <h3 className="mt-2 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{titulo}</h3>
+      <p className="mt-3 text-base leading-7 text-slate-600">{texto}</p>
+      <Lista items={items} />
+      {children && <div className="mt-auto pt-6">{children}</div>}
+    </div>
+  )
+}
+
 function Bloque({
   eyebrow,
   titulo,
@@ -260,6 +318,7 @@ export default async function Home() {
           <span className="truncate text-base font-bold tracking-tight text-slate-800 sm:text-lg">abacontext</span>
         </div>
         <nav className="flex shrink-0 items-center gap-3 sm:gap-6">
+          <a href="#curriculo" className="hidden text-sm font-medium text-slate-600 hover:text-slate-900 md:inline">El currículo</a>
           <a href="#como-funciona" className="hidden text-sm font-medium text-slate-600 hover:text-slate-900 md:inline">Cómo funciona</a>
           <a href="#precio" className="hidden text-sm font-medium text-slate-600 hover:text-slate-900 md:inline">Precio</a>
           <Link href="/login" className="whitespace-nowrap text-xs font-medium text-slate-600 hover:text-slate-900 sm:text-sm">
@@ -283,24 +342,24 @@ export default async function Home() {
               className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide"
               style={{ backgroundColor: 'var(--brand-primary-soft)', color: 'var(--brand-primary-dark)' }}
             >
-              <Nodo /> Software para centros y terapeutas ABA
+              <Nodo /> Currículo RFT en español · para centros y terapeutas
             </p>
-            <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              Deja el papel. Enseña con un currículo{' '}
-              <span style={{ color: '#aa5541' }}>ABA y RFT ya preparado.</span>
+            <h1 className="mt-5 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] lg:leading-[1.15]">
+              Un currículo desde la RFT para promover el{' '}
+              <span style={{ color: '#aa5541' }}>aprendizaje relacional</span> y la conducta verbal compleja
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
-              Programas listos para aplicar, datos ensayo a ensayo en la tableta y gráficos de
-              progreso que tu equipo y las familias entienden. Todo en una sola app, creada por un
-              psicólogo que lleva 20 años dirigiendo un centro ABA.
+              El primer currículo de RFT en español, construido desde la investigación: 159 programas
+              para enseñar a relacionar, no solo a responder. Úsalo tal cual o adáptalo a cada alumno,
+              con los datos en el móvil o en la tableta.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <BotonPrueba />
               <a
-                href="#como-funciona"
+                href="#curriculo"
                 className="rounded-lg border border-slate-300 px-6 py-3 text-center text-base font-medium text-slate-700 hover:bg-white"
               >
-                Ver cómo funciona
+                Ver el currículo
               </a>
             </div>
             <p className="mt-4 text-sm text-slate-500">14 días gratis · sin permanencia · cancela cuando quieras</p>
@@ -325,61 +384,135 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Dolores */}
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-8 sm:py-20">
-        <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">¿Te suena?</h2>
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {DOLORES.map((d) => (
-            <div key={d.texto} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--brand-accent-soft)', color: '#aa5541' }}>
-                <d.Icono className="h-5 w-5" strokeWidth={2} />
-              </span>
-              <p className="text-base leading-relaxed text-slate-700">{d.texto}</p>
+      {/* Por qué relacionar */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#aa5541' }}>Por qué enseñar a relacionar</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              Enseñas dos relaciones. Aparecen cuatro más.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
+              Si el alumno aprende que esta imagen va con la palabra escrita «vaca», y la palabra
+              escrita con la palabra oída, puede relacionar el resto sin que nadie se lo enseñe. Ese
+              aprendizaje derivado es la base del lenguaje con significado, y es lo que la Teoría del
+              Marco Relacional permite enseñar paso a paso.
+            </p>
+          </div>
+          <MaquetaDerivacion />
+        </div>
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {BENEFICIOS.map((b) => (
+            <div key={b.titulo} className="rounded-2xl border border-slate-200 bg-white p-5">
+              <p className="font-semibold text-slate-800">{b.titulo}</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{b.texto}</p>
             </div>
           ))}
         </div>
-        <p className="mt-10 text-center text-lg font-semibold text-slate-800">
-          Abacontext se encarga de todo eso, para que tú te dediques a enseñar.
-        </p>
+      </section>
+
+      {/* El currículo */}
+      <section id="curriculo" className="scroll-mt-6 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: 'var(--brand-primary)' }}>Un currículo único en español</p>
+            <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              El primer currículo de RFT aplicado en español
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
+              Construido desde la investigación y probado en el día a día de un centro. Va de las
+              primeras claves relacionales a la toma de perspectiva y el lenguaje figurado, y cada
+              programa trae sus fases de entrenamiento y de prueba: vínculo mutuo, combinatorio y
+              transformación de funciones.
+            </p>
+          </div>
+          <div className="mt-12">
+            <EscaleraNiveles />
+          </div>
+          <p className="mt-8 text-center text-sm text-slate-500">
+            4 niveles · 16 dominios · 159 programas, que se desbloquean en orden a medida que el alumno los domina.
+          </p>
+        </div>
+      </section>
+
+      {/* Dos formas de trabajar */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Dos formas de trabajar</h2>
+          <p className="mt-3 text-base text-slate-600 sm:text-lg">Sigue el camino que te proponemos o trázalo tú. Puedes mezclar las dos con el mismo alumno.</p>
+        </div>
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <FormaDeTrabajo
+            eyebrow="Guiado"
+            titulo="El currículo te lleva de la mano"
+            texto="La app te propone el siguiente programa según lo que el alumno ya domina, con las clases y los estímulos preparados."
+            items={[
+              'Evaluación inicial y PEI que se arma solo desde el currículo.',
+              'Clases y estímulos propuestos, con más de 1.400 imágenes.',
+              'Ideal para empezar o para equipos con poca experiencia en RFT.',
+            ]}
+          >
+            <div className="grid grid-cols-6 gap-2">
+              {['elefante-1', 'manzana-1', 'autobus-1', 'jirafa-1', 'platano-1', 'buho-1'].map((s) => (
+                <div key={s} className="flex aspect-square items-center justify-center rounded-lg border border-slate-100 bg-white">
+                  <Image src={`/landing/${s}.webp`} alt="" width={72} height={72} className="h-[85%] w-[85%] object-contain" />
+                </div>
+              ))}
+            </div>
+          </FormaDeTrabajo>
+          <FormaDeTrabajo
+            acento
+            eyebrow="A tu manera"
+            titulo="Tú decides qué y cómo se enseña"
+            texto="Cuando el alumno necesita otra cosa, la creas. Con el mismo rigor en la toma de datos y los mismos gráficos."
+            items={[
+              'Crea tus propios programas, o clona uno del currículo y adáptalo.',
+              'Añade clases y estímulos propios a cada alumno.',
+              'Toma los datos con material físico, anotando en el móvil, o con el alumno en la tableta.',
+            ]}
+          />
+        </div>
       </section>
 
       {/* Cómo funciona */}
       <section id="como-funciona" className="scroll-mt-6 bg-white">
-        <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:space-y-28 sm:px-8 sm:py-24">
-          <Bloque
-            eyebrow="1 · El currículo"
-            titulo="No empiezas de una hoja en blanco"
-            texto="159 programas de aprendizaje directo y relacional, ordenados en 4 niveles y 16 dominios. Cada uno trae sus estímulos con imagen, sus grupos y su criterio de dominio."
-            items={[
-              'Evaluación inicial y PEI que se arma solo desde el currículo.',
-              'Cada nivel y dominio se desbloquea al conseguir el anterior.',
-              'Evaluación de preferencias (MSWO y MSW) guiada paso a paso.',
-            ]}
-            maqueta={<MaquetaCurriculo />}
-          />
-          <Bloque
-            invertido
-            eyebrow="2 · La sesión"
-            titulo="Los datos se toman solos, ensayo a ensayo"
-            texto="En los programas RFT el alumno responde directamente en la tableta y cada ensayo queda registrado. En el resto, anotas con un toque desde el móvil, con una mano."
-            items={[
-              'Ensayo discreto y las cuatro fases del aprendizaje relacional.',
-              'Registros de conducta: intervalo, duración, tasa y ABC.',
-              'Funciona sin conexión: no se pierde nada si se corta el wifi.',
-            ]}
-            maqueta={<MaquetaMovil />}
-          />
-          <Bloque
-            eyebrow="3 · El progreso"
-            titulo="Gráficos que nadie tiene que traducir"
-            texto="Línea base, intervención y tendencia se dibujan solas con cada sesión. La familia ve el progreso de su hijo e informes en lenguaje claro, sin que tengas que redactarlos."
-            items={[
-              'Todo el equipo trabaja sobre el mismo plan y los mismos datos.',
-              'Portal de familia con progreso por niveles y dominios.',
-              'Informes para familias generados con IA.',
-            ]}
-            maqueta={<MaquetaGrafico />}
-          />
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Y el día a día, sin papel</h2>
+          </div>
+          <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2">
+            {DOLORES.map((d) => (
+              <div key={d.texto} className="flex items-start gap-3 rounded-xl p-3 text-sm text-slate-600" style={{ backgroundColor: 'var(--brand-accent-soft)' }}>
+                <d.Icono className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#aa5541' }} strokeWidth={2} />
+                <span><span className="line-through decoration-slate-400">{d.texto}</span></span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-16 space-y-20 sm:space-y-28">
+            <Bloque
+              invertido
+              eyebrow="La sesión"
+              titulo="Los datos se toman solos, ensayo a ensayo"
+              texto="En la tableta el alumno responde en la pantalla y cada ensayo queda registrado. Con material físico, anotas con un toque desde el móvil, con una mano."
+              items={[
+                'Ensayo discreto y las fases del aprendizaje relacional.',
+                'Registros de conducta: intervalo, duración, tasa y ABC.',
+                'Funciona sin conexión: no se pierde nada si se corta el wifi.',
+              ]}
+              maqueta={<MaquetaMovil />}
+            />
+            <Bloque
+              eyebrow="El progreso"
+              titulo="Gráficos que nadie tiene que traducir"
+              texto="Línea base, intervención y tendencia se dibujan solas con cada sesión. La familia ve el progreso de su hijo e informes en lenguaje claro, sin que tengas que redactarlos."
+              items={[
+                'Todo el equipo trabaja sobre el mismo plan y los mismos datos.',
+                'Portal de familia con progreso por niveles y dominios.',
+                'Informes para familias generados con IA.',
+              ]}
+              maqueta={<MaquetaGrafico />}
+            />
+          </div>
         </div>
       </section>
 
@@ -387,15 +520,15 @@ export default async function Home() {
       <section style={{ backgroundColor: 'var(--brand-primary)' }}>
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-2">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-white/70">Lo que nos diferencia</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-white/70">Quién hay detrás</p>
             <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              El primer currículo de RFT aplicado en español
+              De la investigación a la sala de terapia
             </h2>
             <p className="mt-4 text-base leading-7 text-white/85 sm:text-lg">
-              La mayoría de herramientas se quedan en el aprendizaje directo. Abacontext integra
-              desde el primer día el currículo, la toma de datos y los gráficos de la Teoría del
-              Marco Relacional (RFT): equivalencia, coordinación, distinción, comparación… Con el
-              mismo criterio clínico, no como un módulo aparte que nunca encuentra hueco.
+              La investigación en RFT lleva décadas mostrando cómo se aprende a relacionar, pero
+              casi nunca llega al trabajo diario con los alumnos. Abacontext traslada esa evidencia a
+              programas concretos, con sus estímulos, sus fases y sus criterios, para que cualquier
+              profesional pueda aplicarla con el mismo rigor que el aprendizaje directo.
             </p>
           </div>
           <div className="rounded-2xl bg-white p-6 sm:p-8">
