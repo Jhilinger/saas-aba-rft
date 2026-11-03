@@ -467,7 +467,7 @@ export default async function Home() {
             texto="Cuando el alumno necesita otra cosa, la creas. Con el mismo rigor en la toma de datos y los mismos gráficos."
             items={[
               'Crea tus propios programas, o clona uno del currículo y adáptalo.',
-              'Añade clases y estímulos propios a cada alumno.',
+              'Añade clases y estímulos propios a cada alumno, con tus propias fotos.',
               'Toma los datos con material físico, anotando en el móvil, o con el alumno en la tableta.',
             ]}
           />
