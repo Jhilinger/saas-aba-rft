@@ -55,11 +55,20 @@ const AJUSTES = {
   Nublado: ['a dry green meadow under a completely overcast sky of thick grey clouds, no rain', 'a calm town square under a heavy grey cloudy sky, dry ground, no rain', 'a beach under a sky completely covered by big grey clouds, no rain'],
   Niebla: ['a foggy day landscape', 'a street with lampposts and trees fading into thick white fog, only the nearest ones visible', 'a foggy day landscape, another different example'],
   Granizo: ['close-up of many white hailstones, round balls of ice, piled on a green lawn', 'round white hailstones bouncing on a car bonnet, close-up', 'a hand-sized pile of round white hailstones on a wooden table outside, close-up, the ice balls clearly visible'],
+  'El sol brilla': ['a bright round sun high in a clear deep-blue sky above a green meadow, the sun disc clearly visible', 'a bright sun shining over a calm blue sea on a cloudless day, the sun disc clearly visible', 'a bright sun shining over a small village with red roofs on a cloudless summer day, the sun disc clearly visible'],
+  Blancanieves: [
+    "a children's illustration of a fairy-tale princess with black hair and a red apple in the forest, with seven little bearded miners, no text",
+    "a children's illustration of seven little bearded miners with lanterns walking home through the forest, a black-haired fairy-tale princess waving at the door of their small cottage, no text",
+    "a children's illustration of a black-haired fairy-tale princess in a tiny cottage with seven little beds, friendly forest animals around her, no text",
+  ],
+  // Mismo nombre en otra categoría: se distingue con la categoría delante
+  'objetos/Bicicleta': ['a blue city bicycle with a front basket, side view', 'a bicycle, a different model, color or variety from the first one', 'a single bicycle, different-looking again, seen from a different angle'],
 }
 
 const porCategoria = new Map()
 for (const [, c] of Object.entries(inv.conceptos)) {
-  porCategoria.set(c.categoria, [...(porCategoria.get(c.categoria) ?? []), { concepto: c.nombre, ejemplares: AJUSTES[c.nombre] ?? ejemplares(c.categoria, c.en) }])
+  const ajuste = AJUSTES[`${c.categoria}/${c.nombre}`] ?? AJUSTES[c.nombre]
+  porCategoria.set(c.categoria, [...(porCategoria.get(c.categoria) ?? []), { concepto: c.nombre, ejemplares: ajuste ?? ejemplares(c.categoria, c.en) }])
 }
 const programas = [...porCategoria].map(([categoria, conceptos]) => ({ programa: `Inventario · ${categoria}`, categoria, grupos: [conceptos] }))
 writeFileSync(path.join(aqui, 'generar.json'), JSON.stringify({ descripcion: 'Banco de imágenes de los programas RFT (inventario 2026-11)', programas }, null, 1))

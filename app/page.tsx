@@ -17,7 +17,7 @@ function Nodo() {
 const CIFRAS = [
   { valor: '159', texto: 'programas listos para aplicar' },
   { valor: '4 × 16', texto: 'niveles y dominios de aprendizaje' },
-  { valor: '+1.000', texto: 'imágenes de estímulos incluidas' },
+  { valor: '+1.400', texto: 'imágenes de estímulos incluidas' },
   { valor: '0', texto: 'datos perdidos si se corta el wifi' },
 ]
 
