@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { crearClinica } from './actions'
 import { Button } from '../../ui'
+import { PAISES, paisPorCodigo } from '@/utils/tarifas'
 
 export default function CrearClinicaForm() {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [paisCodigo, setPaisCodigo] = useState('ES')
+  const moneda = paisPorCodigo(paisCodigo)?.moneda ?? 'EUR'
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
 
@@ -24,6 +27,7 @@ export default function CrearClinicaForm() {
             return
           }
           formRef.current?.reset()
+          setPaisCodigo('ES')
           router.refresh()
         })
       }}
@@ -44,17 +48,22 @@ export default function CrearClinicaForm() {
           />
         </div>
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Cuota fija mensual (€)</label>
-          <input
-            name="precio_fijo_mensual"
-            type="number"
-            step="0.01"
-            defaultValue="0"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
+          <label className="text-sm text-slate-600">País</label>
+          <select
+            name="pais_codigo"
+            value={paisCodigo}
+            onChange={(e) => setPaisCodigo(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base sm:text-sm"
+          >
+            {PAISES.map((p) => (
+              <option key={p.codigo} value={p.codigo}>
+                {p.nombre}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="space-y-1">
-          <label className="text-sm text-slate-600">Precio por alumno (€)</label>
+          <label className="text-sm text-slate-600">Precio por alumno ({moneda})</label>
           <input
             name="precio_por_alumno"
             type="number"

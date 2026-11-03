@@ -21,7 +21,7 @@ export default async function ClinicasPage() {
 
     const { data: clinicasData, error } = await supabase
     .from('clinicas')
-    .select('id, nombre, logo_url, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, activa, sin_facturacion, created_at, telefono, ciudad, pais')
+    .select('id, nombre, logo_url, estado_suscripcion, precio_fijo_mensual, precio_por_alumno, activa, sin_facturacion, created_at, telefono, ciudad, pais, moneda')
     .order('created_at', { ascending: false })
 
   const { data: admins } = await supabase

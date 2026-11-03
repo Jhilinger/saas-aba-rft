@@ -17,6 +17,7 @@ type Clinica = {
   telefono: string | null
   ciudad: string | null
   pais: string | null
+  moneda: string
   admin_nombre: string | null
   admin_email: string | null
 }
@@ -37,6 +38,7 @@ export default function ClinicasTabla({ clinicas }: { clinicas: Clinica[] }) {
       'Estado suscripción': c.estado_suscripcion,
       'Cuota fija': c.precio_fijo_mensual,
       'Precio por alumno': c.precio_por_alumno,
+      Moneda: c.moneda,
       'Sin facturación': c.sin_facturacion ? 'Sí' : 'No',
       Admin: c.admin_nombre ?? '—',
       Email: c.admin_email ?? '—',

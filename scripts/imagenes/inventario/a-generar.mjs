@@ -61,6 +61,12 @@ const AJUSTES = {
     "a children's illustration of seven little bearded miners with lanterns walking home through the forest, a black-haired fairy-tale princess waving at the door of their small cottage, no text",
     "a children's illustration of a black-haired fairy-tale princess in a tiny cottage with seven little beds, friendly forest animals around her, no text",
   ],
+  // Forma clásica de cinco puntas, la que el niño reconoce como «estrella»
+  'universo/Estrella': [
+    'a glowing golden five-pointed star, the classic star shape, shining against a dark blue night sky',
+    'a large bright silver-white five-pointed star, the classic star shape, filling most of the picture, glowing in a dark night sky',
+    'a shining yellow five-pointed star, the classic star shape, with a soft glow, in a deep purple night sky with a few tiny distant stars',
+  ],
   // Mismo nombre en otra categoría: se distingue con la categoría delante
   'objetos/Bicicleta': ['a blue city bicycle with a front basket, side view', 'a bicycle, a different model, color or variety from the first one', 'a single bicycle, different-looking again, seen from a different angle'],
 }

@@ -3,18 +3,20 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { paisPorCodigo } from '@/utils/tarifas'
 
 export async function crearClinica(formData: FormData) {
   const supabase = await createClient()
   const admin = createAdminClient()
 
   const nombre = formData.get('nombre') as string
-  const precio_fijo_mensual = parseFloat(formData.get('precio_fijo_mensual') as string) || 0
+  const pais = paisPorCodigo(formData.get('pais_codigo') as string)
   const precio_por_alumno = parseFloat(formData.get('precio_por_alumno') as string) || 0
   const nombre_admin = formData.get('nombre_admin') as string
   const email_admin = formData.get('email_admin') as string
   const password_admin = formData.get('password_admin') as string
   const logo = formData.get('logo') as File | null
+  if (!pais) return { error: 'Elige el país de la clínica.' }
 
   // 1. Creamos la clínica (sin_facturacion=true: la ha dado de alta el
   // superadmin a mano, sin pasar por el checkout de Stripe)
@@ -22,7 +24,11 @@ export async function crearClinica(formData: FormData) {
     .from('clinicas')
     .insert({
       nombre,
-      precio_fijo_mensual,
+      pais: pais.nombre,
+      pais_codigo: pais.codigo,
+      escalon: pais.escalon,
+      moneda: pais.moneda,
+      precio_fijo_mensual: 0,
       precio_por_alumno,
       sin_facturacion: true,
       estado_suscripcion: 'active',

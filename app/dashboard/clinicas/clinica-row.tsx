@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { editarClinica, archivarClinica, reactivarClinica } from './actions'
 import { useConfirm } from '../../providers/confirm-provider'
 import { useToast } from '../../providers/toast-provider'
+import { formatearImporte } from '@/utils/tarifas'
 
 type Clinica = {
   id: string
@@ -18,6 +19,7 @@ type Clinica = {
   telefono: string | null
   ciudad: string | null
   pais: string | null
+  moneda: string
   admin_nombre: string | null
   admin_email: string | null
 }
@@ -159,8 +161,8 @@ export default function ClinicaRow({ clinica }: { clinica: Clinica }) {
         <td className="p-3">
           <EstadoBadge estado={clinica.estado_suscripcion} />
         </td>
-        <td className="p-3 text-slate-600">{clinica.precio_fijo_mensual} €</td>
-        <td className="p-3 text-slate-600">{clinica.precio_por_alumno} €</td>
+        <td className="p-3 text-slate-600">{formatearImporte(Number(clinica.precio_fijo_mensual), clinica.moneda)}</td>
+        <td className="p-3 text-slate-600">{formatearImporte(Number(clinica.precio_por_alumno), clinica.moneda)}</td>
         <td className="p-3 flex gap-3">
           <button
             onClick={() => setMostrarContacto((v) => !v)}
