@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { FASES_QUE_REQUIEREN_CONEXION, construirGrafoEntrenado, estanConectadas } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 import { duracionValida, latenciaMedia, latenciaValida } from '../../tiempos'
+import { leerEscalonBloque } from '../../../sin-error'
+import type { Json } from '@/database.types'
 
 type EnsayoInput = {
   claseId: string
@@ -61,7 +63,9 @@ export async function guardarBloqueRft(
   notas?: string,
   duracionSegundos?: number | null,
   controles: ControlInput[] = [],
-  modo: 'material' | 'tableta' = 'material'
+  modo: 'material' | 'tableta' = 'material',
+  // Escalón de aprendizaje sin error con que se hizo el bloque (solo entrenamiento)
+  sinError: unknown = null
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -112,6 +116,8 @@ export async function guardarBloqueRft(
     }
   }
 
+  const escalon = fase === 'entrenamiento' ? leerEscalonBloque(sinError as Json) : null
+
   const totalEnsayos = ensayos.length
   // Solo cuenta como acierto si fue correcto Y sin ayuda (independiente).
   // Un acierto con ayuda se guarda igualmente en el detalle, pero no suma al %.
@@ -135,6 +141,7 @@ export async function guardarBloqueRft(
       num_comparativos: numComparativos,
       total_ensayos: totalEnsayos,
       modo: modo === 'tableta' ? 'tableta' : 'material',
+      sin_error: escalon,
       aciertos,
       notas: notas?.trim() || null,
     })

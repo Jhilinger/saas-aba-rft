@@ -2,8 +2,10 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosRftClient from './tomar-datos-rft-client'
+import type { Json } from '@/database.types'
 import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 import { cargarImagenes } from '../../../imagenes-estimulo'
+import { leerSinError } from '../../../sin-error'
 
 export default async function TomarDatosRftPage({
   params,
@@ -38,7 +40,7 @@ export default async function TomarDatosRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
+      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, sin_error, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
     )
     .eq('id', programaId)
     .single()
@@ -69,6 +71,24 @@ export default async function TomarDatosRftPage({
     .select('grupo, fase, posicion_origen, posicion_destino')
     .eq('programa_alumno_id', programaId)
     .eq('dominado', true)
+
+  // Aprendizaje sin error: escalón del último bloque de cada grupo y relación
+  const sinError = leerSinError(programa.sin_error)
+  const ultimosEscalones: Record<string, Json> = {}
+  if (sinError?.activo) {
+    const { data: bloquesSinError } = await supabase
+      .from('bloques_ensayo_rft')
+      .select('grupo, posicion_origen, posicion_destino, sin_error')
+      .eq('programa_alumno_id', programaId)
+      .eq('fase', 'entrenamiento')
+      .not('sin_error', 'is', null)
+      .order('fecha', { ascending: false })
+      .limit(300)
+    for (const b of bloquesSinError ?? []) {
+      const clave = `${b.grupo}__${b.posicion_origen}__${b.posicion_destino}`
+      if (!(clave in ultimosEscalones) && b.sin_error) ultimosEscalones[clave] = b.sin_error
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
@@ -103,6 +123,8 @@ export default async function TomarDatosRftPage({
         }}
         secuenciaPrograma={programa.secuencia_rft}
         imagenes={imagenes}
+        sinError={sinError?.activo ? sinError : null}
+        ultimosEscalones={ultimosEscalones}
       />
     </div>
   )

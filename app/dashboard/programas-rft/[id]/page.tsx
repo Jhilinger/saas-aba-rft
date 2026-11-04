@@ -13,6 +13,8 @@ import type { Enums, Tables } from '@/database.types'
 import PanelAlertas from '../../panel-alertas'
 import { cargarAlertas } from '../../cargar-alertas'
 import { cargarImagenes } from '../../imagenes-estimulo'
+import SinErrorPanel from './sin-error-panel'
+import { leerSinError } from '../../sin-error'
 
 const NOMBRE_FASE: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
@@ -56,7 +58,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -193,6 +195,7 @@ export default async function ProgramaRftPage({
       {disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
       {disena && <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} />}
       {infoPanel}
+      <SinErrorPanel programaAlumnoId={id} config={leerSinError(programa.sin_error)} soloLectura={!disena} />
 
       <ProgramaRftClient
         programaAlumnoId={id}

@@ -4,9 +4,10 @@ import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
-import type { Tables } from '@/database.types'
+import type { Json, Tables } from '@/database.types'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 import { validarRespuestasEsperadas } from '../../respuestas-rft'
+import { errorConfig, leerSinError } from '../../sin-error'
 
 // Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
 // puede ver este programa antes de usar el cliente admin para el borrado en
@@ -255,5 +256,26 @@ export async function guardarRespuestasEsperadas(claseId: string, programaAlumno
   if (error) return { error: error.message }
 
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  return { success: true }
+}
+
+// --- APRENDIZAJE SIN ERROR ---
+
+export async function guardarSinError(programaAlumnoId: string, config: unknown) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  const valida = leerSinError(config as Json)
+  if (!valida) return { error: 'Configuración no válida' }
+  const problema = errorConfig(valida)
+  if (problema) return { error: problema }
+
+  const { error } = await supabase.from('programas_alumno').update({ sin_error: valida }).eq('id', programaAlumnoId)
+  if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/tomar-datos/rft/${programaAlumnoId}`)
   return { success: true }
 }

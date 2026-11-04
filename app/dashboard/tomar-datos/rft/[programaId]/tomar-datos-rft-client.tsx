@@ -21,6 +21,15 @@ import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../.
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
 import PantallaTablet, { esOido, esVisible, type ImagenesBanco } from './pantalla-tablet'
+import {
+  describirEscalon,
+  leerEscalonBloque,
+  siguienteEscalon,
+  textoMovimiento,
+  type ConfigSinError,
+  type Escalon,
+  type EscalonBloque,
+} from '../../../sin-error'
 import AyudaTermino from '../../../ayuda-termino'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
@@ -113,6 +122,16 @@ function ordenEstable(valor: string) {
   return [...valor].reduce((total, caracter) => total + caracter.charCodeAt(0), 0)
 }
 
+// Orden pseudoaleatorio pero reproducible (no cambia al volver a pintar)
+function hashEstable(valor: string) {
+  let h = 2166136261
+  for (const caracter of valor) h = Math.imul(h ^ caracter.charCodeAt(0), 16777619)
+  return h >>> 0
+}
+
+// Escalón de aprendizaje sin error con que se hace un bloque
+type EscalonActivo = { indice: number; total: number; escalon: Escalon; comparaciones: number; tamano: boolean }
+
 // Con material físico o en la tableta (solo si el bloque se puede presentar en pantalla)
 function SelectorModo({
   disponible,
@@ -147,6 +166,7 @@ function TarjetaRecomendacion({
   onTamano,
   onEmpezar,
   selectorModo,
+  apoyo,
 }: {
   rec: Recomendacion
   conGrupo: boolean
@@ -155,6 +175,7 @@ function TarjetaRecomendacion({
   onTamano: (n: number) => void
   onEmpezar: () => void
   selectorModo: React.ReactNode
+  apoyo: Escalon | null
 }) {
   return (
     <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
@@ -170,6 +191,7 @@ function TarjetaRecomendacion({
           <AyudaTermino clave="secuencia" />
           {ejemplo && ` · ej.: ${ejemplo}`}
         </p>
+        {apoyo && <LineaApoyo escalon={apoyo} />}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {[10, 20].map((n) => (
@@ -192,6 +214,14 @@ function TarjetaRecomendacion({
   )
 }
 
+function LineaApoyo({ escalon }: { escalon: Escalon }) {
+  return (
+    <p className="mt-1 text-xs text-amber-700">
+      Aprendizaje sin error: <strong>{escalon.nombre}</strong> · {describirEscalon(escalon)}
+    </p>
+  )
+}
+
 export default function TomarDatosRftClient({
   programaAlumnoId,
   alumnoId,
@@ -206,6 +236,8 @@ export default function TomarDatosRftClient({
   respuesta,
   secuenciaPrograma,
   imagenes,
+  sinError,
+  ultimosEscalones,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -222,6 +254,9 @@ export default function TomarDatosRftClient({
   secuenciaPrograma: Json
   // Imágenes del banco por concepto y ejemplar (modo tableta)
   imagenes: ImagenesBanco
+  // Aprendizaje sin error (solo si está activo) y escalón del último bloque por grupo__origen__destino
+  sinError: ConfigSinError | null
+  ultimosEscalones: Record<string, Json>
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -239,6 +274,13 @@ export default function TomarDatosRftClient({
   const [modo, setModo] = useState<'material' | 'tableta'>('material')
   const [enTableta, setEnTableta] = useState(false)
   const modoBloqueRef = useRef<'material' | 'tableta'>('material')
+  // Escalón de apoyo del bloque en curso (null = sin aprendizaje sin error)
+  const escalonRef = useRef<EscalonActivo | null>(null)
+  const [escalonBloque, setEscalonBloque] = useState<EscalonActivo | null>(null)
+  const fijarEscalon = (e: EscalonActivo | null) => {
+    escalonRef.current = e
+    setEscalonBloque(e)
+  }
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
@@ -250,6 +292,7 @@ export default function TomarDatosRftClient({
     clasesDominadasAhora: string[]
     derivado: boolean
     controles: { total: number; aciertos: number }
+    escalon: EscalonBloque | null
   } | null>(null)
   // Respuesta de opciones elegida, a falta de marcar ✓/✗ (si la clase no tiene respuesta esperada)
   const [respuestaPendiente, setRespuestaPendiente] = useState<string | null>(null)
@@ -328,6 +371,18 @@ export default function TomarDatosRftClient({
       numComparativos: number,
       duracionSegundos: number | null
     ) => {
+      const activo = escalonRef.current
+      const conApoyo = listaEnsayos.length ? listaEnsayos.filter((e) => e.correcto).length / listaEnsayos.length : 0
+      const escalon: EscalonBloque | null =
+        activo && faseActual === 'entrenamiento'
+          ? {
+              ...activo.escalon,
+              indice: activo.indice,
+              total: activo.total,
+              final: activo.indice === activo.total - 1,
+              aciertos_con_apoyo: Math.round(conApoyo * 100),
+            }
+          : null
       startTransition(async () => {
         try {
           const res = await guardarBloqueRft(
@@ -337,7 +392,7 @@ export default function TomarDatosRftClient({
             faseActual,
             origen,
             destino,
-            numComparativos,
+            escalon ? activo!.comparaciones : numComparativos,
             listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs, respuesta }) => ({
               claseId,
               estimuloOrigenId,
@@ -351,7 +406,8 @@ export default function TomarDatosRftClient({
             notasActuales,
             duracionSegundos,
             controlesRef.current,
-            modoBloqueRef.current
+            modoBloqueRef.current,
+            escalon
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -368,6 +424,7 @@ export default function TomarDatosRftClient({
               total: controlesRef.current.length,
               aciertos: controlesRef.current.filter((c) => c.correcto).length,
             },
+            escalon,
           })
         } catch (e) {
           if (esFalloDeRed(e)) {
@@ -398,6 +455,7 @@ export default function TomarDatosRftClient({
       duracionBloque?: number | null
       controles?: ControlRft[]
       modo?: 'material' | 'tableta'
+      escalon?: EscalonActivo | null
     }>(claveProgreso)
     if (guardado) {
       setGrupoSeleccionado(guardado.grupoSeleccionado)
@@ -413,6 +471,7 @@ export default function TomarDatosRftClient({
       controlesRef.current = guardado.controles ?? []
       setControles(guardado.controles ?? [])
       modoBloqueRef.current = guardado.modo ?? 'material'
+      fijarEscalon(guardado.escalon ?? null)
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
         const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
         const numComparativos = clasesDelGrupoGuardado.filter(
@@ -455,11 +514,36 @@ export default function TomarDatosRftClient({
 
   const claseActualId = secuencia?.[ensayos.length]?.id
 
+  // Distractores de otros grupos del programa, para escalones con más
+  // opciones que clases tiene el grupo (solo los que se ven en pantalla)
+  const distractoresExtra = (grupo: string, destino: string, validas: Clase[]) => {
+    const nombres = new Set(validas.map((c) => encontrarEstimulo(c, destino)?.nombre))
+    return clases.filter((c) => {
+      const e = c.grupo !== grupo ? encontrarEstimulo(c, destino) : undefined
+      if (!e || !esVisible(e) || nombres.has(e.nombre)) return false
+      nombres.add(e.nombre)
+      return true
+    })
+  }
+
   const comparativos = (() => {
     if (!secuencia) return []
     const claseActual = secuencia[ensayos.length]
     if (!claseActual) return []
-    return clasesValidas
+    let opciones = clasesValidas
+    if (escalonBloque) {
+      // Con aprendizaje sin error: la correcta y tantos distractores como pida el escalón
+      const semilla = `${ensayos.length}-${claseActual.id}`
+      const distractores = [
+        ...clasesValidas.filter((c) => c.id !== claseActual.id),
+        ...distractoresExtra(claseActual.grupo, posicionDestino, clasesValidas),
+      ]
+        .map((c, i) => ({ c, orden: hashEstable(`${semilla}-${c.id}`) + (i < clasesValidas.length - 1 ? 0 : 2 ** 32) }))
+        .sort((a, b) => a.orden - b.orden)
+        .map((x) => x.c)
+      opciones = [claseActual, ...distractores.slice(0, escalonBloque.comparaciones - 1)]
+    }
+    return opciones
       .map((c) => ({
         claseId: c.id,
         estimulo: encontrarEstimulo(c, posicionDestino)!,
@@ -478,11 +562,17 @@ export default function TomarDatosRftClient({
       toast('Antes hay que dominar en entrenamiento una cadena de relaciones que conecte esas posiciones.', 'error')
       return
     }
-    iniciarBloque(clasesValidas, grupoSeleccionado ? modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) : 'material')
+    const modoInicial = grupoSeleccionado ? modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) : 'material'
+    iniciarBloque(
+      clasesValidas,
+      modoInicial,
+      grupoSeleccionado ? escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoInicial, clasesValidas) : null
+    )
   }
 
-  const iniciarBloque = (validas: Clase[], modoInicial: 'material' | 'tableta' = modo) => {
+  const iniciarBloque = (validas: Clase[], modoInicial: 'material' | 'tableta' = modo, escalon: EscalonActivo | null = null) => {
     modoBloqueRef.current = modoInicial
+    fijarEscalon(escalon)
     setEnTableta(modoInicial === 'tableta')
     setSecuencia(generarSecuenciaClases(validas, tamanoBloque))
     setInicioBloque(marcaDeTiempo())
@@ -522,6 +612,39 @@ export default function TomarDatosRftClient({
   const modoPara = (grupo: string, origen: string, destino: string, faseBloque: string) =>
     modo === 'tableta' && tabletaPosible(grupo, origen, destino, faseBloque) ? 'tableta' : 'material'
 
+  // Aprendizaje sin error: solo en entrenamiento, en la tableta y si las
+  // opciones se ven en pantalla. El escalón sale del último bloque hecho con él
+  const escalonPara = (
+    grupo: string,
+    origen: string,
+    destino: string,
+    faseBloque: string,
+    modoBloque: 'material' | 'tableta',
+    validas: Clase[]
+  ): EscalonActivo | null => {
+    if (!sinError || faseBloque !== 'entrenamiento' || modoBloque !== 'tableta') return null
+    if (!validas.every((c) => esVisible(encontrarEstimulo(c, destino)!))) return null
+    const { indice } = siguienteEscalon(sinError, leerEscalonBloque(ultimosEscalones[`${grupo}__${origen}__${destino}`]))
+    const escalon = sinError.escalones[indice]
+    const disponibles = validas.length + distractoresExtra(grupo, destino, validas).length
+    return {
+      indice,
+      total: sinError.escalones.length,
+      escalon,
+      comparaciones: Math.min(escalon.comparaciones ?? validas.length, disponibles),
+      tamano: sinError.tamano,
+    }
+  }
+  const apoyoRecomendado = (rec: Recomendacion) =>
+    escalonPara(
+      rec.grupo,
+      rec.paso.origen,
+      rec.paso.destino,
+      rec.paso.fase,
+      modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase),
+      clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)
+    )?.escalon ?? null
+
   // Ejemplo con los estímulos reales de la primera clase que encaja
   const ejemploDe = (rec: Recomendacion) => {
     const clase = clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)[0]
@@ -546,7 +669,8 @@ export default function TomarDatosRftClient({
     setPosicionOrigen(rec.paso.origen)
     setPosicionDestino(rec.paso.destino)
     setTipoSonda('normal')
-    iniciarBloque(validas, modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase))
+    const modoInicial = modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase)
+    iniciarBloque(validas, modoInicial, escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, modoInicial, validas))
   }
 
   const registrar = (correcto: boolean, ayuda: string, pregunta?: string, respuestaAlumno?: string | null) => {
@@ -602,8 +726,9 @@ export default function TomarDatosRftClient({
       duracionBloque,
       controles,
       modo: modoBloqueRef.current,
+      escalon: escalonRef.current,
     })
-  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso])
+  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso, escalonBloque])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -623,6 +748,16 @@ export default function TomarDatosRftClient({
         {hayDominio && (
           <p className="text-sm text-amber-700">{resultado.porcentaje}% de acierto en este último bloque</p>
         )}
+        {resultado.escalon && sinError && (() => {
+          const { indice, movimiento } = siguienteEscalon(sinError, resultado.escalon)
+          return (
+            <p className="text-sm text-slate-600">
+              {resultado.escalon.nombre}: {resultado.escalon.aciertos_con_apoyo}% de aciertos con o sin ayuda en pantalla
+              {movimiento && <strong className="block text-amber-800">{textoMovimiento(movimiento, sinError.escalones[indice])}</strong>}
+              {!resultado.escalon.final && <span className="block text-xs text-slate-500">Los bloques con apoyo no cuentan para el dominio.</span>}
+            </p>
+          )
+        })()}
         {resultado.controles.total > 0 && (
           <p className="text-sm text-slate-600">
             Ensayos de control: {resultado.controles.aciertos}/{resultado.controles.total} correctos (no cuentan para el dominio)
@@ -678,6 +813,7 @@ export default function TomarDatosRftClient({
             tamanoBloque={tamanoBloque}
             onTamano={setTamanoBloque}
             onEmpezar={() => empezarRecomendado(recomendacionGlobal)}
+            apoyo={apoyoRecomendado(recomendacionGlobal)}
             selectorModo={
               <SelectorModo
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
@@ -727,6 +863,7 @@ export default function TomarDatosRftClient({
           tamanoBloque={tamanoBloque}
           onTamano={setTamanoBloque}
           onEmpezar={() => empezarRecomendado(recomendacionGrupo)}
+          apoyo={apoyoRecomendado(recomendacionGrupo)}
           selectorModo={
             <SelectorModo
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
@@ -899,6 +1036,10 @@ export default function TomarDatosRftClient({
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
               <SelectorModo disponible modo={modo} onCambiar={setModo} />
             </span>
+            {(() => {
+              const e = escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva), clasesValidas)
+              return e && <LineaApoyo escalon={e.escalon} />
+            })()}
           </div>
         )}
 
@@ -990,6 +1131,14 @@ export default function TomarDatosRftClient({
         ensayo={ensayos.length}
         total={secuencia.length}
         imagenes={imagenes}
+        apoyo={
+          escalonBloque && {
+            nombre: escalonBloque.escalon.nombre,
+            opacidad: escalonBloque.escalon.opacidad,
+            tamano: escalonBloque.tamano,
+            demora: escalonBloque.escalon.demora,
+          }
+        }
         onResponder={(correcto, ayuda, respuestaAlumno) => registrar(correcto, ayuda, undefined, respuestaAlumno)}
         onMuestra={() => cronometro.reiniciar()}
         onSalir={() => setEnTableta(false)}

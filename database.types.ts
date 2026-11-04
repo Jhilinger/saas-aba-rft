@@ -396,6 +396,7 @@ export type Database = {
           posicion_destino: string | null
           posicion_origen: string | null
           programa_alumno_id: string
+          sin_error: Json | null
           terapeuta_id: string
           total_ensayos: number
         }
@@ -417,6 +418,7 @@ export type Database = {
           posicion_destino?: string | null
           posicion_origen?: string | null
           programa_alumno_id: string
+          sin_error?: Json | null
           terapeuta_id: string
           total_ensayos?: number
         }
@@ -438,6 +440,7 @@ export type Database = {
           posicion_destino?: string | null
           posicion_origen?: string | null
           programa_alumno_id?: string
+          sin_error?: Json | null
           terapeuta_id?: string
           total_ensayos?: number
         }
@@ -1879,6 +1882,7 @@ export type Database = {
           programa_base_id: string | null
           respuesta_por_fase: Json
           secuencia_rft: Json | null
+          sin_error: Json | null
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta: string
@@ -1912,6 +1916,7 @@ export type Database = {
           programa_base_id?: string | null
           respuesta_por_fase?: Json
           secuencia_rft?: Json | null
+          sin_error?: Json | null
           terapeuta_id: string
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string
@@ -1945,6 +1950,7 @@ export type Database = {
           programa_base_id?: string | null
           respuesta_por_fase?: Json
           secuencia_rft?: Json | null
+          sin_error?: Json | null
           terapeuta_id?: string
           tipo?: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string

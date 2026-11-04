@@ -1,6 +1,7 @@
 import type { createClient } from '@/utils/supabase/server'
 import { alertasDeUnidad, type Alerta, type BloqueAlerta } from './alertas-progreso'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from './secuencia-rft'
+import { leerEscalonBloque } from './sin-error'
 
 type Supabase = Awaited<ReturnType<typeof createClient>>
 
@@ -41,7 +42,7 @@ export async function cargarAlertas(supabase: Supabase, alumnoIds: string[], pro
   let consultaRft = supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, alumno_id, bloques_ensayo_rft(fecha, porcentaje, fase, grupo, posicion_origen, posicion_destino, latencia_media_ms, aciertos, controles_total, controles_aciertos, ensayos_rft_detalle(correcto, ayuda, tipo_ensayo)), dominio_rft_fases(grupo, fase, posicion_origen, posicion_destino, dominado)'
+      'id, nombre, alumno_id, bloques_ensayo_rft(fecha, porcentaje, fase, grupo, posicion_origen, posicion_destino, latencia_media_ms, aciertos, controles_total, controles_aciertos, sin_error, ensayos_rft_detalle(correcto, ayuda, tipo_ensayo)), dominio_rft_fases(grupo, fase, posicion_origen, posicion_destino, dominado)'
     )
     .in('alumno_id', alumnoIds)
     .eq('tipo', 'rft')
@@ -86,6 +87,9 @@ export async function cargarAlertas(supabase: Supabase, alumnoIds: string[], pro
     const unidades = new Map<string, BloqueAlerta[]>()
     for (const b of [...(p.bloques_ensayo_rft ?? [])].reverse()) {
       if (b.porcentaje === null) continue
+      // Bloques con apoyo del aprendizaje sin error: la ayuda es parte del procedimiento
+      const escalon = leerEscalonBloque(b.sin_error)
+      if (escalon && !escalon.final) continue
       const clave = `${b.grupo ?? ''}|${b.fase}|${b.posicion_origen ?? ''}|${b.posicion_destino ?? ''}`
       if (dominadas.has(clave)) continue
       const lista = unidades.get(clave) ?? []

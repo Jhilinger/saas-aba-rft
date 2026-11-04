@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { useEtapasEnsayo } from '../../../etapas-ensayo'
 import { decir } from '../../../voz'
@@ -20,6 +20,9 @@ export type EstimuloTablet = { id: string; nombre: string; concepto_imagen: stri
 export type ComparativoTablet = { claseId: string; estimulo: EstimuloTablet; esCorrecto: boolean }
 // concepto → ejemplar → URL pública
 export type ImagenesBanco = Record<string, Record<string, string>>
+// Aprendizaje sin error: opacidad (y tamaño) de los distractores y segundos
+// hasta que se resalta la correcta (null = sin ayuda en pantalla)
+export type ApoyoTablet = { nombre: string; opacidad: number; tamano: boolean; demora: number | null }
 
 const AYUDAS = [
   { value: 'verbal', label: 'Verbal' },
@@ -93,6 +96,7 @@ function EnsayoTablet({
   fase,
   ensayo,
   imagenes,
+  apoyo,
   onResponder,
   onMuestra,
 }: {
@@ -101,7 +105,8 @@ function EnsayoTablet({
   fase: string
   ensayo: number
   imagenes: ImagenesBanco
-  onResponder: (correcto: boolean, respuesta: string | null) => void
+  apoyo: ApoyoTablet | null
+  onResponder: (correcto: boolean, respuesta: string | null, conAyudaPantalla: boolean) => void
   onMuestra: () => void
 }) {
   const muestraOida = esOido(origen)
@@ -116,6 +121,18 @@ function EnsayoTablet({
   const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
   const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
   const conMuestra = etapa === 'muestra'
+  // Ayuda en pantalla: la correcta se resalta pasada la demora desde la muestra
+  const demora = apoyo?.demora ?? null
+  const [resaltada, setResaltada] = useState(false)
+  useEffect(() => {
+    if (!conMuestra || demora === null) return
+    const t = setTimeout(() => setResaltada(true), demora * 1000)
+    return () => clearTimeout(t)
+  }, [conMuestra, demora])
+  const estiloDistractor = (c: ComparativoTablet) => {
+    if (!apoyo || c.esCorrecto || apoyo.opacidad >= 1) return undefined
+    return { opacity: apoyo.opacidad, transform: apoyo.tamano ? `scale(${0.4 + 0.6 * apoyo.opacidad})` : undefined }
+  }
 
   return (
     <>
@@ -155,9 +172,11 @@ function EnsayoTablet({
                 <button
                   key={c.claseId}
                   type="button"
-                  onClick={() => conMuestra && onResponder(c.esCorrecto, textoOido(c.estimulo.nombre))}
-                  style={{ width: ladoOpcion, height: ladoOpcion }}
-                  className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98]"
+                  onClick={() => conMuestra && onResponder(c.esCorrecto, textoOido(c.estimulo.nombre), resaltada)}
+                  style={{ width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) }}
+                  className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                    resaltada && c.esCorrecto ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300' : 'border-slate-200'
+                  }`}
                 >
                   <Tarjeta
                     estimulo={c.estimulo}
@@ -175,8 +194,8 @@ function EnsayoTablet({
       <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
         {respuestaOral && conMuestra && (
           <>
-            <BotonLargo onActivar={() => onResponder(true, null)}>✓ Correcto</BotonLargo>
-            <BotonLargo onActivar={() => onResponder(false, null)}>✗ Incorrecto</BotonLargo>
+            <BotonLargo onActivar={() => onResponder(true, null, false)}>✓ Correcto</BotonLargo>
+            <BotonLargo onActivar={() => onResponder(false, null, false)}>✗ Incorrecto</BotonLargo>
           </>
         )}
       </div>
@@ -191,6 +210,7 @@ export default function PantallaTablet({
   ensayo,
   total,
   imagenes,
+  apoyo = null,
   onResponder,
   onMuestra,
   onSalir,
@@ -201,6 +221,7 @@ export default function PantallaTablet({
   ensayo: number
   total: number
   imagenes: ImagenesBanco
+  apoyo?: ApoyoTablet | null
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null) => void
   // Aparece la muestra: desde aquí se mide la latencia
   onMuestra: () => void
@@ -210,9 +231,10 @@ export default function PantallaTablet({
   const [menuAyuda, setMenuAyuda] = useState(false)
   const [menuVoz, setMenuVoz] = useState(false)
 
-  const responder = (correcto: boolean, respuesta: string | null) => {
-    // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda)
-    onResponder(correcto, correcto && ayuda ? ayuda : 'independiente', respuesta)
+  const responder = (correcto: boolean, respuesta: string | null, conAyudaPantalla: boolean) => {
+    // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
+    // un acierto después de resaltarse la correcta es un acierto con ayuda visual
+    onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta)
     setAyuda(null)
   }
 
@@ -222,6 +244,7 @@ export default function PantallaTablet({
         <p className="text-[11px] text-slate-300">
           {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? (fase === 'generalizacion' ? 'Sonda de generalización' : fase === 'mantenimiento' ? 'Sonda de mantenimiento' : fase)} ·{' '}
           {ensayo + 1}/{total}
+          {apoyo && <span className="ml-2">· {apoyo.nombre}</span>}
           {ayuda && <span className="ml-2 font-semibold text-amber-500">ayuda: {AYUDAS.find((a) => a.value === ayuda)?.label}</span>}
         </p>
         <span className="flex gap-2">
@@ -244,6 +267,7 @@ export default function PantallaTablet({
         fase={fase}
         ensayo={ensayo}
         imagenes={imagenes}
+        apoyo={apoyo}
         onResponder={responder}
         onMuestra={onMuestra}
       />
