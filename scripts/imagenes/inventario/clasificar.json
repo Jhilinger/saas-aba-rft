@@ -1,0 +1,16 @@
+{
+ "descripcion": "Miembros de «Clasificar en Categorías» que faltaban en el banco (2026-11)",
+ "programas": [
+  {
+   "programa": "Inventario · objetos",
+   "categoria": "objetos",
+   "grupos": [
+    [
+     { "concepto": "Almohada", "ejemplares": ["a white bed pillow", "a bed pillow with a light blue pillowcase, a different shape from the first one", "a single bed pillow with a patterned pillowcase, seen from a different angle"] },
+     { "concepto": "Rueda", "ejemplares": ["a single car wheel with its black tyre and silver rim, standing upright, side view", "a single car wheel with a black tyre and a dark rim, three-quarter view", "a single car wheel with a white-wall tyre and a chrome rim, front view, standing upright"] },
+     { "concepto": "Ventana", "ejemplares": ["a closed house window with a white frame and glass panes, front view, no wall around it", "an open wooden house window with two panes, front view, no wall around it", "a single round-topped house window with a dark frame, front view, no wall around it"] }
+    ]
+   ]
+  }
+ ]
+}

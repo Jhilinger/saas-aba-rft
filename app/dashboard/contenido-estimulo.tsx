@@ -67,7 +67,8 @@ export default function ContenidoEstimulo({
     )
   }
   if ('color' in estimulo) {
-    return <span className="block rounded-2xl" style={{ width: f(0.8), height: f(0.8), backgroundColor: estimulo.color }} />
+    // Borde fino para que el blanco (y los tonos claros) se distingan del fondo
+    return <span className="block rounded-2xl ring-1 ring-slate-300" style={{ width: f(0.8), height: f(0.8), backgroundColor: estimulo.color }} />
   }
   if ('t' in estimulo) {
     return (

@@ -1,7 +1,9 @@
 // Sube las imágenes procesadas (web/) al bucket «biblioteca» y las registra en
 // biblioteca_imagenes. Idempotente: sobrescribe el archivo y actualiza la fila.
 //
-//   node --env-file=.env.local scripts/imagenes/subir.mjs
+//   node --env-file=.env.local scripts/imagenes/subir.mjs [--solo objetos/rueda,objetos/ventana]
+//
+// --solo limita la subida a esos conceptos (categoría/concepto, en slug).
 //
 // Ejemplares 1 y 2 → entrenamiento; 3 → generalización; eval → evaluación.
 
@@ -12,6 +14,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const aqui = path.dirname(fileURLToPath(import.meta.url))
 const web = path.join(aqui, 'web')
+
+const indiceSolo = process.argv.indexOf('--solo')
+const solo = indiceSolo > -1 ? new Set(process.argv[indiceSolo + 1].split(',')) : null
 
 const USO = { 1: 'entrenamiento', 2: 'entrenamiento', 3: 'generalizacion', eval: 'evaluacion' }
 
@@ -38,6 +43,7 @@ async function main() {
     const uso = USO[p.ejemplar]
     if (!uso) throw new Error(`Ejemplar desconocido: ${p.relativo}`)
     const concepto = `${slug(p.categoria)}/${slug(p.concepto)}`
+    if (solo && !solo.has(concepto)) continue
     const ruta = `${concepto}-${p.ejemplar}.webp`
     const { error: errorSubida } = await supabase.storage
       .from('biblioteca')
