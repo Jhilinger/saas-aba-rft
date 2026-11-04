@@ -19,7 +19,7 @@ import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../nive
 import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronometro'
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
-import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type Recomendacion } from '../../../secuencia-rft'
+import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
 import PantallaTablet, { esOido, esVisible, type ImagenesBanco } from './pantalla-tablet'
 import {
   describirEscalon,
@@ -127,6 +127,23 @@ function hashEstable(valor: string) {
   let h = 2166136261
   for (const caracter of valor) h = Math.imul(h ^ caracter.charCodeAt(0), 16777619)
   return h >>> 0
+}
+
+// Bloque guardado en el dispositivo mientras se toma (ver offline-sync)
+type ProgresoGuardado = {
+  secuencia: Clase[]
+  ensayos: EnsayoRft[]
+  notas: string
+  grupoSeleccionado: string
+  fase: string
+  posicionOrigen: string
+  posicionDestino: string
+  tamanoBloque: number
+  inicioBloque?: number | null
+  duracionBloque?: number | null
+  controles?: ControlRft[]
+  modo?: 'material' | 'tableta'
+  escalon?: EscalonActivo | null
 }
 
 // Escalón de aprendizaje sin error con que se hace un bloque
@@ -439,58 +456,65 @@ export default function TomarDatosRftClient({
     [programaAlumnoId, alumnoId, claveProgreso, toast]
   )
 
-  // Restaura un bloque en curso (o completo pero sin sincronizar todavía) si
-  // se recargó la página o se cerró tras un fallo de red.
-  useEffect(() => {
-    const guardado = leerProgreso<{
-      secuencia: Clase[]
-      ensayos: EnsayoRft[]
-      notas: string
-      grupoSeleccionado: string
-      fase: string
-      posicionOrigen: string
-      posicionDestino: string
-      tamanoBloque: number
-      inicioBloque?: number | null
-      duracionBloque?: number | null
-      controles?: ControlRft[]
-      modo?: 'material' | 'tableta'
-      escalon?: EscalonActivo | null
-    }>(claveProgreso)
-    if (guardado) {
-      setGrupoSeleccionado(guardado.grupoSeleccionado)
-      setFase(guardado.fase)
-      setPosicionOrigen(guardado.posicionOrigen)
-      setPosicionDestino(guardado.posicionDestino)
-      setTamanoBloque(guardado.tamanoBloque)
-      setSecuencia(guardado.secuencia)
-      setEnsayos(guardado.ensayos)
-      setNotas(guardado.notas)
-      setInicioBloque(guardado.inicioBloque ?? null)
-      setDuracionBloque(guardado.duracionBloque ?? null)
-      controlesRef.current = guardado.controles ?? []
-      setControles(guardado.controles ?? [])
-      modoBloqueRef.current = guardado.modo ?? 'material'
-      fijarEscalon(guardado.escalon ?? null)
-      if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
-        const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
-        const numComparativos = clasesDelGrupoGuardado.filter(
-          (c) => encontrarEstimulo(c, guardado.posicionOrigen) && encontrarEstimulo(c, guardado.posicionDestino)
-        ).length
-        intentarGuardar(
-          guardado.ensayos,
-          guardado.notas,
-          guardado.grupoSeleccionado,
-          guardado.fase,
-          guardado.posicionOrigen,
-          guardado.posicionDestino,
-          numComparativos,
-          guardado.duracionBloque ?? null
-        )
-      }
+  const restaurar = (guardado: ProgresoGuardado) => {
+    setGrupoSeleccionado(guardado.grupoSeleccionado)
+    setFase(guardado.fase)
+    setPosicionOrigen(guardado.posicionOrigen)
+    setPosicionDestino(guardado.posicionDestino)
+    setTamanoBloque(guardado.tamanoBloque)
+    setSecuencia(guardado.secuencia)
+    setEnsayos(guardado.ensayos)
+    setNotas(guardado.notas)
+    setInicioBloque(guardado.inicioBloque ?? null)
+    setDuracionBloque(guardado.duracionBloque ?? null)
+    controlesRef.current = guardado.controles ?? []
+    setControles(guardado.controles ?? [])
+    modoBloqueRef.current = guardado.modo ?? 'material'
+    fijarEscalon(guardado.escalon ?? null)
+    if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
+      const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
+      const numComparativos = clasesDelGrupoGuardado.filter(
+        (c) => encontrarEstimulo(c, guardado.posicionOrigen) && encontrarEstimulo(c, guardado.posicionDestino)
+      ).length
+      intentarGuardar(
+        guardado.ensayos,
+        guardado.notas,
+        guardado.grupoSeleccionado,
+        guardado.fase,
+        guardado.posicionOrigen,
+        guardado.posicionDestino,
+        numComparativos,
+        guardado.duracionBloque ?? null
+      )
     }
+  }
+
+  // Bloque a medias guardado en el dispositivo: se pregunta si continuarlo o
+  // descartarlo, para que no se imponga al grupo que se ha elegido
+  const [pendiente, setPendiente] = useState<ProgresoGuardado | null>(null)
+
+  // Al cargar: un bloque completo pero sin sincronizar (fallo de red) se guarda
+  // sin preguntar; uno a medias, se ofrece continuarlo.
+  useEffect(() => {
+    const guardado = leerProgreso<ProgresoGuardado>(claveProgreso)
+    if (!guardado) return
+    if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) restaurar(guardado)
+    else if (guardado.ensayos.length === 0) borrarProgreso(claveProgreso)
+    else setPendiente(guardado)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const descartarBloque = () => {
+    borrarProgreso(claveProgreso)
+    setSecuencia(null)
+    setEnsayos([])
+    setNotas('')
+    fijarControles([])
+    fijarEscalon(null)
+    setEnTableta(false)
+    setInicioBloque(null)
+    setDuracionBloque(null)
+  }
 
   // Reintenta solo en cuanto vuelva la conexión, y muestra un aviso mientras
   // se está tomando el bloque sin conexión.
@@ -799,6 +823,42 @@ export default function TomarDatosRftClient({
         }
         onVolver={() => router.push(`/dashboard/programas-rft/${programaAlumnoId}`)}
       />
+    )
+  }
+
+  if (pendiente && !secuencia) {
+    return (
+      <Panel className="space-y-4 p-4 sm:p-6">
+        <div>
+          <p className="font-semibold text-slate-800">Hay un bloque sin terminar en este dispositivo</p>
+          <p className="text-sm text-slate-600">
+            {pendiente.grupoSeleccionado} · {NOMBRE_FASE_SECUENCIA[pendiente.fase as FaseSecuencia] ?? pendiente.fase}{' '}
+            {pendiente.posicionOrigen}→{pendiente.posicionDestino} · {pendiente.ensayos.length} de {pendiente.secuencia.length} ensayos
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            onClick={() => {
+              restaurar(pendiente)
+              setPendiente(null)
+            }}
+            className="py-3 text-base sm:py-2 sm:text-sm"
+          >
+            Continuar ese bloque
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              borrarProgreso(claveProgreso)
+              setPendiente(null)
+            }}
+            className="py-3 text-base sm:py-2 sm:text-sm"
+          >
+            Descartarlo y empezar otro
+          </Button>
+        </div>
+        <p className="text-xs text-slate-500">Si lo descartas, esos ensayos no se guardan.</p>
+      </Panel>
     )
   }
 
@@ -1170,6 +1230,14 @@ export default function TomarDatosRftClient({
               Deshacer último
             </button>
           )}
+          <button
+            onClick={() => {
+              if (ensayos.length === 0 || window.confirm('¿Descartar este bloque? Los ensayos registrados no se guardarán.')) descartarBloque()
+            }}
+            className="text-slate-500 hover:text-slate-700"
+          >
+            Descartar bloque
+          </button>
         </span>
       </div>
       <div
