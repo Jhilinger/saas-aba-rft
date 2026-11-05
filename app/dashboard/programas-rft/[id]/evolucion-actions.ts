@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { calcularDistribucionAyudas, type DistribucionAyuda } from '../../ayuda-tipos'
+import { calcularDistribucionAyudas, type DistribucionAyuda, type FilaConAyuda } from '../../ayuda-tipos'
 
 export async function obtenerEvolucionRft(programaAlumnoId: string) {
   const supabase = await createClient()
@@ -52,13 +52,13 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
   // independiente por definición).
   const { data: bloquesEntrenamiento } = await supabase
     .from('bloques_ensayo_rft')
-    .select('grupo, ensayos_rft_detalle(ayuda)')
+    .select('grupo, ensayos_rft_detalle(ayuda, correcto, nivel_ayuda)')
     .eq('programa_alumno_id', programaAlumnoId)
     .eq('fase', 'entrenamiento')
     // Los ensayos de control no forman parte del entrenamiento
     .eq('ensayos_rft_detalle.tipo_ensayo', 'principal')
 
-  const ensayosPorGrupo: Record<string, { ayuda: string | null }[]> = {}
+  const ensayosPorGrupo: Record<string, FilaConAyuda[]> = {}
   for (const b of bloquesEntrenamiento ?? []) {
     if (!b.grupo) continue
     if (!ensayosPorGrupo[b.grupo]) ensayosPorGrupo[b.grupo] = []
@@ -67,9 +67,7 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
 
   const distribucionPorGrupo: Record<string, DistribucionAyuda[]> = {}
   for (const grupo of Object.keys(ensayosPorGrupo)) {
-    distribucionPorGrupo[grupo] = calcularDistribucionAyudas(
-      ensayosPorGrupo[grupo] as { ayuda: import('@/database.types').Enums<'tipo_ayuda'> | null }[]
-    )
+    distribucionPorGrupo[grupo] = calcularDistribucionAyudas(ensayosPorGrupo[grupo])
   }
 
   return { porFase, distribucionPorGrupo }

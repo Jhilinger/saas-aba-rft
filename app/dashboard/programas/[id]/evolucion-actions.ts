@@ -39,19 +39,21 @@ export async function obtenerEvolucionAba(programaAlumnoId: string) {
     })
   )
 
-  // Distribución de tipos de ayuda usados en todo el programa (todos los
-  // conjuntos juntos), para el donut de "cuánta ayuda hizo falta".
+  // Distribución de tipos de ayuda en la intervención (todos los conjuntos
+  // juntos), para el donut de "cuánta ayuda hizo falta". La línea base y las
+  // sondas se dejan fuera, como en RFT solo cuenta el entrenamiento.
   const { data: bloquesTodos } = await supabase
     .from('bloques_ensayo')
     .select('id')
     .in('conjunto_id', conjuntos.map((c) => c.id))
+    .eq('fase', 'intervencion')
 
   const bloqueIds = (bloquesTodos ?? []).map((b) => b.id)
   const ensayos = bloqueIds.length
     ? (
         await supabase
           .from('ensayos_aba_detalle')
-          .select('ayuda')
+          .select('ayuda, correcto')
           .in('bloque_id', bloqueIds)
       ).data ?? []
     : []
