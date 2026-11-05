@@ -94,7 +94,7 @@ function Escenario({
                 <span
                   key={i}
                   style={{ width: ladoModelo, height: ladoModelo }}
-                  className={`flex items-center justify-center rounded-[2.5vmin] border border-slate-200 border-t-[1.2vmin] border-t-[#0F4C5C] bg-white shadow-md ${activo ? '' : 'invisible'}`}
+                  className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm ${activo ? '' : 'invisible'}`}
                 >
                   <ContenidoEstimulo estimulo={m} lado={ladoModelo} urlImagen={urlDe} />
                 </span>
@@ -108,7 +108,7 @@ function Escenario({
                   void decirConsigna(p.consigna)
                 }}
                 style={{ width: ladoAudio, height: ladoAudio }}
-                className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border border-slate-200 border-t-[1.2vmin] border-t-[#0F4C5C] bg-white shadow-md ${activo ? '' : 'invisible'}`}
+                className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm ${activo ? '' : 'invisible'}`}
                 aria-label="Escuchar de nuevo"
               >
                 <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>

@@ -44,7 +44,7 @@ export default function AjustesVoz() {
         Velocidad
         <input
           type="range"
-          min={0.6}
+          min={0.4}
           max={1.2}
           step={0.05}
           value={ajustes.velocidad}

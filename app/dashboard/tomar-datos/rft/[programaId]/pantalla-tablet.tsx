@@ -193,9 +193,11 @@ function Presentacion({
     return { opacity: opacidad, transform: apoyo?.tamano ? `scale(${0.4 + 0.6 * opacidad})` : undefined }
   }
 
+  // La muestra se presenta exactamente igual que las comparaciones: mismo
+  // tamaño y misma tarjeta (solo cambia el sitio, arriba)
   const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
-  const ladoMuestra = lado(1, respuestaOral ? 44 : 26, 7)
-  const ladoAudio = lado(1, 16, 7)
+  const ladoMuestra = ladoOpcion
+  const ladoAudio = ladoOpcion
   const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
   const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
   const tocarMuestra = () => {
@@ -203,8 +205,8 @@ function Presentacion({
     hablar()
     setObservada(true)
   }
-  // Muestra en tarjeta con franja superior turquesa; ámbar y latiendo cuando se repite como ayuda
-  const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-slate-200 border-t-[#0F4C5C]'
+  // Ámbar y latiendo cuando se repite la muestra como ayuda
+  const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-slate-200'
 
   return (
     <>
@@ -224,7 +226,7 @@ function Presentacion({
               type="button"
               onClick={tocarMuestra}
               style={{ width: ladoAudio, height: ladoAudio }}
-              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border border-t-[1.2vmin] bg-white shadow-md ${marcoMuestra}`}
+              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 bg-white shadow-sm ${marcoMuestra}`}
               aria-label="Escuchar de nuevo"
             >
               <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
@@ -239,7 +241,7 @@ function Presentacion({
               type="button"
               onClick={tocarMuestra}
               style={{ width: ladoMuestra, height: ladoMuestra }}
-              className={`flex items-center justify-center rounded-[2.5vmin] border border-t-[1.2vmin] bg-white shadow-md ${marcoMuestra}`}
+              className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm ${marcoMuestra}`}
             >
               <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} urlConcepto={urlConcepto} />
             </button>
