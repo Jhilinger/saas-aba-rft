@@ -8,7 +8,8 @@ const MAX_IMAGENES_CENTRO = 1000
 const MAX_BYTES = 512000
 const EXTENSION: Record<string, string> = { 'image/webp': 'webp', 'image/jpeg': 'jpg' }
 
-type Tabla = 'estimulos_rft' | 'estimulos_rft_base'
+type Tabla = 'estimulos_rft' | 'estimulos_rft_base' | 'estimulos_alumno' | 'estimulos_base'
+const TABLAS: Tabla[] = ['estimulos_rft', 'estimulos_rft_base', 'estimulos_alumno', 'estimulos_base']
 
 // Sube la imagen (ya comprimida en el navegador), la registra como concepto
 // propio del centro y se la asigna al estímulo
@@ -19,7 +20,7 @@ export async function subirImagenEstimulo(formData: FormData) {
   const tabla = formData.get('tabla') as Tabla
   const estimuloId = formData.get('estimulo_id') as string
   const archivo = formData.get('archivo') as File | null
-  if (!['estimulos_rft', 'estimulos_rft_base'].includes(tabla) || !estimuloId) return { error: 'Datos incompletos' }
+  if (!TABLAS.includes(tabla) || !estimuloId) return { error: 'Datos incompletos' }
   if (!archivo || !EXTENSION[archivo.type]) return { error: 'Formato de imagen no admitido' }
   if (archivo.size > MAX_BYTES) return { error: 'La imagen es demasiado grande' }
 
@@ -76,7 +77,7 @@ export async function subirImagenEstimulo(formData: FormData) {
 export async function quitarImagenEstimulo(tabla: Tabla, estimuloId: string) {
   const supabase = await createClient()
   if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
-  if (!['estimulos_rft', 'estimulos_rft_base'].includes(tabla)) return { error: 'Datos incompletos' }
+  if (!TABLAS.includes(tabla)) return { error: 'Datos incompletos' }
 
   const { data: actualizado, error } = await supabase
     .from(tabla)

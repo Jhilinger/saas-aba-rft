@@ -9,8 +9,13 @@ import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
 import { leerProgreso, guardarProgreso, borrarProgreso, esFalloDeRed } from '../../offline-sync'
 import { BannerSinConexion, PantallaGuardadoPendiente } from '../../estado-sincronizacion'
+import PantallaVasos from './pantalla-vasos'
+import { describirActividad, leerActividad } from '../../../vasos'
+import { urlImagen, type ImagenesBanco } from '../../rft/[programaId]/pantalla-tablet'
+import { desbloquearAudio, precargarFraseRft } from '../../../voz'
+import type { Json } from '@/database.types'
 
-type Estimulo = { id: string; nombre: string }
+type Estimulo = { id: string; nombre: string; concepto_imagen?: string | null }
 
 type EnsayoRegistrado = {
   estimuloId: string
@@ -70,6 +75,8 @@ export default function TomarDatosClient({
   ayudasPosibles,
   videoUrl,
   faseConjunto,
+  actividadTablet,
+  imagenes,
 }: {
   conjuntoId: string
   programaAlumnoId: string
@@ -80,7 +87,11 @@ export default function TomarDatosClient({
   ayudasPosibles: string | null
   videoUrl: string | null
   faseConjunto: 'linea_base' | 'adquisicion' | 'mantenimiento' | 'dominado' | 'pausado'
+  // Actividad en tableta del conjunto (juego de los vasos) e imágenes de los objetos
+  actividadTablet: Json
+  imagenes: ImagenesBanco
 }) {
+  const actividad = leerActividad(actividadTablet)
   const enLineaBase = faseConjunto === 'linea_base'
   const puedeSonda = faseConjunto === 'dominado' || faseConjunto === 'mantenimiento'
   const claveProgreso = `aba:${conjuntoId}`
@@ -97,6 +108,9 @@ export default function TomarDatosClient({
   const [ensayos, setEnsayos] = useState<EnsayoRegistrado[]>([])
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
+  // Con material o en la tableta (solo si el conjunto tiene actividad)
+  const [modo, setModo] = useState<'material' | 'tableta'>('material')
+  const [enTableta, setEnTableta] = useState(false)
   const [resultado, setResultado] = useState<{ porcentaje: number; dominioLogrado: boolean; tipoSonda: string } | null>(null)
   const [estadoGuardado, setEstadoGuardado] = useState<'idle' | 'pendiente' | 'error'>('idle')
   const [sinConexion, setSinConexion] = useState(false)
@@ -112,7 +126,8 @@ export default function TomarDatosClient({
       listaEnsayos: EnsayoRegistrado[],
       notasActuales: string,
       sondaActual: 'normal' | 'generalizacion' | 'mantenimiento',
-      duracionSegundos: number | null
+      duracionSegundos: number | null,
+      modoActual: 'material' | 'tableta' = 'material'
     ) => {
       startTransition(async () => {
         try {
@@ -123,7 +138,8 @@ export default function TomarDatosClient({
             listaEnsayos.map(({ estimuloId, correcto, ayuda, latenciaMs }) => ({ estimuloId, correcto, ayuda, latenciaMs })),
             notasActuales,
             sondaActual === 'normal' ? undefined : sondaActual,
-            duracionSegundos
+            duracionSegundos,
+            modoActual
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -157,6 +173,7 @@ export default function TomarDatosClient({
       tipoSonda: 'normal' | 'generalizacion' | 'mantenimiento'
       inicioBloque?: number | null
       duracionBloque?: number | null
+      modo?: 'material' | 'tableta'
     }>(claveProgreso)
     if (guardado) {
       setSecuencia(guardado.secuencia)
@@ -166,8 +183,9 @@ export default function TomarDatosClient({
       setTipoSonda(guardado.tipoSonda ?? 'normal')
       setInicioBloque(guardado.inicioBloque ?? null)
       setDuracionBloque(guardado.duracionBloque ?? null)
+      setModo(guardado.modo ?? 'material')
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
-        intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal', guardado.duracionBloque ?? null)
+        intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal', guardado.duracionBloque ?? null, guardado.modo ?? 'material')
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,7 +198,7 @@ export default function TomarDatosClient({
     actualizarEstado()
     const onOnline = () => {
       actualizarEstado()
-      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas, tipoSonda, duracionBloque)
+      if (estadoGuardado === 'pendiente') intentarGuardar(ensayos, notas, tipoSonda, duracionBloque, modo)
     }
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', actualizarEstado)
@@ -188,9 +206,13 @@ export default function TomarDatosClient({
       window.removeEventListener('online', onOnline)
       window.removeEventListener('offline', actualizarEstado)
     }
-  }, [estadoGuardado, ensayos, notas, tipoSonda, duracionBloque, intentarGuardar])
+  }, [estadoGuardado, ensayos, notas, tipoSonda, duracionBloque, modo, intentarGuardar])
 
   const empezarBloque = () => {
+    // Desde un toque: desbloquea el audio para la pregunta grabada
+    desbloquearAudio()
+    void precargarFraseRft('¿Dónde está?')
+    setEnTableta(modo === 'tableta' && !!actividad)
     setSecuencia(generarSecuencia(estimulos, tamanoBloque))
     setInicioBloque(Date.now())
     setDuracionBloque(null)
@@ -200,12 +222,12 @@ export default function TomarDatosClient({
     setEstadoGuardado('idle')
   }
 
-  const registrar = (correcto: boolean, ayuda: string) => {
+  const registrar = (correcto: boolean, ayuda: string, latenciaMs?: number) => {
     if (!secuencia) return
     const actual = secuencia[ensayos.length]
     const nuevos = [
       ...ensayos,
-      { estimuloId: actual.id, estimuloNombre: actual.nombre, correcto, ayuda, latenciaMs: cronometro.leer() },
+      { estimuloId: actual.id, estimuloNombre: actual.nombre, correcto, ayuda, latenciaMs: latenciaMs ?? cronometro.leer() },
     ]
     setEnsayos(nuevos)
     setMostrandoAyudas(false)
@@ -213,7 +235,8 @@ export default function TomarDatosClient({
     if (nuevos.length === secuencia.length) {
       const duracion = segundosDesde(inicioBloque)
       setDuracionBloque(duracion)
-      intentarGuardar(nuevos, notas, tipoSonda, duracion)
+      intentarGuardar(nuevos, notas, tipoSonda, duracion, modo)
+      setEnTableta(false)
     }
   }
 
@@ -224,8 +247,8 @@ export default function TomarDatosClient({
   // Guarda el progreso en el dispositivo según se registra cada ensayo
   useEffect(() => {
     if (!secuencia) return
-    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque })
-  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, claveProgreso])
+    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo })
+  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo, claveProgreso])
 
   if (resultado) {
     return (
@@ -282,7 +305,7 @@ export default function TomarDatosClient({
       <PantallaGuardadoPendiente
         tipo={estadoGuardado}
         reintentando={isPending}
-        onReintentar={() => intentarGuardar(ensayos, notas, tipoSonda, duracionBloque)}
+        onReintentar={() => intentarGuardar(ensayos, notas, tipoSonda, duracionBloque, modo)}
         onVolver={() => router.push(`/dashboard/programas/${programaAlumnoId}`)}
       />
     )
@@ -351,6 +374,25 @@ export default function TomarDatosClient({
             </button>
           ))}
         </div>
+        {actividad && (
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-slate-600">Presentación</p>
+            <div className="flex gap-2">
+              {(['material', 'tableta'] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setModo(m)}
+                  className={`flex-1 sm:flex-none rounded-lg px-4 py-3 sm:py-2 text-base sm:text-sm font-medium ${
+                    modo === m ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {m === 'material' ? 'Con material' : 'En la tableta'}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500">Juego de los vasos: {describirActividad(actividad)}</p>
+          </div>
+        )}
         <button
           onClick={empezarBloque}
           className="w-full rounded-lg bg-slate-800 py-4 sm:py-3 text-base font-semibold text-white hover:bg-slate-700"
@@ -368,6 +410,20 @@ export default function TomarDatosClient({
       <Panel className="p-8 text-center">
         <p className="text-slate-500">Guardando bloque...</p>
       </Panel>
+    )
+  }
+
+  if (enTableta && actividad) {
+    return (
+      <PantallaVasos
+        actividad={actividad}
+        imagen={urlImagen(imagenes, estimuloActual.concepto_imagen ?? null, tipoSonda === 'generalizacion' ? 'generalizacion' : 'entrenamiento', ensayos.length)}
+        nombre={estimuloActual.nombre}
+        ensayo={ensayos.length}
+        total={secuencia.length}
+        onResponder={(correcto, latenciaMs) => registrar(correcto, 'independiente', latenciaMs)}
+        onSalir={() => setEnTableta(false)}
+      />
     )
   }
 

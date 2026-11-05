@@ -22,7 +22,8 @@ export async function guardarBloqueAba(
   ensayos: EnsayoInput[],
   notas?: string,
   tipoSonda?: TipoSonda,
-  duracionSegundos?: number | null
+  duracionSegundos?: number | null,
+  modo: 'material' | 'tableta' = 'material'
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -66,6 +67,7 @@ export async function guardarBloqueAba(
       aciertos,
       notas: notas?.trim() || null,
       fase,
+      modo: modo === 'tableta' ? 'tableta' : 'material',
     })
     .select('id')
     .single()

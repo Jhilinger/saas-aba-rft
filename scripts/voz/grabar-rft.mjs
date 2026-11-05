@@ -20,6 +20,8 @@ const salida = path.join(aqui, 'salida')
 const VELOCIDAD = 0.9
 const CONCURRENCIA = 2
 const REINTENTOS = 4
+// Frases de las actividades de tableta que no salen de las claves relacionales
+const FRASES_FIJAS = { '¿Dónde está?': ['Seguir visualmente · juego de los vasos'] }
 
 const args = process.argv.slice(2)
 const solo = args.includes('--solo') ? Number(args[args.indexOf('--solo') + 1]) : Infinity
@@ -86,6 +88,7 @@ async function main() {
     }
   }
 
+  for (const [texto, usos] of Object.entries(FRASES_FIJAS)) frases.set(texto, [...(frases.get(texto) ?? []), ...usos])
   const lista = [...frases.keys()]
   const pendientes = []
   for (const texto of lista) {

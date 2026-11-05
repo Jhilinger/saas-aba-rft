@@ -80,6 +80,7 @@ export async function actualizarDesdePlantilla(
           conjunto_base_id: conjunto.id,
           nombre: conjunto.nombre,
           orden: conjunto.orden,
+          actividad_tablet: conjunto.actividad_tablet,
         })
         .select('id')
         .single()
@@ -91,6 +92,7 @@ export async function actualizarDesdePlantilla(
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+            concepto_imagen: e.concepto_imagen,
           }))
         )
         if (estimulosError) return { error: estimulosError.message }

@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { leerActividad } from '../../vasos'
+import type { Json } from '@/database.types'
 
 // Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
 // puede ver este programa antes de usar el cliente admin para el borrado en
@@ -156,5 +158,22 @@ export async function actualizarEstadoPrograma(
   revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   revalidatePath(`/dashboard/alumnos/${alumnoId}`)
   revalidatePath(`/dashboard/alumnos/${alumnoId}/progreso`)
+  return { success: true }
+}
+// Nivel del juego de los vasos en la tableta (null = sin actividad en tableta)
+export async function guardarActividadConjunto(conjuntoId: string, programaAlumnoId: string, actividad: unknown) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
+  const supabase = await createClient()
+  const valida = actividad === null ? null : leerActividad(actividad as Json)
+  if (actividad !== null && !valida) return { error: 'Actividad no válida' }
+  const { data, error } = await supabase
+    .from('conjuntos_estimulos_alumno')
+    .update({ actividad_tablet: valida })
+    .eq('id', conjuntoId)
+    .eq('programa_alumno_id', programaAlumnoId)
+    .select('id')
+  if (error) return { error: error.message }
+  if (!data?.length) return { error: 'No tienes permiso para editar este conjunto' }
+  revalidatePath(`/dashboard/programas/${programaAlumnoId}`)
   return { success: true }
 }

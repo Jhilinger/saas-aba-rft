@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import TomarDatosClient from './tomar-datos-client'
 import type { Tables } from '@/database.types'
+import { cargarImagenes } from '../../../imagenes-estimulo'
 
 type ProgramaAlumnoConRelaciones = Pick<
   Tables<'programas_alumno'>,
@@ -45,7 +46,7 @@ export default async function TomarDatosAbaPage({
     const { data: conjunto } = await supabase
     .from('conjuntos_estimulos_alumno')
     .select(
-      'id, nombre, estado, programa_alumno_id, estimulos_alumno(id, nombre), programas_alumno(id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url))'
+      'id, nombre, estado, programa_alumno_id, actividad_tablet, estimulos_alumno(id, nombre, concepto_imagen), programas_alumno(id, nombre, ensayos_por_bloque, alumno_id, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url))'
     )
     .eq('id', conjuntoId)
     .single()
@@ -53,6 +54,8 @@ export default async function TomarDatosAbaPage({
   if (!conjunto) notFound()
 
   const programa = conjunto.programas_alumno as ProgramaAlumnoConRelaciones
+  // Imágenes de los objetos (actividades en tableta)
+  const imagenes = await cargarImagenes(supabase, conjunto.estimulos_alumno.map((e) => e.concepto_imagen))
   const alumnoNombre = programa?.alumnos?.nombre_anonimizado ?? ''
 
   return (
@@ -80,6 +83,8 @@ export default async function TomarDatosAbaPage({
         ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
         videoUrl={programa.programas_base?.video_url ?? null}
         faseConjunto={conjunto.estado}
+        actividadTablet={conjunto.actividad_tablet}
+        imagenes={imagenes}
       />
     </div>
   )

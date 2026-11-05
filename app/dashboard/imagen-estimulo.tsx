@@ -36,7 +36,7 @@ export default function ImagenEstimulo({
   url,
   editable,
 }: {
-  tabla: 'estimulos_rft' | 'estimulos_rft_base'
+  tabla: 'estimulos_rft' | 'estimulos_rft_base' | 'estimulos_alumno' | 'estimulos_base'
   estimuloId: string
   url: string | null
   editable: boolean

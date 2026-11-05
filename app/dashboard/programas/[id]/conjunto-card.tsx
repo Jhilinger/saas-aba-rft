@@ -9,14 +9,98 @@ import {
   eliminarConjuntoAlumno,
   eliminarConjuntoAlumnoForzado,
   iniciarIntervencion,
+  guardarActividadConjunto,
 } from './actions'
+import ImagenEstimulo from '../../imagen-estimulo'
+import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
+import { MAX_INTERCAMBIOS, NOMBRE_VELOCIDAD, describirActividad, leerActividad, type ActividadVasos, type Velocidad } from '../../vasos'
+import type { Json } from '@/database.types'
 import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import HistorialBloques from './historial-bloques'
 import { Button, Panel } from '../../../ui'
 
-type Estimulo = { id: string; nombre: string; descripcion: string | null }
-type Conjunto = { id: string; nombre: string; estado: string; estimulos_alumno: Estimulo[] }
+type Estimulo = { id: string; nombre: string; descripcion: string | null; concepto_imagen?: string | null }
+type Conjunto = { id: string; nombre: string; estado: string; actividad_tablet?: Json; estimulos_alumno: Estimulo[] }
+
+// Nivel del juego de los vasos (actividad en tableta del conjunto)
+function EditorActividad({
+  conjuntoId,
+  programaAlumnoId,
+  actividad,
+  soloLectura,
+}: {
+  conjuntoId: string
+  programaAlumnoId: string
+  actividad: ActividadVasos | null
+  soloLectura: boolean
+}) {
+  const [valor, setValor] = useState<ActividadVasos>(actividad ?? { tipo: 'vasos', vasos: 2, intercambios: 0, velocidad: 'lenta' })
+  const [editando, setEditando] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const toast = useToast()
+
+  const guardar = (siguiente: ActividadVasos | null) =>
+    startTransition(async () => {
+      const res = await guardarActividadConjunto(conjuntoId, programaAlumnoId, siguiente)
+      if (res.error) {
+        toast(res.error, 'error')
+        return
+      }
+      setEditando(false)
+      router.refresh()
+    })
+
+  const select = 'rounded border border-slate-300 px-2 py-1 text-sm'
+  return (
+    <div className="rounded-lg bg-slate-50 px-3 py-2 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-slate-600">
+          Juego de los vasos en la tableta: <strong className="text-slate-800">{actividad ? describirActividad(actividad) : 'sin configurar'}</strong>
+        </span>
+        {!soloLectura && !editando && (
+          <button onClick={() => setEditando(true)} className="text-xs font-medium text-indigo-600 hover:underline">
+            {actividad ? 'Cambiar' : 'Configurar'}
+          </button>
+        )}
+      </div>
+      {editando && (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <select value={valor.vasos} onChange={(e) => setValor({ ...valor, vasos: Number(e.target.value) as 2 | 3 })} className={select}>
+            <option value={2}>2 vasos</option>
+            <option value={3}>3 vasos</option>
+          </select>
+          <select value={valor.intercambios} onChange={(e) => setValor({ ...valor, intercambios: Number(e.target.value) })} className={select}>
+            {Array.from({ length: MAX_INTERCAMBIOS + 1 }, (_, n) => (
+              <option key={n} value={n}>
+                {n === 0 ? 'Sin intercambios' : `${n} intercambio${n === 1 ? '' : 's'}`}
+              </option>
+            ))}
+          </select>
+          <select value={valor.velocidad} onChange={(e) => setValor({ ...valor, velocidad: e.target.value as Velocidad })} className={select}>
+            {(Object.keys(NOMBRE_VELOCIDAD) as Velocidad[]).map((v) => (
+              <option key={v} value={v}>
+                Velocidad {NOMBRE_VELOCIDAD[v]}
+              </option>
+            ))}
+          </select>
+          <Button disabled={isPending} onClick={() => guardar(valor)} className="py-1 text-sm">
+            Guardar
+          </Button>
+          {actividad && (
+            <button disabled={isPending} onClick={() => guardar(null)} className="text-xs text-rose-700 hover:underline">
+              Quitar de la tableta
+            </button>
+          )}
+          <button onClick={() => setEditando(false)} className="text-xs text-slate-500 hover:underline">
+            Cancelar
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const ETIQUETA_ESTADO: Record<string, { label: string; color: string }> = {
   linea_base: { label: 'Línea base', color: 'bg-sky-50 text-sky-700' },
@@ -31,12 +115,19 @@ export default function ConjuntoCard({
   programaAlumnoId,
   alumnoId,
   soloLectura = false,
+  conActividad = false,
+  imagenes = {},
+  conImagenes = false,
 }: {
   conjunto: Conjunto
   programaAlumnoId: string
   alumnoId: string
   // Sin permiso de diseño: se toman datos, pero no se cambian estímulos ni estados
   soloLectura?: boolean
+  // Programa con actividad en tableta: nivel por conjunto e imagen de cada objeto
+  conActividad?: boolean
+  imagenes?: ImagenesBanco
+  conImagenes?: boolean
 }) {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -136,15 +227,34 @@ export default function ConjuntoCard({
         </div>
       </div>
 
+      {conActividad && (
+        <EditorActividad
+          conjuntoId={conjunto.id}
+          programaAlumnoId={programaAlumnoId}
+          actividad={leerActividad(conjunto.actividad_tablet)}
+          soloLectura={soloLectura}
+        />
+      )}
+
             <ul className="space-y-1">
         {conjunto.estimulos_alumno.map((e) => (
           <li
             key={e.id}
             className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm gap-2"
           >
-            <span className="text-slate-800">
-              <strong>{e.nombre}</strong>
-              {e.descripcion ? ` — ${e.descripcion}` : ''}
+            <span className="flex min-w-0 items-center gap-2 text-slate-800">
+              {conActividad && (
+                <ImagenEstimulo
+                  tabla="estimulos_alumno"
+                  estimuloId={e.id}
+                  url={urlImagen(imagenes, e.concepto_imagen ?? null, 'entrenamiento', 0)}
+                  editable={conImagenes}
+                />
+              )}
+              <span>
+                <strong>{e.nombre}</strong>
+                {e.descripcion ? ` — ${e.descripcion}` : ''}
+              </span>
             </span>
             {!soloLectura && (
             <button

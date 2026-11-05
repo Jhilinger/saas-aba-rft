@@ -327,6 +327,7 @@ export type Database = {
           fecha: string
           id: string
           latencia_media_ms: number | null
+          modo: string
           notas: string | null
           porcentaje: number | null
           terapeuta_id: string
@@ -341,6 +342,7 @@ export type Database = {
           fecha?: string
           id?: string
           latencia_media_ms?: number | null
+          modo?: string
           notas?: string | null
           porcentaje?: number | null
           terapeuta_id: string
@@ -355,6 +357,7 @@ export type Database = {
           fecha?: string
           id?: string
           latencia_media_ms?: number | null
+          modo?: string
           notas?: string | null
           porcentaje?: number | null
           terapeuta_id?: string
@@ -773,6 +776,7 @@ export type Database = {
       }
       conjuntos_estimulos_alumno: {
         Row: {
+          actividad_tablet: Json | null
           conjunto_base_id: string | null
           created_at: string
           estado: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -782,6 +786,7 @@ export type Database = {
           programa_alumno_id: string
         }
         Insert: {
+          actividad_tablet?: Json | null
           conjunto_base_id?: string | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -791,6 +796,7 @@ export type Database = {
           programa_alumno_id: string
         }
         Update: {
+          actividad_tablet?: Json | null
           conjunto_base_id?: string | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
@@ -818,6 +824,7 @@ export type Database = {
       }
       conjuntos_estimulos_base: {
         Row: {
+          actividad_tablet: Json | null
           created_at: string
           id: string
           nombre: string
@@ -825,6 +832,7 @@ export type Database = {
           programa_base_id: string
         }
         Insert: {
+          actividad_tablet?: Json | null
           created_at?: string
           id?: string
           nombre: string
@@ -832,6 +840,7 @@ export type Database = {
           programa_base_id: string
         }
         Update: {
+          actividad_tablet?: Json | null
           created_at?: string
           id?: string
           nombre?: string
@@ -1045,6 +1054,7 @@ export type Database = {
       }
       estimulos_alumno: {
         Row: {
+          concepto_imagen: string | null
           conjunto_id: string
           descripcion: string | null
           estimulo_base_id: string | null
@@ -1053,6 +1063,7 @@ export type Database = {
           orden: number
         }
         Insert: {
+          concepto_imagen?: string | null
           conjunto_id: string
           descripcion?: string | null
           estimulo_base_id?: string | null
@@ -1061,6 +1072,7 @@ export type Database = {
           orden?: number
         }
         Update: {
+          concepto_imagen?: string | null
           conjunto_id?: string
           descripcion?: string | null
           estimulo_base_id?: string | null
@@ -1087,6 +1099,7 @@ export type Database = {
       }
       estimulos_base: {
         Row: {
+          concepto_imagen: string | null
           conjunto_id: string
           descripcion: string | null
           id: string
@@ -1094,6 +1107,7 @@ export type Database = {
           orden: number
         }
         Insert: {
+          concepto_imagen?: string | null
           conjunto_id: string
           descripcion?: string | null
           id?: string
@@ -1101,6 +1115,7 @@ export type Database = {
           orden?: number
         }
         Update: {
+          concepto_imagen?: string | null
           conjunto_id?: string
           descripcion?: string | null
           id?: string

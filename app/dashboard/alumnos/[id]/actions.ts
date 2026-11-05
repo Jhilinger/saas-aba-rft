@@ -98,7 +98,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
   if (base.tipo === 'aba_clasico') {
     const { data: conjuntosBase } = await supabase
       .from('conjuntos_estimulos_base')
-      .select('id, nombre, orden, estimulos_base(nombre, descripcion, orden)')
+      .select('id, nombre, orden, actividad_tablet, estimulos_base(nombre, descripcion, orden, concepto_imagen)')
       .eq('programa_base_id', programaBaseId)
       .order('orden')
 
@@ -110,6 +110,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
           conjunto_base_id: conjunto.id,
           nombre: conjunto.nombre,
           orden: conjunto.orden,
+          actividad_tablet: conjunto.actividad_tablet,
         })
         .select('id')
         .single()
@@ -121,6 +122,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+            concepto_imagen: e.concepto_imagen,
           }))
         )
       }

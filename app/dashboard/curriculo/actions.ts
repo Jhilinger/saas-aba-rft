@@ -458,14 +458,14 @@ export async function clonarPrograma(id: string) {
    if (original.tipo === 'aba_clasico') {
     const { data: conjuntos } = await supabase
       .from('conjuntos_estimulos_base')
-      .select('nombre, orden, estimulos_base(nombre, descripcion, orden)')
+      .select('nombre, orden, actividad_tablet, estimulos_base(nombre, descripcion, orden, concepto_imagen)')
       .eq('programa_base_id', id)
       .order('orden')
 
     for (const conjunto of conjuntos ?? []) {
       const { data: nuevoConjunto } = await supabase
         .from('conjuntos_estimulos_base')
-        .insert({ programa_base_id: nuevo.id, nombre: conjunto.nombre, orden: conjunto.orden })
+        .insert({ programa_base_id: nuevo.id, nombre: conjunto.nombre, orden: conjunto.orden, actividad_tablet: conjunto.actividad_tablet })
         .select('id')
         .single()
 
@@ -476,6 +476,7 @@ export async function clonarPrograma(id: string) {
             nombre: e.nombre,
             descripcion: e.descripcion,
             orden: e.orden,
+            concepto_imagen: e.concepto_imagen,
           }))
         )
       }

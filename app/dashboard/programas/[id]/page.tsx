@@ -26,6 +26,7 @@ import { puedeDisenar } from '../../permisos'
 import type { Tables } from '@/database.types'
 import PanelAlertas from '../../panel-alertas'
 import { cargarAlertas } from '../../cargar-alertas'
+import { cargarImagenes } from '../../imagenes-estimulo'
 
 export default async function ProgramaAlumnoPage({
   params,
@@ -40,7 +41,7 @@ export default async function ProgramaAlumnoPage({
 
   const { data: perfil } = await supabase
     .from('perfiles')
-    .select('rol')
+    .select('rol, clinica_id')
     .eq('id', user.id)
     .single()
 
@@ -300,9 +301,21 @@ export default async function ProgramaAlumnoPage({
 
   const { data: conjuntos } = await supabase
     .from('conjuntos_estimulos_alumno')
-    .select('id, nombre, estado, estimulos_alumno(id, nombre, descripcion)')
+    .select('id, nombre, estado, actividad_tablet, estimulos_alumno(id, nombre, descripcion, concepto_imagen)')
     .eq('programa_alumno_id', id)
     .order('orden')
+
+  // Actividad en tableta (juego de los vasos): si algún conjunto la tiene, se
+  // puede configurar en todos y los objetos llevan imagen
+  const conActividad = (conjuntos ?? []).some((c) => c.actividad_tablet)
+  const imagenesConjuntos = conActividad
+    ? await cargarImagenes(supabase, (conjuntos ?? []).flatMap((c) => c.estimulos_alumno.map((e) => e.concepto_imagen)))
+    : {}
+  const extrasConjunto = {
+    conActividad,
+    imagenes: imagenesConjuntos,
+    conImagenes: disena && !!perfil.clinica_id,
+  }
 
   const { conjuntos: datosEvolucion, distribucionAyudas, sondas } = await obtenerEvolucionAba(id)
 
@@ -374,7 +387,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {enLineaBase.map((c) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} {...extrasConjunto} />
                   ))}
                 </div>
               </div>
@@ -386,7 +399,7 @@ export default async function ProgramaAlumnoPage({
               </h2>
               <div className="space-y-4">
                 {enAdquisicion.map((c) => (
-                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
+                  <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} {...extrasConjunto} />
                 ))}
                 {enAdquisicion.length === 0 && (
                   <p className="text-sm text-slate-500">Sin conjuntos en adquisición.</p>
@@ -401,7 +414,7 @@ export default async function ProgramaAlumnoPage({
                 </h2>
                 <div className="space-y-4">
                   {dominados.map((c) => (
-                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} />
+                    <ConjuntoCard key={c.id} conjunto={c} programaAlumnoId={id} alumnoId={programa.alumno_id} soloLectura={!disena} {...extrasConjunto} />
                   ))}
                 </div>
               </div>
