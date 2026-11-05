@@ -123,7 +123,7 @@ export default async function TomarDatosRftPage({
         }}
         secuenciaPrograma={programa.secuencia_rft}
         imagenes={imagenes}
-        sinError={sinError?.activo ? sinError : null}
+        sinError={sinError}
         ultimosEscalones={ultimosEscalones}
       />
     </div>

@@ -7,6 +7,7 @@ import { guardarSinError } from './actions'
 import {
   BAJAR_DEFECTO,
   MAX_COMPARACIONES,
+  NIVELES_MENOR_A_MAYOR,
   SUBIR_DEFECTO,
   describirEscalon,
   errorConfig,
@@ -17,7 +18,7 @@ import {
   type Procedimientos,
 } from '../../sin-error'
 
-// Configuración del aprendizaje sin error en la tableta (programas_alumno.sin_error)
+// Configuración de las ayudas y la presentación en la tableta (programas_alumno.sin_error)
 
 const DEMORAS = [0, 1, 2, 3, 4, 5, 8, 10]
 
@@ -30,6 +31,8 @@ const NOMBRES_PROCEDIMIENTO: { clave: keyof Procedimientos; label: string; detal
 function configInicial(): ConfigSinError {
   return {
     activo: false,
+    modo: 'mayor_a_menor',
+    observacion: false,
     escalones: escaleraPorDefecto({ campo: true, desvanecimiento: true, demora: true }),
     subir: SUBIR_DEFECTO,
     bajar: BAJAR_DEFECTO,
@@ -52,7 +55,7 @@ export default function SinErrorPanel({
   const [isPending, startTransition] = useTransition()
   const toast = useToast()
 
-  if (soloLectura && !guardada?.activo) return null
+  if (soloLectura && !guardada?.activo && !guardada?.observacion) return null
 
   const cambiarEscalon = (i: number, cambio: Partial<Escalon>) =>
     setConfig((c) => ({ ...c, escalones: c.escalones.map((e, j) => (j === i ? { ...e, ...cambio } : e)) }))
@@ -95,21 +98,25 @@ export default function SinErrorPanel({
         return
       }
       setConfig(siguiente)
-      toast(siguiente.activo ? 'Aprendizaje sin error guardado.' : 'Aprendizaje sin error desactivado.', 'exito')
+      toast('Guardado.', 'exito')
     })
   }
 
-  const resumen = config.escalones.map((e) => e.nombre).join(' → ')
+  const resumen = !guardada?.activo
+    ? 'Sin ayudas automáticas.'
+    : guardada.modo === 'menor_a_mayor'
+      ? 'Ayudas de menor a mayor dentro del ensayo, con ensayo de transferencia.'
+      : `Ayudas de mayor a menor por bloques: ${guardada.escalones.map((e) => e.nombre).join(' → ')}.`
+  const mayorAMenor = config.modo === 'mayor_a_menor'
 
   return (
     <Panel className="space-y-4 p-4 text-sm sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold text-slate-700">Aprendizaje sin error (tableta)</h2>
+          <h2 className="font-semibold text-slate-700">Ayudas y presentación en la tableta</h2>
           <p className="text-xs text-slate-500">
-            {guardada?.activo
-              ? `Activo en el entrenamiento: ${resumen}.`
-              : 'Desactivado. En el entrenamiento en la tableta, el apoyo se retira por escalones según los aciertos de cada bloque.'}
+            {resumen}
+            {guardada?.observacion && ' El alumno toca la muestra para ver las opciones.'}
           </p>
         </div>
         {!soloLectura && (
@@ -119,7 +126,7 @@ export default function SinErrorPanel({
         )}
       </div>
 
-      {soloLectura && guardada?.activo && (
+      {soloLectura && guardada?.activo && guardada.modo === 'mayor_a_menor' && (
         <ol className="space-y-1 text-xs text-slate-600">
           {guardada.escalones.map((e, i) => (
             <li key={i}>
@@ -131,6 +138,60 @@ export default function SinErrorPanel({
 
       {abierto && !soloLectura && (
         <div className="space-y-4">
+          <label className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              checked={config.observacion}
+              onChange={(e) => setConfig((c) => ({ ...c, observacion: e.target.checked }))}
+              className="mt-0.5"
+            />
+            <span>
+              Respuesta de observación
+              <span className="block text-xs text-slate-400">
+                Aparece la muestra y el alumno la toca para que salgan las opciones. Sin ella, las opciones salen justo después de la
+                muestra.
+              </span>
+            </span>
+          </label>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-slate-600">Ayudas automáticas en el entrenamiento</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              {(
+                [
+                  ['mayor_a_menor', 'De mayor a menor, por bloques', 'Aprendizaje sin error: el apoyo se retira por escalones según los aciertos de cada bloque.'],
+                  ['menor_a_mayor', 'De menor a mayor, dentro del ensayo', 'El ensayo empieza sin ayuda; tras cada error se repite con la ayuda siguiente.'],
+                ] as const
+              ).map(([valor, titulo, detalle]) => (
+                <button
+                  key={valor}
+                  onClick={() => setConfig((c) => ({ ...c, modo: valor }))}
+                  className={`flex-1 rounded-lg border p-3 text-left ${config.modo === valor ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 hover:bg-slate-50'}`}
+                >
+                  <span className="block font-medium text-slate-700">{titulo}</span>
+                  <span className="block text-xs text-slate-500">{detalle}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {!mayorAMenor && (
+            <div className="space-y-2 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+              <p className="font-medium">Tras cada error, el mismo ensayo con la ayuda siguiente:</p>
+              <ol className="list-decimal space-y-0.5 pl-5">
+                {NIVELES_MENOR_A_MAYOR.map((n) => (
+                  <li key={n}>{n}</li>
+                ))}
+              </ol>
+              <p>
+                Se saltan los niveles que no cambian nada (con 2 opciones, quitar un distractor ya deja solo la correcta). Tras
+                acertar con ayuda se presenta el mismo ensayo sin ayuda (ensayo de transferencia): se registra aparte y no cuenta
+                para el %; si falla, se pasa al siguiente ensayo. El ensayo cuenta como error y se guarda el nivel con que acertó. Solo en el entrenamiento en la tableta; los tests y las sondas no cambian.
+              </p>
+            </div>
+          )}
+
+          {mayorAMenor && (<>
           <div className="space-y-2 rounded-lg bg-slate-50 p-3">
             <p className="text-xs font-medium text-slate-600">Procedimientos</p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
@@ -276,20 +337,18 @@ export default function SinErrorPanel({
           </div>
 
           <p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-500">
-            Se aplica solo al entrenamiento en la tableta; los tests y las sondas no cambian. Para subir o bajar cuentan los
-            aciertos con o sin la ayuda en pantalla. Los bloques de los escalones intermedios se guardan, pero solo los del último
-            («{config.escalones[config.escalones.length - 1].nombre}») cuentan para el dominio. Si se piden más opciones de las
-            que tiene el grupo, los distractores que faltan se toman de otros grupos del programa.
+            Las ayudas automáticas se aplican solo al entrenamiento en la tableta; los tests y las sondas no cambian.
+            {mayorAMenor &&
+              ` Para subir o bajar cuentan los aciertos con o sin la ayuda en pantalla. Los bloques de los escalones intermedios se guardan, pero solo los del último («${config.escalones[config.escalones.length - 1].nombre}») cuentan para el dominio. Si se piden más opciones de las que tiene el grupo, los distractores que faltan se toman de otros grupos del programa.`}
           </p>
+          </>)}
 
           <div className="flex flex-wrap justify-end gap-2">
-            {guardada?.activo && (
-              <Button variant="secondary" disabled={isPending} onClick={() => guardar({ ...config, activo: false })}>
-                Desactivar
-              </Button>
-            )}
+            <Button variant="secondary" disabled={isPending} onClick={() => guardar({ ...config, activo: false })}>
+              {guardada?.activo ? 'Quitar las ayudas automáticas' : 'Guardar sin ayudas automáticas'}
+            </Button>
             <Button disabled={isPending} onClick={() => guardar({ ...config, activo: true })}>
-              {guardada?.activo ? 'Guardar cambios' : 'Activar'}
+              {guardada?.activo ? 'Guardar cambios' : 'Activar las ayudas'}
             </Button>
           </div>
         </div>

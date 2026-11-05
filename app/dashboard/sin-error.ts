@@ -1,19 +1,30 @@
 import type { Json } from '@/database.types'
 
-// Aprendizaje sin error en la tableta (programas_alumno.sin_error): una
-// escalera de grados de apoyo que se recorre en el entrenamiento. Cada
+// Ayudas y presentación en la tableta (programas_alumno.sin_error). Dos
+// formas de ayuda en el entrenamiento, a elegir por programa:
+// - De mayor a menor (aprendizaje sin error): una
+// escalera de grados de apoyo que se recorre bloque a bloque. Cada
 // escalón fija cuántas comparaciones se presentan, con qué opacidad se ven los
 // distractores y a los cuántos segundos se resalta la correcta. El último
 // escalón («Sin apoyo») es el único que cuenta para el dominio. El escalón de
 // cada grupo y relación se deduce del último bloque hecho con el procedimiento
 // (bloques_ensayo_rft.sin_error guarda una copia del escalón usado).
+// - De menor a mayor dentro del ensayo: el ensayo empieza sin ayuda y, tras
+// cada error, se repite con la ayuda siguiente (NIVELES_MENOR_A_MAYOR); tras
+// acertar con ayuda se presenta el mismo ensayo sin ayuda (transferencia).
+// Además, opcionalmente, respuesta de observación: el alumno toca la muestra
+// para que aparezcan las comparaciones.
 
 // comparaciones: número, o null = todas las clases del grupo
 // opacidad: de los distractores (0–1); demora: segundos hasta la ayuda en
 // pantalla, null = sin ayuda
 export type Escalon = { nombre: string; comparaciones: number | null; opacidad: number; demora: number | null }
+export type ModoAyuda = 'mayor_a_menor' | 'menor_a_mayor'
 export type ConfigSinError = {
   activo: boolean
+  modo: ModoAyuda
+  // Respuesta de observación (independiente de que haya ayudas activas)
+  observacion: boolean
   escalones: Escalon[]
   // % de aciertos (con o sin la ayuda en pantalla) para subir / por debajo del cual se baja
   subir: number
@@ -93,12 +104,21 @@ export function leerSinError(valor: Json | null | undefined): ConfigSinError | n
   if (escalones.length < 2 || escalones.some((e) => !e)) return null
   const subir = numero(o.subir, 1, 100) ?? SUBIR_DEFECTO
   const bajar = Math.min(numero(o.bajar, 0, 100) ?? BAJAR_DEFECTO, subir)
-  return { activo: o.activo === true, escalones: escalones as Escalon[], subir, bajar, tamano: o.tamano === true }
+  return {
+    activo: o.activo === true,
+    modo: o.modo === 'menor_a_mayor' ? 'menor_a_mayor' : 'mayor_a_menor',
+    observacion: o.observacion === true,
+    escalones: escalones as Escalon[],
+    subir,
+    bajar,
+    tamano: o.tamano === true,
+  }
 }
 
 // El último escalón tiene que ser el de sin apoyo: campo completo, distractores
 // al 100 % y sin ayuda (si no, el dominio nunca se alcanzaría sin apoyo)
 export function errorConfig(c: ConfigSinError): string | null {
+  if (c.modo === 'menor_a_mayor') return null
   const final = c.escalones[c.escalones.length - 1]
   if (final.comparaciones !== null || final.opacidad < 1 || final.demora !== null) {
     return 'El último escalón debe ser sin apoyo: todas las opciones, distractores al 100 % y sin ayuda.'
@@ -143,4 +163,31 @@ export function textoMovimiento(m: Movimiento, siguiente: Escalon): string {
   if (m === 'sube') return `Sube a «${siguiente.nombre}»`
   if (m === 'baja') return `Baja a «${siguiente.nombre}»`
   return `Repite «${siguiente.nombre}»`
+}
+
+// --- De menor a mayor dentro del ensayo ---
+
+export const NIVELES_MENOR_A_MAYOR = [
+  'Repetir la muestra',
+  'Quitar un distractor',
+  'Atenuar los distractores',
+  'Resaltar la correcta',
+  'Solo la correcta',
+] as const
+export const OPACIDAD_ATENUADA = 0.3
+
+// Cómo se presenta un ensayo con d distractores en el nivel n (0 = sin ayuda)
+export function presentacionNivel(n: number, d: number) {
+  return {
+    distractoresVisibles: n >= 5 ? 0 : n >= 2 ? Math.max(d - 1, 0) : d,
+    opacidad: n >= 3 ? OPACIDAD_ATENUADA : 1,
+    resaltar: n >= 4,
+  }
+}
+
+// Nivel tras un error: el siguiente, saltando los que ya no cambian nada (si
+// al quitar un distractor solo queda la correcta, se pasa a «Solo la correcta»)
+export function siguienteNivel(n: number, d: number): number {
+  const m = Math.min(n + 1, 5)
+  return m < 5 && presentacionNivel(m, d).distractoresVisibles === 0 ? 5 : m
 }

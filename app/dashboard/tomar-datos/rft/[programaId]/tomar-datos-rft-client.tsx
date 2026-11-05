@@ -49,6 +49,19 @@ type EnsayoRft = {
   ayuda: string
   latenciaMs?: number | null
   respuesta?: string | null
+  // Ayudas de menor a mayor: nivel con que acertó tras fallar
+  nivelAyuda?: number | null
+}
+
+// Ensayo de transferencia (el mismo ensayo sin ayuda tras acertar con ayuda):
+// se guarda aparte y no cuenta para el %
+type TransferenciaRft = {
+  claseId: string
+  estimuloOrigenId: string
+  estimuloDestinoId: string
+  correcto: boolean
+  latenciaMs: number
+  respuesta: string | null
 }
 
 // Pregunta extra durante el bloque (ej. de asimetría): se guarda con su
@@ -144,6 +157,8 @@ type ProgresoGuardado = {
   controles?: ControlRft[]
   modo?: 'material' | 'tableta'
   escalon?: EscalonActivo | null
+  menorAMayor?: boolean
+  transferencias?: TransferenciaRft[]
 }
 
 // Escalón de aprendizaje sin error con que se hace un bloque
@@ -192,7 +207,7 @@ function TarjetaRecomendacion({
   onTamano: (n: number) => void
   onEmpezar: () => void
   selectorModo: React.ReactNode
-  apoyo: Escalon | null
+  apoyo: React.ReactNode
 }) {
   return (
     <div className="space-y-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
@@ -208,7 +223,7 @@ function TarjetaRecomendacion({
           <AyudaTermino clave="secuencia" />
           {ejemplo && ` · ej.: ${ejemplo}`}
         </p>
-        {apoyo && <LineaApoyo escalon={apoyo} />}
+        {apoyo}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {[10, 20].map((n) => (
@@ -231,12 +246,18 @@ function TarjetaRecomendacion({
   )
 }
 
-function LineaApoyo({ escalon }: { escalon: Escalon }) {
-  return (
-    <p className="mt-1 text-xs text-amber-700">
-      Aprendizaje sin error: <strong>{escalon.nombre}</strong> · {describirEscalon(escalon)}
-    </p>
-  )
+function LineaApoyo({ escalon, menorAMayor }: { escalon: Escalon | null; menorAMayor: boolean }) {
+  if (escalon) {
+    return (
+      <p className="mt-1 text-xs text-amber-700">
+        Aprendizaje sin error: <strong>{escalon.nombre}</strong> · {describirEscalon(escalon)}
+      </p>
+    )
+  }
+  if (menorAMayor) {
+    return <p className="mt-1 text-xs text-amber-700">Ayudas de menor a mayor: tras cada error, el mismo ensayo con más ayuda</p>
+  }
+  return null
 }
 
 export default function TomarDatosRftClient({
@@ -298,6 +319,14 @@ export default function TomarDatosRftClient({
     escalonRef.current = e
     setEscalonBloque(e)
   }
+  // Ayudas de menor a mayor en el bloque en curso, y sus ensayos de transferencia
+  const menorAMayorRef = useRef(false)
+  const [menorAMayorBloque, setMenorAMayorBloque] = useState(false)
+  const fijarMenorAMayor = (v: boolean) => {
+    menorAMayorRef.current = v
+    setMenorAMayorBloque(v)
+  }
+  const transferenciasRef = useRef<TransferenciaRft[]>([])
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
@@ -310,6 +339,7 @@ export default function TomarDatosRftClient({
     derivado: boolean
     controles: { total: number; aciertos: number }
     escalon: EscalonBloque | null
+    transferencias: { total: number; aciertos: number }
   } | null>(null)
   // Respuesta de opciones elegida, a falta de marcar ✓/✗ (si la clase no tiene respuesta esperada)
   const [respuestaPendiente, setRespuestaPendiente] = useState<string | null>(null)
@@ -410,7 +440,7 @@ export default function TomarDatosRftClient({
             origen,
             destino,
             escalon ? activo!.comparaciones : numComparativos,
-            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs, respuesta }) => ({
+            listaEnsayos.map(({ claseId, estimuloOrigenId, estimuloDestinoId, pregunta, correcto, ayuda, latenciaMs, respuesta, nivelAyuda }) => ({
               claseId,
               estimuloOrigenId,
               estimuloDestinoId,
@@ -419,12 +449,14 @@ export default function TomarDatosRftClient({
               ayuda,
               latenciaMs,
               respuesta,
+              nivelAyuda,
             })),
             notasActuales,
             duracionSegundos,
             controlesRef.current,
             modoBloqueRef.current,
-            escalon
+            escalon,
+            transferenciasRef.current
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -442,6 +474,10 @@ export default function TomarDatosRftClient({
               aciertos: controlesRef.current.filter((c) => c.correcto).length,
             },
             escalon,
+            transferencias: {
+              total: transferenciasRef.current.length,
+              aciertos: transferenciasRef.current.filter((t) => t.correcto).length,
+            },
           })
         } catch (e) {
           if (esFalloDeRed(e)) {
@@ -471,6 +507,8 @@ export default function TomarDatosRftClient({
     setControles(guardado.controles ?? [])
     modoBloqueRef.current = guardado.modo ?? 'material'
     fijarEscalon(guardado.escalon ?? null)
+    fijarMenorAMayor(guardado.menorAMayor ?? false)
+    transferenciasRef.current = guardado.transferencias ?? []
     if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
       const clasesDelGrupoGuardado = clases.filter((c) => c.grupo === guardado.grupoSeleccionado)
       const numComparativos = clasesDelGrupoGuardado.filter(
@@ -511,6 +549,8 @@ export default function TomarDatosRftClient({
     setNotas('')
     fijarControles([])
     fijarEscalon(null)
+    fijarMenorAMayor(false)
+    transferenciasRef.current = []
     setEnTableta(false)
     setInicioBloque(null)
     setDuracionBloque(null)
@@ -590,13 +630,21 @@ export default function TomarDatosRftClient({
     iniciarBloque(
       clasesValidas,
       modoInicial,
-      grupoSeleccionado ? escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoInicial, clasesValidas) : null
+      grupoSeleccionado ? escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoInicial, clasesValidas) : null,
+      menorAMayorPara(posicionDestino, faseEfectiva, modoInicial, clasesValidas)
     )
   }
 
-  const iniciarBloque = (validas: Clase[], modoInicial: 'material' | 'tableta' = modo, escalon: EscalonActivo | null = null) => {
+  const iniciarBloque = (
+    validas: Clase[],
+    modoInicial: 'material' | 'tableta' = modo,
+    escalon: EscalonActivo | null = null,
+    menorAMayor = false
+  ) => {
     modoBloqueRef.current = modoInicial
     fijarEscalon(escalon)
+    fijarMenorAMayor(menorAMayor)
+    transferenciasRef.current = []
     setEnTableta(modoInicial === 'tableta')
     setSecuencia(generarSecuenciaClases(validas, tamanoBloque))
     setInicioBloque(marcaDeTiempo())
@@ -646,7 +694,7 @@ export default function TomarDatosRftClient({
     modoBloque: 'material' | 'tableta',
     validas: Clase[]
   ): EscalonActivo | null => {
-    if (!sinError || faseBloque !== 'entrenamiento' || modoBloque !== 'tableta') return null
+    if (!sinError?.activo || sinError.modo !== 'mayor_a_menor' || faseBloque !== 'entrenamiento' || modoBloque !== 'tableta') return null
     if (!validas.every((c) => esVisible(encontrarEstimulo(c, destino)!))) return null
     const { indice } = siguienteEscalon(sinError, leerEscalonBloque(ultimosEscalones[`${grupo}__${origen}__${destino}`]))
     const escalon = sinError.escalones[indice]
@@ -659,15 +707,23 @@ export default function TomarDatosRftClient({
       tamano: sinError.tamano,
     }
   }
-  const apoyoRecomendado = (rec: Recomendacion) =>
-    escalonPara(
-      rec.grupo,
-      rec.paso.origen,
-      rec.paso.destino,
-      rec.paso.fase,
-      modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase),
-      clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)
-    )?.escalon ?? null
+  // Ayudas de menor a mayor: mismas condiciones (entrenamiento, tableta, opciones visibles)
+  const menorAMayorPara = (destino: string, faseBloque: string, modoBloque: 'material' | 'tableta', validas: Clase[]) =>
+    !!sinError?.activo &&
+    sinError.modo === 'menor_a_mayor' &&
+    faseBloque === 'entrenamiento' &&
+    modoBloque === 'tableta' &&
+    validas.every((c) => esVisible(encontrarEstimulo(c, destino)!))
+  const apoyoRecomendado = (rec: Recomendacion) => {
+    const m = modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase)
+    const validas = clasesCon(rec.grupo, rec.paso.origen, rec.paso.destino)
+    return (
+      <LineaApoyo
+        escalon={escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, m, validas)?.escalon ?? null}
+        menorAMayor={menorAMayorPara(rec.paso.destino, rec.paso.fase, m, validas)}
+      />
+    )
+  }
 
   // Ejemplo con los estímulos reales de la primera clase que encaja
   const ejemploDe = (rec: Recomendacion) => {
@@ -694,14 +750,31 @@ export default function TomarDatosRftClient({
     setPosicionDestino(rec.paso.destino)
     setTipoSonda('normal')
     const modoInicial = modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase)
-    iniciarBloque(validas, modoInicial, escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, modoInicial, validas))
+    iniciarBloque(
+      validas,
+      modoInicial,
+      escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, modoInicial, validas),
+      menorAMayorPara(rec.paso.destino, rec.paso.fase, modoInicial, validas)
+    )
   }
 
-  const registrar = (correcto: boolean, ayuda: string, pregunta?: string, respuestaAlumno?: string | null) => {
+  const registrar = (
+    correcto: boolean,
+    ayuda: string,
+    pregunta?: string,
+    respuestaAlumno?: string | null,
+    extra: { nivelAyuda?: number; transferencia?: { correcto: boolean; respuesta: string | null; latenciaMs: number } } = {}
+  ) => {
     if (!secuencia) return
     const claseActual = secuencia[ensayos.length]
     const origen = encontrarEstimulo(claseActual, posicionOrigen)!
     const destino = encontrarEstimulo(claseActual, posicionDestino)!
+    if (extra.transferencia) {
+      transferenciasRef.current = [
+        ...transferenciasRef.current,
+        { claseId: claseActual.id, estimuloOrigenId: origen.id, estimuloDestinoId: destino.id, ...extra.transferencia },
+      ]
+    }
 
     const nuevos = [
       ...ensayos,
@@ -717,6 +790,7 @@ export default function TomarDatosRftClient({
         ayuda,
         latenciaMs: cronometro.leer(),
         respuesta: respuestaAlumno ?? null,
+        nivelAyuda: extra.nivelAyuda ?? null,
       },
     ]
     setEnsayos(nuevos)
@@ -751,8 +825,10 @@ export default function TomarDatosRftClient({
       controles,
       modo: modoBloqueRef.current,
       escalon: escalonRef.current,
+      menorAMayor: menorAMayorRef.current,
+      transferencias: transferenciasRef.current,
     })
-  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso, escalonBloque])
+  }, [secuencia, ensayos, notas, grupoSeleccionado, faseEfectiva, posicionOrigen, posicionDestino, tamanoBloque, inicioBloque, duracionBloque, controles, claveProgreso, escalonBloque, menorAMayorBloque])
 
   if (resultado) {
     const hayDominio = resultado.clasesDominadasAhora.length > 0
@@ -782,6 +858,12 @@ export default function TomarDatosRftClient({
             </p>
           )
         })()}
+        {resultado.transferencias.total > 0 && (
+          <p className="text-sm text-slate-600">
+            Ensayos de transferencia: {resultado.transferencias.aciertos}/{resultado.transferencias.total} correctos sin ayuda (no
+            cuentan para el %)
+          </p>
+        )}
         {resultado.controles.total > 0 && (
           <p className="text-sm text-slate-600">
             Ensayos de control: {resultado.controles.aciertos}/{resultado.controles.total} correctos (no cuentan para el dominio)
@@ -1097,8 +1179,13 @@ export default function TomarDatosRftClient({
               <SelectorModo disponible modo={modo} onCambiar={setModo} />
             </span>
             {(() => {
-              const e = escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva), clasesValidas)
-              return e && <LineaApoyo escalon={e.escalon} />
+              const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
+              return (
+                <LineaApoyo
+                  escalon={escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, m, clasesValidas)?.escalon ?? null}
+                  menorAMayor={menorAMayorPara(posicionDestino, faseEfectiva, m, clasesValidas)}
+                />
+              )
             })()}
           </div>
         )}
@@ -1199,8 +1286,11 @@ export default function TomarDatosRftClient({
             demora: escalonBloque.escalon.demora,
           }
         }
-        onResponder={(correcto, ayuda, respuestaAlumno) => registrar(correcto, ayuda, undefined, respuestaAlumno)}
+        observacion={!!sinError?.observacion}
+        menorAMayor={menorAMayorBloque}
+        onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
+        onPrimeraRespuesta={() => cronometro.capturar()}
         onSalir={() => setEnTableta(false)}
       />
     )
@@ -1217,6 +1307,11 @@ export default function TomarDatosRftClient({
           {grupoSeleccionado && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
             <button
               onClick={() => {
+                // Si aún no hay ensayos, el bloque pasa a hacerse con el escalón de apoyo que toque
+                if (ensayos.length === 0 && !escalonRef.current) {
+                  fijarEscalon(escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, 'tableta', clasesValidas))
+                  fijarMenorAMayor(menorAMayorPara(posicionDestino, faseEfectiva, 'tableta', clasesValidas))
+                }
                 modoBloqueRef.current = 'tableta'
                 setEnTableta(true)
               }}

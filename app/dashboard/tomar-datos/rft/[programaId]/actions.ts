@@ -17,6 +17,22 @@ type EnsayoInput = {
   ayuda: string
   latenciaMs?: number | null
   respuesta?: string | null
+  // Ayudas de menor a mayor: nivel con que acertó tras fallar (1–5)
+  nivelAyuda?: number | null
+}
+
+// Ensayo de transferencia: el mismo ensayo sin ayuda tras acertar con ayuda
+type TransferenciaInput = {
+  claseId: string
+  estimuloOrigenId: string
+  estimuloDestinoId: string
+  correcto: boolean
+  latenciaMs?: number | null
+  respuesta?: string | null
+}
+
+function nivelAyudaValido(v: unknown): number | null {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 5 ? v : null
 }
 
 type ControlInput = {
@@ -65,7 +81,8 @@ export async function guardarBloqueRft(
   controles: ControlInput[] = [],
   modo: 'material' | 'tableta' = 'material',
   // Escalón de aprendizaje sin error con que se hizo el bloque (solo entrenamiento)
-  sinError: unknown = null
+  sinError: unknown = null,
+  transferencias: TransferenciaInput[] = []
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -163,10 +180,29 @@ export async function guardarBloqueRft(
       ayuda: e.ayuda as AyudaRft,
       latencia_ms: latencias[i],
       respuesta: textoLimitado(e.respuesta, 500),
+      nivel_ayuda: fase === 'entrenamiento' ? nivelAyudaValido(e.nivelAyuda) : null,
     }))
   )
 
   if (detalleError) return { error: detalleError.message }
+
+  // Los ensayos de transferencia se guardan aparte: no cuentan para el % ni el dominio
+  if (transferencias.length > 0 && fase === 'entrenamiento') {
+    const { error: transferenciasError } = await supabase.from('ensayos_rft_detalle').insert(
+      transferencias.map((t) => ({
+        bloque_id: bloque.id,
+        clase_id: t.claseId,
+        estimulo_origen_id: t.estimuloOrigenId,
+        estimulo_destino_id: t.estimuloDestinoId,
+        correcto: t.correcto,
+        ayuda: 'independiente' as AyudaRft,
+        latencia_ms: latenciaValida(t.latenciaMs),
+        respuesta: textoLimitado(t.respuesta, 500),
+        tipo_ensayo: 'transferencia',
+      }))
+    )
+    if (transferenciasError) return { error: transferenciasError.message }
+  }
 
   if (controles.length > 0) {
     const { error: controlesError } = await supabase.from('ensayos_rft_detalle').insert(

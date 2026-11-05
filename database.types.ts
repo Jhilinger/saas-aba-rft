@@ -970,6 +970,7 @@ export type Database = {
           estimulo_origen_id: string
           id: string
           latencia_ms: number | null
+          nivel_ayuda: number | null
           notas: string | null
           pregunta: string | null
           respuesta: string | null
@@ -984,6 +985,7 @@ export type Database = {
           estimulo_origen_id: string
           id?: string
           latencia_ms?: number | null
+          nivel_ayuda?: number | null
           notas?: string | null
           pregunta?: string | null
           respuesta?: string | null
@@ -998,6 +1000,7 @@ export type Database = {
           estimulo_origen_id?: string
           id?: string
           latencia_ms?: number | null
+          nivel_ayuda?: number | null
           notas?: string | null
           pregunta?: string | null
           respuesta?: string | null

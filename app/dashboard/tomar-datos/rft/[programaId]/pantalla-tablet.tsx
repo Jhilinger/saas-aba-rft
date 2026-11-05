@@ -1,19 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
-import { useEtapasEnsayo } from '../../../etapas-ensayo'
+import { PAUSA_ENTRE_ENSAYOS } from '../../../etapas-ensayo'
 import { decir } from '../../../voz'
 import AjustesVoz from '../../../ajustes-voz'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 import ContenidoEstimulo from '../../../contenido-estimulo'
 import { parsearEstimuloPantalla } from '../../../estimulo-pantalla'
+import { presentacionNivel, siguienteNivel } from '../../../sin-error'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
-// las comparaciones en tarjetas. El toque del alumno registra el ensayo; el
-// terapeuta da las ayudas y el refuerzo y las anota con controles que hay que
-// mantener pulsados. Si las comparaciones son palabras que el alumno dice (ej.
-// test B→A), la pantalla solo muestra la muestra y el terapeuta puntúa.
+// las comparaciones en tarjetas. El toque del alumno registra el ensayo. Las
+// ayudas automáticas (de mayor a menor o de menor a mayor) las aplica la
+// pantalla según la configuración del programa; el terapeuta da el refuerzo y
+// las demás ayudas y las anota con controles que hay que mantener pulsados. Si
+// las comparaciones son palabras que el alumno dice (ej. test B→A), la
+// pantalla solo muestra la muestra y el terapeuta puntúa.
 
 // pantalla: columna jsonb (texto, figura SVG, n imágenes…); se valida al pintar
 export type EstimuloTablet = { id: string; nombre: string; concepto_imagen: string | null; pantalla: unknown }
@@ -88,17 +91,38 @@ function Tarjeta({
   )
 }
 
-// Un ensayo: pausa, comparaciones y después la muestra (se monta de nuevo en
-// cada ensayo). Los toques antes de que aparezca la muestra no cuentan.
-function EnsayoTablet({
+type Eleccion = { correcto: boolean; respuesta: string | null; conAyudaPantalla: boolean }
+
+// Respuesta de un ensayo completo. Con ayudas de menor a mayor, un acierto con
+// ayuda se registra como error con el nivel alcanzado, junto al resultado del
+// ensayo de transferencia
+export type RespuestaTablet = Eleccion & {
+  nivelAyuda?: number
+  transferencia?: { correcto: boolean; respuesta: string | null; latenciaMs: number }
+}
+
+// Orden pseudoaleatorio reproducible (qué distractor se quita en cada ensayo)
+function hash(valor: string) {
+  let h = 2166136261
+  for (const caracter of valor) h = Math.imul(h ^ caracter.charCodeAt(0), 16777619)
+  return h >>> 0
+}
+
+// Una presentación del ensayo (se monta de nuevo en cada una): pausa, la
+// muestra y en seguida las comparaciones, o al tocar la muestra si hay
+// respuesta de observación. Los toques antes de que salgan las opciones no
+// cuentan. nivel: ayuda de menor a mayor que se está aplicando (0 = ninguna).
+function Presentacion({
   origen,
   comparativos,
   fase,
   ensayo,
   imagenes,
   apoyo,
-  onResponder,
-  onMuestra,
+  observacion,
+  nivel,
+  onElegir,
+  onOpciones,
 }: {
   origen: EstimuloTablet
   comparativos: ComparativoTablet[]
@@ -106,45 +130,81 @@ function EnsayoTablet({
   ensayo: number
   imagenes: ImagenesBanco
   apoyo: ApoyoTablet | null
-  onResponder: (correcto: boolean, respuesta: string | null, conAyudaPantalla: boolean) => void
-  onMuestra: () => void
+  observacion: boolean
+  nivel: number
+  onElegir: (e: Eleccion) => void
+  // Salen las opciones: desde aquí se mide la latencia
+  onOpciones: () => void
 }) {
   const muestraOida = esOido(origen)
   const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
-  const etapa = useEtapasEnsayo(!respuestaOral, () => {
-    onMuestra()
-    if (muestraOida) decir(textoOido(origen.nombre))
-  })
+  const [conMuestra, setConMuestra] = useState(false)
+  const [observada, setObservada] = useState(false)
+  const conOpciones = conMuestra && (respuestaOral || !observacion || observada)
+
+  useEffect(() => {
+    const t = setTimeout(() => setConMuestra(true), PAUSA_ENTRE_ENSAYOS)
+    return () => clearTimeout(t)
+  }, [])
+  useEffect(() => {
+    if (conMuestra && muestraOida) decir(textoOido(origen.nombre))
+    // Solo al aparecer la muestra
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conMuestra])
+  useEffect(() => {
+    if (conOpciones) onOpciones()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conOpciones])
+  // Ayuda de menor a mayor: en cada nivel se repite la muestra
+  useEffect(() => {
+    if (nivel > 0 && muestraOida) decir(textoOido(origen.nombre))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nivel])
+
+  // Ayuda con demora (mayor a menor): la correcta se resalta pasada la demora
+  const demora = apoyo?.demora ?? null
+  const [resaltadaPorDemora, setResaltadaPorDemora] = useState(false)
+  useEffect(() => {
+    if (!conOpciones || demora === null) return
+    const t = setTimeout(() => setResaltadaPorDemora(true), demora * 1000)
+    return () => clearTimeout(t)
+  }, [conOpciones, demora])
+
+  const distractores = comparativos
+    .filter((c) => !c.esCorrecto)
+    .sort((a, b) => hash(`${ensayo}-${a.claseId}`) - hash(`${ensayo}-${b.claseId}`))
+  const presentacion = presentacionNivel(nivel, distractores.length)
+  const visibles = new Set(distractores.slice(0, presentacion.distractoresVisibles).map((c) => c.claseId))
+  const resaltada = resaltadaPorDemora || presentacion.resaltar
+  const estiloDistractor = (c: ComparativoTablet) => {
+    if (c.esCorrecto) return undefined
+    const opacidad = Math.min(apoyo?.opacidad ?? 1, presentacion.opacidad)
+    if (opacidad >= 1) return undefined
+    return { opacity: opacidad, transform: apoyo?.tamano ? `scale(${0.4 + 0.6 * opacidad})` : undefined }
+  }
+
   const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
   const ladoMuestra = lado(1, respuestaOral ? 44 : 26, 7)
   const ladoAudio = lado(1, 16, 7)
   const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
   const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
-  const conMuestra = etapa === 'muestra'
-  // Ayuda en pantalla: la correcta se resalta pasada la demora desde la muestra
-  const demora = apoyo?.demora ?? null
-  const [resaltada, setResaltada] = useState(false)
-  useEffect(() => {
-    if (!conMuestra || demora === null) return
-    const t = setTimeout(() => setResaltada(true), demora * 1000)
-    return () => clearTimeout(t)
-  }, [conMuestra, demora])
-  const estiloDistractor = (c: ComparativoTablet) => {
-    if (!apoyo || c.esCorrecto || apoyo.opacidad >= 1) return undefined
-    return { opacity: apoyo.opacidad, transform: apoyo.tamano ? `scale(${0.4 + 0.6 * apoyo.opacidad})` : undefined }
+  const tocarMuestra = () => {
+    if (!conMuestra) return
+    if (muestraOida) decir(textoOido(origen.nombre))
+    setObservada(true)
   }
+  const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-indigo-300'
 
   return (
     <>
-      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${etapa === 'pausa' ? 'invisible' : ''}`}>
-        {/* El recuadro de la muestra ocupa su sitio desde el principio para que las opciones no se muevan */}
+      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
         <div className="flex items-center justify-center rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
           {muestraOida ? (
             <button
               type="button"
-              onClick={() => conMuestra && decir(textoOido(origen.nombre))}
+              onClick={tocarMuestra}
               style={{ width: ladoAudio, height: ladoAudio }}
-              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${conMuestra ? '' : 'invisible'}`}
+              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 bg-white ${marcoMuestra}`}
               aria-label="Escuchar de nuevo"
             >
               <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
@@ -155,51 +215,139 @@ function EnsayoTablet({
               </span>
             </button>
           ) : (
-            <span
+            <button
+              type="button"
+              onClick={tocarMuestra}
               style={{ width: ladoMuestra, height: ladoMuestra }}
-              className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${conMuestra ? '' : 'invisible'}`}
+              className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white ${marcoMuestra}`}
             >
               <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} urlConcepto={urlConcepto} />
-            </span>
+            </button>
           )}
         </div>
 
+        {/* Las opciones ocupan su sitio desde el principio para que nada se mueva */}
         {!respuestaOral && (
-          <>
+          <div className={`flex flex-col items-center gap-[2.5vmin] ${conOpciones ? '' : 'invisible'}`}>
             <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>
             <div className="flex flex-wrap justify-center gap-[2.5vmin]">
-              {comparativos.map((c) => (
-                <button
-                  key={c.claseId}
-                  type="button"
-                  onClick={() => conMuestra && onResponder(c.esCorrecto, textoOido(c.estimulo.nombre), resaltada)}
-                  style={{ width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) }}
-                  className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
-                    resaltada && c.esCorrecto ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300' : 'border-slate-200'
-                  }`}
-                >
-                  <Tarjeta
-                    estimulo={c.estimulo}
-                    url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
-                    lado={ladoOpcion}
-                    urlConcepto={urlConcepto}
-                  />
-                </button>
-              ))}
+              {comparativos.map((c) => {
+                const oculta = !c.esCorrecto && !visibles.has(c.claseId)
+                return (
+                  <button
+                    key={c.claseId}
+                    type="button"
+                    disabled={oculta}
+                    onClick={() => conOpciones && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
+                    style={{ width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) }}
+                    className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                      oculta ? 'invisible' : ''
+                    } ${resaltada && c.esCorrecto ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300' : 'border-slate-200'}`}
+                  >
+                    <Tarjeta
+                      estimulo={c.estimulo}
+                      url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                      lado={ladoOpcion}
+                      urlConcepto={urlConcepto}
+                    />
+                  </button>
+                )
+              })}
             </div>
-          </>
+          </div>
         )}
       </div>
 
       <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
         {respuestaOral && conMuestra && (
           <>
-            <BotonLargo onActivar={() => onResponder(true, null, false)}>✓ Correcto</BotonLargo>
-            <BotonLargo onActivar={() => onResponder(false, null, false)}>✗ Incorrecto</BotonLargo>
+            <BotonLargo onActivar={() => onElegir({ correcto: true, respuesta: null, conAyudaPantalla: false })}>✓ Correcto</BotonLargo>
+            <BotonLargo onActivar={() => onElegir({ correcto: false, respuesta: null, conAyudaPantalla: false })}>✗ Incorrecto</BotonLargo>
           </>
         )}
       </div>
     </>
+  )
+}
+
+// Un ensayo (se monta de nuevo en cada uno). Con ayudas de menor a mayor,
+// cada error sube un nivel de ayuda sobre la misma presentación; un acierto con
+// ayuda da paso al ensayo de transferencia (el mismo, sin ayuda), que no escala.
+function EnsayoTablet({
+  origen,
+  comparativos,
+  fase,
+  ensayo,
+  imagenes,
+  apoyo,
+  observacion,
+  menorAMayor,
+  onResponder,
+  onMuestra,
+  onPrimeraRespuesta,
+}: {
+  origen: EstimuloTablet
+  comparativos: ComparativoTablet[]
+  fase: string
+  ensayo: number
+  imagenes: ImagenesBanco
+  apoyo: ApoyoTablet | null
+  observacion: boolean
+  menorAMayor: boolean
+  onResponder: (r: RespuestaTablet) => void
+  onMuestra: () => void
+  onPrimeraRespuesta: () => void
+}) {
+  const [nivel, setNivel] = useState(0)
+  const [transferencia, setTransferencia] = useState(false)
+  const primera = useRef<string | null>(null)
+  const inicioTransferencia = useRef(0)
+  const nDistractores = comparativos.filter((c) => !c.esCorrecto).length
+
+  const elegir = (e: Eleccion) => {
+    if (transferencia) {
+      onResponder({
+        correcto: false,
+        respuesta: primera.current,
+        conAyudaPantalla: false,
+        nivelAyuda: nivel,
+        transferencia: { correcto: e.correcto, respuesta: e.respuesta, latenciaMs: Date.now() - inicioTransferencia.current },
+      })
+      return
+    }
+    if (nivel === 0) onPrimeraRespuesta()
+    if (!menorAMayor || (e.correcto && nivel === 0)) {
+      onResponder(e)
+      return
+    }
+    if (e.correcto) {
+      setTransferencia(true)
+      return
+    }
+    if (nivel === 0) primera.current = e.respuesta
+    setNivel(siguienteNivel(nivel, nDistractores))
+  }
+
+  return (
+    <Presentacion
+      key={transferencia ? 'transferencia' : 'ensayo'}
+      origen={origen}
+      comparativos={comparativos}
+      fase={fase}
+      ensayo={ensayo}
+      imagenes={imagenes}
+      apoyo={transferencia ? null : apoyo}
+      observacion={observacion}
+      nivel={transferencia ? 0 : nivel}
+      onElegir={elegir}
+      onOpciones={
+        transferencia
+          ? () => {
+              inicioTransferencia.current = Date.now()
+            }
+          : onMuestra
+      }
+    />
   )
 }
 
@@ -211,8 +359,11 @@ export default function PantallaTablet({
   total,
   imagenes,
   apoyo = null,
+  observacion = false,
+  menorAMayor = false,
   onResponder,
   onMuestra,
+  onPrimeraRespuesta,
   onSalir,
 }: {
   origen: EstimuloTablet
@@ -222,19 +373,27 @@ export default function PantallaTablet({
   total: number
   imagenes: ImagenesBanco
   apoyo?: ApoyoTablet | null
-  onResponder: (correcto: boolean, ayuda: string, respuesta: string | null) => void
-  // Aparece la muestra: desde aquí se mide la latencia
+  // Respuesta de observación y ayudas de menor a mayor dentro del ensayo
+  observacion?: boolean
+  menorAMayor?: boolean
+  onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
+  // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
+  // Primera respuesta del alumno (fija la latencia aunque luego haya ayudas)
+  onPrimeraRespuesta: () => void
   onSalir: () => void
 }) {
   const [ayuda, setAyuda] = useState<string | null>(null)
   const [menuAyuda, setMenuAyuda] = useState(false)
   const [menuVoz, setMenuVoz] = useState(false)
 
-  const responder = (correcto: boolean, respuesta: string | null, conAyudaPantalla: boolean) => {
+  const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
     // un acierto después de resaltarse la correcta es un acierto con ayuda visual
-    onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta)
+    onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta, {
+      nivelAyuda,
+      transferencia,
+    })
     setAyuda(null)
   }
 
@@ -268,8 +427,11 @@ export default function PantallaTablet({
         ensayo={ensayo}
         imagenes={imagenes}
         apoyo={apoyo}
+        observacion={observacion}
+        menorAMayor={menorAMayor}
         onResponder={responder}
         onMuestra={onMuestra}
+        onPrimeraRespuesta={onPrimeraRespuesta}
       />
 
       {menuVoz && (
