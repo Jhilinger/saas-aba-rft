@@ -622,6 +622,7 @@ export type Database = {
       }
       clases_rft: {
         Row: {
+          consignas: Json | null
           created_at: string
           estado: Database["public"]["Enums"]["estado_programa_alumno"]
           grupo: string
@@ -632,6 +633,7 @@ export type Database = {
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
         }
         Insert: {
+          consignas?: Json | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
           grupo?: string
@@ -642,6 +644,7 @@ export type Database = {
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
         }
         Update: {
+          consignas?: Json | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
           grupo?: string
@@ -663,6 +666,7 @@ export type Database = {
       }
       clases_rft_base: {
         Row: {
+          consignas: Json | null
           grupo: string
           id: string
           nombre: string
@@ -671,6 +675,7 @@ export type Database = {
           respuestas_esperadas: Json
         }
         Insert: {
+          consignas?: Json | null
           grupo?: string
           id?: string
           nombre: string
@@ -679,6 +684,7 @@ export type Database = {
           respuestas_esperadas?: Json
         }
         Update: {
+          consignas?: Json | null
           grupo?: string
           id?: string
           nombre?: string
@@ -1862,6 +1868,7 @@ export type Database = {
           area: string | null
           ayudas_posibles: string | null
           bloques_para_dominio: number
+          consignas: Json | null
           created_at: string
           direccion_cadena: string | null
           direccion_objetivo: string | null
@@ -1896,6 +1903,7 @@ export type Database = {
           area?: string | null
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
+          consignas?: Json | null
           created_at?: string
           direccion_cadena?: string | null
           direccion_objetivo?: string | null
@@ -1930,6 +1938,7 @@ export type Database = {
           area?: string | null
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
+          consignas?: Json | null
           created_at?: string
           direccion_cadena?: string | null
           direccion_objetivo?: string | null
@@ -1997,6 +2006,7 @@ export type Database = {
           ayudas_posibles: string | null
           bloques_para_dominio: number
           clinica_id: string | null
+          consignas: Json | null
           contenido_actualizado_at: string
           creado_por: string
           created_at: string
@@ -2029,6 +2039,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           clinica_id?: string | null
+          consignas?: Json | null
           contenido_actualizado_at?: string
           creado_por: string
           created_at?: string
@@ -2063,6 +2074,7 @@ export type Database = {
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
           clinica_id?: string | null
+          consignas?: Json | null
           contenido_actualizado_at?: string
           creado_por?: string
           created_at?: string

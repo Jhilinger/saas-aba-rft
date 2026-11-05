@@ -48,7 +48,7 @@ export function esVisible(e: { concepto_imagen: string | null; pantalla: unknown
   return !!e.concepto_imagen || parsearEstimuloPantalla(e.pantalla) !== null
 }
 
-function textoOido(nombre: string) {
+export function textoOido(nombre: string) {
   return nombre.trim().replace(/^["“«]|["”»]$/g, '')
 }
 
@@ -121,6 +121,7 @@ function Presentacion({
   apoyo,
   observacion,
   nivel,
+  consigna,
   onElegir,
   onOpciones,
 }: {
@@ -132,22 +133,31 @@ function Presentacion({
   apoyo: ApoyoTablet | null
   observacion: boolean
   nivel: number
+  // Clave relacional que se dice al aparecer la muestra (si no hay, se dice la muestra oída)
+  consigna: string | null
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
 }) {
   const muestraOida = esOido(origen)
   const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
+  // Test de transformación de funciones: sin muestra (se retiran los A); solo
+  // las opciones y la pregunta
+  const sinMuestra = fase === 'transformacion_funciones' && !respuestaOral
   const [conMuestra, setConMuestra] = useState(false)
   const [observada, setObservada] = useState(false)
-  const conOpciones = conMuestra && (respuestaOral || !observacion || observada)
+  const conOpciones = conMuestra && (respuestaOral || sinMuestra || !observacion || observada)
+  const hablar = () => {
+    if (consigna) decir(consigna)
+    else if (muestraOida) decir(textoOido(origen.nombre))
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setConMuestra(true), PAUSA_ENTRE_ENSAYOS)
     return () => clearTimeout(t)
   }, [])
   useEffect(() => {
-    if (conMuestra && muestraOida) decir(textoOido(origen.nombre))
+    if (conMuestra) hablar()
     // Solo al aparecer la muestra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conMuestra])
@@ -157,7 +167,7 @@ function Presentacion({
   }, [conOpciones])
   // Ayuda de menor a mayor: en cada nivel se repite la muestra
   useEffect(() => {
-    if (nivel > 0 && muestraOida) decir(textoOido(origen.nombre))
+    if (nivel > 0) hablar()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nivel])
 
@@ -190,21 +200,31 @@ function Presentacion({
   const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
   const tocarMuestra = () => {
     if (!conMuestra) return
-    if (muestraOida) decir(textoOido(origen.nombre))
+    hablar()
     setObservada(true)
   }
-  const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-indigo-300'
+  // Muestra en tarjeta con franja superior turquesa; ámbar y latiendo cuando se repite como ayuda
+  const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-slate-200 border-t-[#0F4C5C]'
 
   return (
     <>
-      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
-        <div className="flex items-center justify-center rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
-          {muestraOida ? (
+      <div className={`flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
+        <div className="flex items-center justify-center">
+          {sinMuestra ? (
+            <button
+              type="button"
+              onClick={hablar}
+              className="rounded-full border border-slate-200 bg-white px-[3vmin] py-[1.5vmin] text-[2.5vmin] text-slate-500 shadow-sm"
+              aria-label="Escuchar la pregunta"
+            >
+              🔊 Escuchar
+            </button>
+          ) : muestraOida ? (
             <button
               type="button"
               onClick={tocarMuestra}
               style={{ width: ladoAudio, height: ladoAudio }}
-              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 bg-white ${marcoMuestra}`}
+              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border border-t-[1.2vmin] bg-white shadow-md ${marcoMuestra}`}
               aria-label="Escuchar de nuevo"
             >
               <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
@@ -219,7 +239,7 @@ function Presentacion({
               type="button"
               onClick={tocarMuestra}
               style={{ width: ladoMuestra, height: ladoMuestra }}
-              className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white ${marcoMuestra}`}
+              className={`flex items-center justify-center rounded-[2.5vmin] border border-t-[1.2vmin] bg-white shadow-md ${marcoMuestra}`}
             >
               <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} urlConcepto={urlConcepto} />
             </button>
@@ -229,7 +249,6 @@ function Presentacion({
         {/* Las opciones ocupan su sitio desde el principio para que nada se mueva */}
         {!respuestaOral && (
           <div className={`flex flex-col items-center gap-[2.5vmin] ${conOpciones ? '' : 'invisible'}`}>
-            <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>
             <div className="flex flex-wrap justify-center gap-[2.5vmin]">
               {comparativos.map((c) => {
                 const oculta = !c.esCorrecto && !visibles.has(c.claseId)
@@ -282,6 +301,7 @@ function EnsayoTablet({
   apoyo,
   observacion,
   menorAMayor,
+  consigna,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -294,6 +314,7 @@ function EnsayoTablet({
   apoyo: ApoyoTablet | null
   observacion: boolean
   menorAMayor: boolean
+  consigna: string | null
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -339,6 +360,7 @@ function EnsayoTablet({
       apoyo={transferencia ? null : apoyo}
       observacion={observacion}
       nivel={transferencia ? 0 : nivel}
+      consigna={consigna}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -361,6 +383,7 @@ export default function PantallaTablet({
   apoyo = null,
   observacion = false,
   menorAMayor = false,
+  consigna = null,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -376,6 +399,7 @@ export default function PantallaTablet({
   // Respuesta de observación y ayudas de menor a mayor dentro del ensayo
   observacion?: boolean
   menorAMayor?: boolean
+  consigna?: string | null
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -398,7 +422,7 @@ export default function PantallaTablet({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex select-none flex-col bg-[#F5F2EC]">
+    <div className="fixed inset-0 z-50 flex select-none flex-col bg-white">
       <div className="flex items-start justify-between gap-2 px-3 pt-2">
         <p className="text-[11px] text-slate-300">
           {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? (fase === 'generalizacion' ? 'Sonda de generalización' : fase === 'mantenimiento' ? 'Sonda de mantenimiento' : fase)} ·{' '}
@@ -429,6 +453,7 @@ export default function PantallaTablet({
         apoyo={apoyo}
         observacion={observacion}
         menorAMayor={menorAMayor}
+        consigna={consigna}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

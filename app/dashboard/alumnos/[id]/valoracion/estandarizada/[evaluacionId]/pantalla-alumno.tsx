@@ -86,15 +86,15 @@ function Escenario({
 
   return (
     <>
-      <div className={`flex flex-1 flex-col items-center justify-center gap-[2.5vmin] overflow-hidden px-4 pb-2 ${etapa === 'pausa' ? 'invisible' : ''}`}>
+      <div className={`flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2 ${etapa === 'pausa' ? 'invisible' : ''}`}>
         {(modelos.length > 0 || muestraAuditiva) && (
-          <div className="flex flex-wrap items-center justify-center gap-[2.5vmin] rounded-[3vmin] border-2 border-indigo-200 bg-indigo-50/70 px-[3vmin] py-[2.5vmin]">
+          <div className="flex flex-wrap items-center justify-center gap-[2.5vmin]">
             {modelos.length > 0 ? (
               modelos.map((m, i) => (
                 <span
                   key={i}
                   style={{ width: ladoModelo, height: ladoModelo }}
-                  className={`flex items-center justify-center rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${activo ? '' : 'invisible'}`}
+                  className={`flex items-center justify-center rounded-[2.5vmin] border border-slate-200 border-t-[1.2vmin] border-t-[#0F4C5C] bg-white shadow-md ${activo ? '' : 'invisible'}`}
                 >
                   <ContenidoEstimulo estimulo={m} lado={ladoModelo} urlImagen={urlDe} />
                 </span>
@@ -108,7 +108,7 @@ function Escenario({
                   void decirConsigna(p.consigna)
                 }}
                 style={{ width: ladoAudio, height: ladoAudio }}
-                className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 border-indigo-300 bg-white ${activo ? '' : 'invisible'}`}
+                className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border border-slate-200 border-t-[1.2vmin] border-t-[#0F4C5C] bg-white shadow-md ${activo ? '' : 'invisible'}`}
                 aria-label="Escuchar de nuevo"
               >
                 <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
@@ -121,8 +121,6 @@ function Escenario({
             )}
           </div>
         )}
-
-        {p.opciones && (modelos.length > 0 || muestraAuditiva) && <span className="text-[3vmin] font-semibold leading-none text-slate-400">=</span>}
 
         {p.opciones && (
           <div className="flex flex-wrap justify-center gap-[2.5vmin]" style={{ maxWidth: `calc(${porFila} * (${ladoOpcion} + 2.5vmin))` }}>
@@ -289,7 +287,7 @@ export default function PantallaAlumno({
   const orden = ordenes[actual.indice] ?? []
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#F5F2EC] select-none">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white select-none">
       <div className="flex items-start justify-between gap-2 px-3 pt-2">
         <p className="max-w-[75%] text-[11px] text-slate-300">
           {p.fase === 'enunciado' ? 'Enunciado' : p.fase === 'entrenamiento' ? `Entrenamiento · bloque ${bloques + 1}` : p.fase === 'comprobacion' ? 'Comprobación' : 'Test'}

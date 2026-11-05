@@ -20,7 +20,8 @@ import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronome
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
-import PantallaTablet, { esOido, esVisible, type ImagenesBanco } from './pantalla-tablet'
+import PantallaTablet, { esOido, esVisible, textoOido, type ImagenesBanco } from './pantalla-tablet'
+import { consignaPara, leerConsignasClase, leerConsignasPrograma } from '../../../consignas-rft'
 import {
   describirEscalon,
   leerEscalonBloque,
@@ -34,7 +35,7 @@ import AyudaTermino from '../../../ayuda-termino'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla: unknown }
-type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft: Estimulo[] }
+type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
 type EnsayoRft = {
@@ -276,6 +277,7 @@ export default function TomarDatosRftClient({
   imagenes,
   sinError,
   ultimosEscalones,
+  consignas,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -295,6 +297,8 @@ export default function TomarDatosRftClient({
   // Aprendizaje sin error (solo si está activo) y escalón del último bloque por grupo__origen__destino
   sinError: ConfigSinError | null
   ultimosEscalones: Record<string, Json>
+  // Consignas del programa (claves relacionales por paso; ver consignas-rft.ts)
+  consignas: Json
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -1231,6 +1235,17 @@ export default function TomarDatosRftClient({
   }
 
   const origenActual = encontrarEstimulo(claseActual, posicionOrigen)!
+  // Clave relacional del ensayo: la dice la tableta y la lee el terapeuta con material
+  const consignaActual = consignaPara(
+    leerConsignasPrograma(consignas),
+    leerConsignasClase(claseActual.consignas),
+    faseEfectiva,
+    posicionOrigen,
+    posicionDestino,
+    textoOido(origenActual.nombre)
+  )
+  // Sin pregunta escrita, se registra la consigna como pregunta del ensayo
+  const preguntaRegistro = preguntaActual.trim() || consignaActual || ''
   const esTransformacion = fase === 'transformacion_funciones'
   // La fase elegida decide el tipo de respuesta (las sondas usan el de su fase)
   const config = configRespuesta(respuesta, fase)
@@ -1246,7 +1261,7 @@ export default function TomarDatosRftClient({
   // Opciones fijas: con respuesta esperada se corrige sola; si no, el terapeuta marca ✓/✗
   const elegirOpcion = (opcion: string) => {
     if (esperada) {
-      registrar(opcion === esperada, 'independiente', preguntaActual, opcion)
+      registrar(opcion === esperada, 'independiente', preguntaRegistro, opcion)
     } else {
       cronometro.capturar()
       setRespuestaPendiente(opcion)
@@ -1288,6 +1303,7 @@ export default function TomarDatosRftClient({
         }
         observacion={!!sinError?.observacion}
         menorAMayor={menorAMayorBloque}
+        consigna={consignaActual}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
@@ -1373,6 +1389,11 @@ export default function TomarDatosRftClient({
       )}
 
       <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
+        {consignaActual && (
+          <p className="text-sm text-slate-600">
+            Clave relacional: <strong className="text-slate-800">«{consignaActual}»</strong>
+          </p>
+        )}
         {esTransformacion ? (
           <p className="text-sm text-slate-500">
             Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
@@ -1416,7 +1437,7 @@ export default function TomarDatosRftClient({
               setPreguntaActual(e.target.value)
               cronometro.reiniciar()
             }}
-            placeholder="Escribe aquí la pregunta que le haces al alumno..."
+            placeholder={consignaActual ? `Pregunta (si no escribes otra, se guarda «${consignaActual}»)` : 'Escribe aquí la pregunta que le haces al alumno...'}
             rows={2}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
           />
@@ -1440,7 +1461,7 @@ export default function TomarDatosRftClient({
                 <button
                   key={a.value}
                   onClick={() =>
-                    registrar(true, a.value, preguntaActual, config.tipo === 'opciones' ? esperada : respuestaRegistrada)
+                    registrar(true, a.value, preguntaRegistro, config.tipo === 'opciones' ? esperada : respuestaRegistrada)
                   }
                   disabled={isPending}
                   className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
@@ -1464,7 +1485,7 @@ export default function TomarDatosRftClient({
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="success"
-                onClick={() => registrar(true, 'independiente', preguntaActual, respuestaPendiente)}
+                onClick={() => registrar(true, 'independiente', preguntaRegistro, respuestaPendiente)}
                 disabled={isPending}
                 className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
               >
@@ -1472,7 +1493,7 @@ export default function TomarDatosRftClient({
               </Button>
               <Button
                 variant="danger"
-                onClick={() => registrar(false, 'independiente', preguntaActual, respuestaPendiente)}
+                onClick={() => registrar(false, 'independiente', preguntaRegistro, respuestaPendiente)}
                 disabled={isPending}
                 className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
               >
@@ -1515,7 +1536,7 @@ export default function TomarDatosRftClient({
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
               variant="success"
-              onClick={() => registrar(true, 'independiente', preguntaActual, respuestaRegistrada)}
+              onClick={() => registrar(true, 'independiente', preguntaRegistro, respuestaRegistrada)}
               disabled={isPending}
               className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >
@@ -1534,7 +1555,7 @@ export default function TomarDatosRftClient({
             </Button>
             <Button
               variant="danger"
-              onClick={() => registrar(false, 'independiente', preguntaActual, respuestaRegistrada)}
+              onClick={() => registrar(false, 'independiente', preguntaRegistro, respuestaRegistrada)}
               disabled={isPending}
               className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
             >

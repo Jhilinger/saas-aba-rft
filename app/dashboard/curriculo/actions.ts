@@ -434,6 +434,7 @@ export async function clonarPrograma(id: string) {
       opciones_respuesta: original.opciones_respuesta,
       respuesta_por_fase: original.respuesta_por_fase,
       secuencia_rft: original.secuencia_rft,
+      consignas: original.consignas,
       orden: null,
       dominio_id: original.dominio_id,
       clinica_id: original.clinica_id,
@@ -501,7 +502,7 @@ export async function clonarPrograma(id: string) {
   } else if (original.tipo === 'rft') {
     const { data: clases } = await supabase
       .from('clases_rft_base')
-      .select('nombre, grupo, orden, respuestas_esperadas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
+      .select('nombre, grupo, orden, respuestas_esperadas, consignas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
       .eq('programa_base_id', id)
       .order('orden')
 
@@ -514,6 +515,7 @@ export async function clonarPrograma(id: string) {
           grupo: clase.grupo,
           orden: clase.orden,
           respuestas_esperadas: clase.respuestas_esperadas,
+          consignas: clase.consignas,
         })
         .select('id')
         .single()

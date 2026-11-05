@@ -23,7 +23,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
     const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id, formato_recogida, direccion_objetivo, direccion_cadena, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft'
+      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id, formato_recogida, direccion_objetivo, direccion_cadena, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas'
     )
     .eq('id', programaBaseId)
     .single()
@@ -78,6 +78,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
       opciones_respuesta: base.opciones_respuesta,
       respuesta_por_fase: base.respuesta_por_fase,
       secuencia_rft: base.secuencia_rft,
+      consignas: base.consignas,
       ...excepcion,
     })
     .select('id')
@@ -147,7 +148,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
   } else if (base.tipo === 'rft') {
     const { data: clasesBase } = await supabase
       .from('clases_rft_base')
-      .select('id, nombre, grupo, orden, respuestas_esperadas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
+      .select('id, nombre, grupo, orden, respuestas_esperadas, consignas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
       .eq('programa_base_id', programaBaseId)
       .order('orden')
 
@@ -160,6 +161,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
           grupo: clase.grupo,
           tipo_relacion: base.tipo_relacion ?? 'coordinacion',
           respuestas_esperadas: clase.respuestas_esperadas,
+          consignas: clase.consignas,
         })
         .select('id')
         .single()

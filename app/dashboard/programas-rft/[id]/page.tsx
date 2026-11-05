@@ -14,6 +14,10 @@ import PanelAlertas from '../../panel-alertas'
 import { cargarAlertas } from '../../cargar-alertas'
 import { cargarImagenes } from '../../imagenes-estimulo'
 import SinErrorPanel from './sin-error-panel'
+import ConsignasPanel from './consignas-panel'
+import { leerConsignasClase, leerConsignasPrograma } from '../../consignas-rft'
+import { leerSecuencia, secuenciaGenerica } from '../../secuencia-rft'
+import { coerceNivelRft } from '../../niveles-rft'
 import { leerSinError } from '../../sin-error'
 
 const NOMBRE_FASE: Record<string, string> = {
@@ -58,7 +62,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -137,7 +141,7 @@ export default async function ProgramaRftPage({
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, estimulos_rft(id, etiqueta, nombre, posicion, concepto_imagen), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, consignas, estimulos_rft(id, etiqueta, nombre, posicion, concepto_imagen), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')
@@ -196,6 +200,19 @@ export default async function ProgramaRftPage({
       {disena && <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} />}
       {infoPanel}
       <SinErrorPanel programaAlumnoId={id} config={leerSinError(programa.sin_error)} soloLectura={!disena} />
+
+      <ConsignasPanel
+        programaAlumnoId={id}
+        pasos={(() => {
+          const delPrograma = leerSecuencia(programa.secuencia_rft)
+          if (delPrograma.length) return delPrograma
+          const posiciones = [...new Set((clases ?? []).flatMap((c) => c.estimulos_rft.map((e) => e.posicion).filter((x): x is string => !!x)))]
+          return secuenciaGenerica(coerceNivelRft(programa.nivel_rft), posiciones)
+        })()}
+        consignas={leerConsignasPrograma(programa.consignas)}
+        clases={(clases ?? []).map((c) => ({ id: c.id, nombre: c.nombre, grupo: c.grupo, consignas: leerConsignasClase(c.consignas) }))}
+        soloLectura={!disena}
+      />
 
       <ProgramaRftClient
         programaAlumnoId={id}

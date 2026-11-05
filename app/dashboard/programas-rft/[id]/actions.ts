@@ -8,6 +8,7 @@ import type { Json, Tables } from '@/database.types'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 import { validarRespuestasEsperadas } from '../../respuestas-rft'
 import { errorConfig, leerSinError } from '../../sin-error'
+import { leerConsignasClase, leerConsignasPrograma } from '../../consignas-rft'
 
 // Confirma (con el cliente normal, sujeto a RLS) que el usuario autenticado
 // puede ver este programa antes de usar el cliente admin para el borrado en
@@ -274,6 +275,38 @@ export async function guardarSinError(programaAlumnoId: string, config: unknown)
 
   const { error } = await supabase.from('programas_alumno').update({ sin_error: valida }).eq('id', programaAlumnoId)
   if (error) return { error: error.message }
+
+  revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
+  revalidatePath(`/dashboard/tomar-datos/rft/${programaAlumnoId}`)
+  return { success: true }
+}
+
+// --- CONSIGNAS ---
+
+export async function guardarConsignas(
+  programaAlumnoId: string,
+  programa: unknown,
+  clases: { id: string; consignas: unknown }[]
+) {
+  if (!(await puedeDisenar(await createClient()))) return { error: SIN_PERMISO_DISENO }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+
+  // Los textos vacíos se descartan al leer
+  const consignas = leerConsignasPrograma(programa as Json)
+  const { error } = await supabase.from('programas_alumno').update({ consignas }).eq('id', programaAlumnoId)
+  if (error) return { error: error.message }
+
+  for (const clase of clases) {
+    const propias = leerConsignasClase(clase.consignas as Json)
+    const { error: claseError } = await supabase
+      .from('clases_rft')
+      .update({ consignas: Object.keys(propias).length ? propias : null })
+      .eq('id', clase.id)
+      .eq('programa_alumno_id', programaAlumnoId)
+    if (claseError) return { error: claseError.message }
+  }
 
   revalidatePath(`/dashboard/programas-rft/${programaAlumnoId}`)
   revalidatePath(`/dashboard/tomar-datos/rft/${programaAlumnoId}`)
