@@ -670,6 +670,8 @@ export default function TomarDatosRftClient({
     grupos.map((g) => ({ grupo: g, posiciones: posicionesDe(g) })),
     dominioFases
   )
+  // Solo se da por completada la secuencia si el grupo tiene algo dominado
+  const grupoConDatos = dominioFases.some((d) => d.grupo === grupoSeleccionado)
   const recomendacionGrupo = grupoSeleccionado
     ? recomendarBloque(secuenciaPrograma, nivel, [{ grupo: grupoSeleccionado, posiciones: posicionesDe(grupoSeleccionado) }], dominioFases)
     : null
@@ -1048,10 +1050,14 @@ export default function TomarDatosRftClient({
           <button onClick={() => setManual(false)} className="text-sm font-medium text-indigo-600 hover:underline">
             ← Volver al bloque recomendado
           </button>
-        ) : (
+        ) : grupoConDatos ? (
           <p className="rounded-lg bg-emerald-50 p-2 text-sm text-emerald-800">
             Secuencia del programa completada en este grupo: puedes registrar sondas de mantenimiento o generalización, o
             trabajar otro grupo.
+          </p>
+        ) : (
+          <p className="rounded-lg bg-amber-50 p-2 text-sm text-amber-800">
+            No hay un bloque recomendado para este grupo: elige la fase y las posiciones a mano.
           </p>
         )}
 

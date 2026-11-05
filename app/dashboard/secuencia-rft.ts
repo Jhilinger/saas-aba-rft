@@ -35,6 +35,9 @@ export function leerSecuencia(valor: Json | null | undefined): PasoSecuencia[] {
 export function secuenciaGenerica(nivel: NivelRft, posiciones: string[]): PasoSecuencia[] {
   if (nivel === 'abstraccion') return [{ fase: 'entrenamiento', origen: 'A', destino: 'A' }]
   const ordenadas = [...new Set(posiciones)].sort()
+  // Grupo con una sola posición (igualación de identidad): no hay pares que
+  // encadenar, así que se entrena esa posición consigo misma
+  if (ordenadas.length === 1) return [{ fase: 'entrenamiento', origen: ordenadas[0], destino: ordenadas[0] }]
   const fases = FASES_POR_NIVEL[nivel]
   const entrenadas = ordenadas.slice(1).map((p, i) => [ordenadas[i], p] as const)
   const pasos: PasoSecuencia[] = entrenadas.map(([origen, destino]) => ({ fase: 'entrenamiento', origen, destino }))
