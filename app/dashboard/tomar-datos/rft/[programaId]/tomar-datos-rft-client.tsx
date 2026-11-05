@@ -22,6 +22,7 @@ import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
 import PantallaTablet, { esOido, esVisible, textoOido, type ImagenesBanco } from './pantalla-tablet'
 import { consignaPara, leerConsignasClase, leerConsignasPrograma } from '../../../consignas-rft'
+import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import {
   describirEscalon,
   leerEscalonBloque,
@@ -645,6 +646,8 @@ export default function TomarDatosRftClient({
     escalon: EscalonActivo | null = null,
     menorAMayor = false
   ) => {
+    // Se llama desde un toque: desbloquea el audio para que las claves grabadas suenen solas
+    desbloquearAudio()
     modoBloqueRef.current = modoInicial
     fijarEscalon(escalon)
     fijarMenorAMayor(menorAMayor)
@@ -813,6 +816,22 @@ export default function TomarDatosRftClient({
   }
 
   const deshacerUltimo = () => setEnsayos((prev) => prev.slice(0, -1))
+
+  // En la tableta, descarga al empezar las claves grabadas de todo el bloque
+  // (así suenan sin esperas y aunque se corte la conexión)
+  useEffect(() => {
+    if (!enTableta || !secuencia) return
+    const programa = leerConsignasPrograma(consignas)
+    for (const clase of new Set(secuencia)) {
+      const origen = encontrarEstimulo(clase, posicionOrigen)
+      if (!origen) continue
+      const texto =
+        consignaPara(programa, leerConsignasClase(clase.consignas), faseEfectiva, posicionOrigen, posicionDestino, textoOido(origen.nombre)) ??
+        (esOido(origen) ? textoOido(origen.nombre) : null)
+      if (texto) void precargarFraseRft(texto)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enTableta, secuencia])
 
   // Guarda el progreso en el dispositivo según se registra cada ensayo
   useEffect(() => {
@@ -1334,6 +1353,7 @@ export default function TomarDatosRftClient({
                   fijarEscalon(escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, 'tableta', clasesValidas))
                   fijarMenorAMayor(menorAMayorPara(posicionDestino, faseEfectiva, 'tableta', clasesValidas))
                 }
+                desbloquearAudio()
                 modoBloqueRef.current = 'tableta'
                 setEnTableta(true)
               }}

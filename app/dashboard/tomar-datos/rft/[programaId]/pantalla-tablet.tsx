@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { PAUSA_ENTRE_ENSAYOS } from '../../../etapas-ensayo'
-import { decir } from '../../../voz'
+import { decirFraseRft } from '../../../voz'
 import AjustesVoz from '../../../ajustes-voz'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 import ContenidoEstimulo from '../../../contenido-estimulo'
@@ -148,8 +148,8 @@ function Presentacion({
   const [observada, setObservada] = useState(false)
   const conOpciones = conMuestra && (respuestaOral || sinMuestra || !observacion || observada)
   const hablar = () => {
-    if (consigna) decir(consigna)
-    else if (muestraOida) decir(textoOido(origen.nombre))
+    if (consigna) void decirFraseRft(consigna)
+    else if (muestraOida) void decirFraseRft(textoOido(origen.nombre))
   }
 
   useEffect(() => {

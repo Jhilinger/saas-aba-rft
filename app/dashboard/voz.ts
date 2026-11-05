@@ -1,6 +1,6 @@
 'use client'
 
-import { rutaConsignaGrabada, textoParaVoz } from './consignas-grabadas'
+import { rutaConsignaGrabada, rutaFraseRft, textoParaVoz } from './consignas-grabadas'
 
 // Voz sintética de las pantallas de tableta. Usa las voces del dispositivo
 // (Web Speech API); la voz y la velocidad elegidas se guardan en el propio
@@ -74,30 +74,39 @@ export function desbloquearAudio() {
   if (ctx?.state === 'suspended') void ctx.resume()
 }
 
-function urlGrabacion(texto: string) {
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/biblioteca/${rutaConsignaGrabada(texto)}`
+function urlGrabacion(ruta: string) {
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/biblioteca/${ruta}`
 }
 
-// Descarga y decodifica la grabación (una vez por consigna); null si no hay
-export function precargarConsigna(texto: string) {
+// Descarga y decodifica una grabación (una vez por ruta); null si no hay
+function precargar(ruta: string) {
   const ctx = contextoAudio()
   if (!ctx) return Promise.resolve(null)
-  let grabacion = grabaciones.get(texto)
+  let grabacion = grabaciones.get(ruta)
   if (!grabacion) {
-    grabacion = fetch(urlGrabacion(texto))
+    grabacion = fetch(urlGrabacion(ruta))
       .then((res) => (res.ok ? res.arrayBuffer() : null))
       .then((datos) => (datos ? ctx.decodeAudioData(datos) : null))
       .catch(() => null)
-    grabaciones.set(texto, grabacion)
+    grabaciones.set(ruta, grabacion)
   }
   return grabacion
 }
 
+export function precargarConsigna(texto: string) {
+  return precargar(rutaConsignaGrabada(texto))
+}
+
+// Claves relacionales de la tableta RFT (grabadas con otra voz)
+export function precargarFraseRft(texto: string) {
+  return precargar(rutaFraseRft(texto))
+}
+
 let sonando: AudioBufferSourceNode | null = null
 
-export async function decirConsigna(texto: string) {
+async function reproducir(texto: string, ruta: string) {
   const ctx = contextoAudio()
-  const buffer = await precargarConsigna(texto)
+  const buffer = await precargar(ruta)
   if (!ctx || !buffer) {
     decir(textoParaVoz(texto))
     return
@@ -110,4 +119,14 @@ export async function decirConsigna(texto: string) {
   fuente.connect(ctx.destination)
   fuente.start()
   sonando = fuente
+}
+
+export function decirConsigna(texto: string) {
+  return reproducir(texto, rutaConsignaGrabada(texto))
+}
+
+// Dice una frase de la tableta RFT con su grabación o, si no la hay (ej. una
+// clave editada o un estímulo propio), con la voz del dispositivo
+export function decirFraseRft(texto: string) {
+  return reproducir(texto, rutaFraseRft(texto))
 }

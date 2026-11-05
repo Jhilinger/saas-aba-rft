@@ -24,6 +24,14 @@ export function rutaConsignaGrabada(texto: string) {
   return `voz/${VOZ_GRABADA}/${hash(texto.trim())}.m4a`
 }
 
+// Claves relacionales de los programas RFT (scripts/voz/grabar-rft.mjs): otra
+// voz y otro proveedor (Google Cloud Text-to-Speech, Chirp 3 HD), en MP3
+export const VOZ_RFT = 'es-ES-Chirp3-HD-Despina'
+
+export function rutaFraseRft(texto: string) {
+  return `voz/rft/${VOZ_RFT}/${hash(texto.trim())}.mp3`
+}
+
 // Texto que se manda a la voz: las palabras en mayúsculas (pseudopalabras
 // como MELO o DOVI) se pasan a minúsculas para que se lean como palabras y
 // no letra a letra
