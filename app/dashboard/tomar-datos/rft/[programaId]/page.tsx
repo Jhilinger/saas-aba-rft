@@ -7,7 +7,7 @@ import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-
 import { cargarImagenes } from '../../../imagenes-estimulo'
 import { leerSinError } from '../../../sin-error'
 import ConceptosTablet from './conceptos-tablet'
-import { CATEGORIAS_ENTRENAMIENTO, CATEGORIAS_GENERALIZACION, CONCEPTOS_OPUESTOS, leerActividadConceptos, type Concepto } from '../../../conceptos'
+import { CATEGORIAS_ENTRENAMIENTO, CATEGORIAS_GENERALIZACION, conceptosPropiosDe, leerActividadConceptos, type Concepto } from '../../../conceptos'
 
 export default async function TomarDatosRftPage({
   params,
@@ -107,7 +107,7 @@ export default async function TomarDatosRftPage({
       .or(categorias.map((c) => `concepto.like.${c}/%`).join(','))
     const de = (lista: string[]) => (banco ?? []).filter((b) => lista.includes(b.concepto.split('/')[0]))
     conceptosActividad = { entrenamiento: de(CATEGORIAS_ENTRENAMIENTO), generalizacion: de(CATEGORIAS_GENERALIZACION) }
-    imagenesActividad = await cargarImagenes(supabase, actividad.tipo === 'oposicion' ? CONCEPTOS_OPUESTOS : (banco ?? []).map((b) => b.concepto))
+    imagenesActividad = await cargarImagenes(supabase, conceptosPropiosDe(actividad) ?? (banco ?? []).map((b) => b.concepto))
   }
 
   return (

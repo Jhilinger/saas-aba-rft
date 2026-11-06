@@ -13,10 +13,56 @@ export type Dimension = 'tamano' | 'cantidad' | 'longitud' | 'altura'
 export type NivelDistincion = { nombre: string; modo: ModoDistincion; opciones: number }
 export type NivelComparacion = { nombre: string; dimensiones: Dimension[]; proporcion: number; intermedio: boolean }
 export type NivelOposicion = { nombre: string; opciones: number }
+export type ParEspacial = 'encima_debajo' | 'dentro_fuera' | 'delante_detras'
+export type NivelEspacial = { nombre: string; pares: ParEspacial[] }
+export type NivelTemporal = { nombre: string; modo: 'primero_despues' | 'antes_despues' }
 export type ActividadConceptos =
   | { tipo: 'distincion'; niveles: NivelDistincion[] }
   | { tipo: 'comparacion'; niveles: NivelComparacion[] }
   | { tipo: 'oposicion'; niveles: NivelOposicion[] }
+  | { tipo: 'espacial'; niveles: NivelEspacial[] }
+  | { tipo: 'temporal'; niveles: NivelTemporal[] }
+
+// Escenas espaciales (scripts/imagenes/escenas-conceptos.mjs): el mismo par
+// de objetos en cada relación. [objeto, artículo, referencia, artículo, uso, relaciones que faltan]
+const ESCENAS: [string, string, string, string, 'entrenamiento' | 'generalizacion', string[]][] = [
+  ['pelota', 'la', 'caja', 'la', 'entrenamiento', []],
+  ['osito', 'el', 'cesta', 'la', 'entrenamiento', []],
+  ['manzana', 'la', 'bol', 'el', 'entrenamiento', []],
+  ['coche', 'el', 'cubo', 'el', 'entrenamiento', []],
+  ['gato', 'el', 'caja-zapatos', 'la', 'generalizacion', []],
+  ['perro', 'el', 'caseta', 'la', 'generalizacion', ['debajo']],
+]
+const PARES_ESPACIALES: Record<ParEspacial, [string, string]> = {
+  encima_debajo: ['encima', 'debajo'],
+  dentro_fuera: ['dentro', 'fuera'],
+  delante_detras: ['delante', 'detras'],
+}
+const NOMBRE_RELACION: Record<string, string> = { encima: 'encima', debajo: 'debajo', dentro: 'dentro', fuera: 'fuera', delante: 'delante', detras: 'detrás' }
+
+function fraseEspacial(objeto: string, artObjeto: string, referencia: string, artReferencia: string, relacion: string) {
+  const ref = referencia.replace('caja-zapatos', 'caja de zapatos')
+  const de = artReferencia === 'el' ? 'del' : `de ${artReferencia}`
+  return `Toca donde ${artObjeto} ${objeto} está ${NOMBRE_RELACION[relacion]} ${de} ${ref}`
+}
+
+// Secuencias de viñetas: [conceptos en orden, uso]
+const SECUENCIAS: [string[], 'entrenamiento' | 'generalizacion'][] = [
+  ...['globo', 'hielo', 'vela', 'manzana', 'torre', 'vaso', 'dibujo'].map(
+    (s) => [[1, 2, 3].map((i) => `secuencias/${s}-${i}`), 'entrenamiento'] as [string[], 'entrenamiento']
+  ),
+  [['evaluacion-secuencias/semilla', 'evaluacion-secuencias/riego', 'evaluacion-secuencias/flor'], 'entrenamiento'],
+  [[1, 2, 3].map((i) => `secuencias/tostada-${i}`), 'generalizacion'],
+  [[1, 2, 3].map((i) => `secuencias/planta-${i}`), 'generalizacion'],
+  [['evaluacion-secuencias/huevo', 'evaluacion-secuencias/huevo-rompiendose', 'evaluacion-secuencias/pollito-nacido'], 'generalizacion'],
+]
+
+export const CONCEPTOS_ESCENAS = ESCENAS.flatMap(([o, , r, , , sin]) =>
+  Object.keys(NOMBRE_RELACION)
+    .filter((rel) => !sin.includes(rel))
+    .map((rel) => `espaciales/${o}-${rel}-${r}`)
+)
+export const CONCEPTOS_SECUENCIAS = SECUENCIAS.flatMap(([c]) => c)
 
 // Pares de opuestos del banco (scripts/imagenes/pares-oposicion.mjs): el mismo
 // objeto en los dos polos. Se entrena con unas dimensiones y se generaliza con
@@ -60,6 +106,9 @@ export const CONSIGNAS = {
   diferente: 'Toca el diferente',
   intruso: '¿Cuál es diferente?',
   contrario: 'Toca el contrario',
+  primero: '¿Qué pasó primero?',
+  despues: '¿Qué pasó después?',
+  antes: '¿Qué pasó antes?',
   tamano: ['¿Cuál es más grande?', '¿Cuál es más pequeño?'],
   cantidad: ['¿Dónde hay más?', '¿Dónde hay menos?'],
   longitud: ['¿Cuál es más largo?', '¿Cuál es más corto?'],
@@ -67,7 +116,18 @@ export const CONSIGNAS = {
 } as const
 
 export function frasesConceptos(): string[] {
-  return Object.values(CONSIGNAS).flat()
+  const espaciales = ESCENAS.flatMap(([o, ao, r, ar, , sin]) =>
+    Object.keys(NOMBRE_RELACION).filter((rel) => !sin.includes(rel)).map((rel) => fraseEspacial(o, ao, r, ar, rel))
+  )
+  return [...Object.values(CONSIGNAS).flat(), ...espaciales]
+}
+
+// Imágenes del banco que necesita una actividad (las que no salen de las categorías generales)
+export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | null {
+  if (actividad.tipo === 'oposicion') return CONCEPTOS_OPUESTOS
+  if (actividad.tipo === 'espacial') return CONCEPTOS_ESCENAS
+  if (actividad.tipo === 'temporal') return CONCEPTOS_SECUENCIAS
+  return null
 }
 
 const DIMENSIONES: Dimension[] = ['tamano', 'cantidad', 'longitud', 'altura']
@@ -85,6 +145,21 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
       opciones: typeof n.opciones === 'number' ? Math.min(5, Math.max(2, Math.round(n.opciones))) : 2,
     }))
     return lista.length ? { tipo: 'distincion', niveles: lista } : null
+  }
+  if (o.tipo === 'espacial') {
+    const validos = Object.keys(PARES_ESPACIALES) as ParEspacial[]
+    const lista = niveles.map((n, i) => {
+      const pares = Array.isArray(n.pares) ? (n.pares as unknown[]).filter((p): p is ParEspacial => validos.includes(p as ParEspacial)) : []
+      return { nombre: nombre(n, i), pares: pares.length ? pares : (['encima_debajo'] as ParEspacial[]) }
+    })
+    return lista.length ? { tipo: 'espacial', niveles: lista } : null
+  }
+  if (o.tipo === 'temporal') {
+    const lista = niveles.map((n, i) => ({
+      nombre: nombre(n, i),
+      modo: n.modo === 'antes_despues' ? ('antes_despues' as const) : ('primero_despues' as const),
+    }))
+    return lista.length ? { tipo: 'temporal', niveles: lista } : null
   }
   if (o.tipo === 'oposicion') {
     const lista = niveles.map((n, i) => ({
@@ -219,6 +294,51 @@ function oposicion(nivel: NivelOposicion, generalizacion: boolean, n: number, az
   })
 }
 
+// Espaciales: dos escenas con los dos polos de un par y los mismos objetos;
+// la clave nombra la relación («Toca donde la pelota está encima de la caja»)
+function espacial(nivel: NivelEspacial, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+  const escenas = ESCENAS.filter(([, , , , uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento'))
+  const polos = alternados<0 | 1>(0, 1, n, azar)
+  return polos.map((polo, i) => {
+    const par = PARES_ESPACIALES[nivel.pares[i % nivel.pares.length]]
+    const posibles = escenas.filter(([, , , , , sin]) => !par.some((r) => sin.includes(r)))
+    const [o, ao, r, ar] = posibles[Math.floor(azar() * posibles.length)]
+    const pedida = par[polo]
+    const opciones: OpcionGenerada[] = par.map((rel) => ({
+      pantalla: { img: `espaciales/${o}-${rel}-${r}` },
+      etiqueta: `${o} ${NOMBRE_RELACION[rel]} ${r}`,
+      correcta: rel === pedida,
+    }))
+    return { clave: pedida, consigna: fraseEspacial(o, ao, r, ar, pedida), muestra: null, opciones: barajar(opciones, azar) }
+  })
+}
+
+// Temporales: «¿Qué pasó primero / después?» entre dos viñetas seguidas, o una
+// viñeta como muestra y «¿Qué pasó antes / después?» entre la anterior y la siguiente
+function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+  const secuencias = SECUENCIAS.filter(([, uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento')).map(([c]) => c)
+  const polos = alternados<0 | 1>(0, 1, n, azar)
+  const nombre = (c: string) => c.split('/')[1]
+  return polos.map((polo) => {
+    const s = secuencias[Math.floor(azar() * secuencias.length)]
+    if (nivel.modo === 'antes_despues') {
+      const [antes, muestra, despues] = s
+      const opciones: OpcionGenerada[] = [
+        { pantalla: { img: antes }, etiqueta: nombre(antes), correcta: polo === 0 },
+        { pantalla: { img: despues }, etiqueta: nombre(despues), correcta: polo === 1 },
+      ]
+      return { clave: polo === 0 ? 'antes' : 'despues', consigna: polo === 0 ? CONSIGNAS.antes : CONSIGNAS.despues, muestra: { img: muestra }, opciones: barajar(opciones, azar) }
+    }
+    const k = Math.floor(azar() * (s.length - 1))
+    const [primera, segunda] = [s[k], s[k + 1]]
+    const opciones: OpcionGenerada[] = [
+      { pantalla: { img: primera }, etiqueta: nombre(primera), correcta: polo === 0 },
+      { pantalla: { img: segunda }, etiqueta: nombre(segunda), correcta: polo === 1 },
+    ]
+    return { clave: polo === 0 ? 'primero' : 'despues', consigna: polo === 0 ? CONSIGNAS.primero : CONSIGNAS.despues, muestra: null, opciones: barajar(opciones, azar) }
+  })
+}
+
 export function generarBloque(
   actividad: ActividadConceptos,
   indiceNivel: number,
@@ -228,6 +348,8 @@ export function generarBloque(
   azar: Azar = Math.random
 ): EnsayoGenerado[] {
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
+  if (actividad.tipo === 'espacial') return espacial(actividad.niveles[indiceNivel], generalizacion, n, azar)
+  if (actividad.tipo === 'temporal') return temporal(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (!conceptos.length) return []
   if (actividad.tipo === 'distincion') return distincion(actividad.niveles[indiceNivel], conceptos, n, azar)
   return comparacion(actividad.niveles[indiceNivel], conceptos, n, azar)
