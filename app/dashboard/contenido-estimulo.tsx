@@ -25,6 +25,30 @@ export default function ContenidoEstimulo({
       </span>
     )
   }
+  if ('forma' in estimulo) {
+    if (estimulo.forma === 'lapiz') {
+      // Lápiz horizontal; su longitud es la fracción valor del ancho
+      const largo = Math.max(0.15, Math.min(1, estimulo.valor)) * 0.9
+      return (
+        <svg viewBox="0 0 100 20" preserveAspectRatio="none" style={{ width: f(largo), height: f(0.12) }} aria-hidden>
+          <rect x="0" y="3" width="84" height="14" rx="2" fill="#F2B84B" />
+          <rect x="0" y="3" width="8" height="14" rx="2" fill="#E07A5F" />
+          <polygon points="84,3 100,10 84,17" fill="#E9D5B5" />
+          <polygon points="95,8 100,10 95,12" fill="#334155" />
+        </svg>
+      )
+    }
+    // Torre de bloques de colores
+    const bloques = Math.max(1, Math.min(10, Math.round(estimulo.valor)))
+    const COLORES = ['#E07A5F', '#0F4C5C', '#F2B84B', '#81B29A', '#3D405B']
+    return (
+      <span className="flex flex-col-reverse items-center" style={{ height: f(0.9), justifyContent: 'flex-start' }}>
+        {Array.from({ length: bloques }, (_, i) => (
+          <span key={i} className="rounded-sm" style={{ width: f(0.3), height: f(0.085), background: COLORES[i % COLORES.length], marginTop: f(0.004) }} />
+        ))}
+      </span>
+    )
+  }
   if ('externo' in estimulo) {
     return (
       <span className="px-2 text-center text-slate-400" style={{ fontSize: f(0.08) }}>
@@ -52,7 +76,17 @@ export default function ContenidoEstimulo({
       <span className="flex flex-col items-center justify-center" style={{ gap: f(0.03) }}>
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="" draggable={false} className="object-contain" style={{ width: f(estimulo.etiqueta ? 0.68 : 0.88), height: f(estimulo.etiqueta ? 0.68 : 0.88) }} />
+          <img
+            src={url}
+            alt=""
+            draggable={false}
+            className="object-contain"
+            style={{
+              width: f((estimulo.etiqueta ? 0.68 : 0.88) * (estimulo.escala ?? 1)),
+              height: f((estimulo.etiqueta ? 0.68 : 0.88) * (estimulo.escala ?? 1)),
+              filter: estimulo.tono ? `hue-rotate(${estimulo.tono}deg) saturate(1.3)` : undefined,
+            }}
+          />
         ) : (
           <span className="text-slate-400" style={{ fontSize: f(0.08) }}>
             {estimulo.img}

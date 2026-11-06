@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url'
 import { createClient } from '@supabase/supabase-js'
 import { VOZ_RFT, rutaFraseRft, textoParaVoz } from '../../app/dashboard/consignas-grabadas.ts'
 import { consignaPara, leerConsignasClase, leerConsignasPrograma } from '../../app/dashboard/consignas-rft.ts'
+import { frasesConceptos } from '../../app/dashboard/conceptos.ts'
 
 const aqui = path.dirname(fileURLToPath(import.meta.url))
 const salida = path.join(aqui, 'salida')
@@ -21,7 +22,10 @@ const VELOCIDAD = 0.9
 const CONCURRENCIA = 2
 const REINTENTOS = 4
 // Frases de las actividades de tableta que no salen de las claves relacionales
-const FRASES_FIJAS = { '¿Dónde está?': ['Seguir visualmente · juego de los vasos'] }
+const FRASES_FIJAS = {
+  '¿Dónde está?': ['Seguir visualmente · juego de los vasos'],
+  ...Object.fromEntries(frasesConceptos().map((f) => [f, ['Conceptos básicos · ensayos generados']])),
+}
 
 const args = process.argv.slice(2)
 const solo = args.includes('--solo') ? Number(args[args.indexOf('--solo') + 1]) : Infinity

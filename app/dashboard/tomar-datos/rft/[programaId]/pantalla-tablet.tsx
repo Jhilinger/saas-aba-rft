@@ -122,6 +122,7 @@ function Presentacion({
   observacion,
   nivel,
   consigna,
+  sinMuestra: sinMuestraForzada = false,
   onElegir,
   onOpciones,
 }: {
@@ -135,6 +136,8 @@ function Presentacion({
   nivel: number
   // Clave relacional que se dice al aparecer la muestra (si no hay, se dice la muestra oída)
   consigna: string | null
+  // Ensayo sin muestra (ej. «¿Cuál es más grande?» en los conceptos generados)
+  sinMuestra?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -143,7 +146,7 @@ function Presentacion({
   const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
   // Test de transformación de funciones: sin muestra (se retiran los A); solo
   // las opciones y la pregunta
-  const sinMuestra = fase === 'transformacion_funciones' && !respuestaOral
+  const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
   const [conMuestra, setConMuestra] = useState(false)
   const [observada, setObservada] = useState(false)
   const conOpciones = conMuestra && (respuestaOral || sinMuestra || !observacion || observada)
@@ -304,6 +307,7 @@ function EnsayoTablet({
   observacion,
   menorAMayor,
   consigna,
+  sinMuestra,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -317,6 +321,7 @@ function EnsayoTablet({
   observacion: boolean
   menorAMayor: boolean
   consigna: string | null
+  sinMuestra: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -363,6 +368,7 @@ function EnsayoTablet({
       observacion={observacion}
       nivel={transferencia ? 0 : nivel}
       consigna={consigna}
+      sinMuestra={sinMuestra}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -386,6 +392,7 @@ export default function PantallaTablet({
   observacion = false,
   menorAMayor = false,
   consigna = null,
+  sinMuestra = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -402,6 +409,7 @@ export default function PantallaTablet({
   observacion?: boolean
   menorAMayor?: boolean
   consigna?: string | null
+  sinMuestra?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -456,6 +464,7 @@ export default function PantallaTablet({
         observacion={observacion}
         menorAMayor={menorAMayor}
         consigna={consigna}
+        sinMuestra={sinMuestra}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

@@ -6,6 +6,8 @@ import type { Json } from '@/database.types'
 import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 import { cargarImagenes } from '../../../imagenes-estimulo'
 import { leerSinError } from '../../../sin-error'
+import ConceptosTablet from './conceptos-tablet'
+import { CATEGORIAS_ENTRENAMIENTO, CATEGORIAS_GENERALIZACION, CONCEPTOS_OPUESTOS, leerActividadConceptos, type Concepto } from '../../../conceptos'
 
 export default async function TomarDatosRftPage({
   params,
@@ -40,7 +42,7 @@ export default async function TomarDatosRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, sin_error, consignas, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
+      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, sin_error, consignas, actividad_tablet, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
     )
     .eq('id', programaId)
     .single()
@@ -90,6 +92,24 @@ export default async function TomarDatosRftPage({
     }
   }
 
+  // Conceptos básicos generados en la tableta: imágenes de las categorías de
+  // entrenamiento y, aparte, de las de generalización
+  const actividad = leerActividadConceptos(programa.actividad_tablet)
+  let conceptosActividad: { entrenamiento: Concepto[]; generalizacion: Concepto[] } = { entrenamiento: [], generalizacion: [] }
+  let imagenesActividad: Awaited<ReturnType<typeof cargarImagenes>> = {}
+  if (actividad) {
+    const categorias = [...CATEGORIAS_ENTRENAMIENTO, ...CATEGORIAS_GENERALIZACION]
+    const { data: banco } = await supabase
+      .from('biblioteca_imagenes')
+      .select('concepto, nombre')
+      .is('clinica_id', null)
+      .eq('ejemplar', '1')
+      .or(categorias.map((c) => `concepto.like.${c}/%`).join(','))
+    const de = (lista: string[]) => (banco ?? []).filter((b) => lista.includes(b.concepto.split('/')[0]))
+    conceptosActividad = { entrenamiento: de(CATEGORIAS_ENTRENAMIENTO), generalizacion: de(CATEGORIAS_GENERALIZACION) }
+    imagenesActividad = await cargarImagenes(supabase, actividad.tipo === 'oposicion' ? CONCEPTOS_OPUESTOS : (banco ?? []).map((b) => b.concepto))
+  }
+
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
       <div>
@@ -104,6 +124,22 @@ export default async function TomarDatosRftPage({
           {alumnoNombre} — {programa.nombre}
         </h1>
       </div>
+
+      {actividad && (
+        <ConceptosTablet
+          programaAlumnoId={programa.id}
+          alumnoId={programa.alumno_id}
+          actividad={actividad}
+          conceptos={conceptosActividad}
+          imagenes={imagenesActividad}
+          dominados={(dominioFases ?? [])
+            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A')
+            .map((d) => d.grupo)}
+          ensayosPorBloque={programa.ensayos_por_bloque}
+          sinError={sinError}
+          ultimosEscalones={ultimosEscalones}
+        />
+      )}
 
             <TomarDatosRftClient
         programaAlumnoId={programa.id}

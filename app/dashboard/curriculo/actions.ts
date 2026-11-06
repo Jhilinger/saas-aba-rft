@@ -435,6 +435,7 @@ export async function clonarPrograma(id: string) {
       respuesta_por_fase: original.respuesta_por_fase,
       secuencia_rft: original.secuencia_rft,
       consignas: original.consignas,
+      actividad_tablet: original.actividad_tablet,
       orden: null,
       dominio_id: original.dominio_id,
       clinica_id: original.clinica_id,

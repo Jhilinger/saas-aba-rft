@@ -982,7 +982,8 @@ export type Database = {
           clase_id: string | null
           correcto: boolean
           estimulo_destino_id: string | null
-          estimulo_origen_id: string
+          estimulo_origen_id: string | null
+          generado: Json | null
           id: string
           latencia_ms: number | null
           nivel_ayuda: number | null
@@ -997,7 +998,8 @@ export type Database = {
           clase_id?: string | null
           correcto: boolean
           estimulo_destino_id?: string | null
-          estimulo_origen_id: string
+          estimulo_origen_id?: string | null
+          generado?: Json | null
           id?: string
           latencia_ms?: number | null
           nivel_ayuda?: number | null
@@ -1012,7 +1014,8 @@ export type Database = {
           clase_id?: string | null
           correcto?: boolean
           estimulo_destino_id?: string | null
-          estimulo_origen_id?: string
+          estimulo_origen_id?: string | null
+          generado?: Json | null
           id?: string
           latencia_ms?: number | null
           nivel_ayuda?: number | null
@@ -1879,6 +1882,7 @@ export type Database = {
       }
       programas_alumno: {
         Row: {
+          actividad_tablet: Json | null
           alumno_id: string
           area: string | null
           ayudas_posibles: string | null
@@ -1914,6 +1918,7 @@ export type Database = {
           visible_familia: boolean
         }
         Insert: {
+          actividad_tablet?: Json | null
           alumno_id: string
           area?: string | null
           ayudas_posibles?: string | null
@@ -1949,6 +1954,7 @@ export type Database = {
           visible_familia?: boolean
         }
         Update: {
+          actividad_tablet?: Json | null
           alumno_id?: string
           area?: string | null
           ayudas_posibles?: string | null
@@ -2016,6 +2022,7 @@ export type Database = {
       }
       programas_base: {
         Row: {
+          actividad_tablet: Json | null
           activo: boolean
           area: string
           ayudas_posibles: string | null
@@ -2049,6 +2056,7 @@ export type Database = {
           visibilidad: Database["public"]["Enums"]["visibilidad_programa"]
         }
         Insert: {
+          actividad_tablet?: Json | null
           activo?: boolean
           area: string
           ayudas_posibles?: string | null
@@ -2084,6 +2092,7 @@ export type Database = {
           visibilidad?: Database["public"]["Enums"]["visibilidad_programa"]
         }
         Update: {
+          actividad_tablet?: Json | null
           activo?: boolean
           area?: string
           ayudas_posibles?: string | null

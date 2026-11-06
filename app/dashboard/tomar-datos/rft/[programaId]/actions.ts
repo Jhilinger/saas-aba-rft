@@ -8,10 +8,13 @@ import { duracionValida, latenciaMedia, latenciaValida } from '../../tiempos'
 import { leerEscalonBloque } from '../../../sin-error'
 import type { Json } from '@/database.types'
 
+// En los conceptos generados en la tableta no hay clase ni estímulos fijos:
+// los ids van a null y el ensayo se describe en generado
 type EnsayoInput = {
-  claseId: string
-  estimuloOrigenId: string
-  estimuloDestinoId: string
+  claseId: string | null
+  estimuloOrigenId: string | null
+  estimuloDestinoId: string | null
+  generado?: Json
   pregunta?: string
   correcto: boolean
   ayuda: string
@@ -23,9 +26,9 @@ type EnsayoInput = {
 
 // Ensayo de transferencia: el mismo ensayo sin ayuda tras acertar con ayuda
 type TransferenciaInput = {
-  claseId: string
-  estimuloOrigenId: string
-  estimuloDestinoId: string
+  claseId: string | null
+  estimuloOrigenId: string | null
+  estimuloDestinoId: string | null
   correcto: boolean
   latenciaMs?: number | null
   respuesta?: string | null
@@ -181,6 +184,7 @@ export async function guardarBloqueRft(
       latencia_ms: latencias[i],
       respuesta: textoLimitado(e.respuesta, 500),
       nivel_ayuda: fase === 'entrenamiento' ? nivelAyudaValido(e.nivelAyuda) : null,
+      generado: e.generado ?? null,
     }))
   )
 
@@ -226,6 +230,7 @@ export async function guardarBloqueRft(
   if (fase === 'entrenamiento') {
     const paresUnicos = new Map<string, { claseId: string; origenId: string; destinoId: string }>()
     ensayos.forEach((e) => {
+      if (!e.claseId || !e.estimuloOrigenId || !e.estimuloDestinoId) return
       const key = `${e.claseId}-${e.estimuloOrigenId}-${e.estimuloDestinoId}`
       paresUnicos.set(key, {
         claseId: e.claseId,
@@ -252,6 +257,8 @@ export async function guardarBloqueRft(
   // concreta acaba de pasar a dominada (independiente de otras fases).
   let clasesDominadasAhora: string[] = []
   let derivado = false
+  // Esta combinación (grupo + fase + posiciones) acaba de pasar a dominada
+  let dominadoAhora = false
 
   if (FASES_QUE_EVALUAN_DOMINIO.includes(fase)) {
     const { data: antes } = await supabase
@@ -288,8 +295,9 @@ export async function guardarBloqueRft(
 
     const dominadoDespues = despues?.dominado ?? false
 
-    if (!dominadoAntes && dominadoDespues) {
-      const clasesUnicas = [...new Set(ensayos.map((e) => e.claseId))]
+    dominadoAhora = !dominadoAntes && dominadoDespues
+    if (dominadoAhora) {
+      const clasesUnicas = [...new Set(ensayos.map((e) => e.claseId).filter((c): c is string => !!c))]
       const { data: clases } = await supabase
         .from('clases_rft')
         .select('nombre')
@@ -307,5 +315,6 @@ export async function guardarBloqueRft(
     porcentaje: Math.round((aciertos / totalEnsayos) * 100),
     clasesDominadasAhora,
     derivado,
+    dominadoAhora,
   }
 }
