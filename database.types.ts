@@ -83,6 +83,7 @@ export type Database = {
       alumnos: {
         Row: {
           activo: boolean
+          avatar: string | null
           clinica_id: string
           created_at: string
           fecha_nacimiento: string
@@ -91,6 +92,7 @@ export type Database = {
         }
         Insert: {
           activo?: boolean
+          avatar?: string | null
           clinica_id: string
           created_at?: string
           fecha_nacimiento: string
@@ -99,6 +101,7 @@ export type Database = {
         }
         Update: {
           activo?: boolean
+          avatar?: string | null
           clinica_id?: string
           created_at?: string
           fecha_nacimiento?: string
@@ -727,6 +730,7 @@ export type Database = {
           stripe_subscription_item_alumno_id: string | null
           telefono: string | null
           terminos_aceptados_at: string | null
+          tipo: string
         }
         Insert: {
           activa?: boolean
@@ -749,6 +753,7 @@ export type Database = {
           stripe_subscription_item_alumno_id?: string | null
           telefono?: string | null
           terminos_aceptados_at?: string | null
+          tipo?: string
         }
         Update: {
           activa?: boolean
@@ -771,6 +776,7 @@ export type Database = {
           stripe_subscription_item_alumno_id?: string | null
           telefono?: string | null
           terminos_aceptados_at?: string | null
+          tipo?: string
         }
         Relationships: []
       }

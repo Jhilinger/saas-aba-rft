@@ -38,6 +38,15 @@ export default function CrearClinicaForm() {
         Se crea sin pasar por Stripe (uso interno: tu propia clínica, cortesías, pruebas...).
       </p>
 
+      <div className="space-y-1">
+        <label className="text-sm text-slate-600">Tipo de cuenta</label>
+        <select name="tipo" defaultValue="centro" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base sm:text-sm">
+          <option value="centro">Centro o profesional (panel completo)</option>
+          <option value="familia">Familia (app infantil por módulos)</option>
+          <option value="escuela">Escuela (app infantil por módulos)</option>
+        </select>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-1">
           <label className="text-sm text-slate-600">Nombre</label>

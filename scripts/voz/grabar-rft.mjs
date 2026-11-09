@@ -24,6 +24,9 @@ const REINTENTOS = 4
 // Frases de las actividades de tableta que no salen de las claves relacionales
 const FRASES_FIJAS = {
   '¿Dónde está?': ['Seguir visualmente · juego de los vasos'],
+  '¡Muy bien!': ['App infantil · refuerzo'],
+  '¡Genial!': ['App infantil · refuerzo'],
+  '¡Bravo!': ['App infantil · refuerzo'],
   ...Object.fromEntries(frasesConceptos().map((f) => [f, ['Conceptos básicos · ensayos generados']])),
 }
 

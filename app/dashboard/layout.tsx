@@ -72,9 +72,13 @@ export default async function DashboardLayout({
 
   const { data: perfil } = await supabase
     .from('perfiles')
-    .select('nombre, rol, activo, tambien_terapeuta')
+    .select('nombre, rol, activo, tambien_terapeuta, clinicas(tipo)')
     .eq('id', user.id)
     .single()
+
+  // Las cuentas de familia y de escuela usan la app infantil, no el panel
+  const tipoCuenta = (perfil?.clinicas as { tipo: string } | null)?.tipo
+  if (tipoCuenta === 'familia' || tipoCuenta === 'escuela') redirect('/app')
 
   if (perfil && perfil.activo === false) {
     await supabase.auth.signOut()

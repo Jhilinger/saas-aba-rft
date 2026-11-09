@@ -16,6 +16,7 @@ export async function crearClinica(formData: FormData) {
   const email_admin = formData.get('email_admin') as string
   const password_admin = formData.get('password_admin') as string
   const logo = formData.get('logo') as File | null
+  const tipo = (['centro', 'familia', 'escuela'] as const).find((t) => t === formData.get('tipo')) ?? 'centro'
   if (!pais) return { error: 'Elige el país de la clínica.' }
 
   // 1. Creamos la clínica (sin_facturacion=true: la ha dado de alta el
@@ -32,6 +33,7 @@ export async function crearClinica(formData: FormData) {
       precio_por_alumno,
       sin_facturacion: true,
       estado_suscripcion: 'active',
+      tipo,
     })
     .select('id')
     .single()

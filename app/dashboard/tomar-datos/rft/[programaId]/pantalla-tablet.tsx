@@ -450,6 +450,7 @@ export default function PantallaTablet({
   consigna = null,
   sinMuestra = false,
   seleccionOida = false,
+  infantil = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -469,6 +470,9 @@ export default function PantallaTablet({
   sinMuestra?: boolean
   // Tests con respuesta oral por selección entre palabras oídas
   seleccionOida?: boolean
+  // App infantil (familias y escuelas): sin los controles del terapeuta; solo
+  // una salida que hay que mantener pulsada
+  infantil?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -492,6 +496,13 @@ export default function PantallaTablet({
 
   return (
     <div className="fixed inset-0 z-50 flex select-none flex-col bg-white">
+      {infantil ? (
+        <div className="flex justify-end px-3 pt-2">
+          <BotonLargo onActivar={onSalir} className="border border-slate-200 !bg-transparent text-slate-300">
+            ✕
+          </BotonLargo>
+        </div>
+      ) : (
       <div className="flex items-start justify-between gap-2 px-3 pt-2">
         <p className="text-[11px] text-slate-300">
           {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? (fase === 'generalizacion' ? 'Sonda de generalización' : fase === 'mantenimiento' ? 'Sonda de mantenimiento' : fase)} ·{' '}
@@ -511,6 +522,7 @@ export default function PantallaTablet({
           </BotonLargo>
         </span>
       </div>
+      )}
 
       <EnsayoTablet
         key={ensayo}
