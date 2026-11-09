@@ -93,6 +93,20 @@ async function main() {
   }
 
   for (const [texto, usos] of Object.entries(FRASES_FIJAS)) frases.set(texto, [...(frases.get(texto) ?? []), ...usos])
+
+  // Palabras oídas sueltas (opciones de los tests por selección entre palabras)
+  const { data: oidos, error: errorOidos } = await supabase
+    .from('estimulos_rft_base')
+    .select('nombre')
+    .is('concepto_imagen', null)
+    .is('pantalla', null)
+    .limit(10000)
+  if (errorOidos) throw errorOidos
+  for (const e of oidos) {
+    if (!/^["“«].*["”»]$/.test(e.nombre.trim())) continue
+    const palabra = textoOido(e.nombre).toLowerCase()
+    frases.set(palabra, [...(frases.get(palabra) ?? []), 'Tests por selección · palabra oída'])
+  }
   const lista = [...frases.keys()]
   const pendientes = []
   for (const texto of lista) {

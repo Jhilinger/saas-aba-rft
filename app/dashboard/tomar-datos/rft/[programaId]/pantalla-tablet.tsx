@@ -123,6 +123,7 @@ function Presentacion({
   nivel,
   consigna,
   sinMuestra: sinMuestraForzada = false,
+  seleccionOida = false,
   onElegir,
   onOpciones,
 }: {
@@ -138,18 +139,49 @@ function Presentacion({
   consigna: string | null
   // Ensayo sin muestra (ej. «¿Cuál es más grande?» en los conceptos generados)
   sinMuestra?: boolean
+  // Opciones que son palabras oídas: en vez de puntuar el terapeuta, la
+  // tableta las dice una a una y el alumno toca la suya
+  seleccionOida?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
 }) {
   const muestraOida = esOido(origen)
-  const respuestaOral = comparativos.some((c) => esOido(c.estimulo))
+  const oidasComoOpciones = seleccionOida && !muestraOida && comparativos.length > 1 && comparativos.every((c) => esOido(c.estimulo))
+  const respuestaOral = !oidasComoOpciones && comparativos.some((c) => esOido(c.estimulo))
   // Test de transformación de funciones: sin muestra (se retiran los A); solo
   // las opciones y la pregunta
   const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
   const [conMuestra, setConMuestra] = useState(false)
   const [observada, setObservada] = useState(false)
   const conOpciones = conMuestra && (respuestaOral || sinMuestra || !observacion || observada)
+  // Palabras oídas como opciones: se dicen una a una (iluminando su tarjeta)
+  // tras la clave; se puede responder cuando han sonado todas
+  const [sonando, setSonando] = useState<number | null>(null)
+  const [oidasListas, setOidasListas] = useState(false)
+  const temporizadoresOidas = useRef<ReturnType<typeof setTimeout>[]>([])
+  const decirOpciones = (espera: number) => {
+    temporizadoresOidas.current.forEach(clearTimeout)
+    temporizadoresOidas.current = [
+      ...comparativos.map((c, i) =>
+        setTimeout(() => {
+          setSonando(i)
+          void decirFraseRft(textoOido(c.estimulo.nombre).toLowerCase())
+        }, espera + i * 1500)
+      ),
+      setTimeout(() => {
+        setSonando(null)
+        setOidasListas(true)
+      }, espera + comparativos.length * 1500),
+    ]
+  }
+  useEffect(() => {
+    if (conOpciones && oidasComoOpciones) decirOpciones(1600)
+    return () => temporizadoresOidas.current.forEach(clearTimeout)
+    // Solo al salir las opciones
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conOpciones])
+  const listo = conOpciones && (!oidasComoOpciones || oidasListas)
   const hablar = () => {
     if (consigna) void decirFraseRft(consigna)
     else if (muestraOida) void decirFraseRft(textoOido(origen.nombre))
@@ -165,9 +197,9 @@ function Presentacion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conMuestra])
   useEffect(() => {
-    if (conOpciones) onOpciones()
+    if (listo) onOpciones()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conOpciones])
+  }, [listo])
   // Ayuda de menor a mayor: en cada nivel se repite la muestra
   useEffect(() => {
     if (nivel > 0) hablar()
@@ -178,10 +210,10 @@ function Presentacion({
   const demora = apoyo?.demora ?? null
   const [resaltadaPorDemora, setResaltadaPorDemora] = useState(false)
   useEffect(() => {
-    if (!conOpciones || demora === null) return
+    if (!listo || demora === null) return
     const t = setTimeout(() => setResaltadaPorDemora(true), demora * 1000)
     return () => clearTimeout(t)
-  }, [conOpciones, demora])
+  }, [listo, demora])
 
   const distractores = comparativos
     .filter((c) => !c.esCorrecto)
@@ -255,29 +287,50 @@ function Presentacion({
         {!respuestaOral && (
           <div className={`flex flex-col items-center gap-[2.5vmin] ${conOpciones ? '' : 'invisible'}`}>
             <div className="flex flex-wrap justify-center gap-[2.5vmin]">
-              {comparativos.map((c) => {
+              {comparativos.map((c, i) => {
                 const oculta = !c.esCorrecto && !visibles.has(c.claseId)
                 return (
                   <button
                     key={c.claseId}
                     type="button"
                     disabled={oculta}
-                    onClick={() => conOpciones && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
+                    onClick={() => listo && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
                     style={{ width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) }}
                     className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
                       oculta ? 'invisible' : ''
-                    } ${resaltada && c.esCorrecto ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300' : 'border-slate-200'}`}
+                    } ${
+                      resaltada && c.esCorrecto
+                        ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300'
+                        : sonando === i
+                          ? 'border-indigo-400 ring-[1vmin] ring-indigo-200'
+                          : 'border-slate-200'
+                    }`}
                   >
-                    <Tarjeta
-                      estimulo={c.estimulo}
-                      url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
-                      lado={ladoOpcion}
-                      urlConcepto={urlConcepto}
-                    />
+                    {oidasComoOpciones ? (
+                      <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * 0.38)` }}>
+                        🔊
+                      </span>
+                    ) : (
+                      <Tarjeta
+                        estimulo={c.estimulo}
+                        url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                        lado={ladoOpcion}
+                        urlConcepto={urlConcepto}
+                      />
+                    )}
                   </button>
                 )
               })}
             </div>
+            {oidasComoOpciones && (
+              <button
+                type="button"
+                onClick={() => listo && decirOpciones(0)}
+                className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.2vmin] text-slate-500 ${listo ? '' : 'invisible'}`}
+              >
+                🔁 Repetir
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -308,6 +361,7 @@ function EnsayoTablet({
   menorAMayor,
   consigna,
   sinMuestra,
+  seleccionOida,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -322,6 +376,7 @@ function EnsayoTablet({
   menorAMayor: boolean
   consigna: string | null
   sinMuestra: boolean
+  seleccionOida: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -369,6 +424,7 @@ function EnsayoTablet({
       nivel={transferencia ? 0 : nivel}
       consigna={consigna}
       sinMuestra={sinMuestra}
+      seleccionOida={seleccionOida}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -393,6 +449,7 @@ export default function PantallaTablet({
   menorAMayor = false,
   consigna = null,
   sinMuestra = false,
+  seleccionOida = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -410,6 +467,8 @@ export default function PantallaTablet({
   menorAMayor?: boolean
   consigna?: string | null
   sinMuestra?: boolean
+  // Tests con respuesta oral por selección entre palabras oídas
+  seleccionOida?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -465,6 +524,7 @@ export default function PantallaTablet({
         menorAMayor={menorAMayor}
         consigna={consigna}
         sinMuestra={sinMuestra}
+        seleccionOida={seleccionOida}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

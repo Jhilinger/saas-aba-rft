@@ -829,6 +829,11 @@ export default function TomarDatosRftClient({
         consignaPara(programa, leerConsignasClase(clase.consignas), faseEfectiva, posicionOrigen, posicionDestino, textoOido(origen.nombre)) ??
         (esOido(origen) ? textoOido(origen.nombre) : null)
       if (texto) void precargarFraseRft(texto)
+      // Palabras oídas de las opciones (tests por selección entre palabras)
+      if (sinError?.seleccionOida) {
+        const destino = encontrarEstimulo(clase, posicionDestino)
+        if (destino && esOido(destino)) void precargarFraseRft(textoOido(destino.nombre).toLowerCase())
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enTableta, secuencia])
@@ -1327,6 +1332,7 @@ export default function TomarDatosRftClient({
           }
         }
         observacion={!!sinError?.observacion}
+        seleccionOida={!!sinError?.seleccionOida}
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}

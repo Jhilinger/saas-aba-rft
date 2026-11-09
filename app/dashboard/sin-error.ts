@@ -25,6 +25,8 @@ export type ConfigSinError = {
   modo: ModoAyuda
   // Respuesta de observación (independiente de que haya ayudas activas)
   observacion: boolean
+  // Tests con respuesta oral: el alumno elige entre palabras oídas y se puntúa solo
+  seleccionOida: boolean
   escalones: Escalon[]
   // % de aciertos (con o sin la ayuda en pantalla) para subir / por debajo del cual se baja
   subir: number
@@ -108,6 +110,7 @@ export function leerSinError(valor: Json | null | undefined): ConfigSinError | n
     activo: o.activo === true,
     modo: o.modo === 'menor_a_mayor' ? 'menor_a_mayor' : 'mayor_a_menor',
     observacion: o.observacion === true,
+    seleccionOida: o.seleccionOida === true,
     escalones: escalones as Escalon[],
     subir,
     bajar,

@@ -33,6 +33,7 @@ function configInicial(): ConfigSinError {
     activo: false,
     modo: 'mayor_a_menor',
     observacion: false,
+    seleccionOida: false,
     escalones: escaleraPorDefecto({ campo: true, desvanecimiento: true, demora: true }),
     subir: SUBIR_DEFECTO,
     bajar: BAJAR_DEFECTO,
@@ -55,7 +56,7 @@ export default function SinErrorPanel({
   const [isPending, startTransition] = useTransition()
   const toast = useToast()
 
-  if (soloLectura && !guardada?.activo && !guardada?.observacion) return null
+  if (soloLectura && !guardada?.activo && !guardada?.observacion && !guardada?.seleccionOida) return null
 
   const cambiarEscalon = (i: number, cambio: Partial<Escalon>) =>
     setConfig((c) => ({ ...c, escalones: c.escalones.map((e, j) => (j === i ? { ...e, ...cambio } : e)) }))
@@ -117,6 +118,7 @@ export default function SinErrorPanel({
           <p className="text-xs text-slate-500">
             {resumen}
             {guardada?.observacion && ' El alumno toca la muestra para ver las opciones.'}
+            {guardada?.seleccionOida && ' En los tests con respuesta oral, el alumno elige entre palabras oídas.'}
           </p>
         </div>
         {!soloLectura && (
@@ -150,6 +152,22 @@ export default function SinErrorPanel({
               <span className="block text-xs text-slate-400">
                 Aparece la muestra y el alumno la toca para que salgan las opciones. Sin ella, las opciones salen justo después de la
                 muestra.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              checked={config.seleccionOida}
+              onChange={(e) => setConfig((c) => ({ ...c, seleccionOida: e.target.checked }))}
+              className="mt-0.5"
+            />
+            <span>
+              Tests con respuesta oral por selección
+              <span className="block text-xs text-slate-400">
+                Cuando la respuesta es una palabra (ej. test B→A, imagen → «¿Qué es?»), la tableta dice las palabras de las opciones una
+                a una y el alumno toca la que corresponde; se puntúa solo. No sustituye a la respuesta vocal.
               </span>
             </span>
           </label>
