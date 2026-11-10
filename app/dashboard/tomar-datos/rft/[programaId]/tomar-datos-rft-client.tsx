@@ -608,10 +608,13 @@ export default function TomarDatosRftClient({
       const otras = clasesValidas.filter((c) => c.id !== claseActual.id)
       const otra = otras.length ? otras[hashEstable(semilla) % otras.length] : null
       const distractor = otra ? encontrarEstimulo(otra, hashEstable(`${semilla}-p`) % 2 ? posicionOrigen : posicionDestino) : undefined
+      // Las opciones son palabras oídas (la relación es verbal): se presentan
+      // como estímulos oídos aunque tengan imagen en el currículo
+      const oida = (e: Estimulo): Estimulo => ({ ...e, nombre: `"${e.nombre}"`, concepto_imagen: null, pantalla: null })
       return [
-        { claseId: `${claseActual.id}-o`, estimulo: encontrarEstimulo(claseActual, posicionOrigen)!, esCorrecto: false },
-        { claseId: `${claseActual.id}-d`, estimulo: encontrarEstimulo(claseActual, posicionDestino)!, esCorrecto: true },
-        ...(distractor && otra ? [{ claseId: `${otra.id}-x`, estimulo: distractor, esCorrecto: false }] : []),
+        { claseId: `${claseActual.id}-o`, estimulo: oida(encontrarEstimulo(claseActual, posicionOrigen)!), esCorrecto: false },
+        { claseId: `${claseActual.id}-d`, estimulo: oida(encontrarEstimulo(claseActual, posicionDestino)!), esCorrecto: true },
+        ...(distractor && otra ? [{ claseId: `${otra.id}-x`, estimulo: oida(distractor), esCorrecto: false }] : []),
       ].sort((a, b) => hashEstable(`${semilla}-${a.claseId}`) - hashEstable(`${semilla}-${b.claseId}`))
     }
     let opciones = clasesValidas
@@ -1347,7 +1350,7 @@ export default function TomarDatosRftClient({
           }
         }
         observacion={!!sinError?.observacion}
-        seleccionOida={!!sinError?.seleccionOida}
+        seleccionOida={!!sinError?.seleccionOida || opcionesClase}
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
         sinMuestra={opcionesClase}

@@ -176,7 +176,8 @@ function Presentacion({
     ]
   }
   useEffect(() => {
-    if (conOpciones && oidasComoOpciones) decirOpciones(1600)
+    // Las palabras empiezan cuando ha terminado la clave (unos 75 ms por letra)
+    if (conOpciones && oidasComoOpciones) decirOpciones(Math.max(1600, (consigna?.length ?? 0) * 75))
     return () => temporizadoresOidas.current.forEach(clearTimeout)
     // Solo al salir las opciones
     // eslint-disable-next-line react-hooks/exhaustive-deps

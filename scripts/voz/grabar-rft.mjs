@@ -105,6 +105,22 @@ async function main() {
     .is('pantalla', null)
     .limit(10000)
   if (errorOidos) throw errorOidos
+  // y los nombres de los programas con opciones de la propia clase, que se
+  // presentan en audio (relaciones verbales del nivel 3)
+  const { data: verbales, error: errorVerbales } = await supabase
+    .from('programas_base')
+    .select('clases_rft_base(estimulos_rft_base(nombre))')
+    .is('clinica_id', null)
+    .eq('opciones_clase', true)
+  if (errorVerbales) throw errorVerbales
+  for (const p of verbales) {
+    for (const c of p.clases_rft_base) {
+      for (const e of c.estimulos_rft_base) {
+        const palabra = e.nombre.trim().toLowerCase()
+        frases.set(palabra, [...(frases.get(palabra) ?? []), 'Relaciones verbales · opción oída'])
+      }
+    }
+  }
   for (const e of oidos) {
     if (!/^["“«].*["”»]$/.test(e.nombre.trim())) continue
     const palabra = textoOido(e.nombre).toLowerCase()

@@ -87,11 +87,13 @@ function prepararEnsayos(plan: PlanSesion): Ensayo[] {
     const o = de(clase, origen)!
     // Opciones de la propia clase: los dos elementos nombrados y un distractor de otra clase
     const otra = barajar(validas.filter((v) => v.id !== clase.id))[0]
+    // (en audio: la relación es verbal)
+    const oida = (e: typeof o) => ({ ...e, nombre: `"${e.nombre}"`, concepto_imagen: null, pantalla: null })
     const comparativos = plan.opcionesClase
       ? barajar([
-          { claseId: `${clase.id}-o`, estimulo: o, esCorrecto: false },
-          { claseId: `${clase.id}-d`, estimulo: de(clase, destino)!, esCorrecto: true },
-          ...(otra ? [{ claseId: `${otra.id}-x`, estimulo: de(otra, Math.random() < 0.5 ? origen : destino)!, esCorrecto: false }] : []),
+          { claseId: `${clase.id}-o`, estimulo: oida(o), esCorrecto: false },
+          { claseId: `${clase.id}-d`, estimulo: oida(de(clase, destino)!), esCorrecto: true },
+          ...(otra ? [{ claseId: `${otra.id}-x`, estimulo: oida(de(otra, Math.random() < 0.5 ? origen : destino)!), esCorrecto: false }] : []),
         ])
       : barajar(validas).map((v) => ({ claseId: v.id, estimulo: de(v, destino)!, esCorrecto: v.id === clase.id }))
     return {
