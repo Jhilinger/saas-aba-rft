@@ -252,8 +252,13 @@ export default async function ProgramaDetallePage({
             {[...new Set((clasesRft ?? []).map((c) => c.grupo))]
               .sort((a, b) => a.localeCompare(b, 'es', { numeric: true }))
               .map((grupo) => (
-                <div key={grupo} className="space-y-3">
-                  <h3 className="text-sm font-semibold text-slate-700">{grupo}</h3>
+                <div key={grupo} className="space-y-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/40 p-3 sm:p-4">
+                  <h3 className="flex items-center gap-2 text-base font-bold text-indigo-800">
+                    {grupo}
+                    <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-indigo-600">
+                      {(clasesRft ?? []).filter((c) => c.grupo === grupo).length} clases
+                    </span>
+                  </h3>
                   <div className="space-y-4">
                     {(clasesRft ?? [])
                       .filter((c) => c.grupo === grupo)
