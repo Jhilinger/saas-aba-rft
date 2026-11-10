@@ -71,11 +71,19 @@ async function main() {
     .order('orden')
   if (error) throw error
 
+  // Copias en los PEI: claves editadas o de plantillas anteriores, que también
+  // tienen que sonar con la voz grabada
+  const { data: copias, error: errorCopias } = await supabase
+    .from('programas_alumno')
+    .select('nombre, consignas, opciones_clase, clases_rft(nombre, consignas, estimulos_rft(nombre, posicion))')
+    .limit(10000)
+  if (errorCopias) throw errorCopias
+
   // Frase → dónde se usa (para la página de revisión)
   const frases = new Map()
-  for (const p of programas) {
-    const delPrograma = leerConsignasPrograma(p.consignas)
-    for (const c of p.clases_rft_base) {
+  const anadirClaves = (nombre, consignas, clases) => {
+    const delPrograma = leerConsignasPrograma(consignas)
+    for (const c of clases) {
       const deClase = leerConsignasClase(c.consignas)
       const claves = [...new Set([...Object.keys(delPrograma.pasos), ...Object.keys(deClase)])]
       const usos = [
@@ -84,14 +92,20 @@ async function main() {
       ]
       for (const { fase, rel } of usos) {
         const [origen, destino] = rel.split('→')
-        const muestra = c.estimulos_rft_base.find((e) => e.posicion === origen)
+        const muestra = c.estimulos.find((e) => e.posicion === origen)
         if (!muestra) continue
         const texto = consignaPara(delPrograma, deClase, fase, origen, destino, textoOido(muestra.nombre))
         if (!texto) continue
-        const uso = `${p.nombre} · ${fase === 'generalizacion' ? 'sonda de generalización' : fase} ${rel}`
+        const uso = `${nombre} · ${fase === 'generalizacion' ? 'sonda de generalización' : fase} ${rel}`
         frases.set(texto, [...(frases.get(texto) ?? []), uso])
       }
     }
+  }
+  for (const p of programas) {
+    anadirClaves(p.nombre, p.consignas, p.clases_rft_base.map((c) => ({ ...c, estimulos: c.estimulos_rft_base })))
+  }
+  for (const p of copias) {
+    anadirClaves(`${p.nombre} (PEI)`, p.consignas, p.clases_rft.map((c) => ({ ...c, estimulos: c.estimulos_rft })))
   }
 
   for (const [texto, usos] of Object.entries(FRASES_FIJAS)) frases.set(texto, [...(frases.get(texto) ?? []), ...usos])
@@ -117,6 +131,14 @@ async function main() {
       for (const e of c.estimulos_rft_base) {
         const palabra = e.nombre.trim().toLowerCase()
         frases.set(palabra, [...(frases.get(palabra) ?? []), 'Relaciones verbales · opción oída'])
+      }
+    }
+  }
+  for (const p of copias.filter((p) => p.opciones_clase)) {
+    for (const c of p.clases_rft) {
+      for (const e of c.estimulos_rft) {
+        const palabra = e.nombre.trim().toLowerCase()
+        frases.set(palabra, [...(frases.get(palabra) ?? []), 'Relaciones verbales · opción oída (PEI)'])
       }
     }
   }

@@ -72,7 +72,18 @@ function contextoAudio() {
 export function desbloquearAudio() {
   const ctx = contextoAudio()
   if (ctx?.state === 'suspended') void ctx.resume()
+  // iPad: la voz del dispositivo solo habla fuera de un toque si ya ha hablado
+  // una vez dentro de uno; una frase vacía la desbloquea para las frases sin
+  // grabación, que se dicen tras descargar (sin gesto)
+  if (!vozDesbloqueada && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    const vacia = new SpeechSynthesisUtterance('')
+    vacia.volume = 0
+    window.speechSynthesis.speak(vacia)
+    vozDesbloqueada = true
+  }
 }
+
+let vozDesbloqueada = false
 
 function urlGrabacion(ruta: string) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/biblioteca/${ruta}`
