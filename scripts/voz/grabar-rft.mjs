@@ -68,7 +68,6 @@ async function main() {
     .from('programas_base')
     .select('nombre, orden, consignas, clases_rft_base(grupo, nombre, consignas, estimulos_rft_base(nombre, posicion))')
     .is('clinica_id', null)
-    .not('consignas', 'is', null)
     .order('orden')
   if (error) throw error
 
