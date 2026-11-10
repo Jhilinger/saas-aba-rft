@@ -6,7 +6,7 @@ import ConjuntoCard from './conjunto-card'
 import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
 import NuevaClaseRftForm from './nueva-clase-rft-form'
-import ClaseRftBaseCard from './clase-rft-base-card'
+import ClasesPorGrupo from './clases-por-grupo'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
 import RequisitosPrograma from './requisitos-programa'
@@ -247,29 +247,15 @@ export default async function ProgramaDetallePage({
           )}
           {!soloLectura && <NuevaClaseRftForm programaBaseId={id} />}
 
-          {/* Un apartado por grupo, en orden natural (Grupo 2 antes que Grupo 10), y sus clases por nombre */}
-          <div className="space-y-6">
-            {[...new Set((clasesRft ?? []).map((c) => c.grupo))]
-              .sort((a, b) => a.localeCompare(b, 'es', { numeric: true }))
-              .map((grupo) => (
-                <div key={grupo} className="space-y-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50/40 p-3 sm:p-4">
-                  <h3 className="flex items-center gap-2 text-base font-bold text-indigo-800">
-                    {grupo}
-                    <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-indigo-600">
-                      {(clasesRft ?? []).filter((c) => c.grupo === grupo).length} clases
-                    </span>
-                  </h3>
-                  <div className="space-y-4">
-                    {(clasesRft ?? [])
-                      .filter((c) => c.grupo === grupo)
-                      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { numeric: true }))
-                      .map((c) => (
-                        <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} imagenes={imagenes} conImagenes={conImagenes} />
-                      ))}
-                  </div>
-                </div>
-              ))}
-          </div>
+          <ClasesPorGrupo
+            clases={clasesRft ?? []}
+            programaBaseId={id}
+            nivelRft={programa.nivel_rft}
+            soloLectura={soloLectura}
+            conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)}
+            imagenes={imagenes}
+            conImagenes={conImagenes}
+          />
 
           {(!clasesRft || clasesRft.length === 0) && (
             <p className="text-center text-slate-500">Sin clases todavía.</p>

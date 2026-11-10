@@ -82,7 +82,9 @@ export default function ProgramaRftClient({
 
   const gruposVisibles = [...grupos, ...extraGrupos.filter((g) => !grupos.includes(g))]
 
-  const clasesDelGrupo = clases.filter((c) => c.grupo === grupoSeleccionado)
+  const clasesDelGrupo = clases
+    .filter((c) => c.grupo === grupoSeleccionado)
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { numeric: true }))
 
   const porFaseFiltrado: PorFase = {}
   for (const fase of Object.keys(porFase)) {
