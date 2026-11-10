@@ -46,7 +46,13 @@ export default function ClaseRftBaseCard({
   const enElLimite = clase.estimulos_rft_base.length >= maxMiembros
 
   const [nombreEstimulo, setNombreEstimulo] = useState('')
-  const [posicion, setPosicion] = useState(posicionesPermitidas[0])
+  // Una clase no puede tener dos estímulos en la misma posición: solo se
+  // ofrecen las libres, y los estímulos se muestran en orden A, B, C…
+  const ocupadas = new Set(clase.estimulos_rft_base.map((e) => e.posicion))
+  const libres = posicionesPermitidas.filter((p) => !ocupadas.has(p))
+  const [posicionElegida, setPosicion] = useState(libres[0] ?? posicionesPermitidas[0])
+  const posicion = libres.includes(posicionElegida) ? posicionElegida : (libres[0] ?? posicionElegida)
+  const ordenados = [...clase.estimulos_rft_base].sort((a, b) => (a.posicion ?? '~').localeCompare(b.posicion ?? '~') || a.etiqueta.localeCompare(b.etiqueta))
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const confirmar = useConfirm()
@@ -89,7 +95,7 @@ export default function ClaseRftBaseCard({
       </div>
 
       <ul className="space-y-1">
-        {clase.estimulos_rft_base.map((e) => (
+        {ordenados.map((e) => (
           <li
             key={e.id}
             className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
@@ -142,7 +148,7 @@ export default function ClaseRftBaseCard({
         />
       )}
 
-      {soloLectura ? null : enElLimite ? (
+      {soloLectura ? null : enElLimite || libres.length === 0 ? (
         <p className="text-xs text-slate-500 italic">
           {NOMBRE_NIVEL_RFT[nivel]} admite como máximo {maxMiembros} miembro(s) por clase.
         </p>
@@ -168,7 +174,7 @@ export default function ClaseRftBaseCard({
             onChange={(e) => setPosicion(e.target.value)}
             className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
           >
-            {posicionesPermitidas.map((p) => (
+            {libres.map((p) => (
               <option key={p} value={p}>
                 {p}
               </option>

@@ -10,8 +10,9 @@ import DistribucionAyudasChart from '../../distribucion-ayudas-chart'
 import type { DistribucionAyuda } from '../../ayuda-tipos'
 import { Panel } from '../../../ui'
 import AyudaTermino from '../../ayuda-termino'
+import TablaGruposClases from '../../tabla-grupos-clases'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
 type Clase = {
   id: string
@@ -74,7 +75,7 @@ export default function ProgramaRftClient({
   imagenes: ImagenesBanco
   conImagenes: boolean
 }) {
-  const [tab, setTab] = useState<'evolucion' | 'gestion'>('evolucion')
+  const [tab, setTab] = useState<'evolucion' | 'revision' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
   const [grupoSeleccionado, setGrupoSeleccionado] = useState<string>(grupos[0] ?? '')
   const [creandoGrupo, setCreandoGrupo] = useState(false)
@@ -196,6 +197,16 @@ export default function ProgramaRftClient({
           Evolución
         </button>
         <button
+          onClick={() => setTab('revision')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+            tab === 'revision'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Revisión de grupos
+        </button>
+        <button
           onClick={() => setTab('gestion')}
           className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
             tab === 'gestion'
@@ -207,7 +218,12 @@ export default function ProgramaRftClient({
         </button>
       </div>
 
-      {tab === 'evolucion' ? (
+      {tab === 'revision' ? (
+        <TablaGruposClases
+          clases={clases.map((c) => ({ id: c.id, nombre: c.nombre, grupo: c.grupo, estimulos: c.estimulos_rft }))}
+          imagenes={imagenes}
+        />
+      ) : tab === 'evolucion' ? (
         gruposVisibles.length === 0 ? (
           <p className="text-center text-slate-500 py-8">Todavía no hay clases creadas.</p>
         ) : (

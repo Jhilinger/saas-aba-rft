@@ -587,6 +587,15 @@ export async function crearEstimuloRftBase(
     return { error: `En ${NOMBRE_NIVEL_RFT[nivel]} solo se admiten las posiciones: ${POSICIONES_POR_NIVEL[nivel].join(', ')}` }
   }
 
+  // Una clase no puede tener dos estímulos en la misma posición (ej. dos A5)
+  const { data: repetido } = await supabase
+    .from('estimulos_rft_base')
+    .select('etiqueta')
+    .eq('clase_base_id', claseBaseId)
+    .eq('posicion', posicion)
+    .maybeSingle()
+  if (repetido) return { error: `Esta clase ya tiene un estímulo en la posición ${posicion} (${repetido.etiqueta}).` }
+
   const { count } = await supabase
     .from('estimulos_rft_base')
     .select('id', { count: 'exact', head: true })
