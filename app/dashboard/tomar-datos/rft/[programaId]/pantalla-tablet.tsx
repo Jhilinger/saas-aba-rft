@@ -108,6 +108,8 @@ function hash(valor: string) {
   return h >>> 0
 }
 
+const esperar = (ms: number) => new Promise((resolver) => setTimeout(resolver, ms))
+
 // Una presentación del ensayo (se monta de nuevo en cada una): pausa, la
 // muestra y en seguida las comparaciones, o al tocar la muestra si hay
 // respuesta de observación. Los toques antes de que salgan las opciones no
@@ -159,33 +161,28 @@ function Presentacion({
   // tras la clave; se puede responder cuando han sonado todas
   const [sonando, setSonando] = useState<number | null>(null)
   const [oidasListas, setOidasListas] = useState(false)
-  const temporizadoresOidas = useRef<ReturnType<typeof setTimeout>[]>([])
-  const decirOpciones = (espera: number) => {
-    temporizadoresOidas.current.forEach(clearTimeout)
-    temporizadoresOidas.current = [
-      ...comparativos.map((c, i) =>
-        setTimeout(() => {
-          setSonando(i)
-          void decirFraseRft(textoOido(c.estimulo.nombre).toLowerCase())
-        }, espera + i * 1500)
-      ),
-      setTimeout(() => {
-        setSonando(null)
-        setOidasListas(true)
-      }, espera + comparativos.length * 1500),
-    ]
+  // Cada lectura de las opciones invalida la anterior (ensayo nuevo o «repetir»)
+  const lecturaOidas = useRef(0)
+  // Fin de la clave en curso: las opciones esperan a que termine
+  const finClave = useRef<Promise<void>>(Promise.resolve())
+  const decirOpciones = async (trasClave: boolean) => {
+    const lectura = ++lecturaOidas.current
+    const sigue = () => lectura === lecturaOidas.current
+    if (trasClave) await finClave.current
+    await esperar(400)
+    for (let i = 0; i < comparativos.length && sigue(); i++) {
+      setSonando(i)
+      await decirFraseRft(textoOido(comparativos[i].estimulo.nombre).toLowerCase())
+      await esperar(500)
+    }
+    if (!sigue()) return
+    setSonando(null)
+    setOidasListas(true)
   }
-  useEffect(() => {
-    // Las palabras empiezan cuando ha terminado la clave (unos 75 ms por letra)
-    if (conOpciones && oidasComoOpciones) decirOpciones(Math.max(1600, (consigna?.length ?? 0) * 75))
-    return () => temporizadoresOidas.current.forEach(clearTimeout)
-    // Solo al salir las opciones
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conOpciones])
   const listo = conOpciones && (!oidasComoOpciones || oidasListas)
   const hablar = () => {
-    if (consigna) void decirFraseRft(consigna)
-    else if (muestraOida) void decirFraseRft(textoOido(origen.nombre))
+    if (consigna) finClave.current = decirFraseRft(consigna)
+    else if (muestraOida) finClave.current = decirFraseRft(textoOido(origen.nombre))
   }
 
   useEffect(() => {
@@ -197,6 +194,16 @@ function Presentacion({
     // Solo al aparecer la muestra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conMuestra])
+  // Después del efecto anterior (mismo orden en el código), para que la
+  // clave ya haya empezado y las palabras esperen a que termine
+  useEffect(() => {
+    if (conOpciones && oidasComoOpciones) void decirOpciones(true)
+    return () => {
+      lecturaOidas.current++
+    }
+    // Solo al salir las opciones
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conOpciones])
   useEffect(() => {
     if (listo) onOpciones()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -326,7 +333,7 @@ function Presentacion({
             {oidasComoOpciones && (
               <button
                 type="button"
-                onClick={() => listo && decirOpciones(0)}
+                onClick={() => listo && void decirOpciones(false)}
                 className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.2vmin] text-slate-500 ${listo ? '' : 'invisible'}`}
               >
                 🔁 Repetir

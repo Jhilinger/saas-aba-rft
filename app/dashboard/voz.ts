@@ -40,8 +40,10 @@ export function vocesEspanol(): SpeechSynthesisVoice[] {
     .sort((a, b) => Number(b.lang === 'es-ES') - Number(a.lang === 'es-ES') || a.name.localeCompare(b.name, 'es'))
 }
 
-export function decir(texto: string, ajustes: AjustesVoz = leerAjustesVoz()) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+// Se resuelve al terminar de hablar (o, si el dispositivo no avisa, pasado un
+// tiempo máximo según la longitud)
+export function decir(texto: string, ajustes: AjustesVoz = leerAjustesVoz()): Promise<void> {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return Promise.resolve()
   const frase = new SpeechSynthesisUtterance(texto)
   frase.lang = 'es-ES'
   const voz = vocesEspanol().find((v) => v.voiceURI === ajustes.voz)
@@ -50,8 +52,16 @@ export function decir(texto: string, ajustes: AjustesVoz = leerAjustesVoz()) {
     frase.lang = voz.lang
   }
   frase.rate = ajustes.velocidad
+  const fin = new Promise<void>((resolver) => {
+    const tope = setTimeout(resolver, 2000 + (texto.length * 120) / ajustes.velocidad)
+    frase.onend = frase.onerror = () => {
+      clearTimeout(tope)
+      resolver()
+    }
+  })
   window.speechSynthesis.cancel()
   window.speechSynthesis.speak(frase)
+  return fin
 }
 
 // Consignas grabadas (consignas-grabadas.ts). Se reproducen con Web Audio:
@@ -115,21 +125,23 @@ export function precargarFraseRft(texto: string) {
 
 let sonando: AudioBufferSourceNode | null = null
 
-async function reproducir(texto: string, ruta: string) {
+// Se resuelve al terminar la frase (también si la corta otra)
+async function reproducir(texto: string, ruta: string): Promise<void> {
   const ctx = contextoAudio()
   const buffer = await precargar(ruta)
-  if (!ctx || !buffer) {
-    decir(textoParaVoz(texto))
-    return
-  }
+  if (!ctx || !buffer) return decir(textoParaVoz(texto))
   if (ctx.state === 'suspended') await ctx.resume().catch(() => {})
   sonando?.stop()
   window.speechSynthesis?.cancel()
   const fuente = ctx.createBufferSource()
   fuente.buffer = buffer
   fuente.connect(ctx.destination)
+  const fin = new Promise<void>((resolver) => {
+    fuente.onended = () => resolver()
+  })
   fuente.start()
   sonando = fuente
+  return fin
 }
 
 export function decirConsigna(texto: string) {
