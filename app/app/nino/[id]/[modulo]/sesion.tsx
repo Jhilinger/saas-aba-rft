@@ -9,13 +9,13 @@ import { generarBloque } from '../../../../dashboard/conceptos'
 import { desbloquearAudio, decirFraseRft, precargarFraseRft } from '../../../../dashboard/voz'
 import type { Json } from '@/database.types'
 import { prepararSesion, type PlanSesion } from './acciones'
+import { pegatinaDeSesion } from '../../../pegatinas'
 
 // Una sesión de la app infantil: 10 ensayos de la actividad que elige el
 // motor, celebración tras cada acierto en el entrenamiento (en los tests,
 // transición neutra para no reforzar) y pegatina al terminar.
 
 const ENSAYOS = 10
-const PEGATINAS = ['🌟', '🚀', '🦄', '🌈', '🎈', '🐳', '🍦', '⚽', '🎨', '🦖', '🌻', '🍓', '🚂', '🧸', '🎁', '🐞', '🦋', '🍉', '🏰', '🎵']
 export const FRASES_REFUERZO = ['¡Muy bien!', '¡Genial!', '¡Bravo!']
 
 type Ensayo = {
@@ -257,7 +257,7 @@ export default function Sesion({
     )
   }
 
-  const pegatina = PEGATINAS[(plan?.sesionesHechas ?? 0) % PEGATINAS.length]
+  const pegatina = pegatinaDeSesion(plan?.sesionesHechas ?? 0)
 
   return (
     <main className="flex min-h-dvh flex-col items-center px-4 py-6">

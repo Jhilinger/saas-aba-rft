@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server'
 import { avatar } from '../../avatares'
 import { MODULOS } from '../../modulos'
 import ControlAdultos from '../../control-adultos'
+import { progresoNino } from '../../progreso'
+import { pegatinaDeSesion } from '../../pegatinas'
 
 // Los módulos del niño: tarjetas grandes; la app elige después la actividad
 export default async function ModulosNino({ params }: { params: Promise<{ id: string }> }) {
@@ -12,6 +14,9 @@ export default async function ModulosNino({ params }: { params: Promise<{ id: st
   const { data: nino } = await supabase.from('alumnos').select('id, nombre_anonimizado, avatar').eq('id', id).single()
   if (!nino) notFound()
   const a = avatar(nino.avatar)
+  // Álbum: una pegatina por sesión terminada en cada módulo
+  const { sesionesPorModulo } = await progresoNino(supabase, nino.id)
+  const pegatinas = MODULOS.flatMap((m) => Array.from({ length: sesionesPorModulo[m.clave] ?? 0 }, (_, i) => pegatinaDeSesion(i)))
 
   return (
     <main className="flex min-h-dvh flex-col items-center px-4 py-6">
@@ -36,6 +41,16 @@ export default async function ModulosNino({ params }: { params: Promise<{ id: st
           </Link>
         ))}
       </div>
+      {pegatinas.length > 0 && (
+        <section className="mt-10 w-full max-w-4xl rounded-3xl bg-white/70 p-5 shadow-sm">
+          <p className="mb-3 text-center text-lg font-bold text-[#0F4C5C]">Mis pegatinas ({pegatinas.length})</p>
+          <div className="flex flex-wrap justify-center gap-2 text-4xl">
+            {pegatinas.map((p, i) => (
+              <span key={i}>{p}</span>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }
