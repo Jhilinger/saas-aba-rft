@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { guardarBloqueRft } from './actions'
+import { guardarBloqueRft, guardarTextoTablet } from './actions'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
@@ -171,13 +171,19 @@ function SelectorModo({
   disponible,
   modo,
   onCambiar,
+  conTexto,
+  onTexto,
 }: {
   disponible: boolean
   modo: 'material' | 'tableta'
   onCambiar: (m: 'material' | 'tableta') => void
+  // En la tableta, la clave y las opciones también en texto (alumno lector)
+  conTexto: boolean
+  onTexto: (v: boolean) => void
 }) {
   if (!disponible) return null
   return (
+    <span className="inline-flex flex-wrap items-center gap-3">
     <span className="flex rounded-lg bg-white p-0.5 text-sm">
       {(['material', 'tableta'] as const).map((m) => (
         <button
@@ -188,6 +194,13 @@ function SelectorModo({
           {m === 'material' ? 'Con material' : '🖥 En tableta'}
         </button>
       ))}
+    </span>
+    {modo === 'tableta' && (
+      <label className="flex items-center gap-1.5 text-sm text-slate-600">
+        <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
+        Mostrar también en texto (el alumno lee)
+      </label>
+    )}
     </span>
   )
 }
@@ -280,6 +293,7 @@ export default function TomarDatosRftClient({
   ultimosEscalones,
   consignas,
   opcionesClase = false,
+  textoTablet = false,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -304,6 +318,8 @@ export default function TomarDatosRftClient({
   // Opciones de la propia clase (relaciones enunciadas verbalmente): los dos
   // elementos de la relación y un distractor de otra clase del grupo
   opcionesClase?: boolean
+  // Clave y opciones también en texto en la tableta (se recuerda en el programa)
+  textoTablet?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -320,6 +336,11 @@ export default function TomarDatosRftClient({
   // con que empezó el bloque se guarda con él (ref, como los controles)
   const [modo, setModo] = useState<'material' | 'tableta'>('material')
   const [enTableta, setEnTableta] = useState(false)
+  const [conTexto, setConTexto] = useState(textoTablet)
+  const cambiarTexto = (v: boolean) => {
+    setConTexto(v)
+    void guardarTextoTablet(programaAlumnoId, v)
+  }
   const modoBloqueRef = useRef<'material' | 'tableta'>('material')
   // Escalón de apoyo del bloque en curso (null = sin aprendizaje sin error)
   const escalonRef = useRef<EscalonActivo | null>(null)
@@ -465,7 +486,8 @@ export default function TomarDatosRftClient({
             controlesRef.current,
             modoBloqueRef.current,
             escalon,
-            transferenciasRef.current
+            transferenciasRef.current,
+            conTexto
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -498,7 +520,7 @@ export default function TomarDatosRftClient({
         }
       })
     },
-    [programaAlumnoId, alumnoId, claveProgreso, toast]
+    [programaAlumnoId, alumnoId, claveProgreso, toast, conTexto]
   )
 
   const restaurar = (guardado: ProgresoGuardado) => {
@@ -1008,7 +1030,7 @@ export default function TomarDatosRftClient({
               <SelectorModo
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
                 modo={modo}
-                onCambiar={setModo}
+                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
               />
             }
           />
@@ -1058,7 +1080,7 @@ export default function TomarDatosRftClient({
             <SelectorModo
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
               modo={modo}
-              onCambiar={setModo}
+              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
             />
           }
         />
@@ -1228,7 +1250,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
@@ -1354,6 +1376,7 @@ export default function TomarDatosRftClient({
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
         sinMuestra={opcionesClase}
+        conTexto={conTexto}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}

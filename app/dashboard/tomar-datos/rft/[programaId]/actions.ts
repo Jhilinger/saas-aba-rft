@@ -85,7 +85,9 @@ export async function guardarBloqueRft(
   modo: 'material' | 'tableta' = 'material',
   // Escalón de aprendizaje sin error con que se hizo el bloque (solo entrenamiento)
   sinError: unknown = null,
-  transferencias: TransferenciaInput[] = []
+  transferencias: TransferenciaInput[] = [],
+  // Clave y opciones también en texto (solo en la tableta)
+  conTexto = false
 ) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -161,6 +163,7 @@ export async function guardarBloqueRft(
       num_comparativos: numComparativos,
       total_ensayos: totalEnsayos,
       modo: modo === 'tableta' ? 'tableta' : 'material',
+      con_texto: modo === 'tableta' && conTexto === true,
       sin_error: escalon,
       aciertos,
       notas: notas?.trim() || null,
@@ -317,4 +320,12 @@ export async function guardarBloqueRft(
     derivado,
     dominadoAhora,
   }
+}
+
+// Mostrar también en texto la clave y las opciones en la tableta (alumno
+// lector): se recuerda en el programa del alumno
+export async function guardarTextoTablet(programaAlumnoId: string, conTexto: boolean) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('programas_alumno').update({ texto_tablet: conTexto }).eq('id', programaAlumnoId)
+  return error ? { error: error.message } : {}
 }

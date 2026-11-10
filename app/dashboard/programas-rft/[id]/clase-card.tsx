@@ -44,6 +44,8 @@ type TestRealizado = {
   posicionDestino: string
   fecha: string
   porcentaje: number
+  // Hecho en la tableta con la clave y las opciones también en texto
+  conTexto?: boolean
 }
 
 const NOMBRES_FASE: Record<string, string> = {
@@ -334,6 +336,11 @@ export default function ClaseCard({
               >
                 <span className="text-purple-800">
                   {NOMBRES_FASE[t.fase] ?? t.fase}: {t.posicionOrigen}→{t.posicionDestino}
+                  {t.conTexto && (
+                    <span className="ml-2 rounded bg-white px-1.5 py-0.5 text-xs text-slate-500" title="Con la clave y las opciones también en texto">
+                      con texto
+                    </span>
+                  )}
                 </span>
                 <span
                   className={t.porcentaje >= 90 ? 'text-emerald-700 font-medium' : 'text-slate-500'}

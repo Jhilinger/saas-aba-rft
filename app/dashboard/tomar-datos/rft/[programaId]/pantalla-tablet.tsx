@@ -126,6 +126,7 @@ function Presentacion({
   consigna,
   sinMuestra: sinMuestraForzada = false,
   seleccionOida = false,
+  conTexto = false,
   onElegir,
   onOpciones,
 }: {
@@ -144,6 +145,8 @@ function Presentacion({
   // Opciones que son palabras oídas: en vez de puntuar el terapeuta, la
   // tableta las dice una a una y el alumno toca la suya
   seleccionOida?: boolean
+  // Clave y opciones oídas también en texto (alumno lector)
+  conTexto?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -183,8 +186,9 @@ function Presentacion({
   // La tarjeta de la clave se ilumina mientras suena, como las opciones
   const [claveSonando, setClaveSonando] = useState(false)
   const lecturaClave = useRef(0)
+  const textoClave = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
   const hablar = () => {
-    const texto = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
+    const texto = textoClave
     if (!texto) return
     const lectura = ++lecturaClave.current
     // Fuera del render del efecto que la llama
@@ -270,7 +274,7 @@ function Presentacion({
   return (
     <>
       <div className={`flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-[2vmin]">
           {sinMuestra || muestraOida ? (
             // Clave (o muestra oída): la misma tarjeta 🔊 que las opciones oídas
             <button
@@ -295,6 +299,12 @@ function Presentacion({
             >
               <Tarjeta estimulo={origen} url={urlMuestra} lado={ladoMuestra} urlConcepto={urlConcepto} />
             </button>
+          )}
+          {/* Alumno lector: la clave también escrita, a la vista todo el ensayo */}
+          {conTexto && textoClave && (
+            <p className="max-w-[80vw] text-center font-medium leading-snug text-slate-800" style={{ fontSize: '3.6vmin' }}>
+              {textoClave}
+            </p>
           )}
         </div>
 
@@ -322,8 +332,15 @@ function Presentacion({
                     }`}
                   >
                     {oidasComoOpciones ? (
-                      <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * 0.38)` }}>
-                        🔊
+                      <span className="flex flex-col items-center gap-[1vmin]">
+                        <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * ${conTexto ? 0.28 : 0.38})` }}>
+                          🔊
+                        </span>
+                        {conTexto && (
+                          <span className="px-[1vmin] text-center font-medium leading-tight text-slate-800" style={{ fontSize: `calc(${ladoOpcion} * 0.11)` }}>
+                            {textoOido(c.estimulo.nombre)}
+                          </span>
+                        )}
                       </span>
                     ) : (
                       <Tarjeta
@@ -377,6 +394,7 @@ function EnsayoTablet({
   consigna,
   sinMuestra,
   seleccionOida,
+  conTexto,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -392,6 +410,7 @@ function EnsayoTablet({
   consigna: string | null
   sinMuestra: boolean
   seleccionOida: boolean
+  conTexto: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -440,6 +459,7 @@ function EnsayoTablet({
       consigna={consigna}
       sinMuestra={sinMuestra}
       seleccionOida={seleccionOida}
+      conTexto={conTexto}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -465,6 +485,7 @@ export default function PantallaTablet({
   consigna = null,
   sinMuestra = false,
   seleccionOida = false,
+  conTexto = false,
   infantil = false,
   onResponder,
   onMuestra,
@@ -485,6 +506,8 @@ export default function PantallaTablet({
   sinMuestra?: boolean
   // Tests con respuesta oral por selección entre palabras oídas
   seleccionOida?: boolean
+  // Clave y opciones oídas también en texto (alumno lector)
+  conTexto?: boolean
   // App infantil (familias y escuelas): sin los controles del terapeuta; solo
   // una salida que hay que mantener pulsada
   infantil?: boolean
@@ -552,6 +575,7 @@ export default function PantallaTablet({
         consigna={consigna}
         sinMuestra={sinMuestra}
         seleccionOida={seleccionOida}
+        conTexto={conTexto}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

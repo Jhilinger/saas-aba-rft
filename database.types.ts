@@ -387,6 +387,7 @@ export type Database = {
         Row: {
           aciertos: number
           aciertos_por_minuto: number | null
+          con_texto: boolean
           controles_aciertos: number
           controles_total: number
           duracion_segundos: number | null
@@ -409,6 +410,7 @@ export type Database = {
         Insert: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          con_texto?: boolean
           controles_aciertos?: number
           controles_total?: number
           duracion_segundos?: number | null
@@ -431,6 +433,7 @@ export type Database = {
         Update: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          con_texto?: boolean
           controles_aciertos?: number
           controles_total?: number
           duracion_segundos?: number | null
@@ -1920,6 +1923,7 @@ export type Database = {
           secuencia_rft: Json | null
           sin_error: Json | null
           terapeuta_id: string
+          texto_tablet: boolean
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta: string
           visible_familia: boolean
@@ -1957,6 +1961,7 @@ export type Database = {
           secuencia_rft?: Json | null
           sin_error?: Json | null
           terapeuta_id: string
+          texto_tablet?: boolean
           tipo: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string
           visible_familia?: boolean
@@ -1994,6 +1999,7 @@ export type Database = {
           secuencia_rft?: Json | null
           sin_error?: Json | null
           terapeuta_id?: string
+          texto_tablet?: boolean
           tipo?: Database["public"]["Enums"]["tipo_programa"]
           tipo_respuesta?: string
           visible_familia?: boolean

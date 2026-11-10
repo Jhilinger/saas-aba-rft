@@ -36,6 +36,7 @@ type TestBloque = {
   posicionDestino: string | null
   fecha: string
   porcentaje: number | null
+  conTexto: boolean
 }
 
 export default async function ProgramaRftPage({
@@ -156,7 +157,7 @@ export default async function ProgramaRftPage({
 
   const { data: bloquesTest } = await supabase
     .from('bloques_ensayo_rft')
-    .select('id, fase, posicion_origen, posicion_destino, fecha, porcentaje, ensayos_rft_detalle(clase_id)')
+    .select('id, fase, posicion_origen, posicion_destino, fecha, porcentaje, con_texto, ensayos_rft_detalle(clase_id)')
     .eq('programa_alumno_id', id)
     .neq('fase', 'entrenamiento')
     .order('fecha', { ascending: false })
@@ -176,6 +177,7 @@ export default async function ProgramaRftPage({
         posicionDestino: bloque.posicion_destino,
         fecha: bloque.fecha,
         porcentaje: bloque.porcentaje,
+        conTexto: bloque.con_texto,
       })
     }
   }
