@@ -28,6 +28,7 @@ export const CAMPOS_PLANTILLA = [
   { campo: 'secuencia_rft', etiqueta: 'Secuencia de bloques' },
   { campo: 'consignas', etiqueta: 'Claves relacionales' },
   { campo: 'actividad_tablet', etiqueta: 'Actividad en la tableta' },
+  { campo: 'opciones_clase', etiqueta: 'Opciones de la propia clase' },
 ] as const
 
 export type CampoPlantilla = (typeof CAMPOS_PLANTILLA)[number]['campo']
@@ -57,6 +58,7 @@ function mostrar(campo: CampoPlantilla, valor: ValorCampo): string {
   if (campo === 'tipo_respuesta') return esTipoRespuesta(valor) ? NOMBRE_TIPO_RESPUESTA[valor] : String(valor)
   if (campo === 'opciones_respuesta') return Array.isArray(valor) ? valor.join(', ') : ''
   if (campo === 'secuencia_rft') return formatearSecuencia(leerSecuencia(valor))
+  if (campo === 'opciones_clase') return valor ? 'Sí' : 'No'
   if (campo === 'actividad_tablet') {
     const actividad = leerActividadConceptos(valor)
     return actividad ? actividad.niveles.map((n) => n.nombre).join(' → ') : ''
@@ -79,7 +81,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
   const { data: copia } = await supabase
     .from('programas_alumno')
     .select(
-      'id, alumno_id, tipo, formato_recogida, programa_base_id, plantilla_sincronizada_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet'
+      'id, alumno_id, tipo, formato_recogida, programa_base_id, plantilla_sincronizada_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet, opciones_clase'
     )
     .eq('id', programaAlumnoId)
     .maybeSingle()
@@ -88,7 +90,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
   const { data: base } = await supabase
     .from('programas_base')
     .select(
-      'id, tipo, tipo_relacion, contenido_actualizado_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet'
+      'id, tipo, tipo_relacion, contenido_actualizado_at, nombre, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet, opciones_clase'
     )
     .eq('id', copia.programa_base_id)
     .maybeSingle()

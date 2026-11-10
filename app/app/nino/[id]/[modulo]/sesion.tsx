@@ -85,11 +85,20 @@ function prepararEnsayos(plan: PlanSesion): Ensayo[] {
   const delPrograma = leerConsignasPrograma(plan.consignas)
   return secuencia.map((clase) => {
     const o = de(clase, origen)!
+    // Opciones de la propia clase: los dos elementos nombrados y un distractor de otra clase
+    const otra = barajar(validas.filter((v) => v.id !== clase.id))[0]
+    const comparativos = plan.opcionesClase
+      ? barajar([
+          { claseId: `${clase.id}-o`, estimulo: o, esCorrecto: false },
+          { claseId: `${clase.id}-d`, estimulo: de(clase, destino)!, esCorrecto: true },
+          ...(otra ? [{ claseId: `${otra.id}-x`, estimulo: de(otra, Math.random() < 0.5 ? origen : destino)!, esCorrecto: false }] : []),
+        ])
+      : barajar(validas).map((v) => ({ claseId: v.id, estimulo: de(v, destino)!, esCorrecto: v.id === clase.id }))
     return {
       origen: o,
-      comparativos: barajar(validas).map((v) => ({ claseId: v.id, estimulo: de(v, destino)!, esCorrecto: v.id === clase.id })),
+      comparativos,
       consigna: consignaPara(delPrograma, leerConsignasClase(clase.consignas), fase, origen, destino, textoOido(o.nombre)),
-      sinMuestra: false,
+      sinMuestra: plan.opcionesClase,
       claseId: clase.id,
       estimuloOrigenId: o.id,
       estimuloDestinoId: de(clase, destino)!.id,

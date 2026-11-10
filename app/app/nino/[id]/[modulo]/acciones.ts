@@ -41,6 +41,7 @@ export type PlanSesion =
       ensenar: boolean
       clases: Clase[]
       consignas: Json | null
+      opcionesClase: boolean
       imagenes: Record<string, Record<string, string>>
       sesionesHechas: number
     }
@@ -83,7 +84,7 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
   const cargar = async () => {
     const { data: copias } = await supabase
       .from('programas_alumno')
-      .select('id, nombre, programa_base_id, nivel_rft, secuencia_rft, consignas, actividad_tablet, porcentaje_dominio')
+      .select('id, nombre, programa_base_id, nivel_rft, secuencia_rft, consignas, actividad_tablet, porcentaje_dominio, opciones_clase')
       .eq('alumno_id', alumnoId)
       .in('programa_base_id', ordenBases)
     const ids = (copias ?? []).map((c) => c.id)
@@ -224,6 +225,7 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
       ensenar: eleccion.ensenar,
       clases: clasesGrupo.map(({ id, nombre, grupo, consignas, estimulos_rft }) => ({ id, nombre, grupo, consignas, estimulos_rft })),
       consignas: copia.consignas,
+      opcionesClase: copia.opciones_clase,
       imagenes,
       sesionesHechas,
     },

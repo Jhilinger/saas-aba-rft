@@ -1910,6 +1910,7 @@ export type Database = {
           nivel_rft: string | null
           nombre: string
           objetivo: string | null
+          opciones_clase: boolean
           opciones_respuesta: string[] | null
           orden: number | null
           plantilla_sincronizada_at: string
@@ -1946,6 +1947,7 @@ export type Database = {
           nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
+          opciones_clase?: boolean
           opciones_respuesta?: string[] | null
           orden?: number | null
           plantilla_sincronizada_at?: string
@@ -1982,6 +1984,7 @@ export type Database = {
           nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
+          opciones_clase?: boolean
           opciones_respuesta?: string[] | null
           orden?: number | null
           plantilla_sincronizada_at?: string
@@ -2050,6 +2053,7 @@ export type Database = {
           nivel_rft: string | null
           nombre: string
           objetivo: string | null
+          opciones_clase: boolean
           opciones_respuesta: string[] | null
           orden: number | null
           porcentaje_dominio: number
@@ -2084,6 +2088,7 @@ export type Database = {
           nivel_rft?: string | null
           nombre: string
           objetivo?: string | null
+          opciones_clase?: boolean
           opciones_respuesta?: string[] | null
           orden?: number | null
           porcentaje_dominio?: number
@@ -2120,6 +2125,7 @@ export type Database = {
           nivel_rft?: string | null
           nombre?: string
           objetivo?: string | null
+          opciones_clase?: boolean
           opciones_respuesta?: string[] | null
           orden?: number | null
           porcentaje_dominio?: number

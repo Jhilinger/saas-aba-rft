@@ -279,6 +279,7 @@ export default function TomarDatosRftClient({
   sinError,
   ultimosEscalones,
   consignas,
+  opcionesClase = false,
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -300,6 +301,9 @@ export default function TomarDatosRftClient({
   ultimosEscalones: Record<string, Json>
   // Consignas del programa (claves relacionales por paso; ver consignas-rft.ts)
   consignas: Json
+  // Opciones de la propia clase (relaciones enunciadas verbalmente): los dos
+  // elementos de la relación y un distractor de otra clase del grupo
+  opcionesClase?: boolean
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -599,6 +603,17 @@ export default function TomarDatosRftClient({
     if (!secuencia) return []
     const claseActual = secuencia[ensayos.length]
     if (!claseActual) return []
+    if (opcionesClase) {
+      const semilla = `${ensayos.length}-${claseActual.id}`
+      const otras = clasesValidas.filter((c) => c.id !== claseActual.id)
+      const otra = otras.length ? otras[hashEstable(semilla) % otras.length] : null
+      const distractor = otra ? encontrarEstimulo(otra, hashEstable(`${semilla}-p`) % 2 ? posicionOrigen : posicionDestino) : undefined
+      return [
+        { claseId: `${claseActual.id}-o`, estimulo: encontrarEstimulo(claseActual, posicionOrigen)!, esCorrecto: false },
+        { claseId: `${claseActual.id}-d`, estimulo: encontrarEstimulo(claseActual, posicionDestino)!, esCorrecto: true },
+        ...(distractor && otra ? [{ claseId: `${otra.id}-x`, estimulo: distractor, esCorrecto: false }] : []),
+      ].sort((a, b) => hashEstable(`${semilla}-${a.claseId}`) - hashEstable(`${semilla}-${b.claseId}`))
+    }
     let opciones = clasesValidas
     if (escalonBloque) {
       // Con aprendizaje sin error: la correcta y tantos distractores como pida el escalón
@@ -1335,6 +1350,7 @@ export default function TomarDatosRftClient({
         seleccionOida={!!sinError?.seleccionOida}
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
+        sinMuestra={opcionesClase}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
