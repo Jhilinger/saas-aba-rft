@@ -243,10 +243,23 @@ export default async function ProgramaDetallePage({
           )}
           {!soloLectura && <NuevaClaseRftForm programaBaseId={id} />}
 
-          <div className="space-y-4">
-            {clasesRft?.map((c) => (
-              <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} imagenes={imagenes} conImagenes={conImagenes} />
-            ))}
+          {/* Un apartado por grupo, en orden natural (Grupo 2 antes que Grupo 10), y sus clases por nombre */}
+          <div className="space-y-6">
+            {[...new Set((clasesRft ?? []).map((c) => c.grupo))]
+              .sort((a, b) => a.localeCompare(b, 'es', { numeric: true }))
+              .map((grupo) => (
+                <div key={grupo} className="space-y-3">
+                  <h3 className="text-sm font-semibold text-slate-700">{grupo}</h3>
+                  <div className="space-y-4">
+                    {(clasesRft ?? [])
+                      .filter((c) => c.grupo === grupo)
+                      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { numeric: true }))
+                      .map((c) => (
+                        <ClaseRftBaseCard key={c.id} clase={c} programaBaseId={id} nivelRft={programa.nivel_rft} soloLectura={soloLectura} conRespuestasEsperadas={usaRespuestasSinSeleccion(programa)} imagenes={imagenes} conImagenes={conImagenes} />
+                      ))}
+                  </div>
+                </div>
+              ))}
           </div>
 
           {(!clasesRft || clasesRft.length === 0) && (
