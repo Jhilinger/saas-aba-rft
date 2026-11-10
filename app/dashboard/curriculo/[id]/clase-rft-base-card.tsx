@@ -14,10 +14,11 @@ import { useConfirm } from '../../../providers/confirm-provider'
 import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import ImagenEstimulo from '../../imagen-estimulo'
+import MiniaturaEstimulo from '../../miniatura-estimulo'
 import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; estimulos_rft_base: Estimulo[] }
 
 export default function ClaseRftBaseCard({
@@ -107,6 +108,7 @@ export default function ClaseRftBaseCard({
               {' '}— {e.nombre}
             </span>
             <span className="flex items-center gap-3">
+            <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
             <ImagenEstimulo tabla="estimulos_rft_base" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
             {!soloLectura && <button
               onClick={() => {

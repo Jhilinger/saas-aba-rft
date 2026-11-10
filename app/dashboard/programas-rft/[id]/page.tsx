@@ -19,6 +19,7 @@ import { leerConsignasClase, leerConsignasPrograma } from '../../consignas-rft'
 import { leerSecuencia, secuenciaGenerica } from '../../secuencia-rft'
 import { coerceNivelRft } from '../../niveles-rft'
 import { leerSinError } from '../../sin-error'
+import { conceptosDePantalla, parsearEstimuloPantalla } from '../../estimulo-pantalla'
 
 const NOMBRE_FASE: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
@@ -141,12 +142,15 @@ export default async function ProgramaRftPage({
   const { data: clases } = await supabase
     .from('clases_rft')
     .select(
-      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, consignas, estimulos_rft(id, etiqueta, nombre, posicion, concepto_imagen), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
+      'id, nombre, grupo, tipo_relacion, estado, respuestas_esperadas, consignas, estimulos_rft(id, etiqueta, nombre, posicion, concepto_imagen, pantalla), relaciones_entrenadas_rft(id, estimulo_origen_id, estimulo_destino_id)'
     )
     .eq('programa_alumno_id', id)
     .order('grupo')
     .order('created_at', { ascending: false })
-  const imagenes = await cargarImagenes(supabase, (clases ?? []).flatMap((c) => c.estimulos_rft.map((e) => e.concepto_imagen)))
+  const imagenes = await cargarImagenes(
+    supabase,
+    (clases ?? []).flatMap((c) => c.estimulos_rft.flatMap((e) => [e.concepto_imagen, ...conceptosDePantalla(parsearEstimuloPantalla(e.pantalla))]))
+  )
 
   const { porFase, distribucionPorGrupo } = await obtenerEvolucionRft(id)
 

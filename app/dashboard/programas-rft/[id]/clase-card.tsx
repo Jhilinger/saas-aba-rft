@@ -19,9 +19,10 @@ import { Button, Panel } from '../../../ui'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 import AyudaTermino from '../../ayuda-termino'
 import ImagenEstimulo from '../../imagen-estimulo'
+import MiniaturaEstimulo from '../../miniatura-estimulo'
 import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 
-type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null }
+type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
 type Relacion = {
   id: string
   estimulo_origen_id: string
@@ -175,6 +176,7 @@ export default function ClaseCard({
                 {' '}— {e.nombre}
               </span>
               <span className="flex items-center gap-3">
+              <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
               <ImagenEstimulo tabla="estimulos_rft" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
               {!soloLectura && (
               <button
