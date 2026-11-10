@@ -165,10 +165,10 @@ function Presentacion({
   const lecturaOidas = useRef(0)
   // Fin de la clave en curso: las opciones esperan a que termine
   const finClave = useRef<Promise<void>>(Promise.resolve())
-  const decirOpciones = async (trasClave: boolean) => {
+  const decirOpciones = async () => {
     const lectura = ++lecturaOidas.current
     const sigue = () => lectura === lecturaOidas.current
-    if (trasClave) await finClave.current
+    await finClave.current
     await esperar(400)
     for (let i = 0; i < comparativos.length && sigue(); i++) {
       setSonando(i)
@@ -180,9 +180,25 @@ function Presentacion({
     setOidasListas(true)
   }
   const listo = conOpciones && (!oidasComoOpciones || oidasListas)
+  // La tarjeta de la clave se ilumina mientras suena, como las opciones
+  const [claveSonando, setClaveSonando] = useState(false)
+  const lecturaClave = useRef(0)
   const hablar = () => {
-    if (consigna) finClave.current = decirFraseRft(consigna)
-    else if (muestraOida) finClave.current = decirFraseRft(textoOido(origen.nombre))
+    const texto = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
+    if (!texto) return
+    const lectura = ++lecturaClave.current
+    // Fuera del render del efecto que la llama
+    void Promise.resolve().then(() => lectura === lecturaClave.current && setClaveSonando(true))
+    finClave.current = decirFraseRft(texto).then(() => {
+      if (lectura === lecturaClave.current) setClaveSonando(false)
+    })
+  }
+
+  // Repetir: toda la secuencia, la clave y después las opciones oídas
+  const repetirSecuencia = () => {
+    if (!listo) return
+    hablar()
+    void decirOpciones()
   }
 
   useEffect(() => {
@@ -197,7 +213,7 @@ function Presentacion({
   // Después del efecto anterior (mismo orden en el código), para que la
   // clave ya haya empezado y las palabras esperen a que termine
   useEffect(() => {
-    if (conOpciones && oidasComoOpciones) void decirOpciones(true)
+    if (conOpciones && oidasComoOpciones) void decirOpciones()
     return () => {
       lecturaOidas.current++
     }
@@ -255,28 +271,19 @@ function Presentacion({
     <>
       <div className={`flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
         <div className="flex items-center justify-center">
-          {sinMuestra ? (
+          {sinMuestra || muestraOida ? (
+            // Clave (o muestra oída): la misma tarjeta 🔊 que las opciones oídas
             <button
               type="button"
-              onClick={hablar}
-              className="rounded-full border border-slate-200 bg-white px-[3vmin] py-[1.5vmin] text-[2.5vmin] text-slate-500 shadow-sm"
-              aria-label="Escuchar la pregunta"
-            >
-              🔊 Escuchar
-            </button>
-          ) : muestraOida ? (
-            <button
-              type="button"
-              onClick={tocarMuestra}
+              onClick={oidasComoOpciones ? repetirSecuencia : sinMuestra ? hablar : tocarMuestra}
               style={{ width: ladoAudio, height: ladoAudio }}
-              className={`flex flex-col items-center justify-center gap-2 rounded-[2.5vmin] border-2 bg-white shadow-sm ${marcoMuestra}`}
+              className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                nivel > 0 ? 'animate-pulse border-amber-400' : claveSonando ? 'border-indigo-400 ring-[1vmin] ring-indigo-200' : 'border-slate-200'
+              }`}
               aria-label="Escuchar de nuevo"
             >
               <span className="leading-none" style={{ fontSize: `calc(${ladoAudio} * 0.38)` }}>
                 🔊
-              </span>
-              <span className="text-slate-500" style={{ fontSize: `calc(${ladoAudio} * 0.1)` }}>
-                Escuchar
               </span>
             </button>
           ) : (
@@ -333,7 +340,7 @@ function Presentacion({
             {oidasComoOpciones && (
               <button
                 type="button"
-                onClick={() => listo && void decirOpciones(false)}
+                onClick={repetirSecuencia}
                 className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.2vmin] text-slate-500 ${listo ? '' : 'invisible'}`}
               >
                 🔁 Repetir
