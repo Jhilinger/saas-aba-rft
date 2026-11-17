@@ -625,6 +625,15 @@ export default function TomarDatosRftClient({
     if (!secuencia) return []
     const claseActual = secuencia[ensayos.length]
     if (!claseActual) return []
+    if (opcionesClase && claseActual.estimulos_rft.length >= 3) {
+      // Redes de 3 o más miembros: las opciones son todos los de la clase (sin
+      // distractor de otra clase), dichas en audio
+      const semilla = `${ensayos.length}-${claseActual.id}`
+      const oida = (e: Estimulo): Estimulo => ({ ...e, nombre: `"${e.nombre}"`, concepto_imagen: null, pantalla: null })
+      return claseActual.estimulos_rft
+        .map((e) => ({ claseId: `${claseActual.id}-${e.posicion}`, estimulo: oida(e), esCorrecto: e.posicion === posicionDestino }))
+        .sort((a, b) => hashEstable(`${semilla}-${a.claseId}`) - hashEstable(`${semilla}-${b.claseId}`))
+    }
     if (opcionesClase) {
       const semilla = `${ensayos.length}-${claseActual.id}`
       const otras = clasesValidas.filter((c) => c.id !== claseActual.id)

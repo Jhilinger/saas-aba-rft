@@ -89,7 +89,10 @@ function prepararEnsayos(plan: PlanSesion): Ensayo[] {
     const otra = barajar(validas.filter((v) => v.id !== clase.id))[0]
     // (en audio: la relación es verbal)
     const oida = (e: typeof o) => ({ ...e, nombre: `"${e.nombre}"`, concepto_imagen: null, pantalla: null })
-    const comparativos = plan.opcionesClase
+    const comparativos = plan.opcionesClase && clase.estimulos_rft.length >= 3
+      ? // Redes de 3 o más miembros: las opciones son todos los de la clase
+        barajar(clase.estimulos_rft.map((e) => ({ claseId: `${clase.id}-${e.posicion}`, estimulo: oida(e), esCorrecto: e.posicion === destino })))
+      : plan.opcionesClase
       ? barajar([
           { claseId: `${clase.id}-o`, estimulo: oida(o), esCorrecto: false },
           { claseId: `${clase.id}-d`, estimulo: oida(de(clase, destino)!), esCorrecto: true },
