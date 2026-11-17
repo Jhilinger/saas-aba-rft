@@ -20,7 +20,8 @@ import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronome
 import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
-import PantallaTablet, { esOido, esVisible, textoOido, type ImagenesBanco } from './pantalla-tablet'
+import PantallaTablet, { esOido, esVisible, textoOido, urlImagen, type ImagenesBanco } from './pantalla-tablet'
+import MiniaturaEstimulo from '../../../miniatura-estimulo'
 import { consignaPara, leerConsignasClase, leerConsignasPrograma } from '../../../consignas-rft'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import {
@@ -36,6 +37,16 @@ import AyudaTermino from '../../../ayuda-termino'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla: unknown }
+
+// Miniatura de lo que el alumno tiene delante (figura dibujada o foto), para
+// que el terapeuta sepa qué estímulo es aunque su nombre sea genérico
+function VistaEstimulo({ estimulo, imagenes }: { estimulo: Estimulo; imagenes: ImagenesBanco }) {
+  if (estimulo.pantalla) return <MiniaturaEstimulo pantalla={estimulo.pantalla} imagenes={imagenes} />
+  const url = estimulo.concepto_imagen ? urlImagen(imagenes, estimulo.concepto_imagen, 'entrenamiento', 0) : null
+  if (!url) return null
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain" />
+}
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
@@ -1480,12 +1491,18 @@ export default function TomarDatosRftClient({
           </p>
         )}
         {esTransformacion ? (
-          <p className="text-sm text-slate-500">
-            Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
-          </p>
+          <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
+            <VistaEstimulo estimulo={origenActual} imagenes={imagenes} />
+            <p>
+              Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
+            </p>
+          </div>
         ) : (
           <>
-            <p className="text-xl sm:text-2xl font-bold text-slate-800">{origenActual.nombre}</p>
+            <div className="flex items-center justify-center gap-3">
+              <VistaEstimulo estimulo={origenActual} imagenes={imagenes} />
+              <p className="text-xl sm:text-2xl font-bold text-slate-800">{origenActual.nombre}</p>
+            </div>
             <p className="text-xs text-slate-500">{claseActual.nombre}</p>
           </>
         )}
@@ -1495,13 +1512,14 @@ export default function TomarDatosRftClient({
             {comparativos.map((c) => (
               <span
                 key={c.claseId}
-                className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+                className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
                   c.esCorrecto
                     ? 'border-emerald-600 bg-emerald-600 text-white'
                     : 'border-slate-300 bg-white text-slate-600'
                 }`}
                 title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
               >
+                <VistaEstimulo estimulo={c.estimulo} imagenes={imagenes} />
                 {c.estimulo.nombre}
               </span>
             ))}
