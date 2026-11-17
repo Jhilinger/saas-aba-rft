@@ -93,7 +93,7 @@ function prepararEnsayos(plan: PlanSesion): Ensayo[] {
       ? barajar([
           { claseId: `${clase.id}-o`, estimulo: oida(o), esCorrecto: false },
           { claseId: `${clase.id}-d`, estimulo: oida(de(clase, destino)!), esCorrecto: true },
-          ...(otra ? [{ claseId: `${otra.id}-x`, estimulo: oida(de(otra, Math.random() < 0.5 ? origen : destino)!), esCorrecto: false }] : []),
+          ...(otra ? [{ claseId: `${otra.id}-x`, estimulo: oida(de(otra, destino)!), esCorrecto: false }] : []),
         ])
       : barajar(validas).map((v) => ({ claseId: v.id, estimulo: de(v, destino)!, esCorrecto: v.id === clase.id }))
     return {

@@ -629,7 +629,9 @@ export default function TomarDatosRftClient({
       const semilla = `${ensayos.length}-${claseActual.id}`
       const otras = clasesValidas.filter((c) => c.id !== claseActual.id)
       const otra = otras.length ? otras[hashEstable(semilla) % otras.length] : null
-      const distractor = otra ? encontrarEstimulo(otra, hashEstable(`${semilla}-p`) % 2 ? posicionOrigen : posicionDestino) : undefined
+      // El distractor ocupa el mismo papel que la respuesta (otra causa, otro
+      // consecuente…), para que no se descarte solo por el tipo de frase
+      const distractor = otra ? encontrarEstimulo(otra, posicionDestino) : undefined
       // Las opciones son palabras oídas (la relación es verbal): se presentan
       // como estímulos oídos aunque tengan imagen en el currículo
       const oida = (e: Estimulo): Estimulo => ({ ...e, nombre: `"${e.nombre}"`, concepto_imagen: null, pantalla: null })
