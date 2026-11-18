@@ -184,8 +184,11 @@ function SelectorModo({
   onCambiar,
   conTexto,
   onTexto,
+  fuera = 0,
 }: {
   disponible: boolean
+  // Clases del grupo que no se pueden mostrar en la tableta (se quedan fuera)
+  fuera?: number
   modo: 'material' | 'tableta'
   onCambiar: (m: 'material' | 'tableta') => void
   // En la tableta, la clave y las opciones también en texto (activado por
@@ -212,6 +215,11 @@ function SelectorModo({
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
         Clave y opciones también en texto
       </label>
+    )}
+    {modo === 'tableta' && fuera > 0 && (
+      <span className="text-xs font-medium text-amber-700">
+        ⚠ {fuera} clase(s) sin imagen se quedan fuera del bloque en la tableta
+      </span>
     )}
     </span>
   )
@@ -414,10 +422,18 @@ export default function TomarDatosRftClient({
     ),
   ].sort()
 
-  const clasesValidas = clasesDelGrupo.filter(
+  // Una clase se puede presentar en la tableta si sus dos estímulos se ven o se
+  // dicen (con opciones de la propia clase todo se dice en audio)
+  const presentable = (c: Clase, origen: string, destino: string) =>
+    opcionesClase || [encontrarEstimulo(c, origen), encontrarEstimulo(c, destino)].every((e) => !!e && (esVisible(e) || esOido(e)))
+  const clasesConPosiciones = clasesDelGrupo.filter(
     (c) => encontrarEstimulo(c, posicionOrigen) && encontrarEstimulo(c, posicionDestino)
   )
-  const clasesSinPosiciones = clasesDelGrupo.length - clasesValidas.length
+  // En la tableta se quedan fuera las clases que no se pueden mostrar
+  const clasesValidas = enTableta
+    ? clasesConPosiciones.filter((c) => presentable(c, posicionOrigen, posicionDestino))
+    : clasesConPosiciones
+  const clasesSinPosiciones = clasesDelGrupo.length - clasesConPosiciones.length
 
   const entrenamientosDominados: ParEntrenado[] = dominioFases
     .filter((d) => d.fase === 'entrenamiento')
@@ -686,7 +702,7 @@ export default function TomarDatosRftClient({
   })()
 
   const empezarBloque = () => {
-    if (clasesValidas.length < 2) {
+    if (clasesConPosiciones.length < 2) {
       toast('Necesitas al menos 2 clases con esas posiciones en este grupo para poder comparar.', 'error')
       return
     }
@@ -695,11 +711,12 @@ export default function TomarDatosRftClient({
       return
     }
     const modoInicial = grupoSeleccionado ? modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) : 'material'
+    const validas = modoInicial === 'tableta' ? clasesConPosiciones.filter((c) => presentable(c, posicionOrigen, posicionDestino)) : clasesConPosiciones
     iniciarBloque(
-      clasesValidas,
+      validas,
       modoInicial,
-      grupoSeleccionado ? escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoInicial, clasesValidas) : null,
-      menorAMayorPara(posicionDestino, faseEfectiva, modoInicial, clasesValidas)
+      grupoSeleccionado ? escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, modoInicial, validas) : null,
+      menorAMayorPara(posicionDestino, faseEfectiva, modoInicial, validas)
     )
   }
 
@@ -744,18 +761,23 @@ export default function TomarDatosRftClient({
   const clasesCon = (grupo: string, origen: string, destino: string) =>
     clases.filter((c) => c.grupo === grupo && encontrarEstimulo(c, origen) && encontrarEstimulo(c, destino))
 
-  // Se puede presentar en pantalla si el alumno elige un estímulo y todos los
-  // estímulos tienen imagen del banco o son palabras que se dicen
+  // Clases del grupo que se pueden mostrar en la tableta
+  const clasesTableta = (grupo: string, origen: string, destino: string) =>
+    clasesCon(grupo, origen, destino).filter((c) => presentable(c, origen, destino))
+  // Se puede presentar en pantalla si el alumno elige un estímulo y al menos 2
+  // clases tienen sus estímulos con imagen del banco o como palabras que se
+  // dicen; las demás se quedan fuera del bloque (con aviso)
   const tabletaPosible = (grupo: string, origen: string, destino: string, faseBloque: string) => {
     if (configRespuesta(respuesta, faseBloque).tipo !== 'seleccion') return false
-    const validas = clasesCon(grupo, origen, destino)
+    const validas = clasesTableta(grupo, origen, destino)
     if (validas.length < 2) return false
     // Con opciones de la propia clase todo se dice en audio (clave y opciones):
     // no hace falta que ningún estímulo tenga imagen
     if (opcionesClase) return true
-    const estimulos = validas.flatMap((c) => [encontrarEstimulo(c, origen)!, encontrarEstimulo(c, destino)!])
-    return estimulos.every((e) => esVisible(e) || esOido(e)) && estimulos.some(esVisible)
+    return validas.some((c) => esVisible(encontrarEstimulo(c, origen)!) || esVisible(encontrarEstimulo(c, destino)!))
   }
+  const fueraDeTableta = (grupo: string, origen: string, destino: string) =>
+    clasesCon(grupo, origen, destino).length - clasesTableta(grupo, origen, destino).length
   const modoPara = (grupo: string, origen: string, destino: string, faseBloque: string) =>
     modo === 'tableta' && tabletaPosible(grupo, origen, destino, faseBloque) ? 'tableta' : 'material'
 
@@ -825,11 +847,12 @@ export default function TomarDatosRftClient({
     setPosicionDestino(rec.paso.destino)
     setTipoSonda('normal')
     const modoInicial = modoPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase)
+    const enPantalla = modoInicial === 'tableta' ? clasesTableta(rec.grupo, rec.paso.origen, rec.paso.destino) : validas
     iniciarBloque(
-      validas,
+      enPantalla,
       modoInicial,
-      escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, modoInicial, validas),
-      menorAMayorPara(rec.paso.destino, rec.paso.fase, modoInicial, validas)
+      escalonPara(rec.grupo, rec.paso.origen, rec.paso.destino, rec.paso.fase, modoInicial, enPantalla),
+      menorAMayorPara(rec.paso.destino, rec.paso.fase, modoInicial, enPantalla)
     )
   }
 
@@ -1055,6 +1078,7 @@ export default function TomarDatosRftClient({
             selectorModo={
               <SelectorModo
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
+                fuera={fueraDeTableta(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino)}
                 modo={modo}
                 onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
               />
@@ -1105,6 +1129,7 @@ export default function TomarDatosRftClient({
           selectorModo={
             <SelectorModo
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
+              fuera={fueraDeTableta(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino)}
               modo={modo}
               onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
             />
@@ -1276,7 +1301,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)

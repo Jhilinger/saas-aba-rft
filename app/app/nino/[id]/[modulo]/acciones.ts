@@ -60,16 +60,24 @@ const oido = (e: Estimulo) => !e.concepto_imagen && !parsearEstimuloPantalla(e.p
 const visible = (e: Estimulo) => !!e.concepto_imagen || !!parsearEstimuloPantalla(e.pantalla)
 const ordenGrupo = (a: string, b: string) => a.localeCompare(b, 'es', { numeric: true })
 
-// Un paso se puede hacer en la tableta si todos sus estímulos se ven o se oyen
-// y al menos uno se ve (las respuestas orales se hacen eligiendo entre palabras oídas)
-// (con opciones de la propia clase todo se dice en audio y no hace falta imagen)
-function enTableta(clases: Clase[], paso: PasoSecuencia, opcionesClase = false) {
+// Clases de un paso que se pueden mostrar en la tableta: sus dos estímulos se ven
+// o se oyen (con opciones de la propia clase todo se dice en audio). Las demás se
+// quedan fuera de la sesión
+function clasesEnTableta(clases: Clase[], paso: PasoSecuencia, opcionesClase = false) {
   const de = (c: Clase, pos: string) => c.estimulos_rft.find((e) => e.posicion === pos)
-  const validas = clases.filter((c) => de(c, paso.origen) && de(c, paso.destino))
+  return clases.filter((c) => {
+    const o = de(c, paso.origen), d = de(c, paso.destino)
+    return !!o && !!d && (opcionesClase || [o, d].every((e) => visible(e) || oido(e)))
+  })
+}
+
+// Un paso se puede hacer en la tableta si al menos 2 clases se pueden mostrar y
+// alguno de sus estímulos se ve (las respuestas orales se eligen entre palabras oídas)
+function enTableta(clases: Clase[], paso: PasoSecuencia, opcionesClase = false) {
+  const validas = clasesEnTableta(clases, paso, opcionesClase)
   if (validas.length < 2) return false
   if (opcionesClase) return true
-  const estimulos = validas.flatMap((c) => [de(c, paso.origen)!, de(c, paso.destino)!])
-  return estimulos.every((e) => visible(e) || oido(e)) && estimulos.some(visible)
+  return validas.some((c) => c.estimulos_rft.some((e) => (e.posicion === paso.origen || e.posicion === paso.destino) && visible(e)))
 }
 
 export async function prepararSesion(alumnoId: string, claveModulo: string): Promise<{ error: string } | { plan: PlanSesion } | { terminado: true }> {
@@ -212,7 +220,11 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
     }
   }
 
-  const clasesGrupo = datos.clases.filter((c) => c.programa_alumno_id === copia.id && c.grupo === eleccion.grupo)
+  const clasesGrupo = clasesEnTableta(
+    datos.clases.filter((c) => c.programa_alumno_id === copia.id && c.grupo === eleccion.grupo),
+    eleccion.paso,
+    !!copia.opciones_clase
+  )
   const imagenes = await cargarImagenes(
     supabase,
     clasesGrupo.flatMap((c) => c.estimulos_rft.flatMap((e) => [e.concepto_imagen, ...conceptosDePantalla(parsearEstimuloPantalla(e.pantalla))]))
