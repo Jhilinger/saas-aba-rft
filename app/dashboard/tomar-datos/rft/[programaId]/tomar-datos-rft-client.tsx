@@ -188,7 +188,8 @@ function SelectorModo({
   disponible: boolean
   modo: 'material' | 'tableta'
   onCambiar: (m: 'material' | 'tableta') => void
-  // En la tableta, la clave y las opciones también en texto (alumno lector)
+  // En la tableta, la clave y las opciones también en texto (activado por
+  // defecto: el alumno lector las tiene presentes y, si no lee, se las lee el terapeuta)
   conTexto: boolean
   onTexto: (v: boolean) => void
 }) {
@@ -209,7 +210,7 @@ function SelectorModo({
     {modo === 'tableta' && (
       <label className="flex items-center gap-1.5 text-sm text-slate-600">
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
-        Mostrar también en texto (el alumno lee)
+        Clave y opciones también en texto
       </label>
     )}
     </span>
@@ -304,7 +305,7 @@ export default function TomarDatosRftClient({
   ultimosEscalones,
   consignas,
   opcionesClase = false,
-  textoTablet = false,
+  textoTablet = true,
 }: {
   programaAlumnoId: string
   alumnoId: string
