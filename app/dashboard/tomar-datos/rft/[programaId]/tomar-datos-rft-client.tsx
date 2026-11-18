@@ -749,6 +749,9 @@ export default function TomarDatosRftClient({
     if (configRespuesta(respuesta, faseBloque).tipo !== 'seleccion') return false
     const validas = clasesCon(grupo, origen, destino)
     if (validas.length < 2) return false
+    // Con opciones de la propia clase todo se dice en audio (clave y opciones):
+    // no hace falta que ningún estímulo tenga imagen
+    if (opcionesClase) return true
     const estimulos = validas.flatMap((c) => [encontrarEstimulo(c, origen)!, encontrarEstimulo(c, destino)!])
     return estimulos.every((e) => esVisible(e) || esOido(e)) && estimulos.some(esVisible)
   }

@@ -62,10 +62,12 @@ const ordenGrupo = (a: string, b: string) => a.localeCompare(b, 'es', { numeric:
 
 // Un paso se puede hacer en la tableta si todos sus estímulos se ven o se oyen
 // y al menos uno se ve (las respuestas orales se hacen eligiendo entre palabras oídas)
-function enTableta(clases: Clase[], paso: PasoSecuencia) {
+// (con opciones de la propia clase todo se dice en audio y no hace falta imagen)
+function enTableta(clases: Clase[], paso: PasoSecuencia, opcionesClase = false) {
   const de = (c: Clase, pos: string) => c.estimulos_rft.find((e) => e.posicion === pos)
   const validas = clases.filter((c) => de(c, paso.origen) && de(c, paso.destino))
   if (validas.length < 2) return false
+  if (opcionesClase) return true
   const estimulos = validas.flatMap((c) => [de(c, paso.origen)!, de(c, paso.destino)!])
   return estimulos.every((e) => visible(e) || oido(e)) && estimulos.some(visible)
 }
@@ -126,7 +128,7 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
     const pendienteDe = (grupo: string): Eleccion | null => {
       const delGrupo = clasesCopia.filter((c) => c.grupo === grupo)
       const posiciones = [...new Set(delGrupo.flatMap((c) => c.estimulos_rft.map((e) => e.posicion).filter((p): p is string => !!p)))]
-      const paso = secuenciaDelGrupo(copia.secuencia_rft, nivel, posiciones).filter((p) => enTableta(delGrupo, p)).find((p) => !hecho.has(`${grupo}|${p.fase}|${p.origen}|${p.destino}`))
+      const paso = secuenciaDelGrupo(copia.secuencia_rft, nivel, posiciones).filter((p) => enTableta(delGrupo, p, !!copia.opciones_clase)).find((p) => !hecho.has(`${grupo}|${p.fase}|${p.origen}|${p.destino}`))
       if (!paso) return null
       // Regla de los dos intentos en los tests
       const fallidos = datos.bloques.filter(
