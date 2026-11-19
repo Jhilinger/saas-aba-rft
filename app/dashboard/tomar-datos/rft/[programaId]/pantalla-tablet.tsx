@@ -201,7 +201,8 @@ function Presentacion({
   }
   // Presentación en texto (programas verbales con el texto activado): la frase
   // grande y las opciones como botones de texto, que se pueden tocar en cuanto
-  // aparecen; la frase se dice al aparecer y 🔊 repite frase y opciones
+  // aparecen. No suena nada solo: lo lee el alumno o el terapeuta; «🔊 Escuchar»
+  // lee la frase y las opciones a petición
   const modoTexto = oidasComoOpciones && conTexto
   const listo = conOpciones && (!oidasComoOpciones || modoTexto || sinVozAutomatica || oidasListas)
   // La tarjeta de la clave se ilumina mientras suena, como las opciones
@@ -233,7 +234,7 @@ function Presentacion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    if (conMuestra && !sinVozAutomatica) hablar()
+    if (conMuestra && !sinVozAutomatica && !modoTexto) hablar()
     // Solo al aparecer la muestra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conMuestra])
