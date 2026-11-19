@@ -634,6 +634,7 @@ export type Database = {
           consignas: Json | null
           created_at: string
           estado: Database["public"]["Enums"]["estado_programa_alumno"]
+          generado: Json | null
           grupo: string
           id: string
           nombre: string
@@ -645,6 +646,7 @@ export type Database = {
           consignas?: Json | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          generado?: Json | null
           grupo?: string
           id?: string
           nombre: string
@@ -656,6 +658,7 @@ export type Database = {
           consignas?: Json | null
           created_at?: string
           estado?: Database["public"]["Enums"]["estado_programa_alumno"]
+          generado?: Json | null
           grupo?: string
           id?: string
           nombre?: string
@@ -676,6 +679,7 @@ export type Database = {
       clases_rft_base: {
         Row: {
           consignas: Json | null
+          generado: Json | null
           grupo: string
           id: string
           nombre: string
@@ -685,6 +689,7 @@ export type Database = {
         }
         Insert: {
           consignas?: Json | null
+          generado?: Json | null
           grupo?: string
           id?: string
           nombre: string
@@ -694,6 +699,7 @@ export type Database = {
         }
         Update: {
           consignas?: Json | null
+          generado?: Json | null
           grupo?: string
           id?: string
           nombre?: string

@@ -6,6 +6,8 @@ import ConjuntoCard from './conjunto-card'
 import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
 import NuevaClaseRftForm from './nueva-clase-rft-form'
+import GenerarGrupo from '../../generador-rft/generar-grupo'
+import { tienePlantilla } from '../../generador-rft/plantillas'
 import ClasesPorGrupo from './clases-por-grupo'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
 import PasoBaseCard from './paso-base-card'
@@ -246,6 +248,7 @@ export default async function ProgramaDetallePage({
             </p>
           )}
           {!soloLectura && <NuevaClaseRftForm programaBaseId={id} />}
+          {!soloLectura && tienePlantilla(programa.nombre) && <GenerarGrupo destino="curriculo" programaId={id} />}
 
           <ClasesPorGrupo
             clases={clasesRft ?? []}

@@ -47,7 +47,8 @@ function VistaEstimulo({ estimulo, imagenes }: { estimulo: Estimulo; imagenes: I
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={url} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain" />
 }
-type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; estimulos_rft: Estimulo[] }
+// generado: la clase la creó el generador de grupos (sin voz grabada)
+type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; generado?: Json | null; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
 
 type EnsayoRft = {
@@ -1444,6 +1445,7 @@ export default function TomarDatosRftClient({
         consigna={consignaActual}
         sinMuestra={opcionesClase}
         alternarEjemplares={alternarEjemplares}
+        sinVozAutomatica={!!claseActual.generado}
         conTexto={conTexto}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}

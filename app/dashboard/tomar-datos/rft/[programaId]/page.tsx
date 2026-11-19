@@ -53,7 +53,7 @@ export default async function TomarDatosRftPage({
 
   const { data: clases } = await supabase
     .from('clases_rft')
-    .select('id, nombre, grupo, respuestas_esperadas, consignas, estimulos_rft(id, nombre, posicion, concepto_imagen, pantalla)')
+    .select('id, nombre, grupo, respuestas_esperadas, consignas, generado, estimulos_rft(id, nombre, posicion, concepto_imagen, pantalla)')
     .eq('programa_alumno_id', programaId)
     .order('grupo')
     .order('created_at')

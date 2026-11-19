@@ -139,6 +139,7 @@ function Presentacion({
   seleccionOida = false,
   conTexto = false,
   pausa = PAUSA_ENTRE_ENSAYOS,
+  sinVozAutomatica = false,
   onElegir,
   onOpciones,
 }: {
@@ -161,6 +162,8 @@ function Presentacion({
   conTexto?: boolean
   // Pausa en blanco antes de la muestra (más corta tras un acierto con elogio)
   pausa?: number
+  // Sin voz grabada: la clave no se lee sola al aparecer
+  sinVozAutomatica?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -200,7 +203,7 @@ function Presentacion({
   // grande y las opciones como botones de texto, que se pueden tocar en cuanto
   // aparecen; la frase se dice al aparecer y 🔊 repite frase y opciones
   const modoTexto = oidasComoOpciones && conTexto
-  const listo = conOpciones && (!oidasComoOpciones || modoTexto || oidasListas)
+  const listo = conOpciones && (!oidasComoOpciones || modoTexto || sinVozAutomatica || oidasListas)
   // La tarjeta de la clave se ilumina mientras suena, como las opciones
   const [claveSonando, setClaveSonando] = useState(false)
   const lecturaClave = useRef(0)
@@ -230,14 +233,14 @@ function Presentacion({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
-    if (conMuestra) hablar()
+    if (conMuestra && !sinVozAutomatica) hablar()
     // Solo al aparecer la muestra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conMuestra])
   // Después del efecto anterior (mismo orden en el código), para que la
   // clave ya haya empezado y las palabras esperen a que termine
   useEffect(() => {
-    if (conOpciones && oidasComoOpciones && !modoTexto) void decirOpciones()
+    if (conOpciones && oidasComoOpciones && !modoTexto && !sinVozAutomatica) void decirOpciones()
     return () => {
       lecturaOidas.current++
     }
@@ -587,6 +590,7 @@ function EnsayoTablet({
   seleccionOida,
   conTexto,
   pausa,
+  sinVozAutomatica,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -604,6 +608,7 @@ function EnsayoTablet({
   seleccionOida: boolean
   conTexto: boolean
   pausa: number
+  sinVozAutomatica: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -654,6 +659,7 @@ function EnsayoTablet({
       seleccionOida={seleccionOida}
       conTexto={conTexto}
       pausa={transferencia ? PAUSA_ENTRE_ENSAYOS : pausa}
+      sinVozAutomatica={sinVozAutomatica}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -682,6 +688,7 @@ export default function PantallaTablet({
   conTexto = false,
   infantil = false,
   alternarEjemplares = false,
+  sinVozAutomatica = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -708,6 +715,8 @@ export default function PantallaTablet({
   infantil?: boolean
   // Alternar las fotos 1 y 2 de cada concepto entre ensayos (opción del programa)
   alternarEjemplares?: boolean
+  // Clase sin voz grabada (generada): no se lee sola; «🔊 Escuchar» la lee con la voz del dispositivo
+  sinVozAutomatica?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -820,6 +829,7 @@ export default function PantallaTablet({
         seleccionOida={seleccionOida}
         conTexto={conTexto}
         pausa={pausaSiguiente}
+        sinVozAutomatica={sinVozAutomatica}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

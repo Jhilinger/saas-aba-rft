@@ -1,5 +1,6 @@
 'use client'
 
+import GenerarGrupo from '../../generador-rft/generar-grupo'
 import { useState } from 'react'
 import Link from 'next/link'
 import NuevaClaseForm from './nueva-clase-form'
@@ -61,6 +62,7 @@ export default function ProgramaRftClient({
   imagenes,
   conImagenes,
   alternarEjemplares = false,
+  conGenerador = false,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -76,6 +78,8 @@ export default function ProgramaRftClient({
   imagenes: ImagenesBanco
   conImagenes: boolean
   alternarEjemplares?: boolean
+  // El programa tiene generador de grupos (nivel 3 verbal)
+  conGenerador?: boolean
 }) {
   const [tab, setTab] = useState<'evolucion' | 'revision' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -278,6 +282,7 @@ export default function ProgramaRftClient({
         )
       ) : (
         <section className="space-y-4">
+          {!soloLectura && conGenerador && <GenerarGrupo destino="pei" programaId={programaAlumnoId} />}
           {soloLectura ? null : grupoSeleccionado ? (
             <NuevaClaseForm programaAlumnoId={programaAlumnoId} grupoActual={grupoSeleccionado} />
           ) : (

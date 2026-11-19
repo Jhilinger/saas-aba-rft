@@ -1,3 +1,4 @@
+import { tienePlantilla } from '../../generador-rft/plantillas'
 import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar } from '../../permisos'
 import { redirect, notFound } from 'next/navigation'
@@ -64,7 +65,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url, nombre)'
     )
     .eq('id', id)
     .single()
@@ -73,7 +74,7 @@ export default async function ProgramaRftPage({
   if (programa.tipo !== 'rft') redirect(`/dashboard/alumnos/${programa.alumno_id}`)
 
   const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
-  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url'> | null
+  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url' | 'nombre'> | null
   const alumnoNombre = alumno?.nombre_anonimizado ?? ''
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
@@ -235,6 +236,7 @@ export default async function ProgramaRftPage({
         imagenes={imagenes}
         conImagenes={disena && !!perfil.clinica_id}
         alternarEjemplares={programa.alternar_ejemplares}
+        conGenerador={disena && tienePlantilla(programaBase?.nombre ?? programa.nombre)}
       />
 
       {bloquesFluidez && bloquesFluidez.length > 0 && (
