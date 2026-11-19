@@ -54,12 +54,17 @@ export function textoOido(nombre: string) {
 
 // Ejemplar de la imagen: en las sondas de generalización, el reservado (3);
 // en el resto, alterna los de entrenamiento (1 y 2)
-export function urlImagen(imagenes: ImagenesBanco, concepto: string | null, fase: string, ensayo: number) {
+// Foto del banco para un estímulo: siempre la 1 (la que se ve en la ficha de
+// la clase), para que el grupo se trabaje solo con sus estímulos; en las sondas
+// de generalización, la 3. La variación de ejemplares se diseña con los grupos
+// (el número de ensayo se sigue recibiendo para no cambiar las llamadas)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function urlImagen(imagenes: ImagenesBanco, concepto: string | null, fase: string, _ensayo?: number) {
   if (!concepto) return null
   const ejemplares = imagenes[concepto]
   if (!ejemplares) return null
   if (fase === 'generalizacion') return ejemplares['3'] ?? ejemplares['1'] ?? null
-  return ejemplares[ensayo % 2 === 0 ? '1' : '2'] ?? ejemplares['1'] ?? null
+  return ejemplares['1'] ?? null
 }
 
 
@@ -213,6 +218,8 @@ function Presentacion({
   useEffect(() => {
     const t = setTimeout(() => setConMuestra(true), pausa)
     return () => clearTimeout(t)
+    // Solo al montarse el ensayo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   useEffect(() => {
     if (conMuestra) hablar()
