@@ -20,6 +20,7 @@ import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NI
 import AyudaTermino from '../../ayuda-termino'
 import ImagenEstimulo from '../../imagen-estimulo'
 import MiniaturaEstimulo from '../../miniatura-estimulo'
+import OtrosEjemplares from '../../otros-ejemplares'
 import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
@@ -186,6 +187,7 @@ export default function ClaseCard({
               <span className="flex items-center gap-3">
               <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
               <ImagenEstimulo tabla="estimulos_rft" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
+              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} />
               {!soloLectura && (
               <button
                 onClick={() => {

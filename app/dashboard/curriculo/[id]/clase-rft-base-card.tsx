@@ -15,6 +15,7 @@ import { useToast } from '../../../providers/toast-provider'
 import { Button, Panel } from '../../../ui'
 import ImagenEstimulo from '../../imagen-estimulo'
 import MiniaturaEstimulo from '../../miniatura-estimulo'
+import OtrosEjemplares from '../../otros-ejemplares'
 import { urlImagen, type ImagenesBanco } from '../../tomar-datos/rft/[programaId]/pantalla-tablet'
 import { coerceNivelRft, POSICIONES_POR_NIVEL, MAX_MIEMBROS_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../niveles-rft'
 
@@ -116,6 +117,7 @@ export default function ClaseRftBaseCard({
             <span className="flex items-center gap-3">
             <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
             <ImagenEstimulo tabla="estimulos_rft_base" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
+              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} />
             {!soloLectura && <button
               onClick={() => {
                 startTransition(async () => {
