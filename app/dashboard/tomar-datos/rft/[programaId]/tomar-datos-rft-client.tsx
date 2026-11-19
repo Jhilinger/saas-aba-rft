@@ -213,7 +213,7 @@ function SelectorModo({
     {modo === 'tableta' && (
       <label className="flex items-center gap-1.5 text-sm text-slate-600">
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
-        Clave y opciones también en texto
+        Presentación en texto (desmarcada: solo audio)
       </label>
     )}
     {modo === 'tableta' && fuera > 0 && (

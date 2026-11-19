@@ -196,7 +196,11 @@ function Presentacion({
     setSonando(null)
     setOidasListas(true)
   }
-  const listo = conOpciones && (!oidasComoOpciones || oidasListas)
+  // Presentación en texto (programas verbales con el texto activado): la frase
+  // grande y las opciones como botones de texto, que se pueden tocar en cuanto
+  // aparecen; la frase se dice al aparecer y 🔊 repite frase y opciones
+  const modoTexto = oidasComoOpciones && conTexto
+  const listo = conOpciones && (!oidasComoOpciones || modoTexto || oidasListas)
   // La tarjeta de la clave se ilumina mientras suena, como las opciones
   const [claveSonando, setClaveSonando] = useState(false)
   const lecturaClave = useRef(0)
@@ -214,7 +218,7 @@ function Presentacion({
 
   // Repetir: toda la secuencia, la clave y después las opciones oídas
   const repetirSecuencia = () => {
-    if (!listo) return
+    if (!conOpciones) return
     hablar()
     void decirOpciones()
   }
@@ -233,7 +237,7 @@ function Presentacion({
   // Después del efecto anterior (mismo orden en el código), para que la
   // clave ya haya empezado y las palabras esperen a que termine
   useEffect(() => {
-    if (conOpciones && oidasComoOpciones) void decirOpciones()
+    if (conOpciones && oidasComoOpciones && !modoTexto) void decirOpciones()
     return () => {
       lecturaOidas.current++
     }
@@ -287,6 +291,57 @@ function Presentacion({
   }
   // Ámbar y latiendo cuando se repite la muestra como ayuda
   const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-slate-200'
+
+  if (modoTexto) {
+    return (
+      <>
+        <div className={`flex flex-1 flex-col items-center justify-center gap-[4vmin] overflow-y-auto px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
+          <div
+            className={`w-full max-w-[92vw] rounded-[2.5vmin] border-2 bg-white px-[4vmin] py-[3vmin] shadow-sm ${
+              nivel > 0 ? 'animate-pulse border-amber-400' : claveSonando ? 'border-indigo-400 ring-[1vmin] ring-indigo-200' : 'border-slate-200'
+            }`}
+          >
+            <p className="text-center font-medium leading-snug text-slate-800" style={{ fontSize: '5vmin' }}>
+              {textoClave ?? textoOido(origen.nombre)}
+            </p>
+          </div>
+          <div className={`flex w-full max-w-[92vw] flex-wrap justify-center gap-[2.5vmin] ${conOpciones ? '' : 'invisible'}`}>
+            {comparativos.map((c, i) => {
+              const oculta = !c.esCorrecto && !visibles.has(c.claseId)
+              return (
+                <button
+                  key={c.claseId}
+                  type="button"
+                  disabled={oculta}
+                  onClick={() => listo && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
+                  style={{ fontSize: '5vmin', ...estiloDistractor(c) }}
+                  className={`min-w-[26vw] rounded-[2.5vmin] border-2 bg-white px-[4vmin] py-[3vmin] font-semibold leading-tight text-slate-800 shadow-sm transition-transform active:scale-[0.98] ${
+                    oculta ? 'invisible' : ''
+                  } ${
+                    resaltada && c.esCorrecto
+                      ? 'animate-pulse border-amber-400 ring-[1vmin] ring-amber-300'
+                      : sonando === i
+                        ? 'border-indigo-400 ring-[1vmin] ring-indigo-200'
+                        : 'border-slate-200'
+                  }`}
+                >
+                  {textoOido(c.estimulo.nombre)}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={repetirSecuencia}
+            className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.6vmin] text-slate-500 ${conOpciones ? '' : 'invisible'}`}
+          >
+            🔊 Escuchar
+          </button>
+        </div>
+        <div className="flex min-h-12 justify-end gap-2 px-3 pb-2" />
+      </>
+    )
+  }
 
   return (
     <>
@@ -426,6 +481,34 @@ function Retroalimentacion({
   const alternar = useContext(AlternarEjemplares)
   const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo, alternar)
   const textoClave = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
+  if (oidas && conTexto) {
+    return (
+      <>
+        <div className="flex flex-1 flex-col items-center justify-center gap-[4vmin] overflow-y-auto px-4 pb-2">
+          <div className="w-full max-w-[92vw] rounded-[2.5vmin] border-2 border-slate-200 bg-white px-[4vmin] py-[3vmin] shadow-sm">
+            <p className="text-center font-medium leading-snug text-slate-800" style={{ fontSize: '5vmin' }}>
+              {textoClave ?? textoOido(origen.nombre)}
+            </p>
+          </div>
+          <div className="flex w-full max-w-[92vw] flex-wrap justify-center gap-[2.5vmin]">
+            {comparativos.map((c) => (
+              <div
+                key={c.claseId}
+                style={{ fontSize: '5vmin' }}
+                className={`min-w-[26vw] rounded-[2.5vmin] border-2 bg-white px-[4vmin] py-[3vmin] text-center font-semibold leading-tight text-slate-800 shadow-sm ${
+                  c.esCorrecto ? 'border-emerald-500 ring-[1vmin] ring-emerald-300' : 'invisible'
+                }`}
+              >
+                {textoOido(c.estimulo.nombre)}
+              </div>
+            ))}
+          </div>
+          <span className="rounded-full px-[3vmin] py-[1vmin] text-[2.6vmin] invisible">🔊 Escuchar</span>
+        </div>
+        <div className="min-h-12 px-3 pb-2" />
+      </>
+    )
+  }
   return (
     <>
       <div className="flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2">
