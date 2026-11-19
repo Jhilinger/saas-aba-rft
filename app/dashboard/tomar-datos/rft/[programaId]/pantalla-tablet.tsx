@@ -140,6 +140,7 @@ function Presentacion({
   conTexto = false,
   pausa = PAUSA_ENTRE_ENSAYOS,
   sinVozAutomatica = false,
+  sinAudio = false,
   onElegir,
   onOpciones,
 }: {
@@ -164,6 +165,8 @@ function Presentacion({
   pausa?: number
   // Sin voz grabada: la clave no se lee sola al aparecer
   sinVozAutomatica?: boolean
+  // Sin audio: nada se lee, ni a petición
+  sinAudio?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -186,6 +189,7 @@ function Presentacion({
   // Fin de la clave en curso: las opciones esperan a que termine
   const finClave = useRef<Promise<void>>(Promise.resolve())
   const decirOpciones = async () => {
+    if (sinAudio) return
     const lectura = ++lecturaOidas.current
     const sigue = () => lectura === lecturaOidas.current
     await finClave.current
@@ -204,14 +208,14 @@ function Presentacion({
   // aparecen. No suena nada solo: lo lee el alumno o el terapeuta; «🔊 Escuchar»
   // lee la frase y las opciones a petición
   const modoTexto = oidasComoOpciones && conTexto
-  const listo = conOpciones && (!oidasComoOpciones || modoTexto || sinVozAutomatica || oidasListas)
+  const listo = conOpciones && (!oidasComoOpciones || modoTexto || sinVozAutomatica || sinAudio || oidasListas)
   // La tarjeta de la clave se ilumina mientras suena, como las opciones
   const [claveSonando, setClaveSonando] = useState(false)
   const lecturaClave = useRef(0)
   const textoClave = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
   const hablar = () => {
     const texto = textoClave
-    if (!texto) return
+    if (!texto || sinAudio) return
     const lectura = ++lecturaClave.current
     // Fuera del render del efecto que la llama
     void Promise.resolve().then(() => lectura === lecturaClave.current && setClaveSonando(true))
@@ -334,13 +338,15 @@ function Presentacion({
               )
             })}
           </div>
-          <button
-            type="button"
-            onClick={repetirSecuencia}
-            className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.6vmin] text-slate-500 ${conOpciones ? '' : 'invisible'}`}
-          >
-            🔊 Escuchar
-          </button>
+          {!sinAudio && (
+            <button
+              type="button"
+              onClick={repetirSecuencia}
+              className={`rounded-full border border-slate-200 px-[3vmin] py-[1vmin] text-[2.6vmin] text-slate-500 ${conOpciones ? '' : 'invisible'}`}
+            >
+              🔊 Escuchar
+            </button>
+          )}
         </div>
         <div className="flex min-h-12 justify-end gap-2 px-3 pb-2" />
       </>
@@ -351,7 +357,7 @@ function Presentacion({
     <>
       <div className={`flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
         <div className="flex flex-col items-center justify-center gap-[2vmin]">
-          {sinMuestra || muestraOida ? (
+          {(sinMuestra || muestraOida) && sinAudio ? null : sinMuestra || muestraOida ? (
             // Clave (o muestra oída): la misma tarjeta 🔊 que las opciones oídas
             <button
               type="button"
@@ -592,6 +598,7 @@ function EnsayoTablet({
   conTexto,
   pausa,
   sinVozAutomatica,
+  sinAudio,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -610,6 +617,7 @@ function EnsayoTablet({
   conTexto: boolean
   pausa: number
   sinVozAutomatica: boolean
+  sinAudio: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -661,6 +669,7 @@ function EnsayoTablet({
       conTexto={conTexto}
       pausa={transferencia ? PAUSA_ENTRE_ENSAYOS : pausa}
       sinVozAutomatica={sinVozAutomatica}
+      sinAudio={sinAudio}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -690,6 +699,7 @@ export default function PantallaTablet({
   infantil = false,
   alternarEjemplares = false,
   sinVozAutomatica = false,
+  sinAudio = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -718,6 +728,8 @@ export default function PantallaTablet({
   alternarEjemplares?: boolean
   // Clase sin voz grabada (generada): no se lee sola; «🔊 Escuchar» la lee con la voz del dispositivo
   sinVozAutomatica?: boolean
+  // Programa sin audio: nada se lee (ni a petición); solo suena el elogio
+  sinAudio?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -831,6 +843,7 @@ export default function PantallaTablet({
         conTexto={conTexto}
         pausa={pausaSiguiente}
         sinVozAutomatica={sinVozAutomatica}
+        sinAudio={sinAudio}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

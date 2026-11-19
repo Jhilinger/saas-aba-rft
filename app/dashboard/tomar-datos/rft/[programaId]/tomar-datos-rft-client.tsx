@@ -186,10 +186,13 @@ function SelectorModo({
   conTexto,
   onTexto,
   fuera = 0,
+  textoFijo = false,
 }: {
   disponible: boolean
   // Clases del grupo que no se pueden mostrar en la tableta (se quedan fuera)
   fuera?: number
+  // Presentación siempre en texto (sin casilla)
+  textoFijo?: boolean
   modo: 'material' | 'tableta'
   onCambiar: (m: 'material' | 'tableta') => void
   // En la tableta, la clave y las opciones también en texto (activado por
@@ -211,7 +214,7 @@ function SelectorModo({
         </button>
       ))}
     </span>
-    {modo === 'tableta' && (
+    {modo === 'tableta' && !textoFijo && (
       <label className="flex items-center gap-1.5 text-sm text-slate-600">
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
         Presentación en texto (desmarcada: solo audio)
@@ -315,6 +318,7 @@ export default function TomarDatosRftClient({
   consignas,
   opcionesClase = false,
   alternarEjemplares = false,
+  sinAudio = false,
   textoTablet = true,
 }: {
   programaAlumnoId: string
@@ -342,6 +346,8 @@ export default function TomarDatosRftClient({
   opcionesClase?: boolean
   // Alternar las fotos 1 y 2 de cada concepto entre ensayos («… con sus Nombres»)
   alternarEjemplares?: boolean
+  // Programa sin audio en la tableta: siempre en texto, lo lee el alumno o el terapeuta
+  sinAudio?: boolean
   // Clave y opciones también en texto en la tableta (se recuerda en el programa)
   textoTablet?: boolean
 }) {
@@ -360,7 +366,9 @@ export default function TomarDatosRftClient({
   // con que empezó el bloque se guarda con él (ref, como los controles)
   const [modo, setModo] = useState<'material' | 'tableta'>('material')
   const [enTableta, setEnTableta] = useState(false)
-  const [conTexto, setConTexto] = useState(textoTablet)
+  const [conTextoElegido, setConTexto] = useState(textoTablet)
+  // Sin audio (nivel 3 salvo la abstracción de claves): siempre en texto
+  const conTexto = sinAudio || conTextoElegido
   const cambiarTexto = (v: boolean) => {
     setConTexto(v)
     void guardarTextoTablet(programaAlumnoId, v)
@@ -1097,7 +1105,7 @@ export default function TomarDatosRftClient({
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
                 fuera={fueraDeTableta(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino)}
                 modo={modo}
-                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
+                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio}
               />
             }
           />
@@ -1148,7 +1156,7 @@ export default function TomarDatosRftClient({
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
               fuera={fueraDeTableta(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino)}
               modo={modo}
-              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto}
+              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio}
             />
           }
         />
@@ -1318,7 +1326,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
@@ -1445,7 +1453,8 @@ export default function TomarDatosRftClient({
         consigna={consignaActual}
         sinMuestra={opcionesClase}
         alternarEjemplares={alternarEjemplares}
-        sinVozAutomatica={!!claseActual.generado}
+        sinVozAutomatica={sinAudio || !!claseActual.generado}
+        sinAudio={sinAudio}
         conTexto={conTexto}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}

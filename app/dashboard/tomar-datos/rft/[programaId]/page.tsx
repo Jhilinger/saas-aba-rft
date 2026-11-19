@@ -42,7 +42,7 @@ export default async function TomarDatosRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, sin_error, consignas, actividad_tablet, opciones_clase, alternar_ejemplares, texto_tablet, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url)'
+      'id, nombre, estado, ensayos_por_bloque, alumno_id, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, sin_error, consignas, actividad_tablet, opciones_clase, alternar_ejemplares, texto_tablet, alumnos(nombre_anonimizado), programas_base(instrucciones_terapeuta, ayudas_posibles, video_url, nombre, dominios_curriculo(nivel))'
     )
     .eq('id', programaId)
     .single()
@@ -149,6 +149,10 @@ export default async function TomarDatosRftPage({
         instrucciones={programa.programas_base?.instrucciones_terapeuta ?? null}
         ayudasPosibles={programa.programas_base?.ayudas_posibles ?? null}
         videoUrl={programa.programas_base?.video_url ?? null}
+        // Nivel 3 salvo la abstracción de claves: sin audio, siempre en texto
+        sinAudio={
+          programa.programas_base?.dominios_curriculo?.nivel === 3 && !(programa.programas_base?.nombre ?? '').startsWith('Abstraer Claves')
+        }
         grupoInicial={grupo ?? null}
         dominioFases={dominioFases ?? []}
         nivelRft={programa.nivel_rft}
