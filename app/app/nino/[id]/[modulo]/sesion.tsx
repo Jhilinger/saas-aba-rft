@@ -6,7 +6,7 @@ import PantallaTablet, { textoOido, type ComparativoTablet, type EstimuloTablet,
 import { guardarBloqueRft } from '../../../../dashboard/tomar-datos/rft/[programaId]/actions'
 import { consignaPara, leerConsignasClase, leerConsignasPrograma } from '../../../../dashboard/consignas-rft'
 import { generarBloque } from '../../../../dashboard/conceptos'
-import { desbloquearAudio, decirFraseRft, precargarFraseRft } from '../../../../dashboard/voz'
+import { desbloquearAudio, decirElogio, precargarElogios, precargarFraseRft } from '../../../../dashboard/voz'
 import type { Json } from '@/database.types'
 import { prepararSesion, type PlanSesion } from './acciones'
 import { pegatinaDeSesion } from '../../../pegatinas'
@@ -16,7 +16,6 @@ import { pegatinaDeSesion } from '../../../pegatinas'
 // transición neutra para no reforzar) y pegatina al terminar.
 
 const ENSAYOS = 10
-export const FRASES_REFUERZO = ['¡Muy bien!', '¡Genial!', '¡Bravo!']
 
 type Ensayo = {
   origen: EstimuloTablet
@@ -159,7 +158,7 @@ export default function Sesion({
       return
     }
     for (const t of new Set(lista.map((e) => e.consigna).filter((c): c is string => !!c))) void precargarFraseRft(t)
-    for (const t of FRASES_REFUERZO) void precargarFraseRft(t)
+    precargarElogios()
     transferencias.current = []
     inicio.current = Date.now()
     setPlan(res.plan)
@@ -255,7 +254,7 @@ export default function Sesion({
             ]
             if (correcto && !esTest) {
               setCelebrando(true)
-              void decirFraseRft(FRASES_REFUERZO[Math.floor(Math.random() * FRASES_REFUERZO.length)])
+              void decirElogio()
             }
             setRegistros(lista)
             if (lista.length === ensayos.length) void guardar(lista)

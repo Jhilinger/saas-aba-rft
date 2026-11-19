@@ -144,12 +144,53 @@ async function reproducir(texto: string, ruta: string): Promise<void> {
   return fin
 }
 
-export function decirConsigna(texto: string) {
+// Elogio hablado tras un acierto en entrenamiento. La frase siguiente (la clave
+// del ensayo que viene) espera a que termine, para que no lo corte
+export const FRASES_REFUERZO = ['¡Muy bien!', '¡Genial!', '¡Bravo!']
+let elogioSonando: Promise<void> | null = null
+
+export function precargarElogios() {
+  for (const t of FRASES_REFUERZO) void precargarFraseRft(t)
+}
+
+export function decirElogio() {
+  const texto = FRASES_REFUERZO[Math.floor(Math.random() * FRASES_REFUERZO.length)]
+  const actual = reproducir(texto, rutaFraseRft(texto)).finally(() => {
+    if (elogioSonando === actual) elogioSonando = null
+  })
+  elogioSonando = actual
+  return actual
+}
+
+async function trasElogio() {
+  if (elogioSonando) await elogioSonando
+}
+
+// Si el terapeuta quiere el elogio hablado en la tableta (se guarda en el dispositivo)
+const CLAVE_ELOGIOS = 'abacontext:elogios'
+export function leerElogios(): boolean {
+  try {
+    return localStorage.getItem(CLAVE_ELOGIOS) !== 'no'
+  } catch {
+    return true
+  }
+}
+export function guardarElogios(activo: boolean) {
+  try {
+    localStorage.setItem(CLAVE_ELOGIOS, activo ? 'si' : 'no')
+  } catch {
+    // Sin almacenamiento: queda activado
+  }
+}
+
+export async function decirConsigna(texto: string) {
+  await trasElogio()
   return reproducir(texto, rutaConsignaGrabada(texto))
 }
 
 // Dice una frase de la tableta RFT con su grabación o, si no la hay (ej. una
 // clave editada o un estímulo propio), con la voz del dispositivo
-export function decirFraseRft(texto: string) {
+export async function decirFraseRft(texto: string) {
+  await trasElogio()
   return reproducir(texto, rutaFraseRft(texto))
 }

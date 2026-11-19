@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { PAUSA_ENTRE_ENSAYOS } from '../../../etapas-ensayo'
-import { decirFraseRft } from '../../../voz'
+import { decirElogio, decirFraseRft, guardarElogios, leerElogios, precargarElogios } from '../../../voz'
 import AjustesVoz from '../../../ajustes-voz'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 import ContenidoEstimulo from '../../../contenido-estimulo'
@@ -521,8 +521,15 @@ export default function PantallaTablet({
   const [ayuda, setAyuda] = useState<string | null>(null)
   const [menuAyuda, setMenuAyuda] = useState(false)
   const [menuVoz, setMenuVoz] = useState(false)
+  // Elogio hablado («¡Muy bien!») al acertar en entrenamiento; en la app
+  // infantil lo dice la propia sesión
+  const [elogios, setElogios] = useState(leerElogios)
+  useEffect(() => {
+    precargarElogios()
+  }, [])
 
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
+    if (!infantil && elogios && correcto && fase === 'entrenamiento') void decirElogio()
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
     // un acierto después de resaltarse la correcta es un acierto con ayuda visual
     onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta, {
@@ -585,6 +592,20 @@ export default function PantallaTablet({
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
           <div className="w-full max-w-sm space-y-2 rounded-2xl bg-white p-4 text-sm">
             <AjustesVoz />
+            {!infantil && (
+              <label className="flex items-center gap-2 text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={elogios}
+                  onChange={(e) => {
+                    setElogios(e.target.checked)
+                    guardarElogios(e.target.checked)
+                  }}
+                  className="h-4 w-4"
+                />
+                Elogio hablado al acertar en entrenamiento («¡Muy bien!»)
+              </label>
+            )}
             <button onClick={() => setMenuVoz(false)} className="w-full rounded-lg px-3 py-2 text-slate-500">
               Volver
             </button>
