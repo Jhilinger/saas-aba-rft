@@ -433,7 +433,10 @@ export default function TomarDatosRftClient({
   const clasesValidas = enTableta
     ? clasesConPosiciones.filter((c) => presentable(c, posicionOrigen, posicionDestino))
     : clasesConPosiciones
-  const clasesSinPosiciones = clasesDelGrupo.length - clasesConPosiciones.length
+  // Los distractores no entrenados (un solo estímulo, sin el de origen) no son
+  // clases incompletas: solo aparecen en el test de transformación
+  const esDistractorNoEntrenado = (c: Clase) => c.estimulos_rft.length === 1 && !encontrarEstimulo(c, posicionOrigen)
+  const clasesSinPosiciones = clasesDelGrupo.length - clasesConPosiciones.length - clasesDelGrupo.filter(esDistractorNoEntrenado).length
 
   const entrenamientosDominados: ParEntrenado[] = dominioFases
     .filter((d) => d.fase === 'entrenamiento')
@@ -690,6 +693,16 @@ export default function TomarDatosRftClient({
         .sort((a, b) => a.orden - b.orden)
         .map((x) => x.c)
       opciones = [claseActual, ...distractores.slice(0, escalonBloque.comparaciones - 1)]
+    }
+    // Test de transformación: se añaden los distractores no entrenados del grupo
+    // (clases con el estímulo de la posición de respuesta pero sin el de origen,
+    // que nunca se entrenan ni se relacionan con nada)
+    if (fase === 'transformacion_funciones') {
+      const noEntrenados = clasesDelGrupo.filter((c) => {
+        const e = encontrarEstimulo(c, posicionDestino)
+        return !encontrarEstimulo(c, posicionOrigen) && !!e && (!enTableta || esVisible(e) || esOido(e))
+      })
+      opciones = [...opciones, ...noEntrenados]
     }
     return opciones
       .map((c) => ({
