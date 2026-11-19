@@ -313,6 +313,7 @@ export default function TomarDatosRftClient({
   ultimosEscalones,
   consignas,
   opcionesClase = false,
+  alternarEjemplares = false,
   textoTablet = true,
 }: {
   programaAlumnoId: string
@@ -338,6 +339,8 @@ export default function TomarDatosRftClient({
   // Opciones de la propia clase (relaciones enunciadas verbalmente): los dos
   // elementos de la relación y un distractor de otra clase del grupo
   opcionesClase?: boolean
+  // Alternar las fotos 1 y 2 de cada concepto entre ensayos («… con sus Nombres»)
+  alternarEjemplares?: boolean
   // Clave y opciones también en texto en la tableta (se recuerda en el programa)
   textoTablet?: boolean
 }) {
@@ -1440,6 +1443,7 @@ export default function TomarDatosRftClient({
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
         sinMuestra={opcionesClase}
+        alternarEjemplares={alternarEjemplares}
         conTexto={conTexto}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}

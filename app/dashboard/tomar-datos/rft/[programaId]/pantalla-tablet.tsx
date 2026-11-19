@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { PAUSA_ENTRE_ENSAYOS } from '../../../etapas-ensayo'
 import { decirElogio, decirFraseRft, guardarElogios, leerElogios, precargarElogios } from '../../../voz'
@@ -56,16 +56,20 @@ export function textoOido(nombre: string) {
 // en el resto, alterna los de entrenamiento (1 y 2)
 // Foto del banco para un estímulo: siempre la 1 (la que se ve en la ficha de
 // la clase), para que el grupo se trabaje solo con sus estímulos; en las sondas
-// de generalización, la 3. La variación de ejemplares se diseña con los grupos
-// (el número de ensayo se sigue recibiendo para no cambiar las llamadas)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function urlImagen(imagenes: ImagenesBanco, concepto: string | null, fase: string, _ensayo?: number) {
+// de generalización, la 3. La variación de ejemplares se diseña con los grupos.
+// Excepción por programa (alternar): la 1 y la 2 se alternan por ensayo, como
+// múltiples ejemplares del mismo nombre («Vincular Mutuamente … con sus Nombres»)
+export function urlImagen(imagenes: ImagenesBanco, concepto: string | null, fase: string, ensayo = 0, alternar = false) {
   if (!concepto) return null
   const ejemplares = imagenes[concepto]
   if (!ejemplares) return null
   if (fase === 'generalizacion') return ejemplares['3'] ?? ejemplares['1'] ?? null
+  if (alternar && ensayo % 2 === 1) return ejemplares['2'] ?? ejemplares['1'] ?? null
   return ejemplares['1'] ?? null
 }
+
+// Si el programa alterna las fotos 1 y 2 de cada concepto
+const AlternarEjemplares = createContext(false)
 
 
 function lado(n: number, maxVh: number, margenRem = 4) {
@@ -273,8 +277,9 @@ function Presentacion({
   const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
   const ladoMuestra = ladoOpcion
   const ladoAudio = ladoOpcion
-  const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)
-  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
+  const alternar = useContext(AlternarEjemplares)
+  const urlMuestra = urlImagen(imagenes, origen.concepto_imagen, fase, ensayo, alternar)
+  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo, alternar)
   const tocarMuestra = () => {
     if (!conMuestra) return
     hablar()
@@ -357,7 +362,7 @@ function Presentacion({
                     ) : (
                       <Tarjeta
                         estimulo={c.estimulo}
-                        url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                        url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo, alternar)}
                         lado={ladoOpcion}
                         urlConcepto={urlConcepto}
                       />
@@ -418,7 +423,8 @@ function Retroalimentacion({
   const respuestaOral = !oidas && comparativos.some((c) => esOido(c.estimulo))
   const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
   const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
-  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
+  const alternar = useContext(AlternarEjemplares)
+  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo, alternar)
   const textoClave = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
   return (
     <>
@@ -433,7 +439,7 @@ function Retroalimentacion({
                 🔊
               </span>
             ) : (
-              <Tarjeta estimulo={origen} url={urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)} lado={ladoOpcion} urlConcepto={urlConcepto} />
+              <Tarjeta estimulo={origen} url={urlImagen(imagenes, origen.concepto_imagen, fase, ensayo, alternar)} lado={ladoOpcion} urlConcepto={urlConcepto} />
             )}
           </div>
           {conTexto && textoClave && (
@@ -466,7 +472,7 @@ function Retroalimentacion({
                 ) : (
                   <Tarjeta
                     estimulo={c.estimulo}
-                    url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                    url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo, alternar)}
                     lado={ladoOpcion}
                     urlConcepto={urlConcepto}
                   />
@@ -592,6 +598,7 @@ export default function PantallaTablet({
   seleccionOida = false,
   conTexto = false,
   infantil = false,
+  alternarEjemplares = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -616,6 +623,8 @@ export default function PantallaTablet({
   // App infantil (familias y escuelas): sin los controles del terapeuta; solo
   // una salida que hay que mantener pulsada
   infantil?: boolean
+  // Alternar las fotos 1 y 2 de cada concepto entre ensayos (opción del programa)
+  alternarEjemplares?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -661,6 +670,7 @@ export default function PantallaTablet({
   }
 
   return (
+    <AlternarEjemplares.Provider value={alternarEjemplares}>
     <div className="fixed inset-0 z-50 flex select-none flex-col bg-white">
       {infantil ? (
         <div className="flex justify-end px-3 pt-2">
@@ -780,5 +790,6 @@ export default function PantallaTablet({
         </div>
       )}
     </div>
+    </AlternarEjemplares.Provider>
   )
 }

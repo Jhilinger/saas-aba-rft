@@ -220,6 +220,7 @@ export default function Sesion({
           ensayo={n}
           total={ensayos.length}
           imagenes={plan.imagenes}
+          alternarEjemplares={'alternarEjemplares' in plan && plan.alternarEjemplares}
           // Al enseñar un test que no deriva: la correcta se resalta a los 2 s
           apoyo={plan.tipo === 'clases' && plan.ensenar ? { nombre: 'Enseñar', opacidad: 1, tamano: false, demora: 2 } : null}
           menorAMayor={!esTest}

@@ -1892,6 +1892,7 @@ export type Database = {
       programas_alumno: {
         Row: {
           actividad_tablet: Json | null
+          alternar_ejemplares: boolean
           alumno_id: string
           area: string | null
           ayudas_posibles: string | null
@@ -1930,6 +1931,7 @@ export type Database = {
         }
         Insert: {
           actividad_tablet?: Json | null
+          alternar_ejemplares?: boolean
           alumno_id: string
           area?: string | null
           ayudas_posibles?: string | null
@@ -1968,6 +1970,7 @@ export type Database = {
         }
         Update: {
           actividad_tablet?: Json | null
+          alternar_ejemplares?: boolean
           alumno_id?: string
           area?: string | null
           ayudas_posibles?: string | null
@@ -2039,6 +2042,7 @@ export type Database = {
         Row: {
           actividad_tablet: Json | null
           activo: boolean
+          alternar_ejemplares: boolean
           area: string
           ayudas_posibles: string | null
           bloques_para_dominio: number
@@ -2074,6 +2078,7 @@ export type Database = {
         Insert: {
           actividad_tablet?: Json | null
           activo?: boolean
+          alternar_ejemplares?: boolean
           area: string
           ayudas_posibles?: string | null
           bloques_para_dominio?: number
@@ -2111,6 +2116,7 @@ export type Database = {
         Update: {
           actividad_tablet?: Json | null
           activo?: boolean
+          alternar_ejemplares?: boolean
           area?: string
           ayudas_posibles?: string | null
           bloques_para_dominio?: number

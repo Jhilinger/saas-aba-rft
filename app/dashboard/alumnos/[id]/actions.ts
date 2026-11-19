@@ -23,7 +23,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
     const { data: base, error: baseError } = await supabase
     .from('programas_base')
     .select(
-      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id, formato_recogida, direccion_objetivo, direccion_cadena, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet, opciones_clase'
+      'nombre, tipo, tipo_relacion, nivel_rft, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, orden, dominio_id, clinica_id, formato_recogida, direccion_objetivo, direccion_cadena, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, consignas, actividad_tablet, opciones_clase, alternar_ejemplares'
     )
     .eq('id', programaBaseId)
     .single()
@@ -81,6 +81,7 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
       consignas: base.consignas,
       actividad_tablet: base.actividad_tablet,
       opciones_clase: base.opciones_clase,
+      alternar_ejemplares: base.alternar_ejemplares,
       ...excepcion,
     })
     .select('id')
