@@ -379,6 +379,96 @@ function Presentacion({
   )
 }
 
+// Tras un acierto en entrenamiento, la muestra y la opción elegida siguen a la
+// vista (resaltada en verde) mientras suena el elogio, para que el refuerzo
+// llegue contiguo a la relación; las demás opciones desaparecen sin mover nada
+function Retroalimentacion({
+  origen,
+  comparativos,
+  fase,
+  ensayo,
+  imagenes,
+  consigna,
+  sinMuestra: sinMuestraForzada,
+  conTexto,
+}: {
+  origen: EstimuloTablet
+  comparativos: ComparativoTablet[]
+  fase: string
+  ensayo: number
+  imagenes: ImagenesBanco
+  consigna: string | null
+  sinMuestra: boolean
+  conTexto: boolean
+}) {
+  const muestraOida = esOido(origen)
+  const oidas = comparativos.length > 1 && comparativos.every((c) => esOido(c.estimulo))
+  const respuestaOral = !oidas && comparativos.some((c) => esOido(c.estimulo))
+  const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
+  const ladoOpcion = lado(Math.max(comparativos.length, 2), 34)
+  const urlConcepto = (concepto: string) => urlImagen(imagenes, concepto, fase, ensayo)
+  const textoClave = consigna ?? (muestraOida ? textoOido(origen.nombre) : null)
+  return (
+    <>
+      <div className="flex flex-1 flex-col items-center justify-center gap-[5vmin] overflow-hidden px-4 pb-2">
+        <div className="flex flex-col items-center justify-center gap-[2vmin]">
+          <div
+            style={{ width: ladoOpcion, height: ladoOpcion }}
+            className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm"
+          >
+            {sinMuestra || muestraOida ? (
+              <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * 0.38)` }}>
+                🔊
+              </span>
+            ) : (
+              <Tarjeta estimulo={origen} url={urlImagen(imagenes, origen.concepto_imagen, fase, ensayo)} lado={ladoOpcion} urlConcepto={urlConcepto} />
+            )}
+          </div>
+          {conTexto && textoClave && (
+            <p className="max-w-[80vw] text-center font-medium leading-snug text-slate-800" style={{ fontSize: '3.6vmin' }}>
+              {textoClave}
+            </p>
+          )}
+        </div>
+        {!respuestaOral && (
+          <div className="flex flex-wrap justify-center gap-[2.5vmin]">
+            {comparativos.map((c) => (
+              <div
+                key={c.claseId}
+                style={{ width: ladoOpcion, height: ladoOpcion }}
+                className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm ${
+                  c.esCorrecto ? 'border-emerald-500 ring-[1vmin] ring-emerald-300' : 'invisible'
+                }`}
+              >
+                {oidas ? (
+                  <span className="flex flex-col items-center gap-[1vmin]">
+                    <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * ${conTexto ? 0.28 : 0.38})` }}>
+                      🔊
+                    </span>
+                    {conTexto && (
+                      <span className="px-[1vmin] text-center font-medium leading-tight text-slate-800" style={{ fontSize: `calc(${ladoOpcion} * 0.11)` }}>
+                        {textoOido(c.estimulo.nombre)}
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  <Tarjeta
+                    estimulo={c.estimulo}
+                    url={urlImagen(imagenes, c.estimulo.concepto_imagen, fase, ensayo)}
+                    lado={ladoOpcion}
+                    urlConcepto={urlConcepto}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="min-h-12 px-3 pb-2" />
+    </>
+  )
+}
+
 // Un ensayo (se monta de nuevo en cada uno). Con ayudas de menor a mayor,
 // cada error sube un nivel de ayuda sobre la misma presentación; un acierto con
 // ayuda da paso al ensayo de transferencia (el mismo, sin ayuda), que no escala.
@@ -528,8 +618,17 @@ export default function PantallaTablet({
     precargarElogios()
   }, [])
 
+  // Acierto en entrenamiento: se congela el ensayo (muestra y opción correcta)
+  // mientras suena el elogio; el ensayo siguiente empieza al terminar. La
+  // respuesta se registra en el momento del toque (la latencia no cambia)
+  const [retro, setRetro] = useState<{ origen: EstimuloTablet; comparativos: ComparativoTablet[]; consigna: string | null; ensayo: number } | null>(null)
+
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
-    if (!infantil && elogios && correcto && fase === 'entrenamiento') void decirElogio()
+    if (!infantil && correcto && fase === 'entrenamiento') {
+      setRetro({ origen, comparativos, consigna, ensayo })
+      const fin = elogios ? Promise.all([decirElogio(), esperar(900)]) : esperar(900)
+      void fin.then(() => setRetro(null))
+    }
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
     // un acierto después de resaltarse la correcta es un acierto con ayuda visual
     onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta, {
@@ -569,6 +668,18 @@ export default function PantallaTablet({
       </div>
       )}
 
+      {retro ? (
+        <Retroalimentacion
+          origen={retro.origen}
+          comparativos={retro.comparativos}
+          fase={fase}
+          ensayo={retro.ensayo}
+          imagenes={imagenes}
+          consigna={retro.consigna}
+          sinMuestra={sinMuestra}
+          conTexto={conTexto}
+        />
+      ) : (
       <EnsayoTablet
         key={ensayo}
         origen={origen}
@@ -587,6 +698,7 @@ export default function PantallaTablet({
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}
       />
+      )}
 
       {menuVoz && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
