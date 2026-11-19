@@ -738,18 +738,28 @@ export default function PantallaTablet({
 
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
     setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
+    // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
+    // un acierto después de resaltarse la correcta es un acierto con ayuda visual
+    const registrar = () =>
+      onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta, {
+        nivelAyuda,
+        transferencia,
+      })
+    setAyuda(null)
     if (!infantil && correcto && fase === 'entrenamiento') {
       setRetro({ origen, comparativos, consigna, ensayo })
       const fin = elogios ? Promise.all([decirElogio(), esperar(900)]) : esperar(900)
-      void fin.then(() => setRetro(null))
+      // En el último ensayo del bloque, el registro (que cierra la tableta y
+      // pasa a los resultados) espera a que termine el elogio. La latencia ya
+      // quedó fijada en el primer toque
+      const ultimo = ensayo >= total - 1
+      void fin.then(() => {
+        if (ultimo) registrar()
+        else setRetro(null)
+      })
+      if (ultimo) return
     }
-    // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
-    // un acierto después de resaltarse la correcta es un acierto con ayuda visual
-    onResponder(correcto, !correcto ? 'independiente' : (ayuda ?? (conAyudaPantalla ? 'visual' : 'independiente')), respuesta, {
-      nivelAyuda,
-      transferencia,
-    })
-    setAyuda(null)
+    registrar()
   }
 
   return (
