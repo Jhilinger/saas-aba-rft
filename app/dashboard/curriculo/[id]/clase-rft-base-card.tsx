@@ -29,6 +29,7 @@ export default function ClaseRftBaseCard({
   soloLectura = false,
   conRespuestasEsperadas = false,
   imagenes = {},
+  alternarEjemplares = false,
   conImagenes = false,
 }: {
   clase: Clase
@@ -38,6 +39,8 @@ export default function ClaseRftBaseCard({
   // El programa usa respuestas de opciones/ejecución/abiertas en alguna fase
   conRespuestasEsperadas?: boolean
   imagenes?: ImagenesBanco
+  // El programa alterna las fotos 1 y 2 de cada concepto
+  alternarEjemplares?: boolean
   // Se pueden subir imágenes propias del centro
   conImagenes?: boolean
 }) {
@@ -117,7 +120,7 @@ export default function ClaseRftBaseCard({
             <span className="flex items-center gap-3">
             <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
             <ImagenEstimulo tabla="estimulos_rft_base" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
-              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} />
+              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} alternar={alternarEjemplares} />
             {!soloLectura && <button
               onClick={() => {
                 startTransition(async () => {

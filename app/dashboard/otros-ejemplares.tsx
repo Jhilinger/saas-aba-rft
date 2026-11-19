@@ -1,12 +1,16 @@
 import type { ImagenesBanco } from './tomar-datos/rft/[programaId]/pantalla-tablet'
 
-// La foto del concepto que sale en las sondas de generalización (la 3); en
-// entrenamiento y en los tests se usa siempre la 1, la de la ficha
-export default function OtrosEjemplares({ imagenes, concepto }: { imagenes: ImagenesBanco; concepto: string | null }) {
+// Las otras fotos del concepto que salen al tomar datos: la 3 en las sondas de
+// generalización y, si el programa alterna ejemplares, la 2 en entrenamiento y
+// tests. La ficha muestra la 1
+export default function OtrosEjemplares({ imagenes, concepto, alternar = false }: { imagenes: ImagenesBanco; concepto: string | null; alternar?: boolean }) {
   if (!concepto) return null
   const ejemplares = imagenes[concepto]
   if (!ejemplares) return null
-  const otros = [{ clave: '3', etiqueta: 'Sondas de generalización' }].filter((o) => ejemplares[o.clave] && ejemplares[o.clave] !== ejemplares['1'])
+  const otros = [
+    ...(alternar ? [{ clave: '2', etiqueta: 'Se alterna con la 1 en entrenamiento y tests' }] : []),
+    { clave: '3', etiqueta: 'Sondas de generalización' },
+  ].filter((o) => ejemplares[o.clave] && ejemplares[o.clave] !== ejemplares['1'])
   if (!otros.length) return null
   return (
     <span className="flex shrink-0 gap-1">

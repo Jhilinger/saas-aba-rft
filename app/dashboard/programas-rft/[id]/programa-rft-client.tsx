@@ -60,6 +60,7 @@ export default function ProgramaRftClient({
   soloLectura = false,
   imagenes,
   conImagenes,
+  alternarEjemplares = false,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -74,6 +75,7 @@ export default function ProgramaRftClient({
   soloLectura?: boolean
   imagenes: ImagenesBanco
   conImagenes: boolean
+  alternarEjemplares?: boolean
 }) {
   const [tab, setTab] = useState<'evolucion' | 'revision' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -294,6 +296,7 @@ export default function ProgramaRftClient({
                 soloLectura={soloLectura}
                 imagenes={imagenes}
                 conImagenes={conImagenes}
+                alternarEjemplares={alternarEjemplares}
               />
             ))}
           </div>

@@ -64,7 +64,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alumnos(nombre_anonimizado), programas_base(video_url)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url)'
     )
     .eq('id', id)
     .single()
@@ -234,6 +234,7 @@ export default async function ProgramaRftPage({
         soloLectura={!disena}
         imagenes={imagenes}
         conImagenes={disena && !!perfil.clinica_id}
+        alternarEjemplares={programa.alternar_ejemplares}
       />
 
       {bloquesFluidez && bloquesFluidez.length > 0 && (

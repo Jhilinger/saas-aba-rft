@@ -66,6 +66,7 @@ export default function ClaseCard({
   conRespuestasEsperadas = false,
   soloLectura = false,
   imagenes = {},
+  alternarEjemplares = false,
   conImagenes = false,
 }: {
   clase: Clase
@@ -77,6 +78,8 @@ export default function ClaseCard({
   // Sin permiso de diseño: se consulta, pero no se cambian clases ni estímulos
   soloLectura?: boolean
   imagenes?: ImagenesBanco
+  // El programa alterna las fotos 1 y 2 de cada concepto
+  alternarEjemplares?: boolean
   // Se pueden subir imágenes propias del centro
   conImagenes?: boolean
 }) {
@@ -187,7 +190,7 @@ export default function ClaseCard({
               <span className="flex items-center gap-3">
               <MiniaturaEstimulo pantalla={e.pantalla} imagenes={imagenes} />
               <ImagenEstimulo tabla="estimulos_rft" estimuloId={e.id} url={urlImagen(imagenes, e.concepto_imagen, 'entrenamiento', 0)} editable={conImagenes} />
-              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} />
+              <OtrosEjemplares imagenes={imagenes} concepto={e.concepto_imagen} alternar={alternarEjemplares} />
               {!soloLectura && (
               <button
                 onClick={() => {
