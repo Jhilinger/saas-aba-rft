@@ -109,6 +109,8 @@ function hash(valor: string) {
 }
 
 const esperar = (ms: number) => new Promise((resolver) => setTimeout(resolver, ms))
+// Pantalla en blanco antes de la muestra tras un acierto con elogio en entrenamiento
+const PAUSA_TRAS_ELOGIO = 600
 
 // Una presentación del ensayo (se monta de nuevo en cada una): pausa, la
 // muestra y en seguida las comparaciones, o al tocar la muestra si hay
@@ -127,6 +129,7 @@ function Presentacion({
   sinMuestra: sinMuestraForzada = false,
   seleccionOida = false,
   conTexto = false,
+  pausa = PAUSA_ENTRE_ENSAYOS,
   onElegir,
   onOpciones,
 }: {
@@ -147,6 +150,8 @@ function Presentacion({
   seleccionOida?: boolean
   // Clave y opciones oídas también en texto (alumno lector)
   conTexto?: boolean
+  // Pausa en blanco antes de la muestra (más corta tras un acierto con elogio)
+  pausa?: number
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -206,7 +211,7 @@ function Presentacion({
   }
 
   useEffect(() => {
-    const t = setTimeout(() => setConMuestra(true), PAUSA_ENTRE_ENSAYOS)
+    const t = setTimeout(() => setConMuestra(true), pausa)
     return () => clearTimeout(t)
   }, [])
   useEffect(() => {
@@ -485,6 +490,7 @@ function EnsayoTablet({
   sinMuestra,
   seleccionOida,
   conTexto,
+  pausa,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -501,6 +507,7 @@ function EnsayoTablet({
   sinMuestra: boolean
   seleccionOida: boolean
   conTexto: boolean
+  pausa: number
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -550,6 +557,7 @@ function EnsayoTablet({
       sinMuestra={sinMuestra}
       seleccionOida={seleccionOida}
       conTexto={conTexto}
+      pausa={transferencia ? PAUSA_ENTRE_ENSAYOS : pausa}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -623,7 +631,14 @@ export default function PantallaTablet({
   // respuesta se registra en el momento del toque (la latencia no cambia)
   const [retro, setRetro] = useState<{ origen: EstimuloTablet; comparativos: ComparativoTablet[]; consigna: string | null; ensayo: number } | null>(null)
 
+  // Pausa antes de la muestra siguiente: más corta tras un acierto en
+  // entrenamiento, porque el elogio ya separa los ensayos (intervalos cortos
+  // tras el reforzador aceleran la adquisición; Koegel, Dunlap y Dyer, 1980).
+  // Tras un error y en los tests, la de siempre (igual aciertes o falles)
+  const [pausaSiguiente, setPausaSiguiente] = useState(PAUSA_ENTRE_ENSAYOS)
+
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
+    setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
     if (!infantil && correcto && fase === 'entrenamiento') {
       setRetro({ origen, comparativos, consigna, ensayo })
       const fin = elogios ? Promise.all([decirElogio(), esperar(900)]) : esperar(900)
@@ -694,6 +709,7 @@ export default function PantallaTablet({
         sinMuestra={sinMuestra}
         seleccionOida={seleccionOida}
         conTexto={conTexto}
+        pausa={pausaSiguiente}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}
