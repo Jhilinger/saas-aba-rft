@@ -195,7 +195,10 @@ function SelectorModo({
   onForma,
   apoyoVisual,
   onApoyoVisual,
+  soloTableta = false,
 }: {
+  // Programas verbales del nivel 3: si el bloque se puede presentar en la tableta, solo ahí
+  soloTableta?: boolean
   forma: Forma
   onForma: (f: Forma) => void
   // Fichas iguales (programas verbales); undefined = no se ofrece
@@ -238,6 +241,9 @@ function SelectorModo({
     <span className="inline-flex flex-wrap items-center gap-3">
     {selectorForma}
     {selectorApoyo}
+    {soloTableta ? (
+      <span className="text-sm font-medium text-slate-600">🖥 En tableta</span>
+    ) : (
     <span className="flex rounded-lg bg-white p-0.5 text-sm">
       {(['material', 'tableta'] as const).map((m) => (
         <button
@@ -249,6 +255,7 @@ function SelectorModo({
         </button>
       ))}
     </span>
+    )}
     {modo === 'tableta' && !textoFijo && (
       <label className="flex items-center gap-1.5 text-sm text-slate-600">
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
@@ -402,7 +409,11 @@ export default function TomarDatosRftClient({
   const [manual, setManual] = useState(false)
   // Modo del próximo bloque, y si la pantalla del alumno está abierta. El modo
   // con que empezó el bloque se guarda con él (ref, como los controles)
-  const [modo, setModo] = useState<'material' | 'tableta'>('material')
+  // Programas verbales del nivel 3 (sin audio): se registran solo en la tableta
+  // cuando el bloque se puede presentar en ella; si no (respuesta de ejecución,
+  // estímulos que no se ven), con material
+  const soloTableta = sinAudio
+  const [modo, setModo] = useState<'material' | 'tableta'>(soloTableta ? 'tableta' : 'material')
   // Forma de respuesta del próximo bloque; la del bloque en curso va en una ref
   const [forma, setForma] = useState<Forma>('oyente')
   const formaBloqueRef = useRef<Forma>('oyente')
@@ -493,8 +504,11 @@ export default function TomarDatosRftClient({
 
   // Una clase se puede presentar en la tableta si sus dos estímulos se ven o se
   // dicen (con opciones de la propia clase todo se dice en audio)
+  // Opciones fijas (Igual / Diferente / No se sabe, Sí / No): la frase de la clase y
+  // las opciones como botones de texto; no hace falta que los estímulos se vean
+  const opcionesFijas = respuesta.tipo_respuesta === 'opciones'
   const presentable = (c: Clase, origen: string, destino: string) =>
-    opcionesClase || [encontrarEstimulo(c, origen), encontrarEstimulo(c, destino)].every((e) => !!e && (esVisible(e) || esOido(e)))
+    opcionesClase || opcionesFijas || [encontrarEstimulo(c, origen), encontrarEstimulo(c, destino)].every((e) => !!e && (esVisible(e) || esOido(e)))
   const clasesConPosiciones = clasesDelGrupo.filter(
     (c) => encontrarEstimulo(c, posicionOrigen) && encontrarEstimulo(c, posicionDestino)
   )
@@ -730,6 +744,16 @@ export default function TomarDatosRftClient({
     if (!secuencia) return []
     const claseActual = secuencia[ensayos.length]
     if (!claseActual) return []
+    const cfg = configRespuesta(respuesta, fase)
+    if (cfg.tipo === 'opciones') {
+      // Opciones fijas como palabras (botones de texto); correcta, la respuesta esperada
+      const esperadaClase = leerRespuestasEsperadas(claseActual.respuestas_esperadas)[claveCombinacion(posicionOrigen, posicionDestino)]
+      return cfg.opciones.map((op, i) => ({
+        claseId: `${claseActual.id}-op${i}`,
+        estimulo: { id: `${claseActual.id}-op${i}`, posicion: null, nombre: `"${op}"`, concepto_imagen: null, pantalla: null },
+        esCorrecto: op === esperadaClase,
+      }))
+    }
     if (opcionesClase && claseActual.estimulos_rft.length >= 3) {
       // Redes de 3 o más miembros: las opciones son todos los de la clase (sin
       // distractor de otra clase), dichas en audio
@@ -857,7 +881,15 @@ export default function TomarDatosRftClient({
   // clases tienen sus estímulos con imagen del banco o como palabras que se
   // dicen; las demás se quedan fuera del bloque (con aviso)
   const tabletaPosible = (grupo: string, origen: string, destino: string, faseBloque: string) => {
-    if (configRespuesta(respuesta, faseBloque).tipo !== 'seleccion') return false
+    const tipo = configRespuesta(respuesta, faseBloque).tipo
+    if (tipo === 'opciones') {
+      // Cada clase necesita su frase y su respuesta esperada para corregirse sola
+      const conFrase = clasesCon(grupo, origen, destino).filter(
+        (c) => !!leerRespuestasEsperadas(c.respuestas_esperadas)[claveCombinacion(origen, destino)] && !!leerConsignasClase(c.consignas)[`${faseBloque}:${origen}→${destino}`]
+      )
+      return conFrase.length > 0 && conFrase.length === clasesCon(grupo, origen, destino).length
+    }
+    if (tipo !== 'seleccion') return false
     const validas = clasesTableta(grupo, origen, destino)
     if (validas.length < 2) return false
     // Con opciones de la propia clase todo se dice en audio (clave y opciones):
@@ -1173,7 +1205,7 @@ export default function TomarDatosRftClient({
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
                 fuera={fueraDeTableta(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino)}
                 modo={modo}
-                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual}
+                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual} soloTableta={soloTableta}
               />
             }
           />
@@ -1224,7 +1256,7 @@ export default function TomarDatosRftClient({
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
               fuera={fueraDeTableta(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino)}
               modo={modo}
-              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual}
+              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual} soloTableta={soloTableta}
             />
           }
         />
@@ -1394,7 +1426,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual} soloTableta={soloTableta} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
@@ -1516,7 +1548,7 @@ export default function TomarDatosRftClient({
           }
         }
         observacion={!!sinError?.observacion}
-        seleccionOida={!!sinError?.seleccionOida || opcionesClase}
+        seleccionOida={!!sinError?.seleccionOida || opcionesClase || configRespuesta(respuesta, fase).tipo === 'opciones'}
         menorAMayor={menorAMayorBloque}
         consigna={consignaActual}
         sinMuestra={opcionesClase}
