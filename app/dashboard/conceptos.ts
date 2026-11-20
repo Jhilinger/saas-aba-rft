@@ -94,8 +94,16 @@ const OPUESTOS: [string, string, 'entrenamiento' | 'generalizacion'][] = [
 export const CONCEPTOS_OPUESTOS = OPUESTOS.flatMap(([a, b]) => [`oposicion/${a}`, `oposicion/${b}`])
 
 export type OpcionGenerada = { pantalla: EstimuloPantalla; etiqueta: string; correcta: boolean }
-// secuencia: imágenes que se presentan de una en una antes de las opciones
-export type EnsayoGenerado = { clave: string; consigna: string; muestra: EstimuloPantalla | null; opciones: OpcionGenerada[]; secuencia?: EstimuloPantalla[] }
+// secuencia: imágenes que se presentan de una en una antes de las opciones;
+// etiquetasSecuencia: su rótulo al corregir un error («Antes», «Después»)
+export type EnsayoGenerado = {
+  clave: string
+  consigna: string
+  muestra: EstimuloPantalla | null
+  opciones: OpcionGenerada[]
+  secuencia?: EstimuloPantalla[]
+  etiquetasSecuencia?: string[]
+}
 export type Concepto = { concepto: string; nombre: string }
 
 // Categorías del banco para entrenar y, aparte, para las sondas de
@@ -114,6 +122,8 @@ export const CONSIGNAS = {
   antes: '¿Qué pasó antes?',
   salioAntes: '¿Cuál salió antes?',
   salioDespues: '¿Cuál salió después?',
+  esteAntes: '¿Este salió antes?',
+  esteDespues: '¿Este salió después?',
   tamano: ['¿Cuál es más grande?', '¿Cuál es más pequeño?'],
   cantidad: ['¿Dónde hay más?', '¿Dónde hay menos?'],
   longitud: ['¿Cuál es más largo?', '¿Cuál es más corto?'],
@@ -355,22 +365,47 @@ function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar
 
 // Orden físico de presentación: dos objetos sin relación entre sí aparecen uno
 // tras otro en el centro; después salen los dos en posiciones al azar y se
-// pregunta cuál salió antes o después (claves alternadas e impredecibles)
+// pregunta cuál salió antes o después (claves alternadas e impredecibles).
+// Un tercio de los ensayos son de sí/no («¿Este salió antes?» con uno de los
+// dos como muestra), la mitad con respuesta «sí»: varias formas de respuesta
+// favorecen la generalización (Barry, Neufeld y Stewart, 2024)
 function ordenPresentacion(conceptos: Concepto[], n: number, azar: Azar): EnsayoGenerado[] {
   if (conceptos.length < 2) return []
   const polos = alternados<0 | 1>(0, 1, n, azar)
-  return polos.map((polo) => {
+  const nSiNo = Math.round(n / 3)
+  const siNo = barajar(Array.from({ length: n }, (_, i) => i < nSiNo), azar)
+  const respuestasSi = barajar(Array.from({ length: nSiNo }, (_, i) => i % 2 === 0), azar)
+  return polos.map((polo, i) => {
     const [primero, segundo] = barajar(conceptos, azar).slice(0, 2)
+    const comun = {
+      clave: polo === 0 ? 'antes' : 'despues',
+      secuencia: [{ img: primero.concepto }, { img: segundo.concepto }],
+      etiquetasSecuencia: ['Antes', 'Después'],
+    }
+    if (siNo[i]) {
+      const si = respuestasSi.pop() ?? true
+      // La muestra es la que cumple la clave (respuesta «sí») o la otra («no»)
+      const cumple = polo === 0 ? primero : segundo
+      const muestra = si ? cumple : cumple === primero ? segundo : primero
+      return {
+        ...comun,
+        consigna: polo === 0 ? CONSIGNAS.esteAntes : CONSIGNAS.esteDespues,
+        muestra: { img: muestra.concepto },
+        opciones: [
+          { pantalla: { t: 'Sí' }, etiqueta: 'Sí', correcta: si },
+          { pantalla: { t: 'No' }, etiqueta: 'No', correcta: !si },
+        ],
+      }
+    }
     const opciones: OpcionGenerada[] = [
       { pantalla: { img: primero.concepto }, etiqueta: primero.nombre, correcta: polo === 0 },
       { pantalla: { img: segundo.concepto }, etiqueta: segundo.nombre, correcta: polo === 1 },
     ]
     return {
-      clave: polo === 0 ? 'antes' : 'despues',
+      ...comun,
       consigna: polo === 0 ? CONSIGNAS.salioAntes : CONSIGNAS.salioDespues,
       muestra: null,
       opciones: barajar(opciones, azar),
-      secuencia: [{ img: primero.concepto }, { img: segundo.concepto }],
     }
   })
 }

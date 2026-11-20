@@ -124,6 +124,8 @@ const PAUSA_TRAS_ELOGIO = 600
 // pantalla en blanco entre una y otra
 const SECUENCIA_VISIBLE = 1500
 const SECUENCIA_ENTRE = 1000
+// En la corrección del error, con el rótulo debajo, cada imagen se ve más tiempo
+const SECUENCIA_VISIBLE_ROTULADA = 2500
 
 // Una presentación del ensayo (se monta de nuevo en cada una): pausa, la
 // muestra y en seguida las comparaciones, o al tocar la muestra si hay
@@ -146,6 +148,7 @@ function Presentacion({
   sinVozAutomatica = false,
   sinAudio = false,
   secuencia,
+  etiquetasSecuencia,
   onElegir,
   onOpciones,
 }: {
@@ -174,6 +177,8 @@ function Presentacion({
   sinAudio?: boolean
   // Imágenes que se presentan de una en una en el centro antes de las opciones
   secuencia?: EstimuloTablet[]
+  // Corrección del error: cada imagen de la secuencia con su rótulo («antes», «después»)
+  etiquetasSecuencia?: string[]
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -246,7 +251,7 @@ function Presentacion({
       let t = pausa
       secuencia.forEach((_, i) => {
         tiempos.push(window.setTimeout(() => setPaso(i), t))
-        t += SECUENCIA_VISIBLE
+        t += etiquetasSecuencia ? SECUENCIA_VISIBLE_ROTULADA : SECUENCIA_VISIBLE
         tiempos.push(window.setTimeout(() => setPaso(-1), t))
         t += SECUENCIA_ENTRE
       })
@@ -329,13 +334,19 @@ function Presentacion({
   if (paso !== null && secuencia) {
     const ladoSecuencia = lado(2, 40)
     const actual = paso >= 0 ? secuencia[paso] : null
+    const etiqueta = paso !== null && paso >= 0 ? etiquetasSecuencia?.[paso] : undefined
     return (
       <>
-        <div className="flex flex-1 items-center justify-center px-4 pb-2">
+        <div className="flex flex-1 flex-col items-center justify-center gap-[2vmin] px-4 pb-2">
           {actual && (
             <div style={{ width: ladoSecuencia, height: ladoSecuencia }} className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm">
               <Tarjeta estimulo={actual} url={urlImagen(imagenes, actual.concepto_imagen, fase, ensayo, alternar)} lado={ladoSecuencia} urlConcepto={urlConcepto} />
             </div>
+          )}
+          {actual && etiqueta && (
+            <p className="rounded-full bg-amber-100 px-[3vmin] py-[1vmin] font-bold text-amber-800" style={{ fontSize: '5vmin' }}>
+              {etiqueta}
+            </p>
           )}
         </div>
         <div className="min-h-12 px-3 pb-2" />
@@ -626,6 +637,11 @@ function Retroalimentacion({
 // Un ensayo (se monta de nuevo en cada uno). Con ayudas de menor a mayor,
 // cada error sube un nivel de ayuda sobre la misma presentación; un acierto con
 // ayuda da paso al ensayo de transferencia (el mismo, sin ayuda), que no escala.
+// Con corrección del error (entrenamiento sin ayudas de menor a mayor): tras un
+// error se modela la respuesta (la secuencia otra vez con sus rótulos y solo la
+// correcta, resaltada) y se repite el ensayo sin ayuda. El ensayo cuenta como
+// error; la repetición se guarda como ensayo de transferencia (Barry, Neufeld y
+// Stewart, 2024; Rodgers e Iwata, 1991).
 function EnsayoTablet({
   origen,
   comparativos,
@@ -643,6 +659,8 @@ function EnsayoTablet({
   sinVozAutomatica,
   sinAudio,
   secuencia,
+  correccion,
+  etiquetasSecuencia,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -663,12 +681,15 @@ function EnsayoTablet({
   sinVozAutomatica: boolean
   sinAudio: boolean
   secuencia?: EstimuloTablet[]
+  correccion: boolean
+  etiquetasSecuencia?: string[]
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
 }) {
   const [nivel, setNivel] = useState(0)
   const [transferencia, setTransferencia] = useState(false)
+  const [modelo, setModelo] = useState(false)
   const primera = useRef<string | null>(null)
   const inicioTransferencia = useRef(0)
   const nDistractores = comparativos.filter((c) => !c.esCorrecto).length
@@ -679,12 +700,24 @@ function EnsayoTablet({
         correcto: false,
         respuesta: primera.current,
         conAyudaPantalla: false,
-        nivelAyuda: nivel,
+        nivelAyuda: menorAMayor ? nivel : undefined,
         transferencia: { correcto: e.correcto, respuesta: e.respuesta, latenciaMs: Date.now() - inicioTransferencia.current },
       })
       return
     }
+    // Modelo de la corrección: solo está la correcta; al tocarla, se repite el ensayo
+    if (modelo) {
+      if (!e.correcto) return
+      setModelo(false)
+      setTransferencia(true)
+      return
+    }
     if (nivel === 0) onPrimeraRespuesta()
+    if (!menorAMayor && !e.correcto && correccion) {
+      primera.current = e.respuesta
+      setModelo(true)
+      return
+    }
     if (!menorAMayor || (e.correcto && nivel === 0)) {
       onResponder(e)
       return
@@ -699,7 +732,7 @@ function EnsayoTablet({
 
   return (
     <Presentacion
-      key={transferencia ? 'transferencia' : 'ensayo'}
+      key={transferencia ? 'transferencia' : modelo ? 'modelo' : 'ensayo'}
       origen={origen}
       comparativos={comparativos}
       fase={fase}
@@ -707,7 +740,7 @@ function EnsayoTablet({
       imagenes={imagenes}
       apoyo={transferencia ? null : apoyo}
       observacion={observacion}
-      nivel={transferencia ? 0 : nivel}
+      nivel={transferencia ? 0 : modelo ? 5 : nivel}
       consigna={consigna}
       sinMuestra={sinMuestra}
       seleccionOida={seleccionOida}
@@ -715,10 +748,13 @@ function EnsayoTablet({
       pausa={transferencia ? PAUSA_ENTRE_ENSAYOS : pausa}
       sinVozAutomatica={sinVozAutomatica}
       sinAudio={sinAudio}
-      secuencia={transferencia || nivel > 0 ? undefined : secuencia}
+      secuencia={modelo || (correccion && transferencia) ? secuencia : transferencia || nivel > 0 ? undefined : secuencia}
+      etiquetasSecuencia={modelo ? etiquetasSecuencia : undefined}
       onElegir={elegir}
       onOpciones={
-        transferencia
+        modelo
+          ? () => {}
+          : transferencia
           ? () => {
               inicioTransferencia.current = Date.now()
             }
@@ -747,6 +783,8 @@ export default function PantallaTablet({
   sinVozAutomatica = false,
   sinAudio = false,
   secuencia,
+  correccion = false,
+  etiquetasSecuencia,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -779,6 +817,10 @@ export default function PantallaTablet({
   sinAudio?: boolean
   // Imágenes que se presentan de una en una antes de las opciones (orden en que aparecen)
   secuencia?: EstimuloTablet[]
+  // Corrección del error en entrenamiento (modelo y repetición sin ayuda)
+  correccion?: boolean
+  // Rótulos de la secuencia al corregir («antes», «después»)
+  etiquetasSecuencia?: string[]
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -894,6 +936,8 @@ export default function PantallaTablet({
         sinVozAutomatica={sinVozAutomatica}
         sinAudio={sinAudio}
         secuencia={secuencia}
+        correccion={correccion && fase === 'entrenamiento' && !menorAMayor}
+        etiquetasSecuencia={etiquetasSecuencia}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

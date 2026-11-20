@@ -24,6 +24,8 @@ type Registro = {
   respuesta: string | null
   nivelAyuda?: number
   generado: Json
+  // Repetición sin ayuda tras corregir un error (o tras acertar con ayuda)
+  transferencia?: RespuestaTablet['transferencia']
 }
 
 export default function ConceptosTablet({
@@ -120,7 +122,18 @@ export default function ConceptosTablet({
         segundosDesde(inicio),
         [],
         'tableta',
-        escalonBloque
+        escalonBloque,
+        lista
+          .filter((r) => r.transferencia)
+          .map((r) => ({
+            claseId: null,
+            estimuloOrigenId: null,
+            estimuloDestinoId: null,
+            correcto: r.transferencia!.correcto,
+            latenciaMs: r.transferencia!.latenciaMs,
+            respuesta: r.transferencia!.respuesta,
+            generado: r.generado,
+          }))
       )
       if (res.error) {
         toast(res.error, 'error')
@@ -163,6 +176,10 @@ export default function ConceptosTablet({
         consigna={actual.consigna}
         sinMuestra={!actual.muestra}
         secuencia={actual.secuencia?.map((p, i) => ({ id: `s${n}-${i}`, nombre: '', concepto_imagen: null, pantalla: p }))}
+        etiquetasSecuencia={actual.etiquetasSecuencia}
+        // Corrección del error en entrenamiento (modelo y repetición sin
+        // ayuda): de momento solo en las claves temporales
+        correccion={actividad.tipo === 'temporal'}
         // Conceptos generados: cada ensayo alterna las fotos 1 y 2 del concepto (múltiples ejemplares)
         alternarEjemplares
         onResponder={(correcto, ayuda, respuesta, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => {
@@ -172,6 +189,7 @@ export default function ConceptosTablet({
             latenciaMs: latencia.current,
             respuesta,
             nivelAyuda: extra.nivelAyuda,
+            transferencia: extra.transferencia,
             generado: {
               nivel: nivel.nombre,
               clave: actual.clave,

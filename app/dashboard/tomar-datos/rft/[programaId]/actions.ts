@@ -32,6 +32,7 @@ type TransferenciaInput = {
   correcto: boolean
   latenciaMs?: number | null
   respuesta?: string | null
+  generado?: Json
 }
 
 function nivelAyudaValido(v: unknown): number | null {
@@ -205,6 +206,7 @@ export async function guardarBloqueRft(
         ayuda: 'independiente' as AyudaRft,
         latencia_ms: latenciaValida(t.latenciaMs),
         respuesta: textoLimitado(t.respuesta, 500),
+        generado: t.generado ?? null,
         tipo_ensayo: 'transferencia',
       }))
     )

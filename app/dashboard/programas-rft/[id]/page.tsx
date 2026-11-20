@@ -1,4 +1,4 @@
-import { claveTemporal, type FilaClave } from '../../claves-temporales'
+import { claveTemporal, ordenMencion, type FilaClave } from '../../claves-temporales'
 import { tienePlantilla } from '../../generador-rft/plantillas'
 import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar } from '../../permisos'
@@ -194,8 +194,9 @@ export default async function ProgramaRftPage({
         .filter((e) => e.tipo_ensayo !== 'transferencia')
         .map((e) => {
           const generado = e.generado as { consigna?: string } | null
-          const clave = claveTemporal(e.pregunta ?? generado?.consigna)
-          const fila: FilaClave | null = clave ? { grupo: b.grupo ?? '', fase: b.fase, clave, correcto: e.correcto } : null
+          const texto = e.pregunta ?? generado?.consigna
+          const clave = claveTemporal(texto)
+          const fila: FilaClave | null = clave ? { grupo: b.grupo ?? '', fase: b.fase, clave, correcto: e.correcto, orden: ordenMencion(texto) } : null
           return fila
         })
         .filter((f): f is FilaClave => f !== null)
