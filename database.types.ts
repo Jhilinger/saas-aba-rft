@@ -393,6 +393,7 @@ export type Database = {
           duracion_segundos: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha: string
+          forma_respuesta: string
           grupo: string | null
           id: string
           latencia_media_ms: number | null
@@ -416,6 +417,7 @@ export type Database = {
           duracion_segundos?: number | null
           fase: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
+          forma_respuesta?: string
           grupo?: string | null
           id?: string
           latencia_media_ms?: number | null
@@ -439,6 +441,7 @@ export type Database = {
           duracion_segundos?: number | null
           fase?: Database["public"]["Enums"]["fase_rft"]
           fecha?: string
+          forma_respuesta?: string
           grupo?: string | null
           id?: string
           latencia_media_ms?: number | null
@@ -876,6 +879,7 @@ export type Database = {
         Row: {
           dominado: boolean
           fase: Database["public"]["Enums"]["fase_rft"]
+          forma_respuesta: string
           grupo: string
           posicion_destino: string
           posicion_origen: string
@@ -886,6 +890,7 @@ export type Database = {
         Insert: {
           dominado?: boolean
           fase: Database["public"]["Enums"]["fase_rft"]
+          forma_respuesta?: string
           grupo: string
           posicion_destino: string
           posicion_origen: string
@@ -896,6 +901,7 @@ export type Database = {
         Update: {
           dominado?: boolean
           fase?: Database["public"]["Enums"]["fase_rft"]
+          forma_respuesta?: string
           grupo?: string
           posicion_destino?: string
           posicion_origen?: string
@@ -2407,6 +2413,7 @@ export type Database = {
       actualizar_dominio_grupo_rft: {
         Args: {
           p_fase: Database["public"]["Enums"]["fase_rft"]
+          p_forma?: string
           p_grupo: string
           p_posicion_destino: string
           p_posicion_origen: string

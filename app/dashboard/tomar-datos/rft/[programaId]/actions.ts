@@ -88,8 +88,12 @@ export async function guardarBloqueRft(
   sinError: unknown = null,
   transferencias: TransferenciaInput[] = [],
   // Clave y opciones también en texto (solo en la tableta)
-  conTexto = false
+  conTexto = false,
+  // Oyente (elige entre opciones) o hablante (responde sin opciones): el
+  // dominio de cada combinación se lleva por separado para cada forma
+  formaRespuesta: 'oyente' | 'hablante' = 'oyente'
 ) {
+  const forma = formaRespuesta === 'hablante' ? 'hablante' : 'oyente'
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado' }
@@ -129,12 +133,13 @@ export async function guardarBloqueRft(
       .eq('programa_alumno_id', programaAlumnoId)
       .eq('grupo', grupo)
       .eq('fase', 'entrenamiento')
+      .eq('forma_respuesta', forma)
       .eq('dominado', true)
 
     const grafo = construirGrafoEntrenado(entrenamientosDominados ?? [], grupo)
     if (!estanConectadas(grafo, posicionOrigen, posicionDestino)) {
       return {
-        error: `Todavía no se puede probar ${posicionOrigen}→${posicionDestino}: hace falta dominar antes en entrenamiento una cadena de relaciones que las conecte.`,
+        error: `Todavía no se puede probar ${posicionOrigen}→${posicionDestino}: hace falta dominar antes en entrenamiento${forma === 'hablante' ? ' (como hablante)' : ''} una cadena de relaciones que las conecte.`,
       }
     }
   }
@@ -165,6 +170,7 @@ export async function guardarBloqueRft(
       total_ensayos: totalEnsayos,
       modo: modo === 'tableta' ? 'tableta' : 'material',
       con_texto: modo === 'tableta' && conTexto === true,
+      forma_respuesta: forma,
       sin_error: escalon,
       aciertos,
       notas: notas?.trim() || null,
@@ -274,6 +280,7 @@ export async function guardarBloqueRft(
       .eq('fase', fase as FaseRft)
       .eq('posicion_origen', posicionOrigen)
       .eq('posicion_destino', posicionDestino)
+      .eq('forma_respuesta', forma)
       .maybeSingle()
 
     const dominadoAntes = antes?.dominado ?? false
@@ -284,6 +291,7 @@ export async function guardarBloqueRft(
       p_fase: fase as FaseRft,
       p_posicion_origen: posicionOrigen,
       p_posicion_destino: posicionDestino,
+      p_forma: forma,
     })
 
     if (rpcError) return { error: rpcError.message }
@@ -296,6 +304,7 @@ export async function guardarBloqueRft(
       .eq('fase', fase as FaseRft)
       .eq('posicion_origen', posicionOrigen)
       .eq('posicion_destino', posicionDestino)
+      .eq('forma_respuesta', forma)
       .maybeSingle()
 
     const dominadoDespues = despues?.dominado ?? false

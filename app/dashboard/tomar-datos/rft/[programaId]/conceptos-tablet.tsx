@@ -7,7 +7,7 @@ import { useToast } from '../../../../providers/toast-provider'
 import { guardarBloqueRft } from './actions'
 import PantallaTablet, { type ImagenesBanco, type RespuestaTablet } from './pantalla-tablet'
 import PantallaHablante from './pantalla-hablante'
-import { aHablante, generarBloque, SUFIJO_HABLANTE, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
+import { aHablante, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import { segundosDesde, marcaDeTiempo } from '../../cronometro'
@@ -36,6 +36,7 @@ export default function ConceptosTablet({
   conceptos,
   imagenes,
   dominados,
+  dominadosHablante,
   ensayosPorBloque,
   sinError,
   ultimosEscalones,
@@ -47,14 +48,16 @@ export default function ConceptosTablet({
   imagenes: ImagenesBanco
   // Niveles (grupos) ya dominados en entrenamiento
   dominados: string[]
+  // Niveles dominados como hablante (se registran aparte, con la forma de respuesta)
+  dominadosHablante: string[]
   ensayosPorBloque: number
   sinError: ConfigSinError | null
   ultimosEscalones: Record<string, Json>
 }) {
   // Respuesta de oyente (toca la opción) o de hablante (dice la relación y el terapeuta la puntúa)
   const [hablante, setHablante] = useState(false)
-  const grupoDe = (nombre: string, h = hablante) => (h ? nombre + SUFIJO_HABLANTE : nombre)
-  const recomendadoEn = (h: boolean) => Math.max(0, actividad.niveles.findIndex((n) => !dominados.includes(grupoDe(n.nombre, h))))
+  const dominadosDe = (h: boolean) => (h ? dominadosHablante : dominados)
+  const recomendadoEn = (h: boolean) => Math.max(0, actividad.niveles.findIndex((n) => !dominadosDe(h).includes(n.nombre)))
   const recomendado = recomendadoEn(hablante)
   const [indice, setIndice] = useState(recomendado)
   const [versionHablante, setVersionHablante] = useState<EnsayoHablante[]>([])
@@ -75,7 +78,8 @@ export default function ConceptosTablet({
 
   const nivel = actividad.niveles[indice]
   const fase = sonda ? 'generalizacion' : 'entrenamiento'
-  const grupo = grupoDe(nivel.nombre)
+  const grupo = nivel.nombre
+  const dominadosForma = dominadosDe(hablante)
   const menorAMayor = !hablante && !sonda && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
 
   // Escalón de aprendizaje sin error del nivel (si está activo y es entrenamiento)
@@ -141,7 +145,9 @@ export default function ConceptosTablet({
             latenciaMs: r.transferencia!.latenciaMs,
             respuesta: r.transferencia!.respuesta,
             generado: r.generado,
-          }))
+          })),
+        false,
+        hablante ? 'hablante' : 'oyente'
       )
       if (res.error) {
         toast(res.error, 'error')
@@ -264,7 +270,7 @@ export default function ConceptosTablet({
       </div>
       {resultado && (
         <p className={`rounded-lg p-2 text-sm ${resultado.dominio ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800'}`}>
-          {resultado.dominio ? `🎉 ¡Nivel «${grupo}» dominado! ` : 'Bloque guardado: '}
+          {resultado.dominio ? `🎉 ¡Nivel «${grupo}» dominado${hablante ? ' como hablante' : ''}! ` : 'Bloque guardado: '}
           {resultado.porcentaje}% de acierto
         </p>
       )}
@@ -301,13 +307,13 @@ export default function ConceptosTablet({
             }}
             className={`rounded-lg px-3 py-2 text-sm font-medium ${i === indice ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
-            {dominados.includes(grupoDe(nv.nombre)) ? '✓ ' : ''}
+            {dominadosForma.includes(nv.nombre) ? '✓ ' : ''}
             {nv.nombre}
-            {i === recomendado && !dominados.includes(grupoDe(nv.nombre)) ? ' · recomendado' : ''}
+            {i === recomendado && !dominadosForma.includes(nv.nombre) ? ' · recomendado' : ''}
           </button>
         ))}
       </div>
-      {dominados.includes(grupo) && (
+      {dominadosForma.includes(grupo) && (
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <input type="checkbox" checked={sonda} onChange={(e) => setSonda(e.target.checked)} />
           Sonda de generalización con objetos nuevos (5 ensayos, no cuenta para el dominio)

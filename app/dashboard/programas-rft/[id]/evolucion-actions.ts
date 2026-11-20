@@ -8,7 +8,7 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
 
   const { data: bloques } = await supabase
     .from('bloques_ensayo_rft')
-    .select('fase, grupo, posicion_origen, posicion_destino, fecha, porcentaje')
+    .select('fase, grupo, posicion_origen, posicion_destino, forma_respuesta, fecha, porcentaje')
     .eq('programa_alumno_id', programaAlumnoId)
     .order('fecha', { ascending: true })
 
@@ -29,12 +29,14 @@ export async function obtenerEvolucionRft(programaAlumnoId: string) {
 
     if (!porFase[b.fase]) porFase[b.fase] = []
 
-    const id = `${b.grupo}__${b.posicion_origen}__${b.posicion_destino}`
+    // Oyente y hablante, series separadas
+    const hablante = b.forma_respuesta === 'hablante'
+    const id = `${b.grupo}__${b.posicion_origen}__${b.posicion_destino}${hablante ? '__hablante' : ''}`
     let entrada = porFase[b.fase].find((e) => e.id === id)
     if (!entrada) {
       entrada = {
         id,
-        label: `${b.posicion_origen}→${b.posicion_destino}`,
+        label: `${b.posicion_origen}→${b.posicion_destino}${hablante ? ' · hablante' : ''}`,
         grupo: b.grupo,
         bloques: [],
       }

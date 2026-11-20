@@ -166,10 +166,13 @@ export default async function ProgramaRftPage({
   if (actividad) {
     const { data: bloquesNivel } = await supabase
       .from('bloques_ensayo_rft')
-      .select('grupo, fase, fecha, porcentaje, ensayos_rft_detalle(correcto, tipo_ensayo, generado)')
+      .select('grupo, fase, fecha, porcentaje, forma_respuesta, ensayos_rft_detalle(correcto, tipo_ensayo, generado)')
       .eq('programa_alumno_id', id)
       .order('fecha', { ascending: true })
-    const conNivel = (bloquesNivel ?? []).filter((b) => !!b.grupo)
+    // Como hablante, cada nivel se muestra aparte («<nivel> · hablante»)
+    const conNivel = (bloquesNivel ?? [])
+      .filter((b) => !!b.grupo)
+      .map((b) => ({ ...b, grupo: b.forma_respuesta === 'hablante' ? `${b.grupo}${SUFIJO_HABLANTE}` : (b.grupo as string) }))
     evolucionNiveles = {
       // Los niveles y, si se han trabajado, los mismos como hablante
       niveles: [
@@ -236,7 +239,7 @@ export default async function ProgramaRftPage({
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')
-    .select('grupo, fase, posicion_origen, posicion_destino, dominado, via_entrenamiento, updated_at')
+    .select('grupo, fase, posicion_origen, posicion_destino, forma_respuesta, dominado, via_entrenamiento, updated_at')
     .eq('programa_alumno_id', id)
 
   const grupos = [...new Set((clases ?? []).map((c) => c.grupo))]

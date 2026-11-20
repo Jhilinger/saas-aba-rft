@@ -70,7 +70,7 @@ export default async function TomarDatosRftPage({
 
   const { data: dominioFases } = await supabase
     .from('dominio_rft_fases')
-    .select('grupo, fase, posicion_origen, posicion_destino')
+    .select('grupo, fase, posicion_origen, posicion_destino, forma_respuesta')
     .eq('programa_alumno_id', programaId)
     .eq('dominado', true)
 
@@ -133,7 +133,10 @@ export default async function TomarDatosRftPage({
           conceptos={conceptosActividad}
           imagenes={imagenesActividad}
           dominados={(dominioFases ?? [])
-            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A')
+            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'oyente')
+            .map((d) => d.grupo)}
+          dominadosHablante={(dominioFases ?? [])
+            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'hablante')
             .map((d) => d.grupo)}
           ensayosPorBloque={programa.ensayos_por_bloque}
           sinError={sinError}

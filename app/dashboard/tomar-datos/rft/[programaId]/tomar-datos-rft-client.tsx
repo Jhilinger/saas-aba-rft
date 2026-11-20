@@ -49,7 +49,9 @@ function VistaEstimulo({ estimulo, imagenes }: { estimulo: Estimulo; imagenes: I
 }
 // generado: la clase la creó el generador de grupos (sin voz grabada)
 type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; generado?: Json | null; estimulos_rft: Estimulo[] }
-type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string }
+type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string; forma_respuesta?: string }
+// Oyente: elige entre opciones; hablante: responde sin opciones y el terapeuta puntúa
+type Forma = 'oyente' | 'hablante'
 
 type EnsayoRft = {
   claseId: string
@@ -170,6 +172,7 @@ type ProgresoGuardado = {
   duracionBloque?: number | null
   controles?: ControlRft[]
   modo?: 'material' | 'tableta'
+  forma?: Forma
   escalon?: EscalonActivo | null
   menorAMayor?: boolean
   transferencias?: TransferenciaRft[]
@@ -187,7 +190,11 @@ function SelectorModo({
   onTexto,
   fuera = 0,
   textoFijo = false,
+  forma,
+  onForma,
 }: {
+  forma: Forma
+  onForma: (f: Forma) => void
   disponible: boolean
   // Clases del grupo que no se pueden mostrar en la tableta (se quedan fuera)
   fuera?: number
@@ -200,9 +207,24 @@ function SelectorModo({
   conTexto: boolean
   onTexto: (v: boolean) => void
 }) {
-  if (!disponible) return null
+  const selectorForma = (
+    <span className="flex rounded-lg bg-white p-0.5 text-sm">
+      {(['oyente', 'hablante'] as const).map((f) => (
+        <button
+          key={f}
+          onClick={() => onForma(f)}
+          title={f === 'oyente' ? 'El alumno elige entre opciones' : 'El alumno responde sin opciones; usted puntúa'}
+          className={`rounded-md px-3 py-1.5 font-medium ${forma === f ? 'bg-slate-700 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+        >
+          {f === 'oyente' ? '👂 Oyente' : '🗣 Hablante'}
+        </button>
+      ))}
+    </span>
+  )
+  if (!disponible) return <span className="inline-flex flex-wrap items-center gap-3">{selectorForma}</span>
   return (
     <span className="inline-flex flex-wrap items-center gap-3">
+    {selectorForma}
     <span className="flex rounded-lg bg-white p-0.5 text-sm">
       {(['material', 'tableta'] as const).map((m) => (
         <button
@@ -219,6 +241,9 @@ function SelectorModo({
         <input type="checkbox" checked={conTexto} onChange={(e) => onTexto(e.target.checked)} className="h-4 w-4" />
         Presentación en texto (desmarcada: solo audio)
       </label>
+    )}
+    {forma === 'hablante' && (
+      <span className="text-xs text-slate-500">Sin opciones: el alumno responde y usted marca ✓/✗{modo === 'tableta' ? ' (la respuesta esperada, oculta tras «👁»)' : ''}.</span>
     )}
     {modo === 'tableta' && fuera > 0 && (
       <span className="text-xs font-medium text-amber-700">
@@ -365,6 +390,14 @@ export default function TomarDatosRftClient({
   // Modo del próximo bloque, y si la pantalla del alumno está abierta. El modo
   // con que empezó el bloque se guarda con él (ref, como los controles)
   const [modo, setModo] = useState<'material' | 'tableta'>('material')
+  // Forma de respuesta del próximo bloque; la del bloque en curso va en una ref
+  const [forma, setForma] = useState<Forma>('oyente')
+  const formaBloqueRef = useRef<Forma>('oyente')
+  const [formaBloque, setFormaBloque] = useState<Forma>('oyente')
+  const fijarFormaBloque = (f: Forma) => {
+    formaBloqueRef.current = f
+    setFormaBloque(f)
+  }
   const [enTableta, setEnTableta] = useState(false)
   const [conTextoElegido, setConTexto] = useState(textoTablet)
   // Sin audio (nivel 3 salvo la abstracción de claves): siempre en texto
@@ -434,6 +467,9 @@ export default function TomarDatosRftClient({
     ),
   ].sort()
 
+  // Dominio de la forma de respuesta elegida (oyente y hablante van por separado)
+  const dominioForma = dominioFases.filter((d) => (d.forma_respuesta ?? 'oyente') === forma)
+
   // Una clase se puede presentar en la tableta si sus dos estímulos se ven o se
   // dicen (con opciones de la propia clase todo se dice en audio)
   const presentable = (c: Clase, origen: string, destino: string) =>
@@ -450,10 +486,10 @@ export default function TomarDatosRftClient({
   const esDistractorNoEntrenado = (c: Clase) => c.estimulos_rft.length === 1 && !encontrarEstimulo(c, posicionOrigen)
   const clasesSinPosiciones = clasesDelGrupo.length - clasesConPosiciones.length - clasesDelGrupo.filter(esDistractorNoEntrenado).length
 
-  const entrenamientosDominados: ParEntrenado[] = dominioFases
+  const entrenamientosDominados: ParEntrenado[] = dominioForma
     .filter((d) => d.fase === 'entrenamiento')
     .map((d) => ({ grupo: d.grupo, posicion_origen: d.posicion_origen, posicion_destino: d.posicion_destino }))
-  const combosDominados = dominioFases
+  const combosDominados = dominioForma
     .filter((d) => d.fase !== 'entrenamiento')
     .map((d) => `${d.grupo}__${d.posicion_origen}__${d.posicion_destino}`)
 
@@ -530,7 +566,8 @@ export default function TomarDatosRftClient({
             modoBloqueRef.current,
             escalon,
             transferenciasRef.current,
-            conTexto
+            conTexto,
+            formaBloqueRef.current
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -580,6 +617,8 @@ export default function TomarDatosRftClient({
     controlesRef.current = guardado.controles ?? []
     setControles(guardado.controles ?? [])
     modoBloqueRef.current = guardado.modo ?? 'material'
+    fijarFormaBloque(guardado.forma ?? 'oyente')
+    setForma(guardado.forma ?? 'oyente')
     fijarEscalon(guardado.escalon ?? null)
     fijarMenorAMayor(guardado.menorAMayor ?? false)
     transferenciasRef.current = guardado.transferencias ?? []
@@ -754,6 +793,7 @@ export default function TomarDatosRftClient({
     // Se llama desde un toque: desbloquea el audio para que las claves grabadas suenen solas
     desbloquearAudio()
     modoBloqueRef.current = modoInicial
+    fijarFormaBloque(forma)
     fijarEscalon(escalon)
     fijarMenorAMayor(menorAMayor)
     transferenciasRef.current = []
@@ -776,12 +816,12 @@ export default function TomarDatosRftClient({
     secuenciaPrograma,
     nivel,
     grupos.map((g) => ({ grupo: g, posiciones: posicionesDe(g) })),
-    dominioFases
+    dominioForma
   )
   // Solo se da por completada la secuencia si el grupo tiene algo dominado
-  const grupoConDatos = dominioFases.some((d) => d.grupo === grupoSeleccionado)
+  const grupoConDatos = dominioForma.some((d) => d.grupo === grupoSeleccionado)
   const recomendacionGrupo = grupoSeleccionado
-    ? recomendarBloque(secuenciaPrograma, nivel, [{ grupo: grupoSeleccionado, posiciones: posicionesDe(grupoSeleccionado) }], dominioFases)
+    ? recomendarBloque(secuenciaPrograma, nivel, [{ grupo: grupoSeleccionado, posiciones: posicionesDe(grupoSeleccionado) }], dominioForma)
     : null
   const clasesCon = (grupo: string, origen: string, destino: string) =>
     clases.filter((c) => c.grupo === grupo && encontrarEstimulo(c, origen) && encontrarEstimulo(c, destino))
@@ -816,7 +856,8 @@ export default function TomarDatosRftClient({
     modoBloque: 'material' | 'tableta',
     validas: Clase[]
   ): EscalonActivo | null => {
-    if (!sinError?.activo || sinError.modo !== 'mayor_a_menor' || faseBloque !== 'entrenamiento' || modoBloque !== 'tableta') return null
+    // Como hablante no hay opciones en pantalla: sin aprendizaje sin error
+    if (forma === 'hablante' || !sinError?.activo || sinError.modo !== 'mayor_a_menor' || faseBloque !== 'entrenamiento' || modoBloque !== 'tableta') return null
     if (!validas.every((c) => esVisible(encontrarEstimulo(c, destino)!))) return null
     const { indice } = siguienteEscalon(sinError, leerEscalonBloque(ultimosEscalones[`${grupo}__${origen}__${destino}`]))
     const escalon = sinError.escalones[indice]
@@ -831,6 +872,7 @@ export default function TomarDatosRftClient({
   }
   // Ayudas de menor a mayor: mismas condiciones (entrenamiento, tableta, opciones visibles)
   const menorAMayorPara = (destino: string, faseBloque: string, modoBloque: 'material' | 'tableta', validas: Clase[]) =>
+    forma === 'oyente' &&
     !!sinError?.activo &&
     sinError.modo === 'menor_a_mayor' &&
     faseBloque === 'entrenamiento' &&
@@ -968,6 +1010,7 @@ export default function TomarDatosRftClient({
       duracionBloque,
       controles,
       modo: modoBloqueRef.current,
+      forma: formaBloqueRef.current,
       escalon: escalonRef.current,
       menorAMayor: menorAMayorRef.current,
       transferencias: transferenciasRef.current,
@@ -1105,7 +1148,7 @@ export default function TomarDatosRftClient({
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
                 fuera={fueraDeTableta(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino)}
                 modo={modo}
-                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio}
+                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma}
               />
             }
           />
@@ -1156,7 +1199,7 @@ export default function TomarDatosRftClient({
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
               fuera={fueraDeTableta(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino)}
               modo={modo}
-              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio}
+              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma}
             />
           }
         />
@@ -1326,7 +1369,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
@@ -1456,6 +1499,7 @@ export default function TomarDatosRftClient({
         sinVozAutomatica={sinAudio || !!claseActual.generado}
         sinAudio={sinAudio}
         conTexto={conTexto}
+        hablante={formaBloque === 'hablante'}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
@@ -1467,6 +1511,11 @@ export default function TomarDatosRftClient({
   return (
     <div className="space-y-4 sm:space-y-6">
       {sinConexion && <BannerSinConexion />}
+      {formaBloque === 'hablante' && (
+        <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+          🗣 Bloque como hablante: diga la consigna sin presentar las opciones; el alumno responde y usted marca la respuesta.
+        </p>
+      )}
       <div className="flex items-center justify-between text-sm text-slate-500">
         <span aria-live="polite">
           Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}

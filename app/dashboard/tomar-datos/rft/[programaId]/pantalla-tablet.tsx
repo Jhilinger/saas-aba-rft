@@ -149,6 +149,7 @@ function Presentacion({
   sinAudio = false,
   secuencia,
   etiquetasSecuencia,
+  hablante = false,
   onElegir,
   onOpciones,
 }: {
@@ -179,13 +180,18 @@ function Presentacion({
   secuencia?: EstimuloTablet[]
   // Corrección del error: cada imagen de la secuencia con su rótulo («antes», «después»)
   etiquetasSecuencia?: string[]
+  // Respuesta de hablante: sin opciones; el alumno responde y el terapeuta puntúa
+  hablante?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
 }) {
   const muestraOida = esOido(origen)
-  const oidasComoOpciones = seleccionOida && !muestraOida && comparativos.length > 1 && comparativos.every((c) => esOido(c.estimulo))
-  const respuestaOral = !oidasComoOpciones && comparativos.some((c) => esOido(c.estimulo))
+  const oidasComoOpciones = !hablante && seleccionOida && !muestraOida && comparativos.length > 1 && comparativos.every((c) => esOido(c.estimulo))
+  const respuestaOral = hablante || (!oidasComoOpciones && comparativos.some((c) => esOido(c.estimulo)))
+  // Respuesta esperada (hablante): oculta, se ve manteniendo pulsado
+  const [verEsperada, setVerEsperada] = useState(false)
+  const esperada = comparativos.find((c) => c.esCorrecto)?.estimulo.nombre
   // Test de transformación de funciones: sin muestra (se retiran los A); solo
   // las opciones y la pregunta
   const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
@@ -438,7 +444,7 @@ function Presentacion({
           )}
           {/* Alumno lector: la clave también escrita, a la vista todo el ensayo */}
           {conTexto && textoClave && (
-            <p className="max-w-[80vw] text-center font-medium leading-snug text-slate-800" style={{ fontSize: '3.6vmin' }}>
+            <p className="max-w-[80vw] text-center font-medium leading-snug text-slate-800" style={{ fontSize: hablante ? '5vmin' : '3.6vmin' }}>
               {textoClave}
             </p>
           )}
@@ -506,6 +512,19 @@ function Presentacion({
       <div className="flex min-h-12 justify-end gap-2 px-3 pb-2">
         {respuestaOral && conMuestra && (
           <>
+            {hablante && esperada && (
+              <button
+                type="button"
+                onPointerDown={() => setVerEsperada(true)}
+                onPointerUp={() => setVerEsperada(false)}
+                onPointerLeave={() => setVerEsperada(false)}
+                onPointerCancel={() => setVerEsperada(false)}
+                onContextMenu={(e) => e.preventDefault()}
+                className="mr-auto rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 [touch-action:none]"
+              >
+                {verEsperada ? <span className="font-semibold text-slate-800">{textoOido(esperada)}</span> : '👁 Respuesta (mantener pulsado)'}
+              </button>
+            )}
             <BotonLargo onActivar={() => onElegir({ correcto: true, respuesta: null, conAyudaPantalla: false })}>✓ Correcto</BotonLargo>
             <BotonLargo onActivar={() => onElegir({ correcto: false, respuesta: null, conAyudaPantalla: false })}>✗ Incorrecto</BotonLargo>
           </>
@@ -661,6 +680,7 @@ function EnsayoTablet({
   secuencia,
   correccion,
   etiquetasSecuencia,
+  hablante,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -683,6 +703,7 @@ function EnsayoTablet({
   secuencia?: EstimuloTablet[]
   correccion: boolean
   etiquetasSecuencia?: string[]
+  hablante: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -750,6 +771,7 @@ function EnsayoTablet({
       sinAudio={sinAudio}
       secuencia={modelo || (correccion && transferencia) ? secuencia : transferencia || nivel > 0 ? undefined : secuencia}
       etiquetasSecuencia={modelo ? etiquetasSecuencia : undefined}
+      hablante={hablante}
       onElegir={elegir}
       onOpciones={
         modelo
@@ -785,6 +807,7 @@ export default function PantallaTablet({
   secuencia,
   correccion = false,
   etiquetasSecuencia,
+  hablante = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -821,6 +844,8 @@ export default function PantallaTablet({
   correccion?: boolean
   // Rótulos de la secuencia al corregir («antes», «después»)
   etiquetasSecuencia?: string[]
+  // Respuesta de hablante: sin opciones; el terapeuta puntúa (respuesta esperada oculta)
+  hablante?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -927,7 +952,7 @@ export default function PantallaTablet({
         imagenes={imagenes}
         apoyo={apoyo}
         observacion={observacion}
-        menorAMayor={menorAMayor}
+        menorAMayor={menorAMayor && !hablante}
         consigna={consigna}
         sinMuestra={sinMuestra}
         seleccionOida={seleccionOida}
@@ -936,8 +961,9 @@ export default function PantallaTablet({
         sinVozAutomatica={sinVozAutomatica}
         sinAudio={sinAudio}
         secuencia={secuencia}
-        correccion={correccion && fase === 'entrenamiento' && !menorAMayor}
+        correccion={correccion && fase === 'entrenamiento' && !menorAMayor && !hablante}
         etiquetasSecuencia={etiquetasSecuencia}
+        hablante={hablante}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

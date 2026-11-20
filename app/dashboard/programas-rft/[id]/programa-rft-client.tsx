@@ -14,6 +14,7 @@ import { Panel } from '../../../ui'
 import AyudaTermino from '../../ayuda-termino'
 import TablaGruposClases from '../../tabla-grupos-clases'
 import EvolucionNiveles, { type BloqueNivel, type FilaClaveNivel } from '../../evolucion-niveles'
+import { SUFIJO_HABLANTE } from '../../conceptos'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
@@ -35,6 +36,7 @@ type DominioFase = {
   fase: string
   posicion_origen: string
   posicion_destino: string
+  forma_respuesta: string
   dominado: boolean
   via_entrenamiento: boolean
   updated_at: string
@@ -129,7 +131,7 @@ export default function ProgramaRftClient({
           {...evolucionNiveles}
           dominados={dominioFases
             .filter((d) => d.dominado && d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A')
-            .map((d) => d.grupo)}
+            .map((d) => (d.forma_respuesta === 'hablante' ? `${d.grupo}${SUFIJO_HABLANTE}` : d.grupo))}
           porcentajeDominio={porcentajeDominio}
           distribucionPorNivel={distribucionPorGrupo}
         />
@@ -282,6 +284,7 @@ export default function ProgramaRftClient({
                     >
                       <span className="text-slate-600">
                         {NOMBRES_FASE[d.fase] ?? d.fase}: {d.posicion_origen}→{d.posicion_destino}
+                        {d.forma_respuesta === 'hablante' ? ' · 🗣 hablante' : ' · 👂 oyente'}
                       </span>
                       {d.dominado && d.fase !== 'entrenamiento' && !d.via_entrenamiento ? (
                         <span
