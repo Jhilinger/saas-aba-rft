@@ -91,7 +91,9 @@ export async function guardarBloqueRft(
   conTexto = false,
   // Oyente (elige entre opciones) o hablante (responde sin opciones): el
   // dominio de cada combinación se lleva por separado para cada forma
-  formaRespuesta: 'oyente' | 'hablante' = 'oyente'
+  formaRespuesta: 'oyente' | 'hablante' = 'oyente',
+  // Fichas iguales como apoyo visual (programas verbales): no cuenta para el dominio
+  apoyoVisual = false
 ) {
   const forma = formaRespuesta === 'hablante' ? 'hablante' : 'oyente'
   const supabase = await createClient()
@@ -171,6 +173,7 @@ export async function guardarBloqueRft(
       modo: modo === 'tableta' ? 'tableta' : 'material',
       con_texto: modo === 'tableta' && conTexto === true,
       forma_respuesta: forma,
+      apoyo_visual: apoyoVisual === true,
       sin_error: escalon,
       aciertos,
       notas: notas?.trim() || null,

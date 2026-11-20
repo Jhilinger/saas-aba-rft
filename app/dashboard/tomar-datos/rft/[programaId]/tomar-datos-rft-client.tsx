@@ -173,6 +173,7 @@ type ProgresoGuardado = {
   controles?: ControlRft[]
   modo?: 'material' | 'tableta'
   forma?: Forma
+  apoyoVisual?: boolean
   escalon?: EscalonActivo | null
   menorAMayor?: boolean
   transferencias?: TransferenciaRft[]
@@ -192,9 +193,14 @@ function SelectorModo({
   textoFijo = false,
   forma,
   onForma,
+  apoyoVisual,
+  onApoyoVisual,
 }: {
   forma: Forma
   onForma: (f: Forma) => void
+  // Fichas iguales (programas verbales); undefined = no se ofrece
+  apoyoVisual?: boolean
+  onApoyoVisual?: (v: boolean) => void
   disponible: boolean
   // Clases del grupo que no se pueden mostrar en la tableta (se quedan fuera)
   fuera?: number
@@ -221,10 +227,17 @@ function SelectorModo({
       ))}
     </span>
   )
-  if (!disponible) return <span className="inline-flex flex-wrap items-center gap-3">{selectorForma}</span>
+  const selectorApoyo = apoyoVisual !== undefined && onApoyoVisual && (
+    <label className="flex items-center gap-1.5 text-sm text-slate-600" title="Fichas iguales con el nombre debajo, para ver y señalar. Los bloques con fichas no cuentan para el dominio: el apoyo se retira después">
+      <input type="checkbox" checked={apoyoVisual} onChange={(e) => onApoyoVisual(e.target.checked)} className="h-4 w-4" />
+      Con fichas iguales (apoyo visual; no cuenta para el dominio)
+    </label>
+  )
+  if (!disponible) return <span className="inline-flex flex-wrap items-center gap-3">{selectorForma}{selectorApoyo}</span>
   return (
     <span className="inline-flex flex-wrap items-center gap-3">
     {selectorForma}
+    {selectorApoyo}
     <span className="flex rounded-lg bg-white p-0.5 text-sm">
       {(['material', 'tableta'] as const).map((m) => (
         <button
@@ -394,6 +407,14 @@ export default function TomarDatosRftClient({
   const [forma, setForma] = useState<Forma>('oyente')
   const formaBloqueRef = useRef<Forma>('oyente')
   const [formaBloque, setFormaBloque] = useState<Forma>('oyente')
+  // Fichas iguales como apoyo visual (programas verbales): elegido y del bloque en curso
+  const [apoyoVisual, setApoyoVisual] = useState(false)
+  const apoyoVisualBloqueRef = useRef(false)
+  const [apoyoVisualBloque, setApoyoVisualBloque] = useState(false)
+  const fijarApoyoVisualBloque = (v: boolean) => {
+    apoyoVisualBloqueRef.current = v
+    setApoyoVisualBloque(v)
+  }
   const fijarFormaBloque = (f: Forma) => {
     formaBloqueRef.current = f
     setFormaBloque(f)
@@ -567,7 +588,8 @@ export default function TomarDatosRftClient({
             escalon,
             transferenciasRef.current,
             conTexto,
-            formaBloqueRef.current
+            formaBloqueRef.current,
+            apoyoVisualBloqueRef.current
           )
           if (res.error) {
             setEstadoGuardado('error')
@@ -618,6 +640,7 @@ export default function TomarDatosRftClient({
     setControles(guardado.controles ?? [])
     modoBloqueRef.current = guardado.modo ?? 'material'
     fijarFormaBloque(guardado.forma ?? 'oyente')
+    fijarApoyoVisualBloque(guardado.apoyoVisual ?? false)
     setForma(guardado.forma ?? 'oyente')
     fijarEscalon(guardado.escalon ?? null)
     fijarMenorAMayor(guardado.menorAMayor ?? false)
@@ -794,6 +817,7 @@ export default function TomarDatosRftClient({
     desbloquearAudio()
     modoBloqueRef.current = modoInicial
     fijarFormaBloque(forma)
+    fijarApoyoVisualBloque(sinAudio && apoyoVisual)
     fijarEscalon(escalon)
     fijarMenorAMayor(menorAMayor)
     transferenciasRef.current = []
@@ -1011,6 +1035,7 @@ export default function TomarDatosRftClient({
       controles,
       modo: modoBloqueRef.current,
       forma: formaBloqueRef.current,
+      apoyoVisual: apoyoVisualBloqueRef.current,
       escalon: escalonRef.current,
       menorAMayor: menorAMayorRef.current,
       transferencias: transferenciasRef.current,
@@ -1148,7 +1173,7 @@ export default function TomarDatosRftClient({
                 disponible={tabletaPosible(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino, recomendacionGlobal.paso.fase)}
                 fuera={fueraDeTableta(recomendacionGlobal.grupo, recomendacionGlobal.paso.origen, recomendacionGlobal.paso.destino)}
                 modo={modo}
-                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma}
+                onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual}
               />
             }
           />
@@ -1199,7 +1224,7 @@ export default function TomarDatosRftClient({
               disponible={tabletaPosible(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino, recomendacionGrupo.paso.fase)}
               fuera={fueraDeTableta(recomendacionGrupo.grupo, recomendacionGrupo.paso.origen, recomendacionGrupo.paso.destino)}
               modo={modo}
-              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma}
+              onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual}
             />
           }
         />
@@ -1369,7 +1394,7 @@ export default function TomarDatosRftClient({
           <div className="space-y-1">
             <p className="text-sm text-slate-600">Presentación</p>
             <span className="inline-flex rounded-lg bg-slate-100 p-0.5">
-              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
+              <SelectorModo disponible modo={modo} onCambiar={setModo} conTexto={conTexto} onTexto={cambiarTexto} textoFijo={sinAudio} forma={forma} onForma={setForma} apoyoVisual={sinAudio ? apoyoVisual : undefined} onApoyoVisual={setApoyoVisual} fuera={fueraDeTableta(grupoSeleccionado, posicionOrigen, posicionDestino)} />
             </span>
             {(() => {
               const m = modoPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva)
@@ -1500,6 +1525,7 @@ export default function TomarDatosRftClient({
         sinAudio={sinAudio}
         conTexto={conTexto}
         hablante={formaBloque === 'hablante'}
+        apoyoVisual={apoyoVisualBloque}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
@@ -1514,6 +1540,11 @@ export default function TomarDatosRftClient({
       {formaBloque === 'hablante' && (
         <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
           🗣 Bloque como hablante: diga la consigna sin presentar las opciones; el alumno responde y usted marca la respuesta.
+        </p>
+      )}
+      {apoyoVisualBloque && (
+        <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+          Con fichas iguales: coloque una ficha igual por cada nombre de la red y señálela al decirlo. Este bloque no cuenta para el dominio.
         </p>
       )}
       <div className="flex items-center justify-between text-sm text-slate-500">

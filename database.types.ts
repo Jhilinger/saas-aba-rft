@@ -387,6 +387,7 @@ export type Database = {
         Row: {
           aciertos: number
           aciertos_por_minuto: number | null
+          apoyo_visual: boolean
           con_texto: boolean
           controles_aciertos: number
           controles_total: number
@@ -411,6 +412,7 @@ export type Database = {
         Insert: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          apoyo_visual?: boolean
           con_texto?: boolean
           controles_aciertos?: number
           controles_total?: number
@@ -435,6 +437,7 @@ export type Database = {
         Update: {
           aciertos?: number
           aciertos_por_minuto?: number | null
+          apoyo_visual?: boolean
           con_texto?: boolean
           controles_aciertos?: number
           controles_total?: number

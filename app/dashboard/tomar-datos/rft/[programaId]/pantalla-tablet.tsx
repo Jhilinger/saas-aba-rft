@@ -76,6 +76,23 @@ function lado(n: number, maxVh: number, margenRem = 4) {
   return `min(calc((100vw - ${margenRem}rem) / ${n} - 2.5vmin), ${maxVh}vh)`
 }
 
+// Apoyo visual de los programas verbales: todas las fichas iguales (ninguna
+// propiedad física da la respuesta) con el nombre debajo, como las monedas
+// idénticas de Barnes-Holmes et al. (2004)
+function Ficha({ nombre, lado: l }: { nombre: string; lado: string }) {
+  return (
+    <span className="flex flex-col items-center gap-[1.2vmin]">
+      <svg viewBox="0 0 100 100" style={{ width: `calc(${l} * 0.55)`, height: `calc(${l} * 0.55)` }} aria-hidden>
+        <circle cx="50" cy="50" r="46" fill="#e0e7ff" stroke="#6366f1" strokeWidth="4" />
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#a5b4fc" strokeWidth="4" />
+      </svg>
+      <span className="px-[1vmin] text-center font-semibold leading-tight text-slate-800" style={{ fontSize: `calc(${l} * 0.12)` }}>
+        {nombre}
+      </span>
+    </span>
+  )
+}
+
 function Tarjeta({
   estimulo,
   url,
@@ -150,6 +167,7 @@ function Presentacion({
   secuencia,
   etiquetasSecuencia,
   hablante = false,
+  apoyoVisual = false,
   onElegir,
   onOpciones,
 }: {
@@ -182,6 +200,8 @@ function Presentacion({
   etiquetasSecuencia?: string[]
   // Respuesta de hablante: sin opciones; el alumno responde y el terapeuta puntúa
   hablante?: boolean
+  // Fichas iguales con el nombre debajo en vez de botones de texto (programas verbales)
+  apoyoVisual?: boolean
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -382,8 +402,8 @@ function Presentacion({
                   type="button"
                   disabled={oculta}
                   onClick={() => listo && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
-                  style={{ fontSize: '5vmin', ...estiloDistractor(c) }}
-                  className={`min-w-[26vw] rounded-[2.5vmin] border-2 bg-white px-[4vmin] py-[3vmin] font-semibold leading-tight text-slate-800 shadow-sm transition-transform active:scale-[0.98] ${
+                  style={apoyoVisual ? { width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) } : { fontSize: '5vmin', ...estiloDistractor(c) }}
+                  className={`${apoyoVisual ? 'flex items-center justify-center' : 'min-w-[26vw] px-[4vmin] py-[3vmin]'} rounded-[2.5vmin] border-2 bg-white font-semibold leading-tight text-slate-800 shadow-sm transition-transform active:scale-[0.98] ${
                     oculta ? 'invisible' : ''
                   } ${
                     resaltada && c.esCorrecto
@@ -393,7 +413,7 @@ function Presentacion({
                         : 'border-slate-200'
                   }`}
                 >
-                  {textoOido(c.estimulo.nombre)}
+                  {apoyoVisual ? <Ficha nombre={textoOido(c.estimulo.nombre)} lado={ladoOpcion} /> : textoOido(c.estimulo.nombre)}
                 </button>
               )
             })}
@@ -447,6 +467,16 @@ function Presentacion({
             <p className="max-w-[80vw] text-center font-medium leading-snug text-slate-800" style={{ fontSize: hablante ? '5vmin' : '3.6vmin' }}>
               {textoClave}
             </p>
+          )}
+          {/* Hablante con apoyo visual: las fichas a la vista para señalarlas y nombrarlas */}
+          {hablante && apoyoVisual && (
+            <div className="flex flex-wrap justify-center gap-[2.5vmin] pt-[2vmin]">
+              {comparativos.map((c) => (
+                <span key={c.claseId} style={{ width: ladoOpcion, height: ladoOpcion }} className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white">
+                  <Ficha nombre={textoOido(c.estimulo.nombre)} lado={ladoOpcion} />
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
@@ -681,6 +711,7 @@ function EnsayoTablet({
   correccion,
   etiquetasSecuencia,
   hablante,
+  apoyoVisual,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -704,6 +735,7 @@ function EnsayoTablet({
   correccion: boolean
   etiquetasSecuencia?: string[]
   hablante: boolean
+  apoyoVisual: boolean
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -772,6 +804,7 @@ function EnsayoTablet({
       secuencia={modelo || (correccion && transferencia) ? secuencia : transferencia || nivel > 0 ? undefined : secuencia}
       etiquetasSecuencia={modelo ? etiquetasSecuencia : undefined}
       hablante={hablante}
+      apoyoVisual={apoyoVisual}
       onElegir={elegir}
       onOpciones={
         modelo
@@ -808,6 +841,7 @@ export default function PantallaTablet({
   correccion = false,
   etiquetasSecuencia,
   hablante = false,
+  apoyoVisual = false,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -846,6 +880,8 @@ export default function PantallaTablet({
   etiquetasSecuencia?: string[]
   // Respuesta de hablante: sin opciones; el terapeuta puntúa (respuesta esperada oculta)
   hablante?: boolean
+  // Fichas iguales con el nombre debajo (apoyo visual de los programas verbales)
+  apoyoVisual?: boolean
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -964,6 +1000,7 @@ export default function PantallaTablet({
         correccion={correccion && fase === 'entrenamiento' && !menorAMayor && !hablante}
         etiquetasSecuencia={etiquetasSecuencia}
         hablante={hablante}
+        apoyoVisual={apoyoVisual}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}
