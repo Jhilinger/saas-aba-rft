@@ -51,6 +51,8 @@ export default function ConceptosTablet({
   const recomendado = Math.max(0, actividad.niveles.findIndex((n) => !dominados.includes(n.nombre)))
   const [indice, setIndice] = useState(recomendado)
   const [sonda, setSonda] = useState(false)
+  // Ensayos por bloque (las sondas de generalización son siempre de 5)
+  const [tamano, setTamano] = useState(ensayosPorBloque === 20 ? 20 : 10)
   const [ensayos, setEnsayos] = useState<EnsayoGenerado[] | null>(null)
   const [registros, setRegistros] = useState<Registro[]>([])
   const [inicio, setInicio] = useState<number | null>(null)
@@ -77,7 +79,7 @@ export default function ConceptosTablet({
 
   const empezar = () => {
     desbloquearAudio()
-    const lista = generarBloque(actividad, indice, sonda ? conceptos.generalizacion : conceptos.entrenamiento, sonda ? 5 : ensayosPorBloque, sonda)
+    const lista = generarBloque(actividad, indice, sonda ? conceptos.generalizacion : conceptos.entrenamiento, sonda ? 5 : tamano, sonda)
     if (!lista.length) {
       toast('No hay imágenes para generar los ensayos.', 'error')
       return
@@ -232,6 +234,20 @@ export default function ConceptosTablet({
           <input type="checkbox" checked={sonda} onChange={(e) => setSonda(e.target.checked)} />
           Sonda de generalización con objetos nuevos (5 ensayos, no cuenta para el dominio)
         </label>
+      )}
+      {!sonda && (
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <span>Tamaño del bloque</span>
+          {[10, 20].map((t) => (
+            <button
+              key={t}
+              onClick={() => setTamano(t)}
+              className={`rounded-lg px-4 py-2 font-medium ${tamano === t ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            >
+              {t} ensayos
+            </button>
+          ))}
+        </div>
       )}
       {!sonda && escalonDelNivel() && (
         <p className="text-xs text-amber-700">
