@@ -6,7 +6,8 @@ import { Button, Panel } from '../../../../ui'
 import { useToast } from '../../../../providers/toast-provider'
 import { guardarBloqueRft } from './actions'
 import PantallaTablet, { type ImagenesBanco, type RespuestaTablet } from './pantalla-tablet'
-import { generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado } from '../../../conceptos'
+import PantallaHablante from './pantalla-hablante'
+import { aHablante, generarBloque, SUFIJO_HABLANTE, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import { segundosDesde, marcaDeTiempo } from '../../cronometro'
@@ -50,8 +51,13 @@ export default function ConceptosTablet({
   sinError: ConfigSinError | null
   ultimosEscalones: Record<string, Json>
 }) {
-  const recomendado = Math.max(0, actividad.niveles.findIndex((n) => !dominados.includes(n.nombre)))
+  // Respuesta de oyente (toca la opción) o de hablante (dice la relación y el terapeuta la puntúa)
+  const [hablante, setHablante] = useState(false)
+  const grupoDe = (nombre: string, h = hablante) => (h ? nombre + SUFIJO_HABLANTE : nombre)
+  const recomendadoEn = (h: boolean) => Math.max(0, actividad.niveles.findIndex((n) => !dominados.includes(grupoDe(n.nombre, h))))
+  const recomendado = recomendadoEn(hablante)
   const [indice, setIndice] = useState(recomendado)
+  const [versionHablante, setVersionHablante] = useState<EnsayoHablante[]>([])
   const [sonda, setSonda] = useState(false)
   // Ensayos por bloque (las sondas de generalización son siempre de 5)
   const [tamano, setTamano] = useState(ensayosPorBloque === 20 ? 20 : 10)
@@ -69,11 +75,12 @@ export default function ConceptosTablet({
 
   const nivel = actividad.niveles[indice]
   const fase = sonda ? 'generalizacion' : 'entrenamiento'
-  const menorAMayor = !sonda && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
+  const grupo = grupoDe(nivel.nombre)
+  const menorAMayor = !hablante && !sonda && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
 
   // Escalón de aprendizaje sin error del nivel (si está activo y es entrenamiento)
   const escalonDelNivel = () => {
-    if (sonda || !sinError?.activo || sinError.modo !== 'mayor_a_menor') return null
+    if (hablante || sonda || !sinError?.activo || sinError.modo !== 'mayor_a_menor') return null
     const { indice: i } = siguienteEscalon(sinError, leerEscalonBloque(ultimosEscalones[`${nivel.nombre}__A__A`]))
     const e = sinError.escalones[i]
     return { ...e, indice: i, total: sinError.escalones.length, final: i === sinError.escalones.length - 1, aciertos_con_apoyo: 0 }
@@ -88,6 +95,7 @@ export default function ConceptosTablet({
     }
     for (const consigna of new Set(lista.map((e) => e.consigna))) void precargarFraseRft(consigna)
     setEscalon(escalonDelNivel())
+    setVersionHablante(hablante ? lista.map((e) => aHablante(actividad.tipo, e)) : [])
     setEnsayos(lista)
     setRegistros([])
     setInicio(marcaDeTiempo())
@@ -101,7 +109,7 @@ export default function ConceptosTablet({
       const res = await guardarBloqueRft(
         programaAlumnoId,
         alumnoId,
-        nivel.nombre,
+        grupo,
         fase,
         'A',
         'A',
@@ -157,6 +165,35 @@ export default function ConceptosTablet({
     const n = registros.length
     const actual = ensayos[n]
     if (!actual) return <Panel className="p-6 text-center text-slate-500">Guardando bloque…</Panel>
+    if (hablante) {
+      const h = versionHablante[n]
+      return (
+        <PantallaHablante
+          key={n}
+          ensayo={h}
+          numero={n}
+          total={ensayos.length}
+          fase={fase}
+          imagenes={imagenes}
+          onResponder={(correcto) => {
+            const registro: Registro = {
+              correcto,
+              ayuda: 'independiente',
+              latenciaMs: null,
+              respuesta: correcto ? h.esperada : null,
+              generado: { nivel: nivel.nombre, modo: 'hablante', clave: h.clave, consigna: h.pregunta, esperada: h.esperada },
+            }
+            const lista = [...registros, registro]
+            setRegistros(lista)
+            if (lista.length === ensayos.length) guardar(lista, ensayos)
+          }}
+          onSalir={() => {
+            setEnsayos(null)
+            setRegistros([])
+          }}
+        />
+      )
+    }
     const opciones = opcionesDe(actual)
     return (
       <PantallaTablet
@@ -227,8 +264,31 @@ export default function ConceptosTablet({
       </div>
       {resultado && (
         <p className={`rounded-lg p-2 text-sm ${resultado.dominio ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800'}`}>
-          {resultado.dominio ? `🎉 ¡Nivel «${nivel.nombre}» dominado! ` : 'Bloque guardado: '}
+          {resultado.dominio ? `🎉 ¡Nivel «${grupo}» dominado! ` : 'Bloque guardado: '}
           {resultado.porcentaje}% de acierto
+        </p>
+      )}
+      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+        <span>Respuesta</span>
+        {([false, true] as const).map((h) => (
+          <button
+            key={String(h)}
+            onClick={() => {
+              setHablante(h)
+              setIndice(recomendadoEn(h))
+              setSonda(false)
+              setResultado(null)
+            }}
+            className={`rounded-lg px-4 py-2 font-medium ${hablante === h ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+          >
+            {h ? 'Hablante (dice la relación)' : 'Oyente (toca la opción)'}
+          </button>
+        ))}
+      </div>
+      {hablante && (
+        <p className="text-xs text-slate-500">
+          El alumno ve los estímulos y dice la relación; usted hace la pregunta que aparece abajo y marca la respuesta (mantenga pulsado).
+          Se registra aparte de la selección.
         </p>
       )}
       <div className="flex flex-wrap gap-2">
@@ -241,13 +301,13 @@ export default function ConceptosTablet({
             }}
             className={`rounded-lg px-3 py-2 text-sm font-medium ${i === indice ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
-            {dominados.includes(nv.nombre) ? '✓ ' : ''}
+            {dominados.includes(grupoDe(nv.nombre)) ? '✓ ' : ''}
             {nv.nombre}
-            {i === recomendado && !dominados.includes(nv.nombre) ? ' · recomendado' : ''}
+            {i === recomendado && !dominados.includes(grupoDe(nv.nombre)) ? ' · recomendado' : ''}
           </button>
         ))}
       </div>
-      {dominados.includes(nivel.nombre) && (
+      {dominados.includes(grupo) && (
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <input type="checkbox" checked={sonda} onChange={(e) => setSonda(e.target.checked)} />
           Sonda de generalización con objetos nuevos (5 ensayos, no cuenta para el dominio)
@@ -273,7 +333,7 @@ export default function ConceptosTablet({
         </p>
       )}
       <Button onClick={empezar} disabled={isPending} className="w-full py-3 text-base">
-        Empezar «{nivel.nombre}»{sonda ? ' (sonda)' : ''} en la tableta
+        Empezar «{nivel.nombre}»{hablante ? ' como hablante' : ''}{sonda ? ' (sonda)' : ''} en la tableta
       </Button>
     </Panel>
   )

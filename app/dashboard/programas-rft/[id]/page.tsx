@@ -22,7 +22,7 @@ import { leerSecuencia, secuenciaGenerica } from '../../secuencia-rft'
 import { coerceNivelRft } from '../../niveles-rft'
 import { leerSinError } from '../../sin-error'
 import { conceptosDePantalla, parsearEstimuloPantalla } from '../../estimulo-pantalla'
-import { leerActividadConceptos } from '../../conceptos'
+import { leerActividadConceptos, SUFIJO_HABLANTE } from '../../conceptos'
 import type { BloqueNivel, FilaClaveNivel } from '../../evolucion-niveles'
 
 const NOMBRE_FASE: Record<string, string> = {
@@ -171,7 +171,11 @@ export default async function ProgramaRftPage({
       .order('fecha', { ascending: true })
     const conNivel = (bloquesNivel ?? []).filter((b) => !!b.grupo)
     evolucionNiveles = {
-      niveles: actividad.niveles.map((n) => n.nombre),
+      // Los niveles y, si se han trabajado, los mismos como hablante
+      niveles: [
+        ...actividad.niveles.map((n) => n.nombre),
+        ...actividad.niveles.map((n) => n.nombre + SUFIJO_HABLANTE).filter((g) => conNivel.some((b) => b.grupo === g)),
+      ],
       bloques: conNivel.map((b) => ({ fecha: b.fecha, nivel: b.grupo as string, fase: b.fase, porcentaje: Number(b.porcentaje) })),
       claves: conNivel.flatMap((b) =>
         b.ensayos_rft_detalle

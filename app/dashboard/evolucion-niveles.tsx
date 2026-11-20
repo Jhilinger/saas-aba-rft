@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Panel } from '../ui'
 import DistribucionAyudasChart from './distribucion-ayudas-chart'
 import type { DistribucionAyuda } from './ayuda-tipos'
+import { SUFIJO_HABLANTE } from './conceptos'
 
 // Evolución de los programas de abstracción de claves con ensayos generados en
 // la tableta: cada nivel hace de grupo. Se muestran el estado de cada nivel, una
@@ -107,7 +108,7 @@ function Resumen({
 
 // Una sola curva en orden de fecha; cada nivel es una fase (la línea se corta
 // en el cambio de nivel) y las sondas van como puntos sueltos
-function Curva({ bloques, porcentajeDominio }: { bloques: BloqueNivel[]; porcentajeDominio: number }) {
+function Curva({ titulo, bloques, porcentajeDominio }: { titulo: string; bloques: BloqueNivel[]; porcentajeDominio: number }) {
   if (!bloques.length) return null
   // Un tramo de línea por cada paso por un nivel: si se vuelve a un nivel
   // anterior, el tramo nuevo no se une con el antiguo
@@ -129,7 +130,7 @@ function Curva({ bloques, porcentajeDominio }: { bloques: BloqueNivel[]; porcent
   return (
     <Panel className="space-y-2 p-4 sm:p-5">
       <div>
-        <p className="text-sm font-semibold text-slate-700">Curva de aprendizaje</p>
+        <p className="text-sm font-semibold text-slate-700">{titulo}</p>
         <p className="text-xs text-slate-500">% de aciertos por bloque. Las líneas verticales marcan el cambio de nivel.</p>
         <div className="mt-1 flex flex-wrap gap-4 text-xs text-slate-600">
           <span className="flex items-center gap-1.5">
@@ -277,7 +278,16 @@ export default function EvolucionNiveles({
       <Resumen niveles={niveles} bloques={bloques} dominados={dominados} />
       {bloques.length ? (
         <>
-          <Curva bloques={bloques} porcentajeDominio={porcentajeDominio} />
+          <Curva
+            titulo="Curva de aprendizaje · oyente (toca la opción)"
+            bloques={bloques.filter((b) => !b.nivel.endsWith(SUFIJO_HABLANTE))}
+            porcentajeDominio={porcentajeDominio}
+          />
+          <Curva
+            titulo="Curva de aprendizaje · hablante (dice la relación)"
+            bloques={bloques.filter((b) => b.nivel.endsWith(SUFIJO_HABLANTE))}
+            porcentajeDominio={porcentajeDominio}
+          />
           <Claves niveles={niveles} filas={claves} />
           {conAyudas.length > 0 && (
             <Panel className="space-y-3 p-4 sm:p-5">

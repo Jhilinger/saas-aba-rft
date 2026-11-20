@@ -415,6 +415,70 @@ function ordenPresentacion(conceptos: Concepto[], n: number, azar: Azar): Ensayo
   })
 }
 
+// --- Modo hablante ---
+// El mismo ensayo, pero el alumno DICE la relación: ve los estímulos (con uno
+// marcado cuando hace falta), el terapeuta hace la pregunta y marca si la
+// respuesta es correcta. Luciano et al. (2009): entrenar como oyente y como hablante
+// Cada nivel en modo hablante se registra aparte, como «<nivel> · hablante»
+export const SUFIJO_HABLANTE = ' · hablante'
+
+export type EnsayoHablante = {
+  clave: string
+  pregunta: string
+  esperada: string
+  estimulos: EstimuloPantalla[]
+  // Estímulo que señala el terapeuta (se marca en la pantalla); null = ninguno
+  marcada: number | null
+  secuencia?: EstimuloPantalla[]
+}
+
+const PREGUNTA_COMPARACION: Record<Dimension, [string, string, string]> = {
+  tamano: ['¿Este es más grande o más pequeño?', 'Más grande', 'Más pequeño'],
+  cantidad: ['¿Aquí hay más o menos?', 'Más', 'Menos'],
+  longitud: ['¿Este es más largo o más corto?', 'Más largo', 'Más corto'],
+  altura: ['¿Este es más alto o más bajo?', 'Más alto', 'Más bajo'],
+}
+const PALABRA_TEMPORAL: Record<string, string> = { antes: 'Antes', despues: 'Después', primero: 'Primero' }
+
+export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, azar: Azar = Math.random): EnsayoHablante {
+  const correcta = e.opciones.findIndex((o) => o.correcta)
+  const conMuestra = (pregunta: string, esperada: string): EnsayoHablante => ({
+    clave: e.clave,
+    pregunta,
+    esperada,
+    estimulos: [e.muestra!, e.opciones[correcta].pantalla],
+    marcada: null,
+  })
+  if (tipo === 'distincion') {
+    if (e.clave === 'intruso')
+      return { clave: e.clave, pregunta: '¿Cuál es diferente?', esperada: `Señala o nombra: ${e.opciones[correcta].etiqueta}`, estimulos: e.opciones.map((o) => o.pantalla), marcada: null }
+    return conMuestra('¿Son iguales o diferentes?', e.clave === 'igual' ? 'Iguales' : 'Diferentes')
+  }
+  if (tipo === 'oposicion') return conMuestra('¿Son iguales o contrarios?', e.clave === 'igual' ? 'Iguales' : 'Contrarios')
+  if (tipo === 'comparacion') {
+    const [dimension, polo] = e.clave.split(':') as [Dimension, string]
+    const [pregunta, mas, menos] = PREGUNTA_COMPARACION[dimension]
+    return { clave: e.clave, pregunta, esperada: polo === 'mas' ? mas : menos, estimulos: e.opciones.map((o) => o.pantalla), marcada: correcta }
+  }
+  if (tipo === 'espacial') {
+    // «Toca donde la pelota está encima de la caja» → «¿Dónde está la pelota?» / «Encima de la caja»
+    const m = e.consigna.match(/^Toca donde (.+?) está (.+)$/)
+    const esperada = m ? m[2].charAt(0).toUpperCase() + m[2].slice(1) : e.clave
+    return { clave: e.clave, pregunta: m ? `¿Dónde está ${m[1]}?` : '¿Dónde está?', esperada, estimulos: [e.opciones[correcta].pantalla], marcada: null }
+  }
+  // Temporales
+  const esperada = PALABRA_TEMPORAL[e.clave] ?? e.clave
+  if (e.secuencia) {
+    // Orden en que aparecen: tras la secuencia, los dos en orden al azar y
+    // marcado el que cumple la clave
+    const objetivo = e.secuencia[e.clave === 'antes' ? 0 : 1]
+    const estimulos = barajar(e.secuencia, azar)
+    return { clave: e.clave, pregunta: '¿Este salió antes o después?', esperada, estimulos, marcada: estimulos.indexOf(objetivo), secuencia: e.secuencia }
+  }
+  if (e.muestra) return { ...conMuestra('¿Esto pasó antes o después de esto?', esperada), marcada: 1 }
+  return { clave: e.clave, pregunta: '¿Esto pasó primero o después?', esperada, estimulos: e.opciones.map((o) => o.pantalla), marcada: correcta }
+}
+
 export function generarBloque(
   actividad: ActividadConceptos,
   indiceNivel: number,
