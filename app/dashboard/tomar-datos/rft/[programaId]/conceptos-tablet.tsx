@@ -160,6 +160,9 @@ export default function ConceptosTablet({
         menorAMayor={menorAMayor}
         consigna={actual.consigna}
         sinMuestra={!actual.muestra}
+        secuencia={actual.secuencia?.map((p, i) => ({ id: `s${n}-${i}`, nombre: '', concepto_imagen: null, pantalla: p }))}
+        // Conceptos generados: cada ensayo alterna las fotos 1 y 2 del concepto (múltiples ejemplares)
+        alternarEjemplares
         onResponder={(correcto, ayuda, respuesta, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => {
           const registro: Registro = {
             correcto,

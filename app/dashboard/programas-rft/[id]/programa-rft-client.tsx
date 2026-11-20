@@ -1,5 +1,6 @@
 'use client'
 
+import ClavesTemporales, { type FilaClave } from '../../claves-temporales'
 import GenerarGrupo from '../../generador-rft/generar-grupo'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -63,6 +64,7 @@ export default function ProgramaRftClient({
   conImagenes,
   alternarEjemplares = false,
   conGenerador = false,
+  clavesTemporales = [],
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -80,6 +82,8 @@ export default function ProgramaRftClient({
   alternarEjemplares?: boolean
   // El programa tiene generador de grupos (nivel 3 verbal)
   conGenerador?: boolean
+  // Programas temporales: aciertos con «antes» y con «después»
+  clavesTemporales?: FilaClave[]
 }) {
   const [tab, setTab] = useState<'evolucion' | 'revision' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -234,6 +238,7 @@ export default function ProgramaRftClient({
           <p className="text-center text-slate-500 py-8">Todavía no hay clases creadas.</p>
         ) : (
           <div className="space-y-4">
+            <ClavesTemporales filas={clavesTemporales} grupo={grupoSeleccionado} />
             {dominioDelGrupo.length > 0 && (
               <Panel className="p-4 space-y-2">
                 <p className="text-sm font-semibold text-slate-700">

@@ -11,7 +11,7 @@ import { cargarImagenes } from '../../../../dashboard/imagenes-estimulo'
 import {
   CATEGORIAS_ENTRENAMIENTO,
   CATEGORIAS_GENERALIZACION,
-  conceptosPropiosDe,
+  imagenesNecesarias,
   leerActividadConceptos,
   type ActividadConceptos,
   type Concepto,
@@ -206,7 +206,7 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
       .eq('ejemplar', '1')
       .or(categorias.map((c) => `concepto.like.${c}/%`).join(','))
     const de = (lista: string[]) => (banco ?? []).filter((b) => lista.includes(b.concepto.split('/')[0]))
-    const imagenes = await cargarImagenes(supabase, conceptosPropiosDe(eleccion.conceptos) ?? (banco ?? []).map((b) => b.concepto))
+    const imagenes = await cargarImagenes(supabase, imagenesNecesarias(eleccion.conceptos, (banco ?? []).map((b) => b.concepto)))
     return {
       plan: {
         tipo: 'conceptos',

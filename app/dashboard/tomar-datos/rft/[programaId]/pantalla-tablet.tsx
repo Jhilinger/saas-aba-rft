@@ -120,6 +120,10 @@ function hash(valor: string) {
 const esperar = (ms: number) => new Promise((resolver) => setTimeout(resolver, ms))
 // Pantalla en blanco antes de la muestra tras un acierto con elogio en entrenamiento
 const PAUSA_TRAS_ELOGIO = 600
+// Presentación secuencial (orden en que aparecen): cada imagen a la vista y la
+// pantalla en blanco entre una y otra
+const SECUENCIA_VISIBLE = 1500
+const SECUENCIA_ENTRE = 1000
 
 // Una presentación del ensayo (se monta de nuevo en cada una): pausa, la
 // muestra y en seguida las comparaciones, o al tocar la muestra si hay
@@ -141,6 +145,7 @@ function Presentacion({
   pausa = PAUSA_ENTRE_ENSAYOS,
   sinVozAutomatica = false,
   sinAudio = false,
+  secuencia,
   onElegir,
   onOpciones,
 }: {
@@ -167,6 +172,8 @@ function Presentacion({
   sinVozAutomatica?: boolean
   // Sin audio: nada se lee, ni a petición
   sinAudio?: boolean
+  // Imágenes que se presentan de una en una en el centro antes de las opciones
+  secuencia?: EstimuloTablet[]
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -231,7 +238,26 @@ function Presentacion({
     void decirOpciones()
   }
 
+  // Presentación secuencial: null = no hay o ya terminó; -1 = pantalla en blanco
+  const [paso, setPaso] = useState<number | null>(secuencia?.length ? -1 : null)
   useEffect(() => {
+    if (secuencia?.length) {
+      const tiempos: number[] = []
+      let t = pausa
+      secuencia.forEach((_, i) => {
+        tiempos.push(window.setTimeout(() => setPaso(i), t))
+        t += SECUENCIA_VISIBLE
+        tiempos.push(window.setTimeout(() => setPaso(-1), t))
+        t += SECUENCIA_ENTRE
+      })
+      tiempos.push(
+        window.setTimeout(() => {
+          setPaso(null)
+          setConMuestra(true)
+        }, t)
+      )
+      return () => tiempos.forEach((x) => clearTimeout(x))
+    }
     const t = setTimeout(() => setConMuestra(true), pausa)
     return () => clearTimeout(t)
     // Solo al montarse el ensayo
@@ -299,6 +325,23 @@ function Presentacion({
   }
   // Ámbar y latiendo cuando se repite la muestra como ayuda
   const marcoMuestra = nivel > 0 ? 'animate-pulse border-amber-400' : 'border-slate-200'
+
+  if (paso !== null && secuencia) {
+    const ladoSecuencia = lado(2, 40)
+    const actual = paso >= 0 ? secuencia[paso] : null
+    return (
+      <>
+        <div className="flex flex-1 items-center justify-center px-4 pb-2">
+          {actual && (
+            <div style={{ width: ladoSecuencia, height: ladoSecuencia }} className="flex items-center justify-center rounded-[2.5vmin] border-2 border-slate-200 bg-white shadow-sm">
+              <Tarjeta estimulo={actual} url={urlImagen(imagenes, actual.concepto_imagen, fase, ensayo, alternar)} lado={ladoSecuencia} urlConcepto={urlConcepto} />
+            </div>
+          )}
+        </div>
+        <div className="min-h-12 px-3 pb-2" />
+      </>
+    )
+  }
 
   if (modoTexto) {
     return (
@@ -599,6 +642,7 @@ function EnsayoTablet({
   pausa,
   sinVozAutomatica,
   sinAudio,
+  secuencia,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -618,6 +662,7 @@ function EnsayoTablet({
   pausa: number
   sinVozAutomatica: boolean
   sinAudio: boolean
+  secuencia?: EstimuloTablet[]
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -670,6 +715,7 @@ function EnsayoTablet({
       pausa={transferencia ? PAUSA_ENTRE_ENSAYOS : pausa}
       sinVozAutomatica={sinVozAutomatica}
       sinAudio={sinAudio}
+      secuencia={transferencia || nivel > 0 ? undefined : secuencia}
       onElegir={elegir}
       onOpciones={
         transferencia
@@ -700,6 +746,7 @@ export default function PantallaTablet({
   alternarEjemplares = false,
   sinVozAutomatica = false,
   sinAudio = false,
+  secuencia,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -730,6 +777,8 @@ export default function PantallaTablet({
   sinVozAutomatica?: boolean
   // Programa sin audio: nada se lee (ni a petición); solo suena el elogio
   sinAudio?: boolean
+  // Imágenes que se presentan de una en una antes de las opciones (orden en que aparecen)
+  secuencia?: EstimuloTablet[]
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -844,6 +893,7 @@ export default function PantallaTablet({
         pausa={pausaSiguiente}
         sinVozAutomatica={sinVozAutomatica}
         sinAudio={sinAudio}
+        secuencia={secuencia}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

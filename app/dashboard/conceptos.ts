@@ -15,7 +15,9 @@ export type NivelComparacion = { nombre: string; dimensiones: Dimension[]; propo
 export type NivelOposicion = { nombre: string; opciones: number }
 export type ParEspacial = 'encima_debajo' | 'dentro_fuera' | 'delante_detras'
 export type NivelEspacial = { nombre: string; pares: ParEspacial[] }
-export type NivelTemporal = { nombre: string; modo: 'primero_despues' | 'antes_despues' }
+// orden_presentacion: orden físico en que aparecen dos imágenes sin relación
+// («¿Cuál salió antes?»; Neufeld, Stewart y McElwee, 2023)
+export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'primero_despues' | 'antes_despues' }
 export type ActividadConceptos =
   | { tipo: 'distincion'; niveles: NivelDistincion[] }
   | { tipo: 'comparacion'; niveles: NivelComparacion[] }
@@ -92,7 +94,8 @@ const OPUESTOS: [string, string, 'entrenamiento' | 'generalizacion'][] = [
 export const CONCEPTOS_OPUESTOS = OPUESTOS.flatMap(([a, b]) => [`oposicion/${a}`, `oposicion/${b}`])
 
 export type OpcionGenerada = { pantalla: EstimuloPantalla; etiqueta: string; correcta: boolean }
-export type EnsayoGenerado = { clave: string; consigna: string; muestra: EstimuloPantalla | null; opciones: OpcionGenerada[] }
+// secuencia: imágenes que se presentan de una en una antes de las opciones
+export type EnsayoGenerado = { clave: string; consigna: string; muestra: EstimuloPantalla | null; opciones: OpcionGenerada[]; secuencia?: EstimuloPantalla[] }
 export type Concepto = { concepto: string; nombre: string }
 
 // Categorías del banco para entrenar y, aparte, para las sondas de
@@ -109,6 +112,8 @@ export const CONSIGNAS = {
   primero: '¿Qué pasó primero?',
   despues: '¿Qué pasó después?',
   antes: '¿Qué pasó antes?',
+  salioAntes: '¿Cuál salió antes?',
+  salioDespues: '¿Cuál salió después?',
   tamano: ['¿Cuál es más grande?', '¿Cuál es más pequeño?'],
   cantidad: ['¿Dónde hay más?', '¿Dónde hay menos?'],
   longitud: ['¿Cuál es más largo?', '¿Cuál es más corto?'],
@@ -123,6 +128,14 @@ export function frasesConceptos(): string[] {
 }
 
 // Imágenes del banco que necesita una actividad (las que no salen de las categorías generales)
+// Imágenes del banco que necesita una actividad: las suyas propias y, si
+// trabaja con objetos de las categorías generales, también esas
+export function imagenesNecesarias(actividad: ActividadConceptos, categorias: string[]): string[] {
+  const propias = conceptosPropiosDe(actividad)
+  const conCategorias = !propias || (actividad.tipo === 'temporal' && actividad.niveles.some((n) => n.modo === 'orden_presentacion'))
+  return [...(propias ?? []), ...(conCategorias ? categorias : [])]
+}
+
 export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | null {
   if (actividad.tipo === 'oposicion') return CONCEPTOS_OPUESTOS
   if (actividad.tipo === 'espacial') return CONCEPTOS_ESCENAS
@@ -157,7 +170,7 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
   if (o.tipo === 'temporal') {
     const lista = niveles.map((n, i) => ({
       nombre: nombre(n, i),
-      modo: n.modo === 'antes_despues' ? ('antes_despues' as const) : ('primero_despues' as const),
+      modo: n.modo === 'antes_despues' ? ('antes_despues' as const) : n.modo === 'orden_presentacion' ? ('orden_presentacion' as const) : ('primero_despues' as const),
     }))
     return lista.length ? { tipo: 'temporal', niveles: lista } : null
   }
@@ -315,7 +328,8 @@ function espacial(nivel: NivelEspacial, generalizacion: boolean, n: number, azar
 
 // Temporales: «¿Qué pasó primero / después?» entre dos viñetas seguidas, o una
 // viñeta como muestra y «¿Qué pasó antes / después?» entre la anterior y la siguiente
-function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar: Azar, conceptos: Concepto[] = []): EnsayoGenerado[] {
+  if (nivel.modo === 'orden_presentacion') return ordenPresentacion(conceptos, n, azar)
   const secuencias = SECUENCIAS.filter(([, uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento')).map(([c]) => c)
   const polos = alternados<0 | 1>(0, 1, n, azar)
   const nombre = (c: string) => c.split('/')[1]
@@ -339,6 +353,28 @@ function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar
   })
 }
 
+// Orden físico de presentación: dos objetos sin relación entre sí aparecen uno
+// tras otro en el centro; después salen los dos en posiciones al azar y se
+// pregunta cuál salió antes o después (claves alternadas e impredecibles)
+function ordenPresentacion(conceptos: Concepto[], n: number, azar: Azar): EnsayoGenerado[] {
+  if (conceptos.length < 2) return []
+  const polos = alternados<0 | 1>(0, 1, n, azar)
+  return polos.map((polo) => {
+    const [primero, segundo] = barajar(conceptos, azar).slice(0, 2)
+    const opciones: OpcionGenerada[] = [
+      { pantalla: { img: primero.concepto }, etiqueta: primero.nombre, correcta: polo === 0 },
+      { pantalla: { img: segundo.concepto }, etiqueta: segundo.nombre, correcta: polo === 1 },
+    ]
+    return {
+      clave: polo === 0 ? 'antes' : 'despues',
+      consigna: polo === 0 ? CONSIGNAS.salioAntes : CONSIGNAS.salioDespues,
+      muestra: null,
+      opciones: barajar(opciones, azar),
+      secuencia: [{ img: primero.concepto }, { img: segundo.concepto }],
+    }
+  })
+}
+
 export function generarBloque(
   actividad: ActividadConceptos,
   indiceNivel: number,
@@ -349,7 +385,7 @@ export function generarBloque(
 ): EnsayoGenerado[] {
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'espacial') return espacial(actividad.niveles[indiceNivel], generalizacion, n, azar)
-  if (actividad.tipo === 'temporal') return temporal(actividad.niveles[indiceNivel], generalizacion, n, azar)
+  if (actividad.tipo === 'temporal') return temporal(actividad.niveles[indiceNivel], generalizacion, n, azar, conceptos)
   if (!conceptos.length) return []
   if (actividad.tipo === 'distincion') return distincion(actividad.niveles[indiceNivel], conceptos, n, azar)
   return comparacion(actividad.niveles[indiceNivel], conceptos, n, azar)

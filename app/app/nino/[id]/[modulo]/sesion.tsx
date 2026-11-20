@@ -22,6 +22,8 @@ type Ensayo = {
   comparativos: ComparativoTablet[]
   consigna: string | null
   sinMuestra: boolean
+  // Imágenes que se presentan de una en una antes de las opciones
+  secuencia?: EstimuloTablet[]
   // Lo que se guarda del ensayo
   claseId: string | null
   estimuloOrigenId: string | null
@@ -62,6 +64,7 @@ function prepararEnsayos(plan: PlanSesion): Ensayo[] {
       })),
       consigna: e.consigna,
       sinMuestra: !e.muestra,
+      secuencia: e.secuencia?.map((p, i) => ({ id: `s${n}-${i}`, nombre: '', concepto_imagen: null, pantalla: p })),
       claseId: null,
       estimuloOrigenId: null,
       estimuloDestinoId: null,
@@ -220,12 +223,13 @@ export default function Sesion({
           ensayo={n}
           total={ensayos.length}
           imagenes={plan.imagenes}
-          alternarEjemplares={'alternarEjemplares' in plan && plan.alternarEjemplares}
+          alternarEjemplares={plan.tipo === 'conceptos' || ('alternarEjemplares' in plan && plan.alternarEjemplares)}
           // Al enseñar un test que no deriva: la correcta se resalta a los 2 s
           apoyo={plan.tipo === 'clases' && plan.ensenar ? { nombre: 'Enseñar', opacidad: 1, tamano: false, demora: 2 } : null}
           menorAMayor={!esTest}
           consigna={actual.consigna}
           sinMuestra={actual.sinMuestra}
+          secuencia={actual.secuencia}
           seleccionOida
           infantil
           onMuestra={() => {

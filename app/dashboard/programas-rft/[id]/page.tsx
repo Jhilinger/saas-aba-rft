@@ -1,3 +1,4 @@
+import { claveTemporal, type FilaClave } from '../../claves-temporales'
 import { tienePlantilla } from '../../generador-rft/plantillas'
 import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar } from '../../permisos'
@@ -65,7 +66,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url, nombre)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url, nombre, tipo_relacion)'
     )
     .eq('id', id)
     .single()
@@ -74,7 +75,7 @@ export default async function ProgramaRftPage({
   if (programa.tipo !== 'rft') redirect(`/dashboard/alumnos/${programa.alumno_id}`)
 
   const alumno = programa.alumnos as unknown as Pick<Tables<'alumnos'>, 'nombre_anonimizado'> | null
-  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url' | 'nombre'> | null
+  const programaBase = programa.programas_base as unknown as Pick<Tables<'programas_base'>, 'video_url' | 'nombre' | 'tipo_relacion'> | null
   const alumnoNombre = alumno?.nombre_anonimizado ?? ''
   const tieneInfo =
     programa.objetivo || programa.materiales || programa.instrucciones_terapeuta || programa.ayudas_posibles
@@ -156,6 +157,26 @@ export default async function ProgramaRftPage({
 
   const { porFase, distribucionPorGrupo } = await obtenerEvolucionRft(id)
 
+  // Programas temporales: aciertos con «antes» frente a «después» por grupo y fase
+  let clavesTemporales: FilaClave[] = []
+  if (programaBase?.tipo_relacion === 'temporal') {
+    const { data: bloquesClave } = await supabase
+      .from('bloques_ensayo_rft')
+      .select('grupo, fase, ensayos_rft_detalle(pregunta, correcto, tipo_ensayo, generado)')
+      .eq('programa_alumno_id', id)
+    clavesTemporales = (bloquesClave ?? []).flatMap((b) =>
+      b.ensayos_rft_detalle
+        .filter((e) => e.tipo_ensayo !== 'transferencia')
+        .map((e) => {
+          const generado = e.generado as { consigna?: string } | null
+          const clave = claveTemporal(e.pregunta ?? generado?.consigna)
+          const fila: FilaClave | null = clave ? { grupo: b.grupo ?? '', fase: b.fase, clave, correcto: e.correcto } : null
+          return fila
+        })
+        .filter((f): f is FilaClave => f !== null)
+    )
+  }
+
   const { data: bloquesTest } = await supabase
     .from('bloques_ensayo_rft')
     .select('id, fase, posicion_origen, posicion_destino, fecha, porcentaje, con_texto, ensayos_rft_detalle(clase_id)')
@@ -236,6 +257,7 @@ export default async function ProgramaRftPage({
         imagenes={imagenes}
         conImagenes={disena && !!perfil.clinica_id}
         alternarEjemplares={programa.alternar_ejemplares}
+        clavesTemporales={clavesTemporales}
         conGenerador={disena && tienePlantilla(programaBase?.nombre ?? programa.nombre)}
       />
 
