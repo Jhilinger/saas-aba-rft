@@ -22,6 +22,8 @@ import { leerSecuencia, secuenciaGenerica } from '../../secuencia-rft'
 import { coerceNivelRft } from '../../niveles-rft'
 import { leerSinError } from '../../sin-error'
 import { conceptosDePantalla, parsearEstimuloPantalla } from '../../estimulo-pantalla'
+import { leerActividadConceptos } from '../../conceptos'
+import type { BloqueNivel, FilaClaveNivel } from '../../evolucion-niveles'
 
 const NOMBRE_FASE: Record<string, string> = {
   entrenamiento: 'Entrenamiento',
@@ -66,7 +68,7 @@ export default async function ProgramaRftPage({
     const { data: programa } = await supabase
     .from('programas_alumno')
     .select(
-      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, alumnos(nombre_anonimizado), programas_base(video_url, nombre, tipo_relacion)'
+      'id, nombre, tipo, estado, alumno_id, area, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, porcentaje_dominio, nivel_rft, tipo_respuesta, respuesta_por_fase, sin_error, consignas, secuencia_rft, alternar_ejemplares, actividad_tablet, alumnos(nombre_anonimizado), programas_base(video_url, nombre, tipo_relacion)'
     )
     .eq('id', id)
     .single()
@@ -157,9 +159,32 @@ export default async function ProgramaRftPage({
 
   const { porFase, distribucionPorGrupo } = await obtenerEvolucionRft(id)
 
+  // Abstracción de claves con ensayos generados en la tableta: cada nivel hace
+  // de grupo; se cargan los bloques y la clave de cada ensayo
+  const actividad = leerActividadConceptos(programa.actividad_tablet)
+  let evolucionNiveles: { niveles: string[]; bloques: BloqueNivel[]; claves: FilaClaveNivel[] } | null = null
+  if (actividad) {
+    const { data: bloquesNivel } = await supabase
+      .from('bloques_ensayo_rft')
+      .select('grupo, fase, fecha, porcentaje, ensayos_rft_detalle(correcto, tipo_ensayo, generado)')
+      .eq('programa_alumno_id', id)
+      .order('fecha', { ascending: true })
+    const conNivel = (bloquesNivel ?? []).filter((b) => !!b.grupo)
+    evolucionNiveles = {
+      niveles: actividad.niveles.map((n) => n.nombre),
+      bloques: conNivel.map((b) => ({ fecha: b.fecha, nivel: b.grupo as string, fase: b.fase, porcentaje: Number(b.porcentaje) })),
+      claves: conNivel.flatMap((b) =>
+        b.ensayos_rft_detalle
+          .filter((e) => e.tipo_ensayo === 'principal')
+          .map((e) => ({ nivel: b.grupo as string, fase: b.fase, clave: (e.generado as { clave?: string } | null)?.clave ?? '', correcto: e.correcto }))
+          .filter((f) => !!f.clave)
+      ),
+    }
+  }
+
   // Programas temporales: aciertos con «antes» frente a «después» por grupo y fase
   let clavesTemporales: FilaClave[] = []
-  if (programaBase?.tipo_relacion === 'temporal') {
+  if (programaBase?.tipo_relacion === 'temporal' && !actividad) {
     const { data: bloquesClave } = await supabase
       .from('bloques_ensayo_rft')
       .select('grupo, fase, ensayos_rft_detalle(pregunta, correcto, tipo_ensayo, generado)')
@@ -229,6 +254,7 @@ export default async function ProgramaRftPage({
       {infoPanel}
       <SinErrorPanel programaAlumnoId={id} config={leerSinError(programa.sin_error)} soloLectura={!disena} />
 
+      {!actividad && (
       <ConsignasPanel
         programaAlumnoId={id}
         pasos={(() => {
@@ -241,6 +267,7 @@ export default async function ProgramaRftPage({
         clases={(clases ?? []).map((c) => ({ id: c.id, nombre: c.nombre, grupo: c.grupo, consignas: leerConsignasClase(c.consignas) }))}
         soloLectura={!disena}
       />
+      )}
 
       <ProgramaRftClient
         programaAlumnoId={id}
@@ -258,6 +285,7 @@ export default async function ProgramaRftPage({
         conImagenes={disena && !!perfil.clinica_id}
         alternarEjemplares={programa.alternar_ejemplares}
         clavesTemporales={clavesTemporales}
+        evolucionNiveles={evolucionNiveles}
         conGenerador={disena && tienePlantilla(programaBase?.nombre ?? programa.nombre)}
       />
 

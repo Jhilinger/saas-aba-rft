@@ -13,6 +13,7 @@ import type { DistribucionAyuda } from '../../ayuda-tipos'
 import { Panel } from '../../../ui'
 import AyudaTermino from '../../ayuda-termino'
 import TablaGruposClases from '../../tabla-grupos-clases'
+import EvolucionNiveles, { type BloqueNivel, type FilaClaveNivel } from '../../evolucion-niveles'
 
 type Estimulo = { id: string; etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla?: unknown }
 type Relacion = { id: string; estimulo_origen_id: string; estimulo_destino_id: string }
@@ -65,6 +66,7 @@ export default function ProgramaRftClient({
   alternarEjemplares = false,
   conGenerador = false,
   clavesTemporales = [],
+  evolucionNiveles = null,
 }: {
   programaAlumnoId: string
   grupos: string[]
@@ -84,6 +86,8 @@ export default function ProgramaRftClient({
   conGenerador?: boolean
   // Programas temporales: aciertos con «antes» y con «después»
   clavesTemporales?: FilaClave[]
+  // Abstracción de claves con ensayos generados: los niveles hacen de grupos
+  evolucionNiveles?: { niveles: string[]; bloques: BloqueNivel[]; claves: FilaClaveNivel[] } | null
 }) {
   const [tab, setTab] = useState<'evolucion' | 'revision' | 'gestion'>('evolucion')
   const [extraGrupos, setExtraGrupos] = useState<string[]>([])
@@ -106,6 +110,32 @@ export default function ProgramaRftClient({
   }
 
   const dominioDelGrupo = dominioFases.filter((d) => d.grupo === grupoSeleccionado)
+
+  // Ensayos generados en la tableta: sin grupos ni clases de material; cada
+  // nivel hace de grupo
+  if (evolucionNiveles) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">Ensayos generados en la tableta: cada nivel se registra como un grupo.</p>
+          <Link
+            href={`/dashboard/tomar-datos/rft/${programaAlumnoId}`}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+          >
+            Tomar datos
+          </Link>
+        </div>
+        <EvolucionNiveles
+          {...evolucionNiveles}
+          dominados={dominioFases
+            .filter((d) => d.dominado && d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A')
+            .map((d) => d.grupo)}
+          porcentajeDominio={porcentajeDominio}
+          distribucionPorNivel={distribucionPorGrupo}
+        />
+      </div>
+    )
+  }
 
   const confirmarNuevoGrupo = () => {
     const nombre = nombreNuevoGrupo.trim()

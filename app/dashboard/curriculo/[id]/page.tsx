@@ -7,6 +7,7 @@ import EditarProgramaForm from './editar-programa-form'
 import VideoDiferido from '../../video-diferido'
 import NuevaClaseRftForm from './nueva-clase-rft-form'
 import GenerarGrupo from '../../generador-rft/generar-grupo'
+import { leerActividadConceptos } from '../../conceptos'
 import { tienePlantilla } from '../../generador-rft/plantillas'
 import ClasesPorGrupo from './clases-por-grupo'
 import NuevoPasoBaseForm from './nuevo-paso-base-form'
@@ -42,7 +43,7 @@ export default async function ProgramaDetallePage({
     const { data: programa } = await supabase
     .from('programas_base')
     .select(
-      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, alternar_ejemplares'
+      'id, nombre, tipo, area, dominio_id, visibilidad, objetivo, materiales, instrucciones_terapeuta, ayudas_posibles, ensayos_por_bloque, bloques_para_dominio, porcentaje_dominio, tipo_relacion, orden, clinica_id, creado_por, video_url, formato_recogida, direccion_objetivo, direccion_cadena, nivel_rft, tipo_respuesta, opciones_respuesta, respuesta_por_fase, secuencia_rft, alternar_ejemplares, actividad_tablet'
     )
     .eq('id', id)
     .single()
@@ -80,6 +81,9 @@ export default async function ProgramaDetallePage({
     .select('id, nombre, estimulos_base(id, nombre, descripcion)')
     .eq('programa_base_id', id)
     .order('orden')
+
+  // Abstracción de claves con ensayos generados: niveles en vez de grupos y clases
+  const actividad = leerActividadConceptos(programa.actividad_tablet)
 
   const { data: clasesRft } = await supabase
     .from('clases_rft_base')
@@ -236,7 +240,25 @@ export default async function ProgramaDetallePage({
         </section>
       )}
 
-      {programa.tipo === 'rft' && (
+      {programa.tipo === 'rft' && actividad && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-slate-700">Niveles</h2>
+          <p className="text-sm text-slate-500">
+            Los ensayos se generan en la tableta con imágenes del banco, con las claves alternadas en cada bloque: no hay grupos ni
+            clases de material. Cada nivel se registra como un grupo y el siguiente recomendado es el primero sin dominar.
+          </p>
+          <ol className="space-y-1">
+            {actividad.niveles.map((n, i) => (
+              <li key={n.nombre} className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                <span className="mr-2 font-semibold text-slate-400">{i + 1}.</span>
+                {n.nombre}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {programa.tipo === 'rft' && !actividad && (
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-700">Clases (plantilla)</h2>
           {programa.nivel_rft === 'relacion_relaciones' && (
