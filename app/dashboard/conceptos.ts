@@ -298,8 +298,12 @@ function comparacion(nivel: NivelComparacion, conceptos: Concepto[], n: number, 
 function oposicion(nivel: NivelOposicion, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
   const pares = OPUESTOS.filter(([, , uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento'))
   const nombre = (slug: string) => slug.replace(/-/g, ' ')
+  // «Toca el igual» y «Toca el contrario» alternados ante las mismas opciones (la
+  // misma imagen que la muestra y su opuesto): la respuesta depende de la clave
+  // y no de elegir «el que no es igual» (Luciano et al., 2009)
+  const claves = alternados<'igual' | 'contrario'>('igual', 'contrario', n, azar)
   let anterior = -1
-  return Array.from({ length: n }, () => {
+  return claves.map((clave) => {
     let i = Math.floor(azar() * pares.length)
     if (i === anterior && pares.length > 1) i = (i + 1) % pares.length
     anterior = i
@@ -308,12 +312,13 @@ function oposicion(nivel: NivelOposicion, generalizacion: boolean, n: number, az
     const otros = barajar(
       pares.filter((_, j) => j !== i).map(([x, y]) => (azar() < 0.5 ? x : y)),
       azar
-    ).slice(0, nivel.opciones - 1)
+    ).slice(0, Math.max(0, nivel.opciones - 2))
     const opciones: OpcionGenerada[] = [
-      { pantalla: { img: `oposicion/${opuesto}` }, etiqueta: nombre(opuesto), correcta: true },
+      { pantalla: { img: `oposicion/${muestra}` }, etiqueta: `${nombre(muestra)} (igual)`, correcta: clave === 'igual' },
+      { pantalla: { img: `oposicion/${opuesto}` }, etiqueta: nombre(opuesto), correcta: clave === 'contrario' },
       ...otros.map((o) => ({ pantalla: { img: `oposicion/${o}` }, etiqueta: nombre(o), correcta: false })),
     ]
-    return { clave: 'contrario', consigna: CONSIGNAS.contrario, muestra: { img: `oposicion/${muestra}` }, opciones: barajar(opciones, azar) }
+    return { clave, consigna: CONSIGNAS[clave], muestra: { img: `oposicion/${muestra}` }, opciones: barajar(opciones, azar) }
   })
 }
 

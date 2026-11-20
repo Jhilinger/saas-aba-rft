@@ -163,22 +163,27 @@ export default async function ProgramaDetallePage({
           <span className="font-semibold text-slate-700">Objetivo</span>
           <p className="text-slate-700 whitespace-pre-wrap">{programa.objetivo || '—'}</p>
         </div>
-        <div className="sm:col-span-3">
-          <span className="font-semibold text-slate-700">Materiales</span>
-          <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales || '—'}</p>
-        </div>
+        {/* Ensayos generados en la tableta: sin materiales ni ayudas con material */}
+        {!actividad && (
+          <div className="sm:col-span-3">
+            <span className="font-semibold text-slate-700">Materiales</span>
+            <p className="text-slate-700 whitespace-pre-wrap">{programa.materiales || '—'}</p>
+          </div>
+        )}
         <div className="sm:col-span-3">
           <span className="font-semibold text-slate-700">Instrucciones para el terapeuta</span>
           <p className="text-slate-700 whitespace-pre-wrap">
             {programa.instrucciones_terapeuta || '—'}
           </p>
         </div>
-        <div className="sm:col-span-3">
-          <span className="font-semibold text-slate-700">Ayudas posibles</span>
-          <p className="text-slate-700 whitespace-pre-wrap">
-            {programa.ayudas_posibles || '—'}
-          </p>
-        </div>
+        {!actividad && (
+          <div className="sm:col-span-3">
+            <span className="font-semibold text-slate-700">Ayudas posibles</span>
+            <p className="text-slate-700 whitespace-pre-wrap">
+              {programa.ayudas_posibles || '—'}
+            </p>
+          </div>
+        )}
         {programa.video_url && (
           <div className="sm:col-span-3">
             <span className="font-semibold text-slate-700">Vídeo de ejemplo</span>
