@@ -141,7 +141,10 @@ export default async function TomarDatosRftPage({
         />
       )}
 
-            <TomarDatosRftClient
+      {/* Abstracción de claves con ensayos generados: solo la tableta (registrar
+          con material ensayo a ensayo no compensa y sus opciones no aplican) */}
+      {!actividad && (
+      <TomarDatosRftClient
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
         clases={clases ?? []}
@@ -170,6 +173,7 @@ export default async function TomarDatosRftPage({
         alternarEjemplares={programa.alternar_ejemplares}
         textoTablet={programa.texto_tablet}
       />
+      )}
     </div>
   )
 }
