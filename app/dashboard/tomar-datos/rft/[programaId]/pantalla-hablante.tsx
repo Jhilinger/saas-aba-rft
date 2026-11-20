@@ -37,6 +37,9 @@ export default function PantallaHablante({
   // Presentación secuencial (orden en que aparecen): -1 = en blanco; null = terminada
   const [paso, setPaso] = useState<number | null>(ensayo.secuencia ? -1 : null)
   const [vuelta, setVuelta] = useState(0)
+  // La respuesta esperada solo se ve mientras se mantiene pulsado (el alumno
+  // lector no debe poder leerla)
+  const [verRespuesta, setVerRespuesta] = useState(false)
 
   useEffect(() => {
     if (!ensayo.secuencia) return
@@ -93,9 +96,17 @@ export default function PantallaHablante({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-4 py-3">
         <div className="min-w-0">
           <p className="text-base font-semibold text-slate-800">{ensayo.pregunta}</p>
-          <p className="text-sm text-slate-500">
-            Respuesta esperada: <span className="font-semibold text-slate-700">{ensayo.esperada}</span>
-          </p>
+          <button
+            type="button"
+            onPointerDown={() => setVerRespuesta(true)}
+            onPointerUp={() => setVerRespuesta(false)}
+            onPointerLeave={() => setVerRespuesta(false)}
+            onPointerCancel={() => setVerRespuesta(false)}
+            onContextMenu={(e) => e.preventDefault()}
+            className="mt-1 rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm text-slate-500 [touch-action:none]"
+          >
+            {verRespuesta ? <span className="font-semibold text-slate-800">{ensayo.esperada}</span> : '👁 Respuesta (mantener pulsado)'}
+          </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {ensayo.secuencia && (
