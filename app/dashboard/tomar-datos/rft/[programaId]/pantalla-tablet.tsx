@@ -448,7 +448,11 @@ function Presentacion({
               )
             })}
           </div>
-          {!sinAudio && (
+          {/* Sin audio, el hueco se reserva igual: la pantalla del elogio tiene la misma
+              disposición y así la opción correcta no se mueve al marcarse en verde */}
+          {sinAudio ? (
+            <span className="invisible rounded-full border border-transparent px-[3vmin] py-[1vmin] text-[2.6vmin]">🔊 Escuchar</span>
+          ) : (
             <button
               type="button"
               onClick={repetirSecuencia}
@@ -660,7 +664,7 @@ function Retroalimentacion({
               </div>
             ))}
           </div>
-          <span className="rounded-full px-[3vmin] py-[1vmin] text-[2.6vmin] invisible">🔊 Escuchar</span>
+          <span className="invisible rounded-full border border-transparent px-[3vmin] py-[1vmin] text-[2.6vmin]">🔊 Escuchar</span>
           </div>
         </div>
         <div className="min-h-12 px-3 pb-2" />
