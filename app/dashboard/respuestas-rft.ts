@@ -69,6 +69,15 @@ export function leerRespuestasEsperadas(valor: Json | null | undefined): Record<
   return resultado
 }
 
+// Respuesta esperada de una clase en una fase: la propia de la fase
+// («transformacion_funciones:A→B») si la hay, si no la de la combinación («A→B»).
+// Hace falta cuando dos fases usan la misma combinación con respuestas distintas
+// (p. ej. test mutuo «Diferente» y transformación «No»)
+export function respuestaEsperada(valor: Json | null | undefined, fase: string, origen: string, destino: string): string | null {
+  const r = leerRespuestasEsperadas(valor)
+  return r[`${fase}:${claveCombinacion(origen, destino)}`] ?? r[claveCombinacion(origen, destino)] ?? null
+}
+
 // El programa usa en alguna fase una respuesta que no es elegir un estímulo
 // (solo entonces tienen sentido las respuestas esperadas por clase)
 export function usaRespuestasSinSeleccion(programa: {

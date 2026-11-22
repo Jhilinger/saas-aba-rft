@@ -17,7 +17,7 @@ import {
 } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronometro'
-import { claveCombinacion, configRespuesta, leerRespuestasEsperadas } from '../../../respuestas-rft'
+import { configRespuesta, respuestaEsperada } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
 import PantallaTablet, { esOido, esVisible, textoOido, urlImagen, type ImagenesBanco } from './pantalla-tablet'
@@ -747,7 +747,7 @@ export default function TomarDatosRftClient({
     const cfg = configRespuesta(respuesta, fase)
     if (cfg.tipo === 'opciones') {
       // Opciones fijas como palabras (botones de texto); correcta, la respuesta esperada
-      const esperadaClase = leerRespuestasEsperadas(claseActual.respuestas_esperadas)[claveCombinacion(posicionOrigen, posicionDestino)]
+      const esperadaClase = respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino)
       return cfg.opciones.map((op, i) => ({
         claseId: `${claseActual.id}-op${i}`,
         estimulo: { id: `${claseActual.id}-op${i}`, posicion: null, nombre: `"${op}"`, concepto_imagen: null, pantalla: null },
@@ -885,7 +885,7 @@ export default function TomarDatosRftClient({
     if (tipo === 'opciones') {
       // Cada clase necesita su frase y su respuesta esperada para corregirse sola
       const conFrase = clasesCon(grupo, origen, destino).filter(
-        (c) => !!leerRespuestasEsperadas(c.respuestas_esperadas)[claveCombinacion(origen, destino)] && !!leerConsignasClase(c.consignas)[`${faseBloque}:${origen}→${destino}`]
+        (c) => !!respuestaEsperada(c.respuestas_esperadas, faseBloque, origen, destino) && !!leerConsignasClase(c.consignas)[`${faseBloque}:${origen}→${destino}`]
       )
       return conFrase.length > 0 && conFrase.length === clasesCon(grupo, origen, destino).length
     }
@@ -1496,7 +1496,7 @@ export default function TomarDatosRftClient({
   // La fase elegida decide el tipo de respuesta (las sondas usan el de su fase)
   const config = configRespuesta(respuesta, fase)
   const esperada =
-    leerRespuestasEsperadas(claseActual.respuestas_esperadas)[claveCombinacion(posicionOrigen, posicionDestino)] ?? null
+    respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino)
   const conPregunta = esTransformacion || config.tipo === 'opciones' || config.tipo === 'abierta'
   const etiquetas =
     config.tipo === 'ejecucion'
