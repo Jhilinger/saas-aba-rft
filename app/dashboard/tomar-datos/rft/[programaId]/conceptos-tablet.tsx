@@ -7,6 +7,7 @@ import { useToast } from '../../../../providers/toast-provider'
 import { guardarBloqueRft } from './actions'
 import PantallaTablet, { type ImagenesBanco, type RespuestaTablet } from './pantalla-tablet'
 import PantallaHablante from './pantalla-hablante'
+import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import { aHablante, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
@@ -335,6 +336,7 @@ export default function ConceptosTablet({
           ))}
         </div>
       )}
+      <AjustesRefuerzo plegable />
       {!sonda && escalonDelNivel() && (
         <p className="text-xs text-amber-700">
           Aprendizaje sin error: <strong>{escalonDelNivel()!.nombre}</strong> · {describirEscalon(escalonDelNivel()!)}

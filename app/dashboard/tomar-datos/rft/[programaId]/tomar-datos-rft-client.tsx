@@ -1,5 +1,6 @@
 'use client'
 
+import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import { useState, useTransition, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { guardarBloqueRft, guardarTextoTablet } from './actions'
@@ -264,6 +265,11 @@ function SelectorModo({
     )}
     {forma === 'hablante' && (
       <span className="text-xs text-slate-500">Sin opciones: el alumno responde y usted marca ✓/✗{modo === 'tableta' ? ' (la respuesta esperada, oculta tras «👁»)' : ''}.</span>
+    )}
+    {modo === 'tableta' && (
+      <span className="basis-full">
+        <AjustesRefuerzo plegable />
+      </span>
     )}
     {modo === 'tableta' && fuera > 0 && (
       <span className="text-xs font-medium text-amber-700">

@@ -3,13 +3,14 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import BotonLargo from '../../../boton-largo'
 import { PAUSA_ENTRE_ENSAYOS } from '../../../etapas-ensayo'
-import { decirElogio, decirFraseRft, guardarElogios, leerElogios, precargarElogios } from '../../../voz'
+import { decirElogio, decirFraseRft, leerElogios, precargarElogios } from '../../../voz'
 import AjustesVoz from '../../../ajustes-voz'
+import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rft'
 import ContenidoEstimulo from '../../../contenido-estimulo'
 import { parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 import { presentacionNivel, siguienteNivel } from '../../../sin-error'
-import { guardarRefuerzo, leerRefuerzo, sonarAcierto, type PreferenciasRefuerzo } from '../../../refuerzo-tablet'
+import { leerRefuerzo, sonarAcierto, type PreferenciasRefuerzo } from '../../../refuerzo-tablet'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
 // las comparaciones en tarjetas. El toque del alumno registra el ensayo. Las
@@ -974,11 +975,6 @@ export default function PantallaTablet({
   const [aciertos, setAciertos] = useState(0)
   const [destello, setDestello] = useState<number | null>(null)
   const [premio, setPremio] = useState<number | null>(null)
-  const cambiarRefuerzo = (cambio: Partial<PreferenciasRefuerzo>) => {
-    const nuevas = { ...refuerzo, ...cambio }
-    setRefuerzo(nuevas)
-    guardarRefuerzo(nuevas)
-  }
 
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
     setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
@@ -1123,35 +1119,15 @@ export default function PantallaTablet({
       {menuVoz && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
           <div className="w-full max-w-sm space-y-2 rounded-2xl bg-white p-4 text-sm">
-            <AjustesVoz />
-            {!infantil && (
-              <label className="flex items-center gap-2 text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={elogios}
-                  onChange={(e) => {
-                    setElogios(e.target.checked)
-                    guardarElogios(e.target.checked)
-                  }}
-                  className="h-4 w-4"
-                />
-                Elogio hablado al acertar en entrenamiento («¡Muy bien!»)
-              </label>
-            )}
-            {!infantil && (
-              <>
-                <label className="flex items-center gap-2 text-slate-700">
-                  <input type="checkbox" checked={refuerzo.fichas} onChange={(e) => cambiarRefuerzo({ fichas: e.target.checked })} className="h-4 w-4" />
-                  Estrellas por acierto y premio al acabar el bloque (entrenamiento)
-                </label>
-                <label className="flex items-center gap-2 text-slate-700">
-                  <input type="checkbox" checked={refuerzo.sonido} onChange={(e) => cambiarRefuerzo({ sonido: e.target.checked })} className="h-4 w-4" />
-                  Sonido breve al acertar (entrenamiento)
-                </label>
-                <p className="text-xs text-slate-500">
-                  En los tests no hay refuerzo diferencial: ni estrellas ni sonido. Al acabar el bloque, dé usted el reforzador de respaldo.
-                </p>
-              </>
+            {infantil ? (
+              <AjustesVoz />
+            ) : (
+              <AjustesRefuerzo
+                onCambio={({ elogios: e, refuerzo: r }) => {
+                  setElogios(e)
+                  setRefuerzo(r)
+                }}
+              />
             )}
             <button onClick={() => setMenuVoz(false)} className="w-full rounded-lg px-3 py-2 text-slate-500">
               Volver
