@@ -397,9 +397,13 @@ function Presentacion({
   if (modoTexto) {
     return (
       <>
-        <div className={`flex flex-1 flex-col items-center justify-center gap-[4vmin] overflow-y-auto px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
+        {/* La frase en la mitad de arriba y las opciones en la de abajo, bien separadas
+            (como la muestra y las comparaciones con imágenes); la frase, sobre fondo gris y
+            sin sombra, se distingue de las opciones, que son botones */}
+        <div className={`flex flex-1 flex-col overflow-y-auto px-4 pb-2 ${conMuestra ? '' : 'invisible'}`}>
+          <div className="flex flex-1 items-center justify-center py-[3vmin]">
           <div
-            className={`w-full max-w-[92vw] rounded-[2.5vmin] border-2 bg-white px-[4vmin] py-[3vmin] shadow-sm ${
+            className={`w-full max-w-[92vw] rounded-[2.5vmin] border-2 bg-slate-50 px-[4vmin] py-[3vmin] ${
               nivel > 0 ? 'animate-pulse border-amber-400' : claveSonando ? 'border-indigo-400 ring-[1vmin] ring-indigo-200' : 'border-slate-200'
             }`}
           >
@@ -407,6 +411,8 @@ function Presentacion({
               {textoClave ?? textoOido(origen.nombre)}
             </p>
           </div>
+          </div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-[3vmin] border-t-2 border-dashed border-slate-200 py-[3vmin]">
           <div className={`flex w-full max-w-[92vw] flex-wrap justify-center gap-[2.5vmin] ${conOpciones ? '' : 'invisible'}`}>
             {comparativos.map((c, i) => {
               const oculta = !c.esCorrecto && !visibles.has(c.claseId)
@@ -451,6 +457,7 @@ function Presentacion({
               🔊 Escuchar
             </button>
           )}
+          </div>
         </div>
         <div className="flex min-h-12 justify-end gap-2 px-3 pb-2" />
       </>
@@ -631,12 +638,15 @@ function Retroalimentacion({
   if (oidas && conTexto) {
     return (
       <>
-        <div className="flex flex-1 flex-col items-center justify-center gap-[4vmin] overflow-y-auto px-4 pb-2">
-          <div className="w-full max-w-[92vw] rounded-[2.5vmin] border-2 border-slate-200 bg-white px-[4vmin] py-[3vmin] shadow-sm">
+        <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-2">
+          <div className="flex flex-1 items-center justify-center py-[3vmin]">
+          <div className="w-full max-w-[92vw] rounded-[2.5vmin] border-2 border-slate-200 bg-slate-50 px-[4vmin] py-[3vmin]">
             <p className="text-center font-medium leading-snug text-slate-800" style={{ fontSize: '5vmin' }}>
               {textoClave ?? textoOido(origen.nombre)}
             </p>
           </div>
+          </div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-[3vmin] border-t-2 border-dashed border-slate-200 py-[3vmin]">
           <div className="flex w-full max-w-[92vw] flex-wrap justify-center gap-[2.5vmin]">
             {comparativos.map((c) => (
               <div
@@ -651,6 +661,7 @@ function Retroalimentacion({
             ))}
           </div>
           <span className="rounded-full px-[3vmin] py-[1vmin] text-[2.6vmin] invisible">🔊 Escuchar</span>
+          </div>
         </div>
         <div className="min-h-12 px-3 pb-2" />
       </>
