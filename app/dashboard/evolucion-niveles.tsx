@@ -37,6 +37,8 @@ const CLAVE: Record<string, string> = {
   fuera: '«Fuera»',
   delante: '«Delante»',
   detras: '«Detrás»',
+  efecto: '«¿Qué pasará?»',
+  causa: '«¿Por qué ha pasado?»',
   color: '«Mismo color»',
   forma: '«Misma forma»',
   tamano: '«Mismo tamaño»',

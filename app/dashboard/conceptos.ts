@@ -23,7 +23,10 @@ export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'prim
 // control contextual de la dimensión): «una» = cada opción comparte con la muestra una sola
 // propiedad; «dos» = se alternan claves de dos propiedades y de una
 export type NivelClasificacion = { nombre: string; modo: 'una' | 'dos' }
+// Causa y efecto con viñetas: «¿Qué pasará?» (causa → efecto) y «¿Por qué ha pasado esto?» (efecto → causa)
+export type NivelCausal = { nombre: string; opciones: number }
 export type ActividadConceptos =
+  | { tipo: 'causal'; niveles: NivelCausal[] }
   | { tipo: 'clasificacion'; niveles: NivelClasificacion[] }
   | { tipo: 'distincion'; niveles: NivelDistincion[] }
   | { tipo: 'comparacion'; niveles: NivelComparacion[] }
@@ -141,6 +144,9 @@ export const CONSIGNAS = {
   ordenarCantidad: ['Toca de donde hay menos a donde hay más', 'Toca de donde hay más a donde hay menos'],
   ordenarLongitud: ['Toca del más corto al más largo', 'Toca del más largo al más corto'],
   ordenarAltura: ['Toca de la más baja a la más alta', 'Toca de la más alta a la más baja'],
+  // Causa y efecto
+  quePasara: '¿Qué pasará?',
+  porQuePaso: '¿Por qué ha pasado esto?',
   // Clasificar por propiedades
   mismoColor: 'Toca el que es del mismo color',
   mismaForma: 'Toca el que tiene la misma forma',
@@ -172,6 +178,7 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
   if (actividad.tipo === 'temporal') return CONCEPTOS_SECUENCIAS
   // Figuras geométricas dibujadas: sin imágenes del banco
   if (actividad.tipo === 'clasificacion') return []
+  if (actividad.tipo === 'causal') return CONCEPTOS_CAUSALES
   return null
 }
 
@@ -183,6 +190,10 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
   const o = valor as Record<string, unknown>
   const niveles = Array.isArray(o.niveles) ? (o.niveles as Record<string, unknown>[]) : []
   const nombre = (n: Record<string, unknown>, i: number) => (typeof n.nombre === 'string' && n.nombre.trim() ? n.nombre.trim() : `Nivel ${i + 1}`)
+  if (o.tipo === 'causal') {
+    const lista = niveles.map((n, i) => ({ nombre: nombre(n, i), opciones: typeof n.opciones === 'number' ? Math.min(4, Math.max(2, Math.round(n.opciones))) : 3 }))
+    return lista.length ? { tipo: 'causal', niveles: lista } : null
+  }
   if (o.tipo === 'clasificacion') {
     const lista = niveles.map((n, i) => ({ nombre: nombre(n, i), modo: n.modo === 'dos' ? ('dos' as const) : ('una' as const) }))
     return lista.length ? { tipo: 'clasificacion', niveles: lista } : null
@@ -319,6 +330,45 @@ function ordenar(nivel: NivelComparacion, conceptos: Concepto[], n: number, azar
       muestra: null,
       opciones: barajar(elementos, azar),
       orden: enOrden.map((e) => e.etiqueta),
+    }
+  })
+}
+
+// Parejas causa → efecto (scripts/imagenes/causas-efectos.mjs): [slug, uso, causa, efecto]
+const CAUSALES: [string, 'entrenamiento' | 'generalizacion', string, string][] = [
+  ['vela', 'entrenamiento', 'Le echan aire a la vela', 'La vela se apaga'],
+  ['torre', 'entrenamiento', 'Empujan la torre', 'La torre se cae'],
+  ['vaso', 'entrenamiento', 'Le dan un golpe al vaso', 'El vaso se cae y el agua se derrama'],
+  ['globo', 'entrenamiento', 'Pinchan el globo', 'El globo explota'],
+  ['huevo', 'entrenamiento', 'Sueltan el huevo', 'El huevo se rompe'],
+  ['lampara', 'entrenamiento', 'Pulsan el interruptor', 'La lámpara se enciende'],
+  ['papel', 'entrenamiento', 'Cortan el papel con las tijeras', 'El papel queda en dos trozos'],
+]
+export const CONCEPTOS_CAUSALES = CAUSALES.flatMap(([s]) => [`causales/${s}-causa`, `causales/${s}-efecto`])
+
+// «¿Qué pasará?» con la causa a la vista y «¿Por qué ha pasado esto?» con el efecto,
+// alternados: la respuesta depende de la clave (Hayes et al., 2001: marco causal)
+function causal(nivel: NivelCausal, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+  const parejas = CAUSALES.filter(([, uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento'))
+  if (parejas.length < nivel.opciones) return []
+  const claves = alternados<'efecto' | 'causa'>('efecto', 'causa', n, azar)
+  let anterior = -1
+  return claves.map((clave) => {
+    let i = Math.floor(azar() * parejas.length)
+    if (i === anterior && parejas.length > 1) i = (i + 1) % parejas.length
+    anterior = i
+    const [slug] = parejas[i]
+    const otras = barajar(parejas.filter((_, j) => j !== i), azar).slice(0, nivel.opciones - 1)
+    const lado = clave === 'efecto' ? 'efecto' : 'causa'
+    const opciones: OpcionGenerada[] = [
+      { pantalla: { img: `causales/${slug}-${lado}` }, etiqueta: `${slug} ${lado}`, correcta: true },
+      ...otras.map(([s]) => ({ pantalla: { img: `causales/${s}-${lado}` }, etiqueta: `${s} ${lado}`, correcta: false })),
+    ]
+    return {
+      clave,
+      consigna: clave === 'efecto' ? CONSIGNAS.quePasara : CONSIGNAS.porQuePaso,
+      muestra: { img: `causales/${slug}-${clave === 'efecto' ? 'causa' : 'efecto'}` },
+      opciones: barajar(opciones, azar),
     }
   })
 }
@@ -568,6 +618,12 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
     estimulos: [e.muestra!, e.opciones[correcta].pantalla],
     marcada: null,
   })
+  if (tipo === 'causal') {
+    // Ve la causa (o el efecto) y dice qué pasará (o por qué ha pasado)
+    const slug = e.opciones.find((o) => o.correcta)!.etiqueta.split(' ')[0]
+    const pareja = CAUSALES.find(([s]) => s === slug)!
+    return { clave: e.clave, pregunta: e.consigna, esperada: e.clave === 'efecto' ? pareja[3] : pareja[2], estimulos: [e.muestra!], marcada: null }
+  }
   if (tipo === 'clasificacion') {
     // La muestra marcada y las opciones; el alumno señala la que va con ella
     const correcta = e.opciones.findIndex((o) => o.correcta)
@@ -622,6 +678,7 @@ export function generarBloque(
   generalizacion = false,
   azar: Azar = Math.random
 ): EnsayoGenerado[] {
+  if (actividad.tipo === 'causal') return causal(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'clasificacion') return clasificacion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'espacial') return espacial(actividad.niveles[indiceNivel], generalizacion, n, azar)
