@@ -37,6 +37,8 @@ const CLAVE: Record<string, string> = {
   fuera: '«Fuera»',
   delante: '«Delante»',
   detras: '«Detrás»',
+  asc: 'ordenar de menos a más',
+  desc: 'ordenar de más a menos',
 }
 
 export function etiquetaClave(clave: string) {

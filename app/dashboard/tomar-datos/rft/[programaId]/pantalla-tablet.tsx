@@ -515,9 +515,14 @@ function Presentacion({
                     key={c.claseId}
                     type="button"
                     disabled={oculta}
-                    onClick={() => listo && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
+                    onClick={() =>
+                      listo &&
+                      (ordenEsperado
+                        ? tocarEnOrden(textoOido(c.estimulo.nombre))
+                        : onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora }))
+                    }
                     style={{ width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) }}
-                    className={`flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
+                    className={`relative flex items-center justify-center rounded-[2.5vmin] border-2 bg-white shadow-sm transition-transform active:scale-[0.98] ${
                       oculta ? 'invisible' : ''
                     } ${
                       resaltada && c.esCorrecto
@@ -527,6 +532,11 @@ function Presentacion({
                           : 'border-slate-200'
                     }`}
                   >
+                    {ordenEsperado && tocadas.includes(textoOido(c.estimulo.nombre)) && (
+                      <span className="absolute left-[1vmin] top-[1vmin] inline-flex h-[6vmin] w-[6vmin] items-center justify-center rounded-full bg-indigo-600 text-[3.5vmin] font-bold text-white">
+                        {tocadas.indexOf(textoOido(c.estimulo.nombre)) + 1}
+                      </span>
+                    )}
                     {oidasComoOpciones ? (
                       <span className="flex flex-col items-center gap-[1vmin]">
                         <span className="leading-none" style={{ fontSize: `calc(${ladoOpcion} * ${conTexto ? 0.28 : 0.38})` }}>

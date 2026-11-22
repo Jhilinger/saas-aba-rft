@@ -11,7 +11,8 @@ import type { EstimuloPantalla } from './estimulo-pantalla'
 export type ModoDistincion = 'igual_diferente' | 'intruso' | 'sutil'
 export type Dimension = 'tamano' | 'cantidad' | 'longitud' | 'altura'
 export type NivelDistincion = { nombre: string; modo: ModoDistincion; opciones: number }
-export type NivelComparacion = { nombre: string; dimensiones: Dimension[]; proporcion: number; intermedio: boolean }
+// orden: ordenar series de ese número de elementos (si hay varios, uno al azar en cada ensayo)
+export type NivelComparacion = { nombre: string; dimensiones: Dimension[]; proporcion: number; intermedio: boolean; orden?: number[] }
 export type NivelOposicion = { nombre: string; opciones: number }
 export type ParEspacial = 'encima_debajo' | 'dentro_fuera' | 'delante_detras'
 export type NivelEspacial = { nombre: string; pares: ParEspacial[] }
@@ -103,6 +104,8 @@ export type EnsayoGenerado = {
   opciones: OpcionGenerada[]
   secuencia?: EstimuloPantalla[]
   etiquetasSecuencia?: string[]
+  // Ordenar: las etiquetas de las opciones en el orden pedido (respuesta de tocar en orden)
+  orden?: string[]
 }
 export type Concepto = { concepto: string; nombre: string }
 
@@ -128,6 +131,11 @@ export const CONSIGNAS = {
   cantidad: ['¿Dónde hay más?', '¿Dónde hay menos?'],
   longitud: ['¿Cuál es más largo?', '¿Cuál es más corto?'],
   altura: ['¿Cuál es más alto?', '¿Cuál es más bajo?'],
+  // Ordenar series: [de menos a más, de más a menos]
+  ordenarTamano: ['Toca del más pequeño al más grande', 'Toca del más grande al más pequeño'],
+  ordenarCantidad: ['Toca de donde hay menos a donde hay más', 'Toca de donde hay más a donde hay menos'],
+  ordenarLongitud: ['Toca del más corto al más largo', 'Toca del más largo al más corto'],
+  ordenarAltura: ['Toca de la más baja a la más alta', 'Toca de la más alta a la más baja'],
 } as const
 
 export function frasesConceptos(): string[] {
@@ -198,6 +206,7 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
         nombre: nombre(n, i),
         dimensiones: dims.length ? dims : (['tamano'] as Dimension[]),
         proporcion: typeof n.proporcion === 'number' ? Math.min(0.9, Math.max(0.3, n.proporcion)) : 0.5,
+        orden: Array.isArray(n.orden) ? (n.orden as unknown[]).filter((k): k is number => typeof k === 'number' && k >= 3 && k <= 5) : undefined,
         intermedio: n.intermedio === true,
       }
     })
@@ -258,7 +267,46 @@ function distincion(nivel: NivelDistincion, conceptos: Concepto[], n: number, az
   })
 }
 
+const ORDENAR: Record<Dimension, readonly [string, string]> = {
+  tamano: CONSIGNAS.ordenarTamano,
+  cantidad: CONSIGNAS.ordenarCantidad,
+  longitud: CONSIGNAS.ordenarLongitud,
+  altura: CONSIGNAS.ordenarAltura,
+}
+
+// Ordenar series de 3 a 5 elementos en una dimensión (Luciano et al., 2009, 6.4.1:
+// el combinatorio no arbitrario de la comparación); el sentido se alterna
+function ordenar(nivel: NivelComparacion, conceptos: Concepto[], n: number, azar: Azar): EnsayoGenerado[] {
+  const sentidos = alternados<0 | 1>(0, 1, n, azar)
+  let anterior: string[] = []
+  return sentidos.map((sentido) => {
+    const dimension = nivel.dimensiones[Math.floor(azar() * nivel.dimensiones.length)]
+    const k = nivel.orden![Math.floor(azar() * nivel.orden!.length)]
+    const x = elegir(conceptos, azar, anterior)
+    anterior = [x.concepto]
+    // De mayor a menor: magnitudes p^j (en cantidad, k…1 objetos)
+    const elementos: OpcionGenerada[] = Array.from({ length: k }, (_, j) => {
+      const m = nivel.proporcion ** j
+      if (dimension === 'tamano') return { pantalla: { img: x.concepto, escala: m }, etiqueta: `${x.nombre} ${Math.round(m * 100)} %`, correcta: false }
+      if (dimension === 'cantidad') return { pantalla: { img: x.concepto, n: k - j }, etiqueta: `${x.nombre} ×${k - j}`, correcta: false }
+      if (dimension === 'longitud') return { pantalla: { forma: 'lapiz', valor: m }, etiqueta: `lápiz ${Math.round(m * 100)} %`, correcta: false }
+      // Torres de alturas consecutivas (k + 1 … 2 bloques), todas distintas
+      const bloques = k - j + 1
+      return { pantalla: { forma: 'torre', valor: bloques }, etiqueta: `torre de ${bloques}`, correcta: false }
+    })
+    const enOrden = sentido === 0 ? [...elementos].reverse() : elementos
+    return {
+      clave: `${dimension}:${sentido === 0 ? 'asc' : 'desc'}`,
+      consigna: ORDENAR[dimension][sentido],
+      muestra: null,
+      opciones: barajar(elementos, azar),
+      orden: enOrden.map((e) => e.etiqueta),
+    }
+  })
+}
+
 function comparacion(nivel: NivelComparacion, conceptos: Concepto[], n: number, azar: Azar): EnsayoGenerado[] {
+  if (nivel.orden?.length) return ordenar(nivel, conceptos, n, azar)
   const polos = alternados<0 | 1>(0, 1, n, azar)
   let anterior: string[] = []
   return polos.map((polo, i) => {
@@ -456,6 +504,11 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
   }
   if (tipo === 'oposicion') return conMuestra('¿Son iguales o contrarios?', e.clave === 'igual' ? 'Iguales' : 'Contrarios')
   if (tipo === 'comparacion') {
+    if (e.orden) {
+      // Los señala en orden: la esperada, como posiciones en la pantalla
+      const pos = e.orden.map((et) => `${e.opciones.findIndex((o) => o.etiqueta === et) + 1}.ª`)
+      return { clave: e.clave, pregunta: e.consigna.replace('Toca', 'Señálalos en orden,'), esperada: `${pos.join(', ')} (contando desde la izquierda)`, estimulos: e.opciones.map((o) => o.pantalla), marcada: null }
+    }
     const [dimension, polo] = e.clave.split(':') as [Dimension, string]
     const [pregunta, mas, menos] = PREGUNTA_COMPARACION[dimension]
     return { clave: e.clave, pregunta, esperada: polo === 'mas' ? mas : menos, estimulos: e.opciones.map((o) => o.pantalla), marcada: correcta }

@@ -161,7 +161,8 @@ export default function ConceptosTablet({
 
   // Opciones del ensayo según el escalón de apoyo (campo reducido)
   const opcionesDe = (e: EnsayoGenerado) => {
-    if (!escalon || escalon.comparaciones === null) return e.opciones
+    // Ordenar: siempre todos los elementos de la serie
+    if (!escalon || escalon.comparaciones === null || e.orden) return e.opciones
     const correctas = e.opciones.filter((o) => o.correcta)
     const otras = e.opciones.filter((o) => !o.correcta).slice(0, Math.max(0, escalon.comparaciones - 1))
     return e.opciones.filter((o) => correctas.includes(o) || otras.includes(o))
@@ -220,6 +221,7 @@ export default function ConceptosTablet({
         sinMuestra={!actual.muestra}
         secuencia={actual.secuencia?.map((p, i) => ({ id: `s${n}-${i}`, nombre: '', concepto_imagen: null, pantalla: p }))}
         etiquetasSecuencia={actual.etiquetasSecuencia}
+        ordenEsperado={actual.orden}
         // Corrección del error en entrenamiento (modelo y repetición sin
         // ayuda): de momento solo en las claves temporales
         correccion={actividad.tipo === 'temporal'}
