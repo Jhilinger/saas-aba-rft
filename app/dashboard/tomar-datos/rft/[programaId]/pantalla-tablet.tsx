@@ -1038,19 +1038,6 @@ export default function PantallaTablet({
           {apoyo && <span className="ml-2">· {apoyo.nombre}</span>}
           {ayuda && <span className="ml-2 font-semibold text-amber-500">ayuda: {AYUDAS.find((a) => a.value === ayuda)?.label}</span>}
         </p>
-        {conFichas && (
-          <span className="flex flex-wrap items-center justify-center gap-[0.6vmin]" aria-label={`${aciertos} estrellas`}>
-            {Array.from({ length: total }, (_, i) => (
-              <span
-                key={i}
-                className={`leading-none transition-transform duration-300 ${i < aciertos ? 'text-amber-400' : 'text-slate-200'} ${destello === i ? 'scale-150' : ''}`}
-                style={{ fontSize: total > 12 ? '3vmin' : '4.2vmin' }}
-              >
-                ★
-              </span>
-            ))}
-          </span>
-        )}
         <span className="flex gap-2">
           <BotonLargo onActivar={() => setMenuAyuda(true)} className="border border-slate-200 !bg-transparent">
             Ayuda
@@ -1104,6 +1091,22 @@ export default function PantallaTablet({
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}
       />
+      )}
+
+      {/* Estrellas abajo, centradas en su propia fila: no compiten con los controles del
+          terapeuta y la fila es la misma en el ensayo y en el elogio, así que nada se mueve */}
+      {conFichas && (
+        <div className="flex flex-wrap items-center justify-center gap-[0.8vmin] px-3 pb-[1.5vmin]" aria-label={`${aciertos} estrellas`}>
+          {Array.from({ length: total }, (_, i) => (
+            <span
+              key={i}
+              className={`leading-none transition-transform duration-300 ${i < aciertos ? 'text-amber-400' : 'text-slate-200'} ${destello === i ? 'scale-150' : ''}`}
+              style={{ fontSize: total > 12 ? '3.4vmin' : '4.6vmin' }}
+            >
+              ★
+            </span>
+          ))}
+        </div>
       )}
 
       {premio !== null && (
