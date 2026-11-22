@@ -975,6 +975,8 @@ export default function PantallaTablet({
   const [aciertos, setAciertos] = useState(0)
   const [destello, setDestello] = useState<number | null>(null)
   const [premio, setPremio] = useState<number | null>(null)
+  // Registro pendiente mientras se ve el premio: se hace al pulsar «Continuar»
+  const alContinuar = useRef<(() => void) | null>(null)
 
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
     setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
@@ -991,8 +993,10 @@ export default function PantallaTablet({
     // En el último ensayo, con fichas, la pantalla de premio antes de pasar a los resultados
     const cerrar = () => {
       if (conFichas && ultimo) {
+        // Las estrellas se quedan a la vista hasta que el terapeuta pulse «Continuar»,
+        // para dar el reforzador de respaldo enseñándoselas
+        alContinuar.current = registrar
         setPremio(aciertosTotales)
-        setTimeout(registrar, 2400)
       } else registrar()
     }
     if (!infantil && correcto && fase === 'entrenamiento') {
@@ -1113,6 +1117,23 @@ export default function PantallaTablet({
           <p className="font-bold text-slate-800" style={{ fontSize: '7vmin' }}>
             ¡{premio} {premio === 1 ? 'estrella' : 'estrellas'}!
           </p>
+          <div className="flex flex-wrap justify-center gap-[0.8vmin] px-4">
+            {Array.from({ length: total }, (_, i) => (
+              <span key={i} className={`leading-none ${i < premio ? 'text-amber-400' : 'text-slate-200'}`} style={{ fontSize: total > 12 ? '4vmin' : '5.5vmin' }}>
+                ★
+              </span>
+            ))}
+          </div>
+          <BotonLargo
+            onActivar={() => {
+              const registrar = alContinuar.current
+              alContinuar.current = null
+              registrar?.()
+            }}
+            className="mt-[2vmin] border border-slate-200"
+          >
+            Continuar (mantener pulsado)
+          </BotonLargo>
         </div>
       )}
 
