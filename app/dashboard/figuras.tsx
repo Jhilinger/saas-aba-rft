@@ -176,8 +176,12 @@ const GEOMETRICAS: Record<string, React.ReactNode> = {
   cruz: <polygon points="36,8 64,8 64,36 92,36 92,64 64,64 64,92 36,92 36,64 8,64 8,36 36,36" />,
 }
 
-function Geometrica({ nombre }: { nombre: string }) {
-  return <g fill="#4F46E5">{GEOMETRICAS[nombre] ?? GEOMETRICAS.circulo}</g>
+// Colores con nombre (clasificar por color): rojo, azul, amarillo, verde, naranja, morado
+export const COLORES_GEOMETRICAS = ['#EF4444', '#3B82F6', '#FACC15', '#22C55E', '#F97316', '#A855F7']
+
+function Geometrica({ nombre, tono }: { nombre: string; tono?: number }) {
+  const relleno = tono === undefined ? '#4F46E5' : COLORES_GEOMETRICAS[tono % COLORES_GEOMETRICAS.length]
+  return <g fill={relleno}>{GEOMETRICAS[nombre] ?? GEOMETRICAS.circulo}</g>
 }
 
 function Personaje() {
@@ -212,7 +216,7 @@ export default function Figura({
       {tipo === 'criatura' && <Criatura rnd={rnd} />}
       {tipo === 'objeto' && <Objeto rnd={rnd} />}
       {tipo === 'personaje' && <Personaje />}
-      {tipo === 'geometrica' && <Geometrica nombre={semilla} />}
+      {tipo === 'geometrica' && <Geometrica nombre={semilla} tono={tono} />}
     </svg>
   )
 }

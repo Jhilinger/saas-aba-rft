@@ -19,7 +19,12 @@ export type NivelEspacial = { nombre: string; pares: ParEspacial[] }
 // orden_presentacion: orden físico en que aparecen dos imágenes sin relación
 // («¿Cuál salió antes?»; Neufeld, Stewart y McElwee, 2023)
 export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'primero_despues' | 'antes_despues' }
+// Clasificar por propiedades (Villarroel y Luciano: filtrado de lo común; O'Hora y Stewart, 2013:
+// control contextual de la dimensión): «una» = cada opción comparte con la muestra una sola
+// propiedad; «dos» = se alternan claves de dos propiedades y de una
+export type NivelClasificacion = { nombre: string; modo: 'una' | 'dos' }
 export type ActividadConceptos =
+  | { tipo: 'clasificacion'; niveles: NivelClasificacion[] }
   | { tipo: 'distincion'; niveles: NivelDistincion[] }
   | { tipo: 'comparacion'; niveles: NivelComparacion[] }
   | { tipo: 'oposicion'; niveles: NivelOposicion[] }
@@ -136,6 +141,13 @@ export const CONSIGNAS = {
   ordenarCantidad: ['Toca de donde hay menos a donde hay más', 'Toca de donde hay más a donde hay menos'],
   ordenarLongitud: ['Toca del más corto al más largo', 'Toca del más largo al más corto'],
   ordenarAltura: ['Toca de la más baja a la más alta', 'Toca de la más alta a la más baja'],
+  // Clasificar por propiedades
+  mismoColor: 'Toca el que es del mismo color',
+  mismaForma: 'Toca el que tiene la misma forma',
+  mismoTamano: 'Toca el que es del mismo tamaño',
+  colorForma: 'Toca el que es del mismo color y tiene la misma forma',
+  formaTamano: 'Toca el que tiene la misma forma y es del mismo tamaño',
+  colorTamano: 'Toca el que es del mismo color y del mismo tamaño',
 } as const
 
 export function frasesConceptos(): string[] {
@@ -158,6 +170,8 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
   if (actividad.tipo === 'oposicion') return CONCEPTOS_OPUESTOS
   if (actividad.tipo === 'espacial') return CONCEPTOS_ESCENAS
   if (actividad.tipo === 'temporal') return CONCEPTOS_SECUENCIAS
+  // Figuras geométricas dibujadas: sin imágenes del banco
+  if (actividad.tipo === 'clasificacion') return []
   return null
 }
 
@@ -169,6 +183,10 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
   const o = valor as Record<string, unknown>
   const niveles = Array.isArray(o.niveles) ? (o.niveles as Record<string, unknown>[]) : []
   const nombre = (n: Record<string, unknown>, i: number) => (typeof n.nombre === 'string' && n.nombre.trim() ? n.nombre.trim() : `Nivel ${i + 1}`)
+  if (o.tipo === 'clasificacion') {
+    const lista = niveles.map((n, i) => ({ nombre: nombre(n, i), modo: n.modo === 'dos' ? ('dos' as const) : ('una' as const) }))
+    return lista.length ? { tipo: 'clasificacion', niveles: lista } : null
+  }
   if (o.tipo === 'distincion') {
     const lista = niveles.map((n, i) => ({
       nombre: nombre(n, i),
@@ -302,6 +320,59 @@ function ordenar(nivel: NivelComparacion, conceptos: Concepto[], n: number, azar
       opciones: barajar(elementos, azar),
       orden: enOrden.map((e) => e.etiqueta),
     }
+  })
+}
+
+type Propiedad = 'color' | 'forma' | 'tamano'
+const PROPIEDADES: Propiedad[] = ['color', 'forma', 'tamano']
+const FORMAS = { entrenamiento: ['circulo', 'cuadrado', 'triangulo', 'estrella', 'corazon', 'rombo'], generalizacion: ['hexagono', 'pentagono', 'ovalo', 'cruz', 'semicirculo', 'rectangulo'] }
+const COLORES = { entrenamiento: [0, 1, 2, 3], generalizacion: [4, 5, 0, 1] }
+const NOMBRE_COLOR = ['rojo', 'azul', 'amarillo', 'verde', 'naranja', 'morado']
+const TAMANOS = [1, 0.55]
+const CLAVE_UNA: Record<Propiedad, string> = { color: CONSIGNAS.mismoColor, forma: CONSIGNAS.mismaForma, tamano: CONSIGNAS.mismoTamano }
+const CLAVE_DOS: [Propiedad, Propiedad, string][] = [
+  ['color', 'forma', CONSIGNAS.colorForma],
+  ['forma', 'tamano', CONSIGNAS.formaTamano],
+  ['color', 'tamano', CONSIGNAS.colorTamano],
+]
+type Fig = { forma: string; color: number; tamano: number }
+
+// Una figura que comparte con la muestra exactamente las propiedades indicadas
+function figuraQueComparte(muestra: Fig, comunes: Propiedad[], formas: string[], colores: number[], azar: Azar): Fig {
+  const otra = <T,>(lista: T[], valor: T) => {
+    const resto = lista.filter((x) => x !== valor)
+    return resto[Math.floor(azar() * resto.length)]
+  }
+  return {
+    forma: comunes.includes('forma') ? muestra.forma : otra(formas, muestra.forma),
+    color: comunes.includes('color') ? muestra.color : otra(colores, muestra.color),
+    tamano: comunes.includes('tamano') ? muestra.tamano : otra(TAMANOS, muestra.tamano),
+  }
+}
+const pantallaFig = (f: Fig): EstimuloPantalla => ({ fig: 'geometrica', s: f.forma, c: f.color, escala: f.tamano })
+const etiquetaFig = (f: Fig, i: number) => `${f.forma} ${NOMBRE_COLOR[f.color]} ${f.tamano === 1 ? 'grande' : 'pequeño'} (${i + 1})`
+
+function clasificacion(nivel: NivelClasificacion, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+  const uso = generalizacion ? 'generalizacion' : 'entrenamiento'
+  const formas = FORMAS[uso], colores = COLORES[uso]
+  // Claves alternadas: en «una», las tres propiedades; en «dos», pares y propiedades sueltas
+  const claves: string[] = nivel.modo === 'una' ? [...PROPIEDADES] : [...CLAVE_DOS.map((c) => `${c[0]}+${c[1]}`), ...PROPIEDADES]
+  let ultima = ''
+  return Array.from({ length: n }, () => {
+    let clave = claves[Math.floor(azar() * claves.length)]
+    if (clave === ultima) clave = claves[(claves.indexOf(clave) + 1) % claves.length]
+    ultima = clave
+    const muestra: Fig = { forma: formas[Math.floor(azar() * formas.length)], color: colores[Math.floor(azar() * colores.length)], tamano: TAMANOS[Math.floor(azar() * 2)] }
+    const pedidas = clave.split('+') as Propiedad[]
+    // Opciones: la correcta comparte justo lo pedido; cada distractora comparte solo una
+    // de las propiedades pedidas o la que no se pide (hay que atender a todas las pedidas)
+    const resto = PROPIEDADES.filter((p) => !pedidas.includes(p))
+    const distractoras: Propiedad[][] = pedidas.length === 2 ? [[pedidas[0]], [pedidas[1]], resto] : resto.map((p) => [p])
+    if (nivel.modo === 'dos' && pedidas.length === 1) distractoras.push([])
+    const figuras = [figuraQueComparte(muestra, pedidas, formas, colores, azar), ...distractoras.map((c) => figuraQueComparte(muestra, c, formas, colores, azar))]
+    const opciones: OpcionGenerada[] = figuras.map((f, i) => ({ pantalla: pantallaFig(f), etiqueta: etiquetaFig(f, i), correcta: i === 0 }))
+    const consigna = pedidas.length === 2 ? CLAVE_DOS.find((c) => c[0] === pedidas[0] && c[1] === pedidas[1])![2] : CLAVE_UNA[pedidas[0]]
+    return { clave, consigna, muestra: pantallaFig(muestra), opciones: barajar(opciones, azar) }
   })
 }
 
@@ -497,6 +568,17 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
     estimulos: [e.muestra!, e.opciones[correcta].pantalla],
     marcada: null,
   })
+  if (tipo === 'clasificacion') {
+    // La muestra marcada y las opciones; el alumno señala la que va con ella
+    const correcta = e.opciones.findIndex((o) => o.correcta)
+    return {
+      clave: e.clave,
+      pregunta: `${e.consigna.replace('Toca el que', '¿Cuál')} que la marcada?`,
+      esperada: `La ${correcta + 2}.ª contando desde la izquierda`,
+      estimulos: [e.muestra!, ...e.opciones.map((o) => o.pantalla)],
+      marcada: 0,
+    }
+  }
   if (tipo === 'distincion') {
     if (e.clave === 'intruso')
       return { clave: e.clave, pregunta: '¿Cuál es diferente?', esperada: `Señala o nombra: ${e.opciones[correcta].etiqueta}`, estimulos: e.opciones.map((o) => o.pantalla), marcada: null }
@@ -540,6 +622,7 @@ export function generarBloque(
   generalizacion = false,
   azar: Azar = Math.random
 ): EnsayoGenerado[] {
+  if (actividad.tipo === 'clasificacion') return clasificacion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'espacial') return espacial(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'temporal') return temporal(actividad.niveles[indiceNivel], generalizacion, n, azar, conceptos)

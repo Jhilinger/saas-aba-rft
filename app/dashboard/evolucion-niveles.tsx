@@ -37,6 +37,12 @@ const CLAVE: Record<string, string> = {
   fuera: '«Fuera»',
   delante: '«Delante»',
   detras: '«Detrás»',
+  color: '«Mismo color»',
+  forma: '«Misma forma»',
+  tamano: '«Mismo tamaño»',
+  'color+forma': '«Color y forma»',
+  'forma+tamano': '«Forma y tamaño»',
+  'color+tamano': '«Color y tamaño»',
   asc: 'ordenar de menos a más',
   desc: 'ordenar de más a menos',
 }

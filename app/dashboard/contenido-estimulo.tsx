@@ -122,7 +122,7 @@ export default function ContenidoEstimulo({
           {estimulo.e}
         </span>
       ) : (
-        <span style={{ width: f(etiqueta ? 0.66 : 0.82), height: f(etiqueta ? 0.66 : 0.82) }}>
+        <span style={{ width: f((etiqueta ? 0.66 : 0.82) * ('escala' in estimulo ? (estimulo.escala ?? 1) : 1)), height: f((etiqueta ? 0.66 : 0.82) * ('escala' in estimulo ? (estimulo.escala ?? 1) : 1)) }}>
           <Figura tipo={estimulo.fig} semilla={estimulo.s} variante={estimulo.v} tono={estimulo.c} className="h-full w-full" />
         </span>
       )}

@@ -11,7 +11,8 @@ export type EstimuloPantalla =
   | { color: string }
   // v: variante fija de la figura (ej. familia de forma de las abstractas);
   // c: color (índice de tono) para distinguir figuras de un mismo programa
-  | { fig: string; s: string; v?: number; c?: number; etiqueta?: string }
+  // escala (0,3–1): tamaño de la figura (p. ej. grande / pequeña al clasificar)
+  | { fig: string; s: string; v?: number; c?: number; escala?: number; etiqueta?: string }
   | { externo: string }
   // Formas dibujadas para comparar magnitudes: lápiz de longitud valor (0,2–1)
   // o torre de valor bloques
