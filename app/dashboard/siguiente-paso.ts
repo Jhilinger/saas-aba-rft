@@ -42,7 +42,16 @@ export type TipoPaso =
   | 'sonda_generalizacion'
   | 'sonda_mantenimiento'
 
-export type Paso = { tipo: TipoPaso; grupo: string | null; titulo: string; detalle: string; accion?: AccionPaso }
+// relacion: el test al que se refiere un paso de todo el programa (para que anule
+// los pasos más débiles de ese mismo test en cada grupo)
+export type Paso = {
+  tipo: TipoPaso
+  grupo: string | null
+  titulo: string
+  detalle: string
+  accion?: AccionPaso
+  relacion?: PasoSecuencia & { forma: Forma }
+}
 
 export type DatosPaso = {
   bloques: BloquePaso[]
@@ -103,6 +112,7 @@ export function siguientesPasos(d: DatosPaso): Paso[] {
         pasos.push({
           tipo: 'operante_generalizada',
           grupo: null,
+          relacion: { ...t, forma: f },
           titulo: `El ${nombreCombo(t)} ya se deriva en ${derivados.size} grupos${formaTexto(f)}`,
           detalle: 'Se deriva a la primera con estímulos nuevos: la relación se comporta como operante generalizada. No hace falta entrenar más grupos para este test: pase a la siguiente fase de la secuencia o al siguiente programa.',
         })
@@ -124,6 +134,7 @@ export function siguientesPasos(d: DatosPaso): Paso[] {
         pasos.push({
           tipo: 'volver_paso_anterior',
           grupo: null,
+          relacion: { ...t, forma: f },
           titulo: `El ${nombreCombo(t)} no se deriva en ${fallidos.size} grupos${formaTexto(f)}`,
           detalle: `Falta base para esta relación. Vuelva al paso anterior del marco${d.programaAnterior ? ` («${d.programaAnterior}»)` : ''} y refuércelo con más ejemplares antes de seguir (Luciano et al., 2009).`,
         })
@@ -266,5 +277,11 @@ export function siguientesPasos(d: DatosPaso): Paso[] {
     })
   }
 
-  return pasos
+  // La propuesta más fuerte anula a la otra: si un test ya se da por generalizado o
+  // hay que volver al paso anterior, sobran los pasos de ese test en cada grupo
+  const deTest: TipoPaso[] = ['repetir_test', 'probar_fichas', 'entrenar_direccion']
+  const fuertes = pasos.filter((p) => p.relacion)
+  return pasos.filter(
+    (p) => !(deTest.includes(p.tipo) && p.accion && fuertes.some((x) => x.relacion!.forma === p.accion!.forma && mismo(x.relacion!, p.accion!)))
+  )
 }
