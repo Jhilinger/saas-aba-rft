@@ -168,6 +168,7 @@ function Presentacion({
   etiquetasSecuencia,
   hablante = false,
   apoyoVisual = false,
+  ordenEsperado,
   onElegir,
   onOpciones,
 }: {
@@ -202,6 +203,8 @@ function Presentacion({
   hablante?: boolean
   // Fichas iguales con el nombre debajo en vez de botones de texto (programas verbales)
   apoyoVisual?: boolean
+  // Respuesta de ordenar: tocar las opciones en este orden (nombres)
+  ordenEsperado?: string[]
   onElegir: (e: Eleccion) => void
   // Salen las opciones: desde aquí se mide la latencia
   onOpciones: () => void
@@ -211,7 +214,18 @@ function Presentacion({
   const respuestaOral = hablante || (!oidasComoOpciones && comparativos.some((c) => esOido(c.estimulo)))
   // Respuesta esperada (hablante): oculta, se ve manteniendo pulsado
   const [verEsperada, setVerEsperada] = useState(false)
-  const esperada = comparativos.find((c) => c.esCorrecto)?.estimulo.nombre
+  const esperada = ordenEsperado ? ordenEsperado.join(' → ') : comparativos.find((c) => c.esCorrecto)?.estimulo.nombre
+  // Ordenar: lo que el alumno ha tocado, en orden; al tocar el último se registra
+  const [tocadas, setTocadas] = useState<string[]>([])
+  const tocarEnOrden = (nombre: string) => {
+    if (!ordenEsperado || tocadas.includes(nombre)) return
+    const lista = [...tocadas, nombre]
+    setTocadas(lista)
+    if (lista.length === ordenEsperado.length) {
+      const bien = lista.every((n, i) => n.trim().toLowerCase() === ordenEsperado[i].trim().toLowerCase())
+      onElegir({ correcto: bien, respuesta: lista.join(' → '), conAyudaPantalla: false })
+    }
+  }
   // Test de transformación de funciones: sin muestra (se retiran los A); solo
   // las opciones y la pregunta
   const sinMuestra = sinMuestraForzada || (fase === 'transformacion_funciones' && !respuestaOral)
@@ -401,7 +415,12 @@ function Presentacion({
                   key={c.claseId}
                   type="button"
                   disabled={oculta}
-                  onClick={() => listo && onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora })}
+                  onClick={() =>
+                    listo &&
+                    (ordenEsperado
+                      ? tocarEnOrden(textoOido(c.estimulo.nombre))
+                      : onElegir({ correcto: c.esCorrecto, respuesta: textoOido(c.estimulo.nombre), conAyudaPantalla: resaltadaPorDemora }))
+                  }
                   style={apoyoVisual ? { width: ladoOpcion, height: ladoOpcion, ...estiloDistractor(c) } : { fontSize: '5vmin', ...estiloDistractor(c) }}
                   className={`${apoyoVisual ? 'flex items-center justify-center' : 'min-w-[26vw] px-[4vmin] py-[3vmin]'} rounded-[2.5vmin] border-2 bg-white font-semibold leading-tight text-slate-800 shadow-sm transition-transform active:scale-[0.98] ${
                     oculta ? 'invisible' : ''
@@ -413,6 +432,11 @@ function Presentacion({
                         : 'border-slate-200'
                   }`}
                 >
+                  {ordenEsperado && tocadas.includes(textoOido(c.estimulo.nombre)) && (
+                    <span className="mr-[1.5vmin] inline-flex h-[6vmin] w-[6vmin] items-center justify-center rounded-full bg-indigo-600 align-middle text-[3.5vmin] font-bold text-white">
+                      {tocadas.indexOf(textoOido(c.estimulo.nombre)) + 1}
+                    </span>
+                  )}
                   {apoyoVisual ? <Ficha nombre={textoOido(c.estimulo.nombre)} lado={ladoOpcion} /> : textoOido(c.estimulo.nombre)}
                 </button>
               )
@@ -712,6 +736,7 @@ function EnsayoTablet({
   etiquetasSecuencia,
   hablante,
   apoyoVisual,
+  ordenEsperado,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -736,6 +761,7 @@ function EnsayoTablet({
   etiquetasSecuencia?: string[]
   hablante: boolean
   apoyoVisual: boolean
+  ordenEsperado?: string[]
   onResponder: (r: RespuestaTablet) => void
   onMuestra: () => void
   onPrimeraRespuesta: () => void
@@ -805,6 +831,7 @@ function EnsayoTablet({
       etiquetasSecuencia={modelo ? etiquetasSecuencia : undefined}
       hablante={hablante}
       apoyoVisual={apoyoVisual}
+      ordenEsperado={ordenEsperado}
       onElegir={elegir}
       onOpciones={
         modelo
@@ -842,6 +869,7 @@ export default function PantallaTablet({
   etiquetasSecuencia,
   hablante = false,
   apoyoVisual = false,
+  ordenEsperado,
   onResponder,
   onMuestra,
   onPrimeraRespuesta,
@@ -882,6 +910,8 @@ export default function PantallaTablet({
   hablante?: boolean
   // Fichas iguales con el nombre debajo (apoyo visual de los programas verbales)
   apoyoVisual?: boolean
+  // Respuesta de ordenar: tocar las opciones en este orden
+  ordenEsperado?: string[]
   onResponder: (correcto: boolean, ayuda: string, respuesta: string | null, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => void
   // Salen las opciones: desde aquí se mide la latencia
   onMuestra: () => void
@@ -988,7 +1018,7 @@ export default function PantallaTablet({
         imagenes={imagenes}
         apoyo={apoyo}
         observacion={observacion}
-        menorAMayor={menorAMayor && !hablante}
+        menorAMayor={menorAMayor && !hablante && !ordenEsperado}
         consigna={consigna}
         sinMuestra={sinMuestra}
         seleccionOida={seleccionOida}
@@ -1001,6 +1031,7 @@ export default function PantallaTablet({
         etiquetasSecuencia={etiquetasSecuencia}
         hablante={hablante}
         apoyoVisual={apoyoVisual}
+        ordenEsperado={ordenEsperado}
         onResponder={responder}
         onMuestra={onMuestra}
         onPrimeraRespuesta={onPrimeraRespuesta}

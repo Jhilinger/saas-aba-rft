@@ -5,7 +5,7 @@
 
 import type { Json } from '@/database.types'
 
-export const TIPOS_RESPUESTA = ['seleccion', 'opciones', 'ejecucion', 'abierta'] as const
+export const TIPOS_RESPUESTA = ['seleccion', 'opciones', 'ejecucion', 'abierta', 'orden'] as const
 export type TipoRespuesta = (typeof TIPOS_RESPUESTA)[number]
 
 export const NOMBRE_TIPO_RESPUESTA: Record<TipoRespuesta, string> = {
@@ -13,6 +13,9 @@ export const NOMBRE_TIPO_RESPUESTA: Record<TipoRespuesta, string> = {
   opciones: 'Opciones fijas',
   ejecucion: 'Ejecución (lo hace o no)',
   abierta: 'Respuesta abierta',
+  // Toca los miembros de la clase en orden (p. ej. las acciones en el orden en que ocurren);
+  // la respuesta esperada es la lista en orden, separada por comas
+  orden: 'Ordenar (tocar en orden)',
 }
 
 export type ConfigRespuesta = { tipo: TipoRespuesta; opciones: string[] }

@@ -889,6 +889,11 @@ export default function TomarDatosRftClient({
       )
       return conFrase.length > 0 && conFrase.length === clasesCon(grupo, origen, destino).length
     }
+    if (tipo === 'orden') {
+      // Ordenar: opciones de la propia clase (3 o más miembros) y el orden esperado en cada clase
+      const cs = clasesCon(grupo, origen, destino)
+      return opcionesClase && cs.length > 0 && cs.every((c) => c.estimulos_rft.length >= 3 && !!respuestaEsperada(c.respuestas_esperadas, faseBloque, origen, destino))
+    }
     if (tipo !== 'seleccion') return false
     const validas = clasesTableta(grupo, origen, destino)
     if (validas.length < 2) return false
@@ -1558,6 +1563,11 @@ export default function TomarDatosRftClient({
         conTexto={conTexto}
         hablante={formaBloque === 'hablante'}
         apoyoVisual={apoyoVisualBloque}
+        ordenEsperado={
+          configRespuesta(respuesta, fase).tipo === 'orden'
+            ? (respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino) ?? '').split(',').map((x) => x.trim()).filter(Boolean)
+            : undefined
+        }
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
