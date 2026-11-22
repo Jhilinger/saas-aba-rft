@@ -9,6 +9,7 @@ import { NOMBRE_FASE_SECUENCIA, type FaseSecuencia } from '../../../secuencia-rf
 import ContenidoEstimulo from '../../../contenido-estimulo'
 import { parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 import { presentacionNivel, siguienteNivel } from '../../../sin-error'
+import { guardarRefuerzo, leerRefuerzo, sonarAcierto, type PreferenciasRefuerzo } from '../../../refuerzo-tablet'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
 // las comparaciones en tarjetas. El toque del alumno registra el ensayo. Las
@@ -965,6 +966,20 @@ export default function PantallaTablet({
   // Tras un error y en los tests, la de siempre (igual aciertes o falles)
   const [pausaSiguiente, setPausaSiguiente] = useState(PAUSA_ENTRE_ENSAYOS)
 
+  // Economía de fichas (solo terapeuta y entrenamiento): una estrella por acierto,
+  // la última encendida destella, y al acabar el bloque una pantalla de premio
+  // mientras el terapeuta da el reforzador de respaldo
+  const [refuerzo, setRefuerzo] = useState<PreferenciasRefuerzo>(leerRefuerzo)
+  const conFichas = !infantil && refuerzo.fichas && fase === 'entrenamiento'
+  const [aciertos, setAciertos] = useState(0)
+  const [destello, setDestello] = useState<number | null>(null)
+  const [premio, setPremio] = useState<number | null>(null)
+  const cambiarRefuerzo = (cambio: Partial<PreferenciasRefuerzo>) => {
+    const nuevas = { ...refuerzo, ...cambio }
+    setRefuerzo(nuevas)
+    guardarRefuerzo(nuevas)
+  }
+
   const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
     setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
@@ -975,20 +990,35 @@ export default function PantallaTablet({
         transferencia,
       })
     setAyuda(null)
+    const ultimo = ensayo >= total - 1
+    const aciertosTotales = aciertos + (correcto && fase === 'entrenamiento' ? 1 : 0)
+    // En el último ensayo, con fichas, la pantalla de premio antes de pasar a los resultados
+    const cerrar = () => {
+      if (conFichas && ultimo) {
+        setPremio(aciertosTotales)
+        setTimeout(registrar, 2400)
+      } else registrar()
+    }
     if (!infantil && correcto && fase === 'entrenamiento') {
+      if (conFichas) {
+        setAciertos(aciertosTotales)
+        setDestello(aciertosTotales - 1)
+        setTimeout(() => setDestello(null), 700)
+      }
+      if (refuerzo.sonido) sonarAcierto()
       setRetro({ origen, comparativos, consigna, ensayo })
       const fin = elogios ? Promise.all([decirElogio(), esperar(900)]) : esperar(900)
       // En el último ensayo del bloque, el registro (que cierra la tableta y
       // pasa a los resultados) espera a que termine el elogio. La latencia ya
       // quedó fijada en el primer toque
-      const ultimo = ensayo >= total - 1
       void fin.then(() => {
-        if (ultimo) registrar()
+        if (ultimo) cerrar()
         else setRetro(null)
       })
       if (ultimo) return
     }
-    registrar()
+    if (ultimo) cerrar()
+    else registrar()
   }
 
   return (
@@ -1008,12 +1038,25 @@ export default function PantallaTablet({
           {apoyo && <span className="ml-2">· {apoyo.nombre}</span>}
           {ayuda && <span className="ml-2 font-semibold text-amber-500">ayuda: {AYUDAS.find((a) => a.value === ayuda)?.label}</span>}
         </p>
+        {conFichas && (
+          <span className="flex flex-wrap items-center justify-center gap-[0.6vmin]" aria-label={`${aciertos} estrellas`}>
+            {Array.from({ length: total }, (_, i) => (
+              <span
+                key={i}
+                className={`leading-none transition-transform duration-300 ${i < aciertos ? 'text-amber-400' : 'text-slate-200'} ${destello === i ? 'scale-150' : ''}`}
+                style={{ fontSize: total > 12 ? '3vmin' : '4.2vmin' }}
+              >
+                ★
+              </span>
+            ))}
+          </span>
+        )}
         <span className="flex gap-2">
           <BotonLargo onActivar={() => setMenuAyuda(true)} className="border border-slate-200 !bg-transparent">
             Ayuda
           </BotonLargo>
           <BotonLargo onActivar={() => setMenuVoz(true)} className="border border-slate-200 !bg-transparent">
-            Voz
+            {infantil ? 'Voz' : 'Voz y refuerzo'}
           </BotonLargo>
           <BotonLargo onActivar={onSalir} className="border border-slate-200 !bg-transparent">
             Salir
@@ -1063,6 +1106,17 @@ export default function PantallaTablet({
       />
       )}
 
+      {premio !== null && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-[3vmin] bg-white">
+          <span className="animate-bounce leading-none text-amber-400" style={{ fontSize: '22vmin' }}>
+            ★
+          </span>
+          <p className="font-bold text-slate-800" style={{ fontSize: '7vmin' }}>
+            ¡{premio} {premio === 1 ? 'estrella' : 'estrellas'}!
+          </p>
+        </div>
+      )}
+
       {menuVoz && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
           <div className="w-full max-w-sm space-y-2 rounded-2xl bg-white p-4 text-sm">
@@ -1080,6 +1134,21 @@ export default function PantallaTablet({
                 />
                 Elogio hablado al acertar en entrenamiento («¡Muy bien!»)
               </label>
+            )}
+            {!infantil && (
+              <>
+                <label className="flex items-center gap-2 text-slate-700">
+                  <input type="checkbox" checked={refuerzo.fichas} onChange={(e) => cambiarRefuerzo({ fichas: e.target.checked })} className="h-4 w-4" />
+                  Estrellas por acierto y premio al acabar el bloque (entrenamiento)
+                </label>
+                <label className="flex items-center gap-2 text-slate-700">
+                  <input type="checkbox" checked={refuerzo.sonido} onChange={(e) => cambiarRefuerzo({ sonido: e.target.checked })} className="h-4 w-4" />
+                  Sonido breve al acertar (entrenamiento)
+                </label>
+                <p className="text-xs text-slate-500">
+                  En los tests no hay refuerzo diferencial: ni estrellas ni sonido. Al acabar el bloque, dé usted el reforzador de respaldo.
+                </p>
+              </>
             )}
             <button onClick={() => setMenuVoz(false)} className="w-full rounded-lg px-3 py-2 text-slate-500">
               Volver
