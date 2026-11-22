@@ -8,6 +8,8 @@ import { guardarBloqueRft } from './actions'
 import PantallaTablet, { type ImagenesBanco, type RespuestaTablet } from './pantalla-tablet'
 import PantallaHablante from './pantalla-hablante'
 import AjustesRefuerzo from '../../../ajustes-refuerzo'
+import PanelSiguientePaso from '../../../panel-siguiente-paso'
+import type { Paso } from '../../../siguiente-paso'
 import { aHablante, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
@@ -41,6 +43,7 @@ export default function ConceptosTablet({
   ensayosPorBloque,
   sinError,
   ultimosEscalones,
+  siguientesPasos = [],
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -54,6 +57,8 @@ export default function ConceptosTablet({
   ensayosPorBloque: number
   sinError: ConfigSinError | null
   ultimosEscalones: Record<string, Json>
+  // Lo que la app propone con los datos (ver siguiente-paso.ts)
+  siguientesPasos?: Paso[]
 }) {
   // Respuesta de oyente (toca la opción) o de hablante (dice la relación y el terapeuta la puntúa)
   const [hablante, setHablante] = useState(false)
@@ -277,6 +282,7 @@ export default function ConceptosTablet({
           {resultado.porcentaje}% de acierto
         </p>
       )}
+      <PanelSiguientePaso pasos={siguientesPasos} />
       <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
         <span>Respuesta</span>
         {([false, true] as const).map((h) => (

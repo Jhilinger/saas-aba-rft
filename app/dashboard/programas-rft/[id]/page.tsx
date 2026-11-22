@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { claveTemporal, ordenMencion, type FilaClave } from '../../claves-temporales'
 import { tienePlantilla } from '../../generador-rft/plantillas'
 import { createClient } from '@/utils/supabase/server'
@@ -14,6 +15,8 @@ import { Breadcrumb, Panel } from '../../../ui'
 import type { Enums, Tables } from '@/database.types'
 import PanelAlertas from '../../panel-alertas'
 import { cargarAlertas } from '../../cargar-alertas'
+import { cargarSiguientesPasos } from '../../siguiente-paso-datos'
+import PanelSiguientePaso from '../../panel-siguiente-paso'
 import { cargarImagenes } from '../../imagenes-estimulo'
 import SinErrorPanel from './sin-error-panel'
 import ConsignasPanel from './consignas-panel'
@@ -254,11 +257,26 @@ export default async function ProgramaRftPage({
     .order('fecha', { ascending: false })
     .limit(10)
 
+  // Siguiente paso según los datos (ver siguiente-paso.ts)
+  const siguientesPasos = await cargarSiguientesPasos(supabase, id)
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-8">
       {cabecera}
       {disena && diferenciasPlantilla && <AvisoPlantilla programaAlumnoId={id} diferencias={diferenciasPlantilla} />}
-      {disena && <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} />}
+      {disena && <PanelAlertas unidades={await cargarAlertas(supabase, [programa.alumno_id], id)} sinSugerencia={siguientesPasos.length > 0} />}
+      {siguientesPasos.length > 0 && (
+        <Panel className="p-4 sm:p-5">
+          <PanelSiguientePaso pasos={siguientesPasos} />
+          <p className="mt-3 text-xs text-slate-500">
+            En{' '}
+            <Link href={`/dashboard/tomar-datos/rft/${id}`} className="text-indigo-600 hover:underline">
+              Tomar datos
+            </Link>{' '}
+            cada paso tiene un botón para dejar preparado su bloque.
+          </p>
+        </Panel>
+      )}
       {infoPanel}
       <SinErrorPanel programaAlumnoId={id} config={leerSinError(programa.sin_error)} soloLectura={!disena} />
 

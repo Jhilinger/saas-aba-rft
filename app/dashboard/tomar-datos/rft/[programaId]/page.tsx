@@ -7,6 +7,7 @@ import { conceptosDePantalla, parsearEstimuloPantalla } from '../../../estimulo-
 import { cargarImagenes } from '../../../imagenes-estimulo'
 import { leerSinError } from '../../../sin-error'
 import ConceptosTablet from './conceptos-tablet'
+import { cargarSiguientesPasos } from '../../../siguiente-paso-datos'
 import { CATEGORIAS_ENTRENAMIENTO, CATEGORIAS_GENERALIZACION, imagenesNecesarias, leerActividadConceptos, type Concepto } from '../../../conceptos'
 
 export default async function TomarDatosRftPage({
@@ -92,6 +93,9 @@ export default async function TomarDatosRftPage({
     }
   }
 
+  // Siguiente paso según los datos (fallos, estancamiento, generalización…)
+  const siguientesPasos = await cargarSiguientesPasos(supabase, programaId)
+
   // Conceptos básicos generados en la tableta: imágenes de las categorías de
   // entrenamiento y, aparte, de las de generalización
   const actividad = leerActividadConceptos(programa.actividad_tablet)
@@ -141,6 +145,7 @@ export default async function TomarDatosRftPage({
           ensayosPorBloque={programa.ensayos_por_bloque}
           sinError={sinError}
           ultimosEscalones={ultimosEscalones}
+          siguientesPasos={siguientesPasos}
         />
       )}
 
@@ -175,6 +180,7 @@ export default async function TomarDatosRftPage({
         opcionesClase={programa.opciones_clase}
         alternarEjemplares={programa.alternar_ejemplares}
         textoTablet={programa.texto_tablet}
+        siguientesPasos={siguientesPasos}
       />
       )}
     </div>

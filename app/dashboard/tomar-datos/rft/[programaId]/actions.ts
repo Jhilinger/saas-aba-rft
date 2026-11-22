@@ -7,6 +7,8 @@ import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../nive
 import { duracionValida, latenciaMedia, latenciaValida } from '../../tiempos'
 import { leerEscalonBloque } from '../../../sin-error'
 import type { Json } from '@/database.types'
+import { cargarSiguientesPasos } from '../../../siguiente-paso-datos'
+import type { Paso } from '../../../siguiente-paso'
 
 // En los conceptos generados en la tableta no hay clase ni estímulos fijos:
 // los ids van a null y el ensayo se describe en generado
@@ -342,4 +344,10 @@ export async function guardarTextoTablet(programaAlumnoId: string, conTexto: boo
   const supabase = await createClient()
   const { error } = await supabase.from('programas_alumno').update({ texto_tablet: conTexto }).eq('id', programaAlumnoId)
   return error ? { error: error.message } : {}
+}
+
+// Siguiente paso tras guardar un bloque (con los datos ya actualizados)
+export async function obtenerSiguientesPasos(programaAlumnoId: string): Promise<Paso[]> {
+  const supabase = await createClient()
+  return cargarSiguientesPasos(supabase, programaAlumnoId)
 }

@@ -3,7 +3,9 @@
 import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import { useState, useTransition, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { guardarBloqueRft, guardarTextoTablet } from './actions'
+import { guardarBloqueRft, guardarTextoTablet, obtenerSiguientesPasos } from './actions'
+import PanelSiguientePaso from '../../../panel-siguiente-paso'
+import type { AccionPaso, Paso } from '../../../siguiente-paso'
 import VideoDiferido from '../../../video-diferido'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
@@ -371,6 +373,7 @@ export default function TomarDatosRftClient({
   alternarEjemplares = false,
   sinAudio = false,
   textoTablet = true,
+  siguientesPasos = [],
 }: {
   programaAlumnoId: string
   alumnoId: string
@@ -401,6 +404,8 @@ export default function TomarDatosRftClient({
   sinAudio?: boolean
   // Clave y opciones también en texto en la tableta (se recuerda en el programa)
   textoTablet?: boolean
+  // Lo que la app propone hacer con los datos (ver siguiente-paso.ts)
+  siguientesPasos?: Paso[]
 }) {
   const nivel = coerceNivelRft(nivelRft)
   const FASES = FASES_TODAS.filter((f) => FASES_POR_NIVEL[nivel].includes(f.value))
@@ -413,6 +418,8 @@ export default function TomarDatosRftClient({
   const [tamanoBloque, setTamanoBloque] = useState(ensayosPorBloqueDefecto)
   // El terapeuta elige la combinación a mano en lugar de la recomendada
   const [manual, setManual] = useState(false)
+  // Siguiente paso recalculado tras guardar el bloque (null: aún no)
+  const [pasosTrasBloque, setPasosTrasBloque] = useState<Paso[] | null>(null)
   // Modo del próximo bloque, y si la pantalla del alumno está abierta. El modo
   // con que empezó el bloque se guarda con él (ref, como los controles)
   // Programas verbales del nivel 3 (sin audio): se registran solo en la tableta
@@ -618,6 +625,8 @@ export default function TomarDatosRftClient({
           }
           borrarProgreso(claveProgreso)
           setEstadoGuardado('idle')
+          setPasosTrasBloque(null)
+          obtenerSiguientesPasos(programaAlumnoId).then(setPasosTrasBloque, () => setPasosTrasBloque([]))
           setResultado({
             porcentaje: res.porcentaje ?? 0,
             clasesDominadasAhora: res.clasesDominadasAhora ?? [],
@@ -861,6 +870,22 @@ export default function TomarDatosRftClient({
     setNotas('')
     setResultado(null)
     setEstadoGuardado('idle')
+  }
+
+  // «Preparar este bloque» desde el siguiente paso: deja elegida la combinación a mano
+  const preparar = (a: AccionPaso) => {
+    setResultado(null)
+    setSecuencia(null)
+    setEstadoGuardado('idle')
+    setGrupoSeleccionado(a.grupo)
+    setFase(a.fase)
+    setPosicionOrigen(a.origen)
+    setPosicionDestino(a.destino)
+    setTipoSonda('normal')
+    setForma(a.forma)
+    setApoyoVisual(a.apoyoVisual)
+    setManual(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // Recomendación: primer paso pendiente de la secuencia del programa
@@ -1125,6 +1150,11 @@ export default function TomarDatosRftClient({
             Ensayos de control: {resultado.controles.aciertos}/{resultado.controles.total} correctos (no cuentan para el dominio)
           </p>
         )}
+        {pasosTrasBloque === null ? (
+          <p className="text-xs text-slate-400">Calculando el siguiente paso…</p>
+        ) : (
+          <PanelSiguientePaso pasos={pasosTrasBloque} onPreparar={preparar} />
+        )}
         <div className="flex flex-col sm:flex-row justify-center gap-3">
           <Button
             onClick={() => {
@@ -1222,6 +1252,7 @@ export default function TomarDatosRftClient({
             }
           />
         )}
+        <PanelSiguientePaso pasos={siguientesPasos} onPreparar={preparar} />
         <p className="text-sm font-medium text-slate-600">
           {recomendacionGlobal ? 'O elige un grupo:' : '¿Qué grupo de clases vas a trabajar?'}
         </p>
@@ -1272,6 +1303,7 @@ export default function TomarDatosRftClient({
             />
           }
         />
+        <PanelSiguientePaso pasos={siguientesPasos} grupo={grupoSeleccionado} onPreparar={preparar} />
         <button onClick={() => setManual(true)} className="text-sm font-medium text-slate-500 hover:text-slate-700">
           Elegir otra combinación o una sonda →
         </button>
@@ -1298,6 +1330,7 @@ export default function TomarDatosRftClient({
           )}
         </div>
 
+        <PanelSiguientePaso pasos={siguientesPasos} grupo={grupoSeleccionado} titulo="Lo que propone la app" />
         {recomendacionGrupo ? (
           <button onClick={() => setManual(false)} className="text-sm font-medium text-indigo-600 hover:underline">
             ← Volver al bloque recomendado
