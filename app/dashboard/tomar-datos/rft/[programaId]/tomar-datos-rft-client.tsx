@@ -17,7 +17,7 @@ import {
 } from './relaciones-rft'
 import { coerceNivelRft, FASES_POR_NIVEL, NOMBRE_NIVEL_RFT } from '../../../niveles-rft'
 import { marcaDeTiempo, segundosDesde, useCronometroEnsayo } from '../../cronometro'
-import { configRespuesta, respuestaEsperada } from '../../../respuestas-rft'
+import { configRespuesta, opcionesDeClase, respuestaEsperada } from '../../../respuestas-rft'
 import type { Json } from '@/database.types'
 import { NOMBRE_FASE_SECUENCIA, recomendarBloque, type FaseSecuencia, type Recomendacion } from '../../../secuencia-rft'
 import PantallaTablet, { esOido, esVisible, textoOido, urlImagen, type ImagenesBanco } from './pantalla-tablet'
@@ -48,7 +48,7 @@ function VistaEstimulo({ estimulo, imagenes }: { estimulo: Estimulo; imagenes: I
   return <img src={url} alt="" className="h-12 w-12 shrink-0 rounded-lg border border-slate-200 bg-white object-contain" />
 }
 // generado: la clase la creó el generador de grupos (sin voz grabada)
-type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; consignas: Json; generado?: Json | null; estimulos_rft: Estimulo[] }
+type Clase = { id: string; nombre: string; grupo: string; respuestas_esperadas: Json; opciones_por_fase?: Json; consignas: Json; generado?: Json | null; estimulos_rft: Estimulo[] }
 type DominioFase = { grupo: string; fase: string; posicion_origen: string; posicion_destino: string; forma_respuesta?: string }
 // Oyente: elige entre opciones; hablante: responde sin opciones y el terapeuta puntúa
 type Forma = 'oyente' | 'hablante'
@@ -748,7 +748,8 @@ export default function TomarDatosRftClient({
     if (cfg.tipo === 'opciones') {
       // Opciones fijas como palabras (botones de texto); correcta, la respuesta esperada
       const esperadaClase = respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino)
-      return cfg.opciones.map((op, i) => ({
+      const opcionesClaseActual = opcionesDeClase(claseActual.opciones_por_fase, fase, posicionOrigen, posicionDestino) ?? cfg.opciones
+      return opcionesClaseActual.map((op, i) => ({
         claseId: `${claseActual.id}-op${i}`,
         estimulo: { id: `${claseActual.id}-op${i}`, posicion: null, nombre: `"${op}"`, concepto_imagen: null, pantalla: null },
         esCorrecto: op === esperadaClase,
@@ -1499,7 +1500,12 @@ export default function TomarDatosRftClient({
   const preguntaRegistro = preguntaActual.trim() || consignaActual || ''
   const esTransformacion = fase === 'transformacion_funciones'
   // La fase elegida decide el tipo de respuesta (las sondas usan el de su fase)
-  const config = configRespuesta(respuesta, fase)
+  // Las opciones fijas pueden ser propias de la clase (p. ej. las funciones de su red)
+  const configPrograma = configRespuesta(respuesta, fase)
+  const config = {
+    ...configPrograma,
+    opciones: opcionesDeClase(claseActual.opciones_por_fase, fase, posicionOrigen, posicionDestino) ?? configPrograma.opciones,
+  }
   const esperada =
     respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino)
   const conPregunta = esTransformacion || config.tipo === 'opciones' || config.tipo === 'abierta'

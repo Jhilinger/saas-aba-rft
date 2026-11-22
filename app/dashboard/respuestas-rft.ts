@@ -72,6 +72,13 @@ export function leerRespuestasEsperadas(valor: Json | null | undefined): Record<
   return resultado
 }
 
+// Opciones propias de una clase en una fase y combinación («test_combinatorio:D→E»), o null
+export function opcionesDeClase(valor: Json | null | undefined, fase: string, origen: string, destino: string): string[] | null {
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return null
+  const lista = (valor as Record<string, unknown>)[`${fase}:${claveCombinacion(origen, destino)}`]
+  return Array.isArray(lista) && lista.length ? lista.filter((o): o is string => typeof o === 'string') : null
+}
+
 // Respuesta esperada de una clase en una fase: la propia de la fase
 // («transformacion_funciones:A→B») si la hay, si no la de la combinación («A→B»).
 // Hace falta cuando dos fases usan la misma combinación con respuestas distintas

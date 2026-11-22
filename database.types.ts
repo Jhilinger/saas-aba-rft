@@ -644,6 +644,7 @@ export type Database = {
           grupo: string
           id: string
           nombre: string
+          opciones_por_fase: Json
           programa_alumno_id: string
           respuestas_esperadas: Json
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
@@ -656,6 +657,7 @@ export type Database = {
           grupo?: string
           id?: string
           nombre: string
+          opciones_por_fase?: Json
           programa_alumno_id: string
           respuestas_esperadas?: Json
           tipo_relacion: Database["public"]["Enums"]["tipo_relacion_rft"]
@@ -668,6 +670,7 @@ export type Database = {
           grupo?: string
           id?: string
           nombre?: string
+          opciones_por_fase?: Json
           programa_alumno_id?: string
           respuestas_esperadas?: Json
           tipo_relacion?: Database["public"]["Enums"]["tipo_relacion_rft"]
@@ -689,6 +692,7 @@ export type Database = {
           grupo: string
           id: string
           nombre: string
+          opciones_por_fase: Json
           orden: number | null
           programa_base_id: string
           respuestas_esperadas: Json
@@ -699,6 +703,7 @@ export type Database = {
           grupo?: string
           id?: string
           nombre: string
+          opciones_por_fase?: Json
           orden?: number | null
           programa_base_id: string
           respuestas_esperadas?: Json
@@ -709,6 +714,7 @@ export type Database = {
           grupo?: string
           id?: string
           nombre?: string
+          opciones_por_fase?: Json
           orden?: number | null
           programa_base_id?: string
           respuestas_esperadas?: Json

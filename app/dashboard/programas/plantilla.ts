@@ -124,6 +124,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
     nombre: string
     grupo: string
     respuestas_esperadas: Json
+    opciones_por_fase: Json
     consignas: Json | null
     estimulos_rft_base: { etiqueta: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla: Json | null }[]
   }[] = []
@@ -140,7 +141,7 @@ export async function compararConPlantilla(supabase: Supabase, programaAlumnoId:
     const [{ data: clasesBase }, { data: clasesCopia }] = await Promise.all([
       supabase
         .from('clases_rft_base')
-        .select('nombre, grupo, orden, respuestas_esperadas, consignas, estimulos_rft_base(etiqueta, nombre, posicion, concepto_imagen, pantalla)')
+        .select('nombre, grupo, orden, respuestas_esperadas, opciones_por_fase, consignas, estimulos_rft_base(etiqueta, nombre, posicion, concepto_imagen, pantalla)')
         .eq('programa_base_id', base.id)
         .order('orden'),
       supabase.from('clases_rft').select('nombre, grupo').eq('programa_alumno_id', copia.id),

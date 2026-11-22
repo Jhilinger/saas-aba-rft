@@ -506,7 +506,7 @@ export async function clonarPrograma(id: string) {
   } else if (original.tipo === 'rft') {
     const { data: clases } = await supabase
       .from('clases_rft_base')
-      .select('nombre, grupo, orden, respuestas_esperadas, consignas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
+      .select('nombre, grupo, orden, respuestas_esperadas, opciones_por_fase, consignas, estimulos_rft_base(etiqueta, nombre, posicion, orden, concepto_imagen, pantalla)')
       .eq('programa_base_id', id)
       .order('orden')
 
@@ -519,6 +519,7 @@ export async function clonarPrograma(id: string) {
           grupo: clase.grupo,
           orden: clase.orden,
           respuestas_esperadas: clase.respuestas_esperadas,
+          opciones_por_fase: clase.opciones_por_fase,
           consignas: clase.consignas,
         })
         .select('id')
