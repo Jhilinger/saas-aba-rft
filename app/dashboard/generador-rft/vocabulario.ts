@@ -13,13 +13,65 @@ export const PERSONAJES = ['Pim', 'Tok', 'Lu', 'Mo', 'Kiri', 'Dax', 'Bo', 'Fi']
 
 // Dimensiones de comparación: sintagma, polos y pregunta (todas abstraídas en
 // «Abstraer Claves de Comparación»)
-export const DIMENSIONES: { sintagma: (n: string) => string; polos: [string, string]; pregunta: string }[] = [
-  { sintagma: (n) => n, polos: ['alto', 'bajo'], pregunta: '¿Quién es' },
-  { sintagma: (n) => `el tren ${n}`, polos: ['largo', 'corto'], pregunta: '¿Qué tren es' },
-  { sintagma: (n) => `la caja ${n}`, polos: ['pesada', 'ligera'], pregunta: '¿Qué caja es' },
-  { sintagma: (n) => `el coche ${n}`, polos: ['rápido', 'lento'], pregunta: '¿Qué coche es' },
-  { sintagma: (n) => `la pelota ${n}`, polos: ['grande', 'pequeña'], pregunta: '¿Qué pelota es' },
-  { sintagma: (n) => `la torre ${n}`, polos: ['alta', 'baja'], pregunta: '¿Qué torre es' },
+// Transformación de funciones (las mismas situaciones que los grupos del currículo):
+// - justo: umbral para el vínculo mutuo. justo[0] nombra al del polo 0 (alto,
+//   largo…) y la respuesta es el otro; justo[1] nombra al del polo 1.
+// - mejor: situación que pide el extremo en la red. mejor[0] pide el del polo 0;
+//   mejor[1], el del polo 1.
+type Dimension = {
+  sintagma: (n: string) => string
+  polos: [string, string]
+  pregunta: string
+  justo: [(x: string) => string, (x: string) => string]
+  mejor: [string, string]
+}
+
+export const DIMENSIONES: Dimension[] = [
+  {
+    sintagma: (n) => n,
+    polos: ['alto', 'bajo'],
+    pregunta: '¿Quién es',
+    justo: [(x) => `${x} llega justo a la estantería de arriba. ¿Quién no llega?`, (x) => `${x} cabe justo por debajo de la rama. ¿Quién no cabe?`],
+    mejor: ['Hay que coger un bote de la estantería más alta. ¿A quién sería mejor pedírselo?', 'Hay que pasar por debajo de una rama muy baja. ¿Quién pasaría mejor?'],
+  },
+  {
+    sintagma: (n) => `el tren ${n}`,
+    polos: ['largo', 'corto'],
+    pregunta: '¿Qué tren es',
+    justo: [(x) => `En el tren ${x} caben justo todos los niños. ¿En qué tren no caben?`, (x) => `El tren ${x} cabe justo en la estación pequeña. ¿Qué tren no cabe?`],
+    mejor: ['Van de excursión muchísimos niños. ¿Qué tren sería mejor coger?', 'La estación es muy pequeña. ¿Qué tren cabría mejor?'],
+  },
+  {
+    sintagma: (n) => `la caja ${n}`,
+    polos: ['pesada', 'ligera'],
+    pregunta: '¿Qué caja es',
+    justo: [(x) => `La caja ${x} sujeta justo la puerta para que no se cierre. ¿Qué caja no la sujeta?`, (x) => `Ana levanta justo la caja ${x}. ¿Qué caja no puede levantar Ana?`],
+    mejor: ['Hay que sujetar la puerta un día de mucho viento. ¿Qué caja sería mejor usar?', 'Ana tiene que llevar una caja muy lejos. ¿Qué caja sería mejor darle?'],
+  },
+  {
+    sintagma: (n) => `el coche ${n}`,
+    polos: ['rápido', 'lento'],
+    pregunta: '¿Qué coche es',
+    justo: [
+      (x) => `El coche ${x} llega justo a tiempo a la tienda. ¿Qué coche no llega a tiempo?`,
+      (x) => `El coche ${x} va justo a la velocidad que se permite en la calle del colegio. ¿Qué coche va demasiado deprisa para esa calle?`,
+    ],
+    mejor: ['Hay que llegar lo antes posible. ¿Qué coche sería mejor coger?', 'En la calle del colegio hay que ir muy despacio. ¿Qué coche iría mejor?'],
+  },
+  {
+    sintagma: (n) => `la pelota ${n}`,
+    polos: ['grande', 'pequeña'],
+    pregunta: '¿Qué pelota es',
+    justo: [(x) => `La pelota ${x} tapa justo el agujero de la valla. ¿Qué pelota no lo tapa?`, (x) => `La pelota ${x} cabe justo por el tubo. ¿Qué pelota no cabe?`],
+    mejor: ['Hay que tapar un agujero muy grande. ¿Qué pelota sería mejor usar?', 'Hay que pasar una pelota por un tubo muy estrecho. ¿Qué pelota sería mejor usar?'],
+  },
+  {
+    sintagma: (n) => `la torre ${n}`,
+    polos: ['alta', 'baja'],
+    pregunta: '¿Qué torre es',
+    justo: [(x) => `La torre ${x} se ve justo desde el pueblo. ¿Qué torre no se ve?`, (x) => `La torre ${x} cabe justo debajo del puente. ¿Qué torre no cabe?`],
+    mejor: ['La torre tiene que verse desde muy lejos. ¿Qué torre se vería mejor?', 'Hay que pasar una torre por debajo de un puente muy bajo. ¿Qué torre cabría mejor?'],
+  },
 ]
 
 // Objetos del banco de imágenes para las relaciones espaciales (con artículo)
@@ -46,6 +98,17 @@ export const MARCOS: [[string, string], [string, string]][] = [
   [['delante', 'más adelante'], ['detrás', 'más atrás']],
   [['a la izquierda', 'más a la izquierda'], ['a la derecha', 'más a la derecha']],
 ]
+
+// Lado de cada relación para la transformación («Empiezas a pintar por arriba…»)
+// y hacia dónde se avanza desde él
+export const LADO: Record<string, { lado: string; avance: string }> = {
+  encima: { lado: 'arriba', avance: 'vas bajando' },
+  debajo: { lado: 'abajo', avance: 'vas subiendo' },
+  delante: { lado: 'delante', avance: 'vas hacia atrás' },
+  detrás: { lado: 'detrás', avance: 'vas hacia delante' },
+  'a la izquierda': { lado: 'la izquierda', avance: 'vas hacia la derecha' },
+  'a la derecha': { lado: 'la derecha', avance: 'vas hacia la izquierda' },
+}
 
 // Acciones con imagen del banco, sin orden habitual entre ellas: [3.ª persona, infinitivo]
 export const ACCIONES: Record<string, [string, string]> = {

@@ -75,6 +75,7 @@ export default function GenerarGrupo({ destino, programaId }: { destino: Destino
                     {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? fase} {relacion}
                   </span>{' '}
                   «{frase}»
+                  {c.respuestas_esperadas?.[clave] && <span className="text-xs text-slate-400"> → {c.respuestas_esperadas[clave]}</span>}
                 </li>
               )
             })}

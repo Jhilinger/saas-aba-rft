@@ -2,12 +2,19 @@
 // crea un grupo de 3 clases con sus estímulos y las claves de todas las fases.
 // La respuesta correcta sale de cómo se construye la red (la posición destino
 // de cada fase), nunca de un modelo de lenguaje. Mismo formato y contrapesos que
-// los grupos del currículo (migraciones del 10 y el 17 de noviembre de 2026).
+// los grupos del currículo (migraciones del 10 y el 17 de noviembre de 2026), con
+// la transformación de funciones al final (plan de fusión del 22 de noviembre).
 
-import { ACCIONES, DIMENSIONES, MARCOS, NOMBRES, OBJETOS, PERSONAJES } from './vocabulario'
+import { ACCIONES, DIMENSIONES, LADO, MARCOS, NOMBRES, OBJETOS, PERSONAJES } from './vocabulario'
 
 export type EstimuloGenerado = { posicion: 'A' | 'B' | 'C'; nombre: string; concepto_imagen: string | null }
-export type ClaseGenerada = { numero: number; estimulos: EstimuloGenerado[]; consignas: Record<string, string> }
+// respuestas_esperadas: solo cuando la respuesta no es elegir un estímulo (p. ej. ordenar)
+export type ClaseGenerada = {
+  numero: number
+  estimulos: EstimuloGenerado[]
+  consignas: Record<string, string>
+  respuestas_esperadas?: Record<string, string>
+}
 // Lo que ya tiene el programa (para no repetir): nombres de estímulos y pares de
 // miembros de una misma clase
 export type Usados = { nombres: Set<string>; pares: Set<string> }
@@ -92,7 +99,7 @@ const comparacionMutua: Plantilla = (ctx) => {
   return numeros(ctx).map((n, j) => {
     const [a, b] = trozos[j]
     const { pol, inv } = factores(n)
-    const { sintagma, polos, pregunta } = DIMENSIONES[(n - 1) % DIMENSIONES.length]
+    const { sintagma, polos, pregunta, justo } = DIMENSIONES[(n - 1) % DIMENSIONES.length]
     const adj = polos[pol], contra = polos[1 - pol]
     const premisa = inv ? `Comparado con ${sintagma(b)}, ${sintagma(a)} es más ${adj}.` : `${cap(sintagma(a))} es más ${adj} que ${sintagma(b)}.`
     return {
@@ -101,6 +108,9 @@ const comparacionMutua: Plantilla = (ctx) => {
       consignas: {
         'entrenamiento:B→A': `${premisa} ${pregunta} más ${adj}?`,
         'test_mutuo:A→B': `${premisa} ${pregunta} más ${contra}?`,
+        // Umbral: nombra a uno y se elige al otro (A tiene el polo «pol»)
+        'transformacion_funciones:A→B': `${premisa} ${justo[pol](a)}`,
+        'transformacion_funciones:B→A': `${premisa} ${justo[1 - pol](b)}`,
       },
     }
   })
@@ -112,7 +122,7 @@ const comparacionRed: Plantilla = (ctx) => {
   return numeros(ctx).map((n, j) => {
     const [a, b, c] = trozos[j]
     const { pol, inv, orden, alt } = factores(n)
-    const { sintagma, polos, pregunta } = DIMENSIONES[(n - 1) % DIMENSIONES.length]
+    const { sintagma, polos, pregunta, mejor } = DIMENSIONES[(n - 1) % DIMENSIONES.length]
     const adj = polos[pol], contra = polos[1 - pol]
     const premisa = (x: string, y: string) => (inv ? `Comparado con ${sintagma(y)}, ${sintagma(x)} es más ${adj}.` : `${cap(sintagma(x))} es más ${adj} que ${sintagma(y)}.`)
     const p1 = premisa(a, b), p2 = premisa(b, c)
@@ -128,6 +138,9 @@ const comparacionRed: Plantilla = (ctx) => {
         'test_mutuo:B→C': `${p2} ${pregunta} más ${contra}?`,
         'test_combinatorio:C→A': `${ambas} ${pregunta} más ${adj}, ${extremos}?`,
         'test_combinatorio:A→C': `${ambas} ${pregunta} más ${contra}, ${extremos}?`,
+        // Situación que pide un extremo: A es el más «pol», C el del otro polo
+        'transformacion_funciones:A→C': `${ambas} ${mejor[1 - pol]}`,
+        'transformacion_funciones:C→A': `${ambas} ${mejor[pol]}`,
       },
     }
   })
@@ -152,6 +165,9 @@ const espacialMutua: Plantilla = (ctx) => {
       consignas: {
         'entrenamiento:B→A': `${premisa} ¿Qué está ${rel} ${de(B)}?`,
         'test_mutuo:A→B': `${premisa} ¿Qué está ${contra} ${de(A)}?`,
+        // Se pinta desde un lado hasta justo uno: queda sin pintar el otro
+        'transformacion_funciones:A→B': `${premisa} Empiezas a pintar por ${LADO[rel].lado} y la pintura llega justo hasta ${A}. ¿Qué queda sin pintar?`,
+        'transformacion_funciones:B→A': `${premisa} Empiezas a pintar por ${LADO[contra].lado} y la pintura llega justo hasta ${B}. ¿Qué queda sin pintar?`,
       },
     }
   })
@@ -184,6 +200,9 @@ const espacialRed: Plantilla = (ctx) => {
         'test_mutuo:B→C': `${p2} ¿Qué está ${contra} ${de(B)}?`,
         'test_combinatorio:C→A': `${ambas} ¿Qué está ${extRel}, ${extremos}?`,
         'test_combinatorio:A→C': `${ambas} ¿Qué está ${extContra}, ${extremos}?`,
+        // Se pinta de un extremo al otro: lo último es el extremo contrario
+        'transformacion_funciones:A→C': `${ambas} Empiezas a pintar por ${LADO[rel].lado} y ${LADO[rel].avance}. ¿Qué pintarás lo último?`,
+        'transformacion_funciones:C→A': `${ambas} Empiezas a pintar por ${LADO[contra].lado} y ${LADO[contra].avance}. ¿Qué pintarás lo último?`,
       },
     }
   })
@@ -212,6 +231,17 @@ const temporalMutua: Plantilla = (ctx) => {
       consignas: {
         'entrenamiento:B→A': `${premisa} ¿Qué hace ${p} ${rel} de ${B[1]}?`,
         'test_mutuo:A→B': `${premisa} ¿Qué hace ${p} ${contra} de ${A[1]}?`,
+        // La noche llega al terminar la primera acción (queda la segunda) y el
+        // día al empezar la segunda (la primera fue de noche)
+        ...(pol
+          ? {
+              'transformacion_funciones:B→A': `${premisa} Se hace de noche justo cuando ${p} termina de ${B[1]}. ¿Qué hace ${p} de noche?`,
+              'transformacion_funciones:A→B': `${premisa} Se hace de día justo cuando ${p} empieza a ${A[1]}. ¿Qué hace ${p} todavía de noche?`,
+            }
+          : {
+              'transformacion_funciones:A→B': `${premisa} Se hace de noche justo cuando ${p} termina de ${A[1]}. ¿Qué hace ${p} de noche?`,
+              'transformacion_funciones:B→A': `${premisa} Se hace de día justo cuando ${p} empieza a ${B[1]}. ¿Qué hace ${p} todavía de noche?`,
+            }),
       },
     }
   })
@@ -240,6 +270,11 @@ const temporalRed: Plantilla = (ctx) => {
         'test_mutuo:B→C': `${p2} ¿Qué hace ${p} ${contra} de ${B[1]}?`,
         'test_combinatorio:C→A': `${ambas} ¿Qué hace ${p} ${rel}, ${extremos}?`,
         'test_combinatorio:A→C': `${ambas} ¿Qué hace ${p} ${contra}, ${extremos}?`,
+        'transformacion_funciones:A→C': `${ambas} Ahora hazlo tú como ${p}: toca las tres acciones en el orden en que las hace ${p}.`,
+      },
+      // Orden en que ocurren: A, B, C si es «antes»; al revés si es «después»
+      respuestas_esperadas: {
+        'transformacion_funciones:A→C': (pol ? [C, B, A] : [A, B, C]).map((x) => cap(x[0])).join(', '),
       },
     }
   })

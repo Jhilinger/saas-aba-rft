@@ -78,7 +78,7 @@ export async function guardarGrupoGenerado(destino: Destino, programaId: string,
   const generado = { plantilla: datos.nombre, semilla, fecha: new Date().toISOString() }
 
   for (const c of clases) {
-    const fila = { nombre: `Clase ${c.numero}`, grupo, consignas: c.consignas, generado }
+    const fila = { nombre: `Clase ${c.numero}`, grupo, consignas: c.consignas, respuestas_esperadas: c.respuestas_esperadas ?? {}, generado }
     const { data: clase, error } =
       destino === 'curriculo'
         ? await supabase.from('clases_rft_base').insert({ ...fila, programa_base_id: programaId }).select('id').single()
