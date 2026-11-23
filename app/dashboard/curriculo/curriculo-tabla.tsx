@@ -102,6 +102,9 @@ export default function CurriculoTabla({
   const [busqueda, setBusqueda] = useState('')
   const [filtroTipo, setFiltroTipo] = useState('')
   const [abiertos, setAbiertos] = useState<Set<string>>(new Set())
+  // Los programas retirados (inactivos) no se muestran salvo que se pidan
+  const [verRetirados, setVerRetirados] = useState(false)
+  const retirados = programas.filter((p) => !p.activo).length
 
   const codificador = useMemo(() => crearCodificador(estructura), [estructura])
   const filtrando = busqueda.trim() !== '' || filtroTipo !== ''
@@ -117,6 +120,7 @@ export default function CurriculoTabla({
     const texto = busqueda.trim().toLowerCase()
     const mapa = new Map<string, Programa[]>()
     for (const p of programas) {
+      if (!p.activo && !verRetirados) continue
       if (filtroTipo && p.tipo !== filtroTipo) continue
       if (texto) {
         const codigo = codificador.codigo(p) ?? ''
@@ -130,7 +134,7 @@ export default function CurriculoTabla({
       lista.sort((a, b) => (a.orden ?? Infinity) - (b.orden ?? Infinity) || a.nombre.localeCompare(b.nombre))
     }
     return mapa
-  }, [programas, busqueda, filtroTipo, codificador])
+  }, [programas, busqueda, filtroTipo, codificador, verRetirados])
 
   const totalVisibles = [...porDominio.values()].reduce((n, l) => n + l.length, 0)
 
@@ -240,6 +244,11 @@ export default function CurriculoTabla({
           </button>
         )}
       </div>
+      {retirados > 0 && (
+        <button type="button" onClick={() => setVerRetirados((v) => !v)} className="text-xs text-slate-500 hover:text-slate-700">
+          {verRetirados ? 'Ocultar programas retirados' : `Mostrar programas retirados (${retirados})`}
+        </button>
+      )}
 
       {estructura.niveles.map((nivel) => {
         const dominios = estructura.dominios.filter((d) => d.nivel === nivel.numero)
