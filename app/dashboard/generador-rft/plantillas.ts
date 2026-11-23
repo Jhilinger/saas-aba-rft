@@ -379,48 +379,54 @@ function palabrasDistincion(ctx: Contexto, cuantas: number): string[] | null {
 // no se sabe. Los cuatro patrones rotan con el número de clase y el contexto de la
 // transformación rota aparte, para que no anticipe la respuesta.
 const PATRONES_DISTINCION: [boolean, boolean][] = [[true, true], [true, false], [false, true], [false, false]]
+// Una clase de la red de distinción con sus tres palabras (también se usa para
+// rehacer los grupos del currículo con el mismo reparto)
+export function claseDistincionRed(n: number, a: string, b: string, c: string): ClaseGenerada {
+  const { inv, orden } = factores(n)
+  const [ab, bc] = PATRONES_DISTINCION[(n - 1) % 4]
+  const contexto = CONTEXTOS_DISTINCION[(Math.floor((n - 1) / 4) + (n - 1)) % CONTEXTOS_DISTINCION.length]
+  const rel = (x: string, y: string, igual: boolean) => `${x} es ${igual ? 'igual que' : 'diferente de'} ${y}.`
+  const p1 = rel(a, b, ab), p2 = rel(b, c, bc)
+  const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
+  const pregunta = (x: string, y: string) => (inv ? `¿${x} es diferente de ${y} o igual?` : `¿${x} es igual que ${y} o diferente?`)
+  const nombre = (igual: boolean) => (igual ? 'Igual' : 'Diferente')
+  const ac = ab && bc ? 'Igual' : ab || bc ? 'Diferente' : 'No se sabe'
+  const tof = ac === 'Igual' ? 'Sí' : ac === 'Diferente' ? 'No' : 'No se sabe'
+  const { plural, dimension, np, propiedad } = contexto
+  return {
+    numero: n,
+    estimulos: [
+      { posicion: 'A', nombre: a, concepto_imagen: null },
+      { posicion: 'B', nombre: b, concepto_imagen: null },
+      { posicion: 'C', nombre: c, concepto_imagen: null },
+    ],
+    consignas: {
+      'entrenamiento:A→B': `${p1} ${pregunta(a, b)}`,
+      'entrenamiento:B→C': `${p2} ${pregunta(b, c)}`,
+      'test_mutuo:B→A': `${p1} ${pregunta(b, a)}`,
+      'test_mutuo:C→B': `${p2} ${pregunta(c, b)}`,
+      'test_combinatorio:A→C': `${ambas} ¿${a} es igual que ${c}, diferente o no se sabe?`,
+      'test_combinatorio:C→A': `${ambas} ¿${c} es igual que ${a}, diferente o no se sabe?`,
+      'transformacion_funciones:A→C': `${a}, ${b} y ${c} son ${plural} que solo pueden diferenciarse en ${dimension}. ${ambas} ${cap(np)} ${a} es ${propiedad}. ¿Es ${propiedad} ${np} ${c}?`,
+    },
+    respuestas_esperadas: {
+      'A→B': nombre(ab),
+      'B→A': nombre(ab),
+      'B→C': nombre(bc),
+      'C→B': nombre(bc),
+      'A→C': ac,
+      'C→A': ac,
+      'transformacion_funciones:A→C': tof,
+    },
+  }
+}
+
 const distincionRed: Plantilla = (ctx) => {
   const palabras = palabrasDistincion(ctx, CLASES_POR_GRUPO * 3)
   if (!palabras) return null
   return numeros(ctx).map((n, j) => {
     const [a, b, c] = palabras.slice(j * 3, j * 3 + 3)
-    const { inv, orden } = factores(n)
-    const [ab, bc] = PATRONES_DISTINCION[(n - 1) % 4]
-    const contexto = CONTEXTOS_DISTINCION[(Math.floor((n - 1) / 4) + (n - 1)) % CONTEXTOS_DISTINCION.length]
-    const rel = (x: string, y: string, igual: boolean) => `${x} es ${igual ? 'igual que' : 'diferente de'} ${y}.`
-    const p1 = rel(a, b, ab), p2 = rel(b, c, bc)
-    const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
-    const pregunta = (x: string, y: string) => (inv ? `¿${x} es diferente de ${y} o igual?` : `¿${x} es igual que ${y} o diferente?`)
-    const nombre = (igual: boolean) => (igual ? 'Igual' : 'Diferente')
-    const ac = ab && bc ? 'Igual' : ab || bc ? 'Diferente' : 'No se sabe'
-    const tof = ac === 'Igual' ? 'Sí' : ac === 'Diferente' ? 'No' : 'No se sabe'
-    const { plural, dimension, np, propiedad } = contexto
-    return {
-      numero: n,
-      estimulos: [
-        { posicion: 'A', nombre: a, concepto_imagen: null },
-        { posicion: 'B', nombre: b, concepto_imagen: null },
-        { posicion: 'C', nombre: c, concepto_imagen: null },
-      ],
-      consignas: {
-        'entrenamiento:A→B': `${p1} ${pregunta(a, b)}`,
-        'entrenamiento:B→C': `${p2} ${pregunta(b, c)}`,
-        'test_mutuo:B→A': `${p1} ${pregunta(b, a)}`,
-        'test_mutuo:C→B': `${p2} ${pregunta(c, b)}`,
-        'test_combinatorio:A→C': `${ambas} ¿${a} es igual que ${c}, diferente o no se sabe?`,
-        'test_combinatorio:C→A': `${ambas} ¿${c} es igual que ${a}, diferente o no se sabe?`,
-        'transformacion_funciones:A→C': `${a}, ${b} y ${c} son ${plural} que solo pueden diferenciarse en ${dimension}. ${ambas} ${cap(np)} ${a} es ${propiedad}. ¿Es ${propiedad} ${np} ${c}?`,
-      },
-      respuestas_esperadas: {
-        'A→B': nombre(ab),
-        'B→A': nombre(ab),
-        'B→C': nombre(bc),
-        'C→B': nombre(bc),
-        'A→C': ac,
-        'C→A': ac,
-        'transformacion_funciones:A→C': tof,
-      },
-    }
+    return claseDistincionRed(n, a, b, c)
   })
 }
 
