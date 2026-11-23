@@ -120,3 +120,112 @@ export const ACCIONES: Record<string, [string, string]> = {
   pintar: ['pinta', 'pintar'], saltar: ['salta', 'saltar'], soplar: ['sopla', 'soplar'],
   'subir-escaleras': ['sube las escaleras', 'subir las escaleras'],
 }
+
+// ---------------------------------------------------------------- Distinción
+// Objetos conocidos con su propiedad (vínculo mutuo de distinción). El nombre
+// inventado (B) es siempre masculino («el tasi»): el adjetivo va en masculino.
+export type ObjetoDistincion = { np: string; plural?: boolean; valor: string }
+export const DISTINCION: {
+  dimension: 'funcion' | 'color' | 'forma' | 'sabor'
+  objetos: ObjetoDistincion[]
+}[] = [
+  {
+    dimension: 'funcion',
+    objetos: [
+      { np: 'el balón', valor: 'jugar' },
+      { np: 'la cuchara', valor: 'comer sopa' },
+      { np: 'el vaso', valor: 'beber agua' },
+      { np: 'el lápiz', valor: 'escribir' },
+      { np: 'la llave', valor: 'abrir la puerta' },
+      { np: 'las tijeras', plural: true, valor: 'cortar papel' },
+      { np: 'el peine', valor: 'peinarse' },
+      { np: 'la escoba', valor: 'barrer' },
+      { np: 'la toalla', valor: 'secarse' },
+    ],
+  },
+  {
+    dimension: 'color',
+    objetos: [
+      { np: 'el plátano', valor: 'amarillo' },
+      { np: 'el tomate', valor: 'rojo' },
+      { np: 'la hierba', valor: 'verde' },
+      { np: 'la nieve', valor: 'blanco' },
+      { np: 'el cielo', valor: 'azul' },
+      { np: 'el carbón', valor: 'negro' },
+      { np: 'la fresa', valor: 'rojo' },
+      { np: 'la leche', valor: 'blanco' },
+    ],
+  },
+  {
+    dimension: 'forma',
+    objetos: [
+      { np: 'la pelota', valor: 'redondo' },
+      { np: 'el dado', valor: 'cuadrado' },
+      { np: 'la regla', valor: 'alargado' },
+      { np: 'el huevo', valor: 'ovalado' },
+      { np: 'la moneda', valor: 'redondo' },
+      { np: 'la ventana', valor: 'cuadrado' },
+      { np: 'el plato', valor: 'redondo' },
+    ],
+  },
+  {
+    dimension: 'sabor',
+    objetos: [
+      { np: 'el limón', valor: 'ácido' },
+      { np: 'el azúcar', valor: 'dulce' },
+      { np: 'la sal', valor: 'salado' },
+      { np: 'el café', valor: 'amargo' },
+      { np: 'el caramelo', valor: 'dulce' },
+      { np: 'el vinagre', valor: 'ácido' },
+      { np: 'la miel', valor: 'dulce' },
+    ],
+  },
+]
+
+// Redes de distinción: palabras sin sentido en mayúsculas y contextos de la
+// transformación (cualquiera con cualquier patrón, para que el contexto no
+// anticipe la respuesta)
+export const SILABAS_DISTINCION = {
+  consonantes: ['B', 'D', 'F', 'G', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'V', 'Z'],
+  vocales: ['A', 'E', 'I', 'O', 'U'],
+}
+export const CONTEXTOS_DISTINCION = [
+  { plural: 'zumos', dimension: 'el sabor', np: 'el zumo', propiedad: 'dulce' },
+  { plural: 'cuerdas', dimension: 'la longitud', np: 'la cuerda', propiedad: 'larga' },
+  { plural: 'pinturas', dimension: 'el color', np: 'la pintura', propiedad: 'roja' },
+]
+
+// ---------------------------------------------------------------- Oposición
+// Objetos con dos efectos contrarios: efecto[i] es lo que hace (3.ª persona) y
+// quiero[i], lo que se quiere cuando se busca ese efecto. Con «es», la relación se
+// dice «es lo contrario de» (cosas); con «hace», «hace lo contrario que» (aparatos)
+export const OPOSICION: {
+  sustantivo: string
+  femenino: boolean
+  verbo: 'hace' | 'es'
+  efecto: [string, string]
+  quiero: [string, string]
+  elegir: 'uso' | 'elijo'
+}[] = [
+  { sustantivo: 'botón', femenino: false, verbo: 'hace', efecto: ['enciende la luz', 'apaga la luz'], quiero: ['Quiero encender la luz', 'Quiero apagar la luz'], elegir: 'uso' },
+  { sustantivo: 'palanca', femenino: true, verbo: 'hace', efecto: ['hace que el tren arranque', 'hace que el tren se pare'], quiero: ['Quiero que el tren arranque', 'Quiero que el tren se pare'], elegir: 'uso' },
+  { sustantivo: 'llave', femenino: true, verbo: 'hace', efecto: ['abre la puerta', 'cierra la puerta'], quiero: ['Quiero abrir la puerta', 'Quiero cerrar la puerta'], elegir: 'uso' },
+  { sustantivo: 'grifo', femenino: false, verbo: 'hace', efecto: ['echa agua fría', 'echa agua caliente'], quiero: ['Quiero agua fría', 'Quiero agua caliente'], elegir: 'uso' },
+  { sustantivo: 'interruptor', femenino: false, verbo: 'hace', efecto: ['sube la persiana', 'baja la persiana'], quiero: ['Quiero subir la persiana', 'Quiero bajar la persiana'], elegir: 'uso' },
+  { sustantivo: 'tecla', femenino: true, verbo: 'hace', efecto: ['sube el volumen', 'baja el volumen'], quiero: ['Quiero subir el volumen', 'Quiero bajar el volumen'], elegir: 'uso' },
+  { sustantivo: 'mando', femenino: false, verbo: 'hace', efecto: ['enciende la tele', 'apaga la tele'], quiero: ['Quiero encender la tele', 'Quiero apagar la tele'], elegir: 'uso' },
+  { sustantivo: 'pedal', femenino: false, verbo: 'hace', efecto: ['hace que la bici vaya más deprisa', 'hace que la bici vaya más despacio'], quiero: ['Quiero que la bici vaya más deprisa', 'Quiero que la bici vaya más despacio'], elegir: 'uso' },
+  { sustantivo: 'poción', femenino: true, verbo: 'hace', efecto: ['hace crecer', 'hace encoger'], quiero: ['Quiero hacerme grande', 'Quiero hacerme pequeño'], elegir: 'uso' },
+  { sustantivo: 'silbato', femenino: false, verbo: 'hace', efecto: ['hace que los perros vengan', 'hace que los perros se vayan'], quiero: ['Quiero que los perros vengan', 'Quiero que los perros se vayan'], elegir: 'uso' },
+  { sustantivo: 'tambor', femenino: false, verbo: 'hace', efecto: ['despierta al dragón', 'duerme al dragón'], quiero: ['Quiero despertar al dragón', 'Quiero dormir al dragón'], elegir: 'uso' },
+  { sustantivo: 'varita', femenino: true, verbo: 'hace', efecto: ['hace aparecer al conejo', 'hace desaparecer al conejo'], quiero: ['Quiero que el conejo aparezca', 'Quiero que el conejo desaparezca'], elegir: 'uso' },
+  { sustantivo: 'bebida', femenino: true, verbo: 'es', efecto: ['está caliente', 'está fría'], quiero: ['Quiero beber algo caliente', 'Quiero beber algo frío'], elegir: 'elijo' },
+  { sustantivo: 'caramelo', femenino: false, verbo: 'es', efecto: ['es dulce', 'es salado'], quiero: ['Quiero algo dulce', 'Quiero algo salado'], elegir: 'elijo' },
+  { sustantivo: 'manta', femenino: true, verbo: 'es', efecto: ['da calor', 'refresca'], quiero: ['Tengo frío y quiero calentarme', 'Tengo calor y quiero refrescarme'], elegir: 'elijo' },
+  { sustantivo: 'caja', femenino: true, verbo: 'es', efecto: ['tiene un premio dentro', 'está vacía'], quiero: ['Quiero una caja con premio', 'Quiero la caja vacía'], elegir: 'elijo' },
+  { sustantivo: 'fruta', femenino: true, verbo: 'es', efecto: ['es blanda', 'es dura'], quiero: ['Quiero una fruta blanda', 'Quiero una fruta dura'], elegir: 'elijo' },
+]
+
+// ---------------------------------------------------------------- Condicionales
+// Parejas de personajes (el que hace la condición y el que responde)
+export const PAREJAS = [['Pim', 'Tok'], ['Lu', 'Mo'], ['Kiri', 'Dax'], ['Bo', 'Fi']] as const

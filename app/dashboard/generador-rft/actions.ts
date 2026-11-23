@@ -21,7 +21,12 @@ function analizar(clases: Existente[]) {
   const usados: Usados = { nombres: new Set(), pares: new Set() }
   for (const c of clases) {
     const claves = c.estimulos.map((e) => e.concepto_imagen ?? e.nombre)
-    for (const e of c.estimulos) usados.nombres.add(e.nombre)
+    // El nombre entero y cada palabra («El botón Kafi» → «Kafi»), para reconocer
+    // los nombres inventados dentro de un sintagma
+    for (const e of c.estimulos) {
+      usados.nombres.add(e.nombre)
+      for (const palabra of e.nombre.split(' ')) usados.nombres.add(palabra.charAt(0).toUpperCase() + palabra.slice(1))
+    }
     claves.forEach((x, i) => claves.slice(i + 1).forEach((y) => usados.pares.add(clavePar(x, y))))
   }
   return { primerNumero, grupo, usados }

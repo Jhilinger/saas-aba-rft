@@ -5,7 +5,20 @@
 // los grupos del currículo (migraciones del 10 y el 17 de noviembre de 2026), con
 // la transformación de funciones al final (plan de fusión del 22 de noviembre).
 
-import { ACCIONES, DIMENSIONES, LADO, MARCOS, NOMBRES, OBJETOS, PERSONAJES } from './vocabulario'
+import {
+  ACCIONES,
+  CONTEXTOS_DISTINCION,
+  DIMENSIONES,
+  DISTINCION,
+  LADO,
+  MARCOS,
+  NOMBRES,
+  OBJETOS,
+  OPOSICION,
+  PAREJAS,
+  PERSONAJES,
+  SILABAS_DISTINCION,
+} from './vocabulario'
 
 export type EstimuloGenerado = { posicion: 'A' | 'B' | 'C'; nombre: string; concepto_imagen: string | null }
 // respuestas_esperadas: solo cuando la respuesta no es elegir un estímulo (p. ej. ordenar)
@@ -280,6 +293,237 @@ const temporalRed: Plantilla = (ctx) => {
   })
 }
 
+// ---------------------------------------------------------------- Distinción
+// Vínculo mutuo: un objeto conocido (A) y un nombre inventado (B) que sirve para
+// lo mismo o para algo diferente, tiene el mismo color o uno diferente… Con
+// opciones fijas «Lo mismo»/«Diferente» y, en la transformación, «Sí»/«No».
+const femenino = (np: string) => np.startsWith('la ') || np.startsWith('las ')
+const enFemenino = (adj: string) => (adj.endsWith('o') ? `${adj.slice(0, -1)}a` : adj)
+const sinArticulo = (np: string) => np.replace(/^(el|la|los|las) /, '')
+
+const distincionMutua: Plantilla = (ctx) => {
+  const trozos = elegir(NOMBRES, 1, ctx, true)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const b = `el ${trozos[j][0].toLowerCase()}`
+    const { dimension, objetos } = DISTINCION[(n - 1) % DISTINCION.length]
+    const o = objetos[Math.floor(ctx.azar() * objetos.length)]
+    const A = o.np
+    // Mitad de las clases «lo mismo» y mitad «diferente», alternando entre grupos
+    const igual = factores(n).pol === 0
+    const sirve = o.plural ? 'sirven' : 'sirve'
+    const frases = {
+      funcion: {
+        premisa: `${cap(b)} sirve para ${igual ? 'lo mismo' : 'algo diferente'} que ${A}.`,
+        pregunta: (x: string, y: string, verbo = 'sirve') => `¿${cap(x)} ${verbo} para lo mismo que ${y} o para algo diferente?`,
+        tof: `${cap(A)} ${sirve} para ${o.valor}. ${cap(b)} sirve para ${igual ? 'lo mismo' : 'algo diferente'} que ${A}. Quiero ${o.valor} y no tengo ${sinArticulo(A)}. ¿Me sirve ${b}?`,
+      },
+      color: {
+        premisa: `${cap(b)} tiene ${igual ? 'el mismo color' : 'un color diferente'} que ${A}.`,
+        pregunta: (x: string, y: string, verbo = 'tiene') => `¿${cap(x)} ${verbo} el mismo color que ${y} o un color diferente?`,
+        tof: '',
+      },
+      forma: {
+        premisa: `${cap(b)} tiene ${igual ? 'la misma forma' : 'una forma diferente'} que ${A}.`,
+        pregunta: (x: string, y: string, verbo = 'tiene') => `¿${cap(x)} ${verbo} la misma forma que ${y} o una forma diferente?`,
+        tof: '',
+      },
+      sabor: {
+        premisa: `${cap(b)} sabe ${igual ? 'igual' : 'diferente'} que ${A}.`,
+        pregunta: (x: string, y: string, verbo = 'sabe') => `¿${cap(x)} ${verbo} igual que ${y} o sabe diferente?`,
+        tof: '',
+      },
+    }[dimension]
+    const tof =
+      dimension === 'funcion'
+        ? frases.tof
+        : `${cap(A)} es ${femenino(A) ? enFemenino(o.valor) : o.valor}. ${frases.premisa} ¿Es ${o.valor} ${b}?`
+    // En plural («las tijeras») el verbo del mutuo concuerda con A
+    const verboA = o.plural ? { funcion: 'sirven', color: 'tienen', forma: 'tienen', sabor: 'saben' }[dimension] : undefined
+    const respuesta = igual ? 'Lo mismo' : 'Diferente'
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: cap(A), concepto_imagen: null },
+        { posicion: 'B', nombre: cap(b), concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:B→A': `${frases.premisa} ${frases.pregunta(b, A)}`,
+        'test_mutuo:A→B': `${frases.premisa} ${frases.pregunta(A, b, verboA)}`,
+        'transformacion_funciones:A→B': tof,
+      },
+      respuestas_esperadas: { 'A→B': respuesta, 'B→A': respuesta, 'transformacion_funciones:A→B': igual ? 'Sí' : 'No' },
+    }
+  })
+}
+
+// Palabras sin sentido (CVC o CVCV) para las redes de distinción
+function palabrasDistincion(ctx: Contexto, cuantas: number): string[] | null {
+  const { consonantes: c, vocales: v } = SILABAS_DISTINCION
+  const pick = <T,>(l: T[]) => l[Math.floor(ctx.azar() * l.length)]
+  const elegidas = new Set<string>()
+  for (let i = 0; i < INTENTOS && elegidas.size < cuantas; i++) {
+    // CVC acabadas en consonante rara en español (no salen palabras reales) y
+    // CVCV con K; sin repetir la consonante («DUD», «ZEZ»)
+    const w = ctx.azar() < 0.6 ? pick(c) + pick(v) + pick(['B', 'F', 'G', 'K', 'P']) : pick(c) + pick(v) + pick(c) + pick(v)
+    const consonantes = w.replace(/[AEIOU]/g, '')
+    if (new Set(consonantes).size !== consonantes.length) continue
+    if (w.length === 4 && !w.includes('K')) continue
+    if (!ctx.usados.nombres.has(w)) elegidas.add(w)
+  }
+  return elegidas.size === cuantas ? [...elegidas] : null
+}
+
+// Red de distinción: A–B y B–C, cada una «igual» o «diferente». Igual+igual →
+// igual; igual+diferente (en cualquier orden) → diferente; diferente+diferente →
+// no se sabe. Los cuatro patrones rotan con el número de clase y el contexto de la
+// transformación rota aparte, para que no anticipe la respuesta.
+const PATRONES_DISTINCION: [boolean, boolean][] = [[true, true], [true, false], [false, true], [false, false]]
+const distincionRed: Plantilla = (ctx) => {
+  const palabras = palabrasDistincion(ctx, CLASES_POR_GRUPO * 3)
+  if (!palabras) return null
+  return numeros(ctx).map((n, j) => {
+    const [a, b, c] = palabras.slice(j * 3, j * 3 + 3)
+    const { inv, orden } = factores(n)
+    const [ab, bc] = PATRONES_DISTINCION[(n - 1) % 4]
+    const contexto = CONTEXTOS_DISTINCION[(Math.floor((n - 1) / 4) + (n - 1)) % CONTEXTOS_DISTINCION.length]
+    const rel = (x: string, y: string, igual: boolean) => `${x} es ${igual ? 'igual que' : 'diferente de'} ${y}.`
+    const p1 = rel(a, b, ab), p2 = rel(b, c, bc)
+    const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
+    const pregunta = (x: string, y: string) => (inv ? `¿${x} es diferente de ${y} o igual?` : `¿${x} es igual que ${y} o diferente?`)
+    const nombre = (igual: boolean) => (igual ? 'Igual' : 'Diferente')
+    const ac = ab && bc ? 'Igual' : ab || bc ? 'Diferente' : 'No se sabe'
+    const tof = ac === 'Igual' ? 'Sí' : ac === 'Diferente' ? 'No' : 'No se sabe'
+    const { plural, dimension, np, propiedad } = contexto
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: a, concepto_imagen: null },
+        { posicion: 'B', nombre: b, concepto_imagen: null },
+        { posicion: 'C', nombre: c, concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:A→B': `${p1} ${pregunta(a, b)}`,
+        'entrenamiento:B→C': `${p2} ${pregunta(b, c)}`,
+        'test_mutuo:B→A': `${p1} ${pregunta(b, a)}`,
+        'test_mutuo:C→B': `${p2} ${pregunta(c, b)}`,
+        'test_combinatorio:A→C': `${ambas} ¿${a} es igual que ${c}, diferente o no se sabe?`,
+        'test_combinatorio:C→A': `${ambas} ¿${c} es igual que ${a}, diferente o no se sabe?`,
+        'transformacion_funciones:A→C': `${a}, ${b} y ${c} son ${plural} que solo pueden diferenciarse en ${dimension}. ${ambas} ${cap(np)} ${a} es ${propiedad}. ¿Es ${propiedad} ${np} ${c}?`,
+      },
+      respuestas_esperadas: {
+        'A→B': nombre(ab),
+        'B→A': nombre(ab),
+        'B→C': nombre(bc),
+        'C→B': nombre(bc),
+        'A→C': ac,
+        'C→A': ac,
+        'transformacion_funciones:A→C': tof,
+      },
+    }
+  })
+}
+
+// ---------------------------------------------------------------- Oposición
+// Aparatos o cosas con nombre inventado («el botón Kafi»). La respuesta es elegir
+// uno de los miembros de la clase (opciones de la propia clase)
+function oposicion(n: number) {
+  const o = OPOSICION[(n - 1) % OPOSICION.length]
+  const art = o.femenino ? 'la' : 'el'
+  const np = (x: string) => `${art} ${o.sustantivo} ${x}`
+  const de = (x: string) => (o.femenino ? `de la ${o.sustantivo} ${x}` : `del ${o.sustantivo} ${x}`)
+  const contrario = (x: string, y: string) => (o.verbo === 'hace' ? `${cap(np(x))} hace lo contrario que ${np(y)}.` : `${cap(np(x))} es lo contrario ${de(y)}.`)
+  const quien = (y: string) => (o.verbo === 'hace' ? `¿Qué ${o.sustantivo} hace lo contrario que ${np(y)}?` : `¿Qué ${o.sustantivo} es lo contrario ${de(y)}?`)
+  const mismo = (y: string) => (o.verbo === 'hace' ? `¿Qué ${o.sustantivo} hace lo mismo que ${np(y)}?` : `¿Qué ${o.sustantivo} es igual que ${np(y)}?`)
+  return { o, np, contrario, quien, mismo, otro: o.femenino ? 'otra' : 'otro' }
+}
+
+const oposicionMutua: Plantilla = (ctx) => {
+  const trozos = elegir(NOMBRES, 2, ctx, true)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const [a, b] = trozos[j]
+    const { o, np, contrario, quien } = oposicion(n)
+    const { pol, inv } = factores(n)
+    const premisa = inv ? contrario(a, b) : contrario(b, a)
+    const usar = `¿Qué ${o.sustantivo} ${o.elegir}?`
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: cap(np(a)), concepto_imagen: null },
+        { posicion: 'B', nombre: cap(np(b)), concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:A→B': `${premisa} ${quien(a)}`,
+        'test_mutuo:B→A': `${premisa} ${quien(b)}`,
+        // A tiene el efecto «pol» y B el contrario: se pide el contrario del que se nombra
+        'transformacion_funciones:A→B': `${cap(np(a))} ${o.efecto[pol]}. ${premisa} ${o.quiero[1 - pol]}. ${usar}`,
+        'transformacion_funciones:B→A': `${cap(np(b))} ${o.efecto[1 - pol]}. ${premisa} ${o.quiero[pol]}. ${usar}`,
+      },
+    }
+  })
+}
+
+const oposicionRed: Plantilla = (ctx) => {
+  const trozos = elegir(NOMBRES, 3, ctx, true)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const [a, b, c] = trozos[j]
+    const { o, np, contrario, quien, mismo, otro } = oposicion(n)
+    const { pol, inv, orden } = factores(n)
+    const p1 = inv ? contrario(a, b) : contrario(b, a)
+    const p2 = inv ? contrario(b, c) : contrario(c, b)
+    const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
+    const efectoA = `${cap(np(a))} ${o.efecto[pol]}.`
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: cap(np(a)), concepto_imagen: null },
+        { posicion: 'B', nombre: cap(np(b)), concepto_imagen: null },
+        { posicion: 'C', nombre: cap(np(c)), concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:A→B': `${p1} ${quien(a)}`,
+        'entrenamiento:B→C': `${p2} ${quien(b)}`,
+        'test_mutuo:B→A': `${p1} ${quien(b)}`,
+        'test_mutuo:C→B': `${p2} ${quien(c)}`,
+        // Dos veces «contrario» es «lo mismo»: C hace lo mismo que A
+        'test_combinatorio:A→C': `${ambas} ${mismo(a)}`,
+        'test_combinatorio:C→A': `${ambas} ${mismo(c)}`,
+        'transformacion_funciones:A→B': `${efectoA} ${ambas} ${o.quiero[1 - pol]}. ¿Qué ${o.sustantivo} ${o.elegir}?`,
+        'transformacion_funciones:A→C': `${efectoA} ${ambas} ${o.quiero[pol]}, pero ${np(a)} no está. ¿Qué ${otro} ${o.sustantivo} ${o.elegir}?`,
+      },
+    }
+  })
+}
+
+// ---------------------------------------------------------------- Condicionales
+// «Si Pim bebe, Tok baila»: la condición (A) la hace un personaje y la
+// consecuencia (B), otro. Cuatro formas de decirlo, que rotan
+const condicionalMutua: Plantilla = (ctx) => {
+  const trozos = elegir(CONCEPTOS_ACCION, 2, ctx, false)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const [ca, cb] = trozos[j]
+    const [p, q] = PAREJAS[(n - 1) % PAREJAS.length]
+    const A = verbo(ca), B = verbo(cb)
+    const conector = (n - 1) % 4 < 2 ? 'si' : 'cuando'
+    const premisa = (n - 1) % 2 === 0 ? `${cap(conector)} ${p} ${A[0]}, ${q} ${B[0]}.` : `${q} ${B[0]} ${conector} ${p} ${A[0]}.`
+    // «¿Cuándo monta Dax en bici?»: el verbo delante del personaje
+    const [v, ...resto] = B[0].startsWith('se ') ? [B[0]] : B[0].split(' ')
+    const cuando = `¿Cuándo ${v} ${q}${resto.length ? ` ${resto.join(' ')}` : ''}?`
+    return {
+      numero: n,
+      estimulos: [{ ...accion(ca), posicion: 'A' }, { ...accion(cb), posicion: 'B' }],
+      consignas: {
+        'entrenamiento:A→B': `${premisa} ¿Qué hace ${q} ${conector} ${p} ${A[0]}?`,
+        'test_mutuo:B→A': `${premisa} ${cuando}`,
+        'transformacion_funciones:B→A': `${premisa} Quieres ver a ${q} ${B[1]}. ¿Qué tiene que hacer ${p}?`,
+      },
+    }
+  })
+}
+
 // Programas con generador (por nombre del programa del currículo)
 const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones de Comparación': comparacionMutua,
@@ -288,6 +532,11 @@ const PLANTILLAS: Record<string, Plantilla> = {
   'Derivar Relaciones Espaciales en Redes Combinatorias': espacialRed,
   'Vincular Mutuamente Relaciones Temporales': temporalMutua,
   'Derivar Relaciones Temporales en Redes Combinatorias': temporalRed,
+  'Vincular Mutuamente Relaciones de Distinción': distincionMutua,
+  'Derivar Relaciones de Distinción en Redes Combinatorias': distincionRed,
+  'Vincular Mutuamente Relaciones de Oposición': oposicionMutua,
+  'Derivar Relaciones de Oposición en Redes Combinatorias': oposicionRed,
+  'Vincular Mutuamente Relaciones Condicionales': condicionalMutua,
 }
 
 export function tienePlantilla(nombrePrograma: string) {
