@@ -12,6 +12,7 @@ import {
   CATEGORIAS_ENTRENAMIENTO,
   CATEGORIAS_GENERALIZACION,
   imagenesNecesarias,
+  faseDeNivel,
   leerActividadConceptos,
   type ActividadConceptos,
   type Concepto,
@@ -126,7 +127,7 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
     const hecho = new Set(datos.dominio.filter((d) => d.programa_alumno_id === copiaId).map((d) => `${d.grupo}|${d.fase}|${d.posicion_origen}|${d.posicion_destino}`))
     const actividad = leerActividadConceptos(copia.actividad_tablet)
     if (actividad) {
-      const niveles = actividad.niveles.map((n, i) => ({ i, hecho: hecho.has(`${n.nombre}|entrenamiento|A|A`) }))
+      const niveles = actividad.niveles.map((n, i) => ({ i, hecho: hecho.has(`${n.nombre}|${faseDeNivel(actividad, n.nombre)}|A|A`) }))
       const primero: Eleccion | null = niveles[0].hecho ? null : { copiaId, conceptos: actividad, nivel: 0 }
       const otro = niveles.find((n) => n.i > 0 && !n.hecho)
       return { primero, practica: otro ? ({ copiaId, conceptos: actividad, nivel: otro.i } as Eleccion) : null }

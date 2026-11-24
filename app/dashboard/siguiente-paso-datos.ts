@@ -2,7 +2,7 @@ import type { createClient } from '@/utils/supabase/server'
 import { siguientesPasos, type BloquePaso, type DatosPaso, type DominioPaso, type Forma, type Paso } from './siguiente-paso'
 import { secuenciaDelGrupo } from './secuencia-rft'
 import { coerceNivelRft } from './niveles-rft'
-import { leerActividadConceptos } from './conceptos'
+import { faseDeNivel, leerActividadConceptos } from './conceptos'
 import { leerSinError } from './sin-error'
 import { claveTemporal, ordenMencion } from './claves-temporales'
 import { etiquetaClave } from './etiqueta-clave'
@@ -94,7 +94,7 @@ export async function cargarSiguientesPasos(supabase: Supabase, programaAlumnoId
   }
   const nivel = coerceNivelRft(programa.nivel_rft)
   const secuencias = actividad
-    ? actividad.niveles.map((n) => ({ grupo: n.nombre, pasos: [{ fase: 'entrenamiento' as const, origen: 'A', destino: 'A' }] }))
+    ? actividad.niveles.map((n) => ({ grupo: n.nombre, pasos: [{ fase: faseDeNivel(actividad, n.nombre), origen: 'A', destino: 'A' }] }))
     : [...posiciones.entries()].map(([grupo, pos]) => ({ grupo, pasos: secuenciaDelGrupo(programa.secuencia_rft, nivel, pos) }))
 
   const forma = (f: string): Forma => (f === 'hablante' ? 'hablante' : 'oyente')

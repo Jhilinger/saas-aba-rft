@@ -10,7 +10,7 @@ import PantallaHablante from './pantalla-hablante'
 import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import PanelSiguientePaso from '../../../panel-siguiente-paso'
 import type { Paso } from '../../../siguiente-paso'
-import { aHablante, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
+import { aHablante, faseDeNivel, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import { segundosDesde, marcaDeTiempo } from '../../cronometro'
@@ -83,14 +83,16 @@ export default function ConceptosTablet({
   const latencia = useRef<number | null>(null)
 
   const nivel = actividad.niveles[indice]
-  const fase = sonda ? 'generalizacion' : 'entrenamiento'
+  const fase = sonda ? 'generalizacion' : faseDeNivel(actividad, nivel.nombre)
+  // Analogía: redes propias del alumno, sin sondas con objetos nuevos ni modo hablante
+  const esAnalogia = actividad.tipo === 'analogia'
   const grupo = nivel.nombre
   const dominadosForma = dominadosDe(hablante)
-  const menorAMayor = !hablante && !sonda && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
+  const menorAMayor = !hablante && fase === 'entrenamiento' && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
 
   // Escalón de aprendizaje sin error del nivel (si está activo y es entrenamiento)
   const escalonDelNivel = () => {
-    if (hablante || sonda || !sinError?.activo || sinError.modo !== 'mayor_a_menor') return null
+    if (hablante || fase !== 'entrenamiento' || !sinError?.activo || sinError.modo !== 'mayor_a_menor') return null
     const { indice: i } = siguienteEscalon(sinError, leerEscalonBloque(ultimosEscalones[`${nivel.nombre}__A__A`]))
     const e = sinError.escalones[i]
     return { ...e, indice: i, total: sinError.escalones.length, final: i === sinError.escalones.length - 1, aciertos_con_apoyo: 0 }
@@ -98,7 +100,7 @@ export default function ConceptosTablet({
 
   const empezar = () => {
     desbloquearAudio()
-    const lista = generarBloque(actividad, indice, sonda ? conceptos.generalizacion : conceptos.entrenamiento, sonda ? 5 : tamano, sonda)
+    const lista = generarBloque(actividad, indice, sonda ? conceptos.generalizacion : conceptos.entrenamiento, sonda ? 5 : tamano, sonda, undefined, programaAlumnoId)
     if (!lista.length) {
       toast('No hay imágenes para generar los ensayos.', 'error')
       return
@@ -274,7 +276,11 @@ export default function ConceptosTablet({
     <Panel className="space-y-3 p-4 sm:p-5">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">En la tableta · ensayos generados</p>
-        <p className="text-xs text-slate-500">Imágenes del banco, claves alternadas en cada bloque. Cada nivel se registra como un grupo.</p>
+        <p className="text-xs text-slate-500">
+          {esAnalogia
+            ? 'Dos redes de figuras propias de este alumno (siempre las mismas). Los niveles de test van sin consecuencias diferenciales: el primer bloque sin ayudas indica si la relación es derivada.'
+            : 'Imágenes del banco, claves alternadas en cada bloque. Cada nivel se registra como un grupo.'}
+        </p>
       </div>
       {resultado && (
         <p className={`rounded-lg p-2 text-sm ${resultado.dominio ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800'}`}>
@@ -283,6 +289,7 @@ export default function ConceptosTablet({
         </p>
       )}
       <PanelSiguientePaso pasos={siguientesPasos} />
+      {!esAnalogia && (
       <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
         <span>Respuesta</span>
         {([false, true] as const).map((h) => (
@@ -300,6 +307,7 @@ export default function ConceptosTablet({
           </button>
         ))}
       </div>
+      )}
       {hablante && (
         <p className="text-xs text-slate-500">
           El alumno ve los estímulos y dice la relación; usted hace la pregunta que aparece abajo y marca la respuesta (mantenga pulsado).
@@ -322,7 +330,7 @@ export default function ConceptosTablet({
           </button>
         ))}
       </div>
-      {dominadosForma.includes(grupo) && (
+      {!esAnalogia && dominadosForma.includes(grupo) && (
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <input type="checkbox" checked={sonda} onChange={(e) => setSonda(e.target.checked)} />
           Sonda de generalización con objetos nuevos (5 ensayos, no cuenta para el dominio)

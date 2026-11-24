@@ -49,7 +49,8 @@ function Resumen({
           </thead>
           <tbody>
             {niveles.map((nivel) => {
-              const entrenamiento = bloques.filter((b) => b.nivel === nivel && b.fase === 'entrenamiento')
+              // Entrenamiento o, en los niveles de test (analogía), el test
+              const entrenamiento = bloques.filter((b) => b.nivel === nivel && (b.fase === 'entrenamiento' || b.fase === 'test_combinatorio'))
               const sondas = bloques.filter((b) => b.nivel === nivel && b.fase === 'generalizacion')
               const ultimo = entrenamiento.at(-1)
               const sonda = sondas.at(-1)
@@ -171,7 +172,7 @@ const pct = (c: Cuenta) => Math.round((c.aciertos / c.total) * 100)
 // el alumno puede estar respondiendo por una sola clave y no por la relación
 function Claves({ niveles, filas }: { niveles: string[]; filas: FilaClaveNivel[] }) {
   const grupos = niveles.flatMap((nivel) =>
-    (['entrenamiento', 'generalizacion'] as const).map((fase) => {
+    (['entrenamiento', 'test_combinatorio', 'generalizacion'] as const).map((fase) => {
       const cuentas = new Map<string, Cuenta>()
       for (const f of filas) {
         if (f.nivel !== nivel || f.fase !== fase) continue

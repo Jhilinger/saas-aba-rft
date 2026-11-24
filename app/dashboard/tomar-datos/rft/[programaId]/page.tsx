@@ -137,10 +137,10 @@ export default async function TomarDatosRftPage({
           conceptos={conceptosActividad}
           imagenes={imagenesActividad}
           dominados={(dominioFases ?? [])
-            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'oyente')
+            .filter((d) => d.fase !== 'generalizacion' && d.fase !== 'mantenimiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'oyente')
             .map((d) => d.grupo)}
           dominadosHablante={(dominioFases ?? [])
-            .filter((d) => d.fase === 'entrenamiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'hablante')
+            .filter((d) => d.fase !== 'generalizacion' && d.fase !== 'mantenimiento' && d.posicion_origen === 'A' && d.posicion_destino === 'A' && d.forma_respuesta === 'hablante')
             .map((d) => d.grupo)}
           ensayosPorBloque={programa.ensayos_por_bloque}
           sinError={sinError}

@@ -27,6 +27,11 @@ const CLAVE: Record<string, string> = {
   'color+tamano': '«Color y tamaño»',
   asc: 'ordenar de menos a más',
   desc: 'ordenar de más a menos',
+  // Analogía
+  AB: 'Relación A–B',
+  AC: 'Relación A–C',
+  mutuo: 'Mutua',
+  combinatorio: 'Combinatoria',
 }
 
 export function etiquetaClave(clave: string) {

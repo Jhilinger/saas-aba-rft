@@ -25,7 +25,15 @@ export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'prim
 export type NivelClasificacion = { nombre: string; modo: 'una' | 'dos' }
 // Causa y efecto con viñetas: «¿Qué pasará?» (causa → efecto) y «¿Por qué ha pasado esto?» (efecto → causa)
 export type NivelCausal = { nombre: string; opciones: number }
+// Analogía con estímulos arbitrarios (Ruiz y Luciano, 2011): dos redes de figuras
+// sin parecido físico, cada una con dos clases de tres miembros (A, B, C) y una
+// figura sin clase por posición. Se entrena A–B y A–C en cada red, se relacionan
+// pares entrenados, se prueban las relaciones derivadas y, por último, la analogía:
+// un par derivado B–C de una red con el par de la otra que mantiene la misma relación
+export type ModoAnalogia = 'entrenar_red' | 'relaciones_entrenadas' | 'derivadas' | 'analogia'
+export type NivelAnalogia = { nombre: string; modo: ModoAnalogia; red?: 1 | 2 }
 export type ActividadConceptos =
+  | { tipo: 'analogia'; niveles: NivelAnalogia[] }
   | { tipo: 'causal'; niveles: NivelCausal[] }
   | { tipo: 'clasificacion'; niveles: NivelClasificacion[] }
   | { tipo: 'distincion'; niveles: NivelDistincion[] }
@@ -154,6 +162,8 @@ export const CONSIGNAS = {
   colorForma: 'Toca el que es del mismo color y tiene la misma forma',
   formaTamano: 'Toca el que tiene la misma forma y es del mismo tamaño',
   colorTamano: 'Toca el que es del mismo color y del mismo tamaño',
+  // Analogía: relacionar pares
+  pareja: '¿Qué pareja es como esta?',
 } as const
 
 export function frasesConceptos(): string[] {
@@ -176,20 +186,37 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
   if (actividad.tipo === 'oposicion') return CONCEPTOS_OPUESTOS
   if (actividad.tipo === 'espacial') return CONCEPTOS_ESCENAS
   if (actividad.tipo === 'temporal') return CONCEPTOS_SECUENCIAS
-  // Figuras geométricas dibujadas: sin imágenes del banco
-  if (actividad.tipo === 'clasificacion') return []
+  // Figuras geométricas o generadas por semilla: sin imágenes del banco
+  if (actividad.tipo === 'clasificacion' || actividad.tipo === 'analogia') return []
   if (actividad.tipo === 'causal') return CONCEPTOS_CAUSALES
   return null
 }
 
 const DIMENSIONES: Dimension[] = ['tamano', 'cantidad', 'longitud', 'altura']
 const MODOS: ModoDistincion[] = ['igual_diferente', 'intruso', 'sutil']
+const MODOS_ANALOGIA: ModoAnalogia[] = ['entrenar_red', 'relaciones_entrenadas', 'derivadas', 'analogia']
+
+// Fase con la que se registra un nivel: los niveles de test (relaciones derivadas
+// y analogía) van sin consecuencias diferenciales y cuentan como derivadas
+export function faseDeNivel(actividad: ActividadConceptos, nombreNivel: string): 'entrenamiento' | 'test_combinatorio' {
+  if (actividad.tipo !== 'analogia') return 'entrenamiento'
+  const modo = actividad.niveles.find((n) => n.nombre === nombreNivel)?.modo
+  return modo === 'derivadas' || modo === 'analogia' ? 'test_combinatorio' : 'entrenamiento'
+}
 
 export function leerActividadConceptos(valor: Json | null | undefined): ActividadConceptos | null {
   if (!valor || typeof valor !== 'object' || Array.isArray(valor)) return null
   const o = valor as Record<string, unknown>
   const niveles = Array.isArray(o.niveles) ? (o.niveles as Record<string, unknown>[]) : []
   const nombre = (n: Record<string, unknown>, i: number) => (typeof n.nombre === 'string' && n.nombre.trim() ? n.nombre.trim() : `Nivel ${i + 1}`)
+  if (o.tipo === 'analogia') {
+    const lista = niveles.map((n, i) => ({
+      nombre: nombre(n, i),
+      modo: MODOS_ANALOGIA.includes(n.modo as ModoAnalogia) ? (n.modo as ModoAnalogia) : ('entrenar_red' as const),
+      red: n.red === 2 ? (2 as const) : (1 as const),
+    }))
+    return lista.length ? { tipo: 'analogia', niveles: lista } : null
+  }
   if (o.tipo === 'causal') {
     const lista = niveles.map((n, i) => ({ nombre: nombre(n, i), opciones: typeof n.opciones === 'number' ? Math.min(4, Math.max(2, Math.round(n.opciones))) : 3 }))
     return lista.length ? { tipo: 'causal', niveles: lista } : null
@@ -670,14 +697,103 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
   return { clave: e.clave, pregunta: '¿Esto pasó primero o después?', esperada, estimulos: e.opciones.map((o) => o.pantalla), marcada: correcta }
 }
 
+// ── Analogía ────────────────────────────────────────────────────────────────
+// Las redes son siempre las mismas para un alumno (semilla del programa): se
+// entrenan en unos niveles y se prueban en otros. Red 1: figuras abstractas;
+// red 2: símbolos (como las formas y las letras griegas de Ruiz y Luciano), para
+// que nunca compartan rasgos físicos. Clases 1 y 2; la 3 son figuras sin clase
+// que hacen de comparación negativa.
+type PosicionRed = 'A' | 'B' | 'C'
+const LETRAS_RED_2: Record<PosicionRed, string> = { A: 'X', B: 'Y', C: 'Z' }
+
+function miembroRed(semilla: string, red: 1 | 2, pos: PosicionRed, clase: number): { pantalla: EstimuloPantalla; etiqueta: string } {
+  const s = `rft-analogia:${semilla}:${red}:${pos}${clase}`
+  return {
+    pantalla: red === 1 ? { fig: 'abstracta', s, c: 6 } : { fig: 'simbolo', s },
+    etiqueta: `${red === 1 ? pos : LETRAS_RED_2[pos]}${clase}`,
+  }
+}
+
+function parRed(semilla: string, red: 1 | 2, [p1, c1]: [PosicionRed, number], [p2, c2]: [PosicionRed, number]) {
+  const a = miembroRed(semilla, red, p1, c1)
+  const b = miembroRed(semilla, red, p2, c2)
+  return { pantalla: { par: [a.pantalla, b.pantalla] } as EstimuloPantalla, etiqueta: `${a.etiqueta}–${b.etiqueta}` }
+}
+
+// Muestra y tres comparaciones (las dos clases y la figura sin clase)
+function ensayoSimple(semilla: string, red: 1 | 2, clave: string, origen: PosicionRed, destino: PosicionRed, clase: number, azar: Azar): EnsayoGenerado {
+  const opciones = [1, 2, 3].map((k) => ({ ...miembroRed(semilla, red, destino, k), correcta: k === clase }))
+  return { clave, consigna: CONSIGNAS.igual, muestra: miembroRed(semilla, red, origen, clase).pantalla, opciones: barajar(opciones, azar) }
+}
+
+function analogia(nivel: NivelAnalogia, semilla: string, n: number, azar: Azar): EnsayoGenerado[] {
+  const clase = () => (azar() < 0.5 ? 1 : 2)
+  const red = (): 1 | 2 => (azar() < 0.5 ? 1 : 2)
+  if (nivel.modo === 'entrenar_red') {
+    const r = nivel.red ?? 1
+    const clases = alternados(1, 2, n, azar)
+    return alternados<'AB' | 'AC'>('AB', 'AC', n, azar).map((clave, i) => ensayoSimple(semilla, r, clave, 'A', clave === 'AB' ? 'B' : 'C', clases[i], azar))
+  }
+  if (nivel.modo === 'derivadas') {
+    // Mutuas (B o C → A) y combinatorias (B ↔ C), de las dos redes
+    return alternados<'mutuo' | 'combinatorio'>('mutuo', 'combinatorio', n, azar).map((clave) => {
+      const desde: PosicionRed = azar() < 0.5 ? 'B' : 'C'
+      const hacia: PosicionRed = clave === 'mutuo' ? 'A' : desde === 'B' ? 'C' : 'B'
+      return ensayoSimple(semilla, red(), clave, desde, hacia, clase(), azar)
+    })
+  }
+  return alternados<'igual' | 'diferente'>('igual', 'diferente', n, azar).map((clave) => {
+    const k = clase()
+    const o = 3 - k
+    if (nivel.modo === 'relaciones_entrenadas') {
+      // Pares entrenados de una red: muestra con una relación (A–B o A–C) y
+      // opciones con la otra, sin repetir ninguna figura de la muestra (si no,
+      // bastaría con evitar la opción que la repite)
+      const r = red()
+      const [p1, p2]: [PosicionRed, PosicionRed] = azar() < 0.5 ? ['B', 'C'] : ['C', 'B']
+      const muestra = parRed(semilla, r, ['A', k], [p1, clave === 'igual' ? k : o])
+      const igual = parRed(semilla, r, ['A', o], [p2, clave === 'igual' ? o : k])
+      const otra = parRed(semilla, r, ['A', o], [p2, clave === 'igual' ? k : o])
+      return {
+        clave,
+        consigna: CONSIGNAS.pareja,
+        muestra: muestra.pantalla,
+        opciones: barajar([{ ...igual, correcta: true }, { ...otra, correcta: false }], azar),
+      }
+    }
+    // Analogía entre redes: par derivado B–C de una red y pares B–C de la otra
+    const r = red()
+    const otraRed: 1 | 2 = r === 1 ? 2 : 1
+    const j = clase()
+    const muestra = parRed(semilla, r, ['B', k], ['C', clave === 'igual' ? k : o])
+    const mismaClase = parRed(semilla, otraRed, ['B', j], ['C', j])
+    const distintas = parRed(semilla, otraRed, ['B', j], ['C', 3 - j])
+    return {
+      clave,
+      consigna: CONSIGNAS.pareja,
+      muestra: muestra.pantalla,
+      opciones: barajar(
+        [
+          { ...mismaClase, correcta: clave === 'igual' },
+          { ...distintas, correcta: clave === 'diferente' },
+        ],
+        azar
+      ),
+    }
+  })
+}
+
 export function generarBloque(
   actividad: ActividadConceptos,
   indiceNivel: number,
   conceptos: Concepto[],
   n: number,
   generalizacion = false,
-  azar: Azar = Math.random
+  azar: Azar = Math.random,
+  // Fija las redes de la analogía (el programa del alumno)
+  semilla = ''
 ): EnsayoGenerado[] {
+  if (actividad.tipo === 'analogia') return analogia(actividad.niveles[indiceNivel], semilla, n, azar)
   if (actividad.tipo === 'causal') return causal(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'clasificacion') return clasificacion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
