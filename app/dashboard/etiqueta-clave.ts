@@ -32,6 +32,14 @@ const CLAVE: Record<string, string> = {
   AC: 'Relación A–C',
   mutuo: 'Mutua',
   combinatorio: 'Combinatoria',
+  grande_pequeno: '«Grande–pequeño»',
+  pequeno_grande: '«Pequeño–grande»',
+  creciente: '«De menor a mayor»',
+  decreciente: '«De mayor a menor»',
+  AAB: 'Patrón A-A-B',
+  ABA: 'Patrón A-B-A',
+  ABB: 'Patrón A-B-B',
+  ABC: 'Patrón A-B-C',
 }
 
 export function etiquetaClave(clave: string) {

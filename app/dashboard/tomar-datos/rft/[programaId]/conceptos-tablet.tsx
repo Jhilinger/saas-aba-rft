@@ -10,7 +10,7 @@ import PantallaHablante from './pantalla-hablante'
 import AjustesRefuerzo from '../../../ajustes-refuerzo'
 import PanelSiguientePaso from '../../../panel-siguiente-paso'
 import type { Paso } from '../../../siguiente-paso'
-import { aHablante, faseDeNivel, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
+import { aHablante, esAnalogiaNoArbitraria, faseDeNivel, generarBloque, type ActividadConceptos, type Concepto, type EnsayoGenerado, type EnsayoHablante } from '../../../conceptos'
 import { leerEscalonBloque, siguienteEscalon, describirEscalon, type ConfigSinError, type EscalonBloque } from '../../../sin-error'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import { segundosDesde, marcaDeTiempo } from '../../cronometro'
@@ -86,6 +86,8 @@ export default function ConceptosTablet({
   const fase = sonda ? 'generalizacion' : faseDeNivel(actividad, nivel.nombre)
   // Analogía: redes propias del alumno, sin sondas con objetos nuevos ni modo hablante
   const esAnalogia = actividad.tipo === 'analogia'
+  // Las sondas con objetos nuevos solo tienen sentido con imágenes del banco
+  const conSondas = !esAnalogia || esAnalogiaNoArbitraria(actividad, nivel.nombre)
   const grupo = nivel.nombre
   const dominadosForma = dominadosDe(hablante)
   const menorAMayor = !hablante && fase === 'entrenamiento' && !!sinError?.activo && sinError.modo === 'menor_a_mayor'
@@ -278,7 +280,7 @@ export default function ConceptosTablet({
         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">En la tableta · ensayos generados</p>
         <p className="text-xs text-slate-500">
           {esAnalogia
-            ? 'Dos redes de figuras propias de este alumno (siempre las mismas). Los niveles de test van sin consecuencias diferenciales: el primer bloque sin ayudas indica si la relación es derivada.'
+            ? 'Pares y tríos con imágenes del banco (relaciones no arbitrarias) o dos redes de figuras propias de este alumno (siempre las mismas). Los niveles de test van sin consecuencias diferenciales: el primer bloque sin ayudas indica si la relación es derivada.'
             : 'Imágenes del banco, claves alternadas en cada bloque. Cada nivel se registra como un grupo.'}
         </p>
       </div>
@@ -330,7 +332,7 @@ export default function ConceptosTablet({
           </button>
         ))}
       </div>
-      {!esAnalogia && dominadosForma.includes(grupo) && (
+      {conSondas && dominadosForma.includes(grupo) && (
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <input type="checkbox" checked={sonda} onChange={(e) => setSonda(e.target.checked)} />
           Sonda de generalización con objetos nuevos (5 ensayos, no cuenta para el dominio)

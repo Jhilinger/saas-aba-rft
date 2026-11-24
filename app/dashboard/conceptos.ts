@@ -30,7 +30,11 @@ export type NivelCausal = { nombre: string; opciones: number }
 // figura sin clase por posición. Se entrena A–B y A–C en cada red, se relacionan
 // pares entrenados, se prueban las relaciones derivadas y, por último, la analogía:
 // un par derivado B–C de una red con el par de la otra que mantiene la misma relación
-export type ModoAnalogia = 'entrenar_red' | 'relaciones_entrenadas' | 'derivadas' | 'analogia'
+// Abstraer la clave con relaciones no arbitrarias (imágenes del banco): pares
+// iguales/diferentes, grande-pequeño, contrarios/iguales o mezclados, y tríos
+// con el mismo patrón de igualdad o de tamaño (redes de tres miembros)
+export type ModoAnalogiaNoArbitraria = 'pares_igual' | 'pares_tamano' | 'pares_oposicion' | 'pares_mezcla' | 'trios_igual' | 'trios_tamano'
+export type ModoAnalogia = 'entrenar_red' | 'relaciones_entrenadas' | 'derivadas' | 'analogia' | ModoAnalogiaNoArbitraria
 export type NivelAnalogia = { nombre: string; modo: ModoAnalogia; red?: 1 | 2 }
 export type ActividadConceptos =
   | { tipo: 'analogia'; niveles: NivelAnalogia[] }
@@ -164,6 +168,7 @@ export const CONSIGNAS = {
   colorTamano: 'Toca el que es del mismo color y del mismo tamaño',
   // Analogía: relacionar pares
   pareja: '¿Qué pareja es como esta?',
+  trio: '¿Qué grupo es como este?',
 } as const
 
 export function frasesConceptos(): string[] {
@@ -178,7 +183,10 @@ export function frasesConceptos(): string[] {
 // trabaja con objetos de las categorías generales, también esas
 export function imagenesNecesarias(actividad: ActividadConceptos, categorias: string[]): string[] {
   const propias = conceptosPropiosDe(actividad)
-  const conCategorias = !propias || (actividad.tipo === 'temporal' && actividad.niveles.some((n) => n.modo === 'orden_presentacion'))
+  const conCategorias =
+    !propias ||
+    (actividad.tipo === 'temporal' && actividad.niveles.some((n) => n.modo === 'orden_presentacion')) ||
+    (actividad.tipo === 'analogia' && actividad.niveles.some((n) => MODOS_NO_ARBITRARIOS.includes(n.modo as ModoAnalogiaNoArbitraria)))
   return [...(propias ?? []), ...(conCategorias ? categorias : [])]
 }
 
@@ -187,14 +195,24 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
   if (actividad.tipo === 'espacial') return CONCEPTOS_ESCENAS
   if (actividad.tipo === 'temporal') return CONCEPTOS_SECUENCIAS
   // Figuras geométricas o generadas por semilla: sin imágenes del banco
-  if (actividad.tipo === 'clasificacion' || actividad.tipo === 'analogia') return []
+  if (actividad.tipo === 'clasificacion') return []
+  // Analogía: los contrarios solo si algún nivel usa pares de oposición
+  if (actividad.tipo === 'analogia') return actividad.niveles.some((n) => n.modo === 'pares_oposicion' || n.modo === 'pares_mezcla') ? CONCEPTOS_OPUESTOS : []
   if (actividad.tipo === 'causal') return CONCEPTOS_CAUSALES
   return null
 }
 
 const DIMENSIONES: Dimension[] = ['tamano', 'cantidad', 'longitud', 'altura']
 const MODOS: ModoDistincion[] = ['igual_diferente', 'intruso', 'sutil']
-const MODOS_ANALOGIA: ModoAnalogia[] = ['entrenar_red', 'relaciones_entrenadas', 'derivadas', 'analogia']
+const MODOS_NO_ARBITRARIOS: ModoAnalogiaNoArbitraria[] = ['pares_igual', 'pares_tamano', 'pares_oposicion', 'pares_mezcla', 'trios_igual', 'trios_tamano']
+const MODOS_ANALOGIA: ModoAnalogia[] = ['entrenar_red', 'relaciones_entrenadas', 'derivadas', 'analogia', ...MODOS_NO_ARBITRARIOS]
+
+// Nivel de analogía con imágenes del banco (admite sondas con objetos nuevos)
+export function esAnalogiaNoArbitraria(actividad: ActividadConceptos, nombreNivel: string) {
+  if (actividad.tipo !== 'analogia') return false
+  const modo = actividad.niveles.find((n) => n.nombre === nombreNivel)?.modo
+  return MODOS_NO_ARBITRARIOS.includes(modo as ModoAnalogiaNoArbitraria)
+}
 
 // Fase con la que se registra un nivel: los niveles de test (relaciones derivadas
 // y analogía) van sin consecuencias diferenciales y cuentan como derivadas
@@ -726,6 +744,102 @@ function ensayoSimple(semilla: string, red: 1 | 2, clave: string, origen: Posici
   return { clave, consigna: CONSIGNAS.igual, muestra: miembroRed(semilla, red, origen, clase).pantalla, opciones: barajar(opciones, azar) }
 }
 
+// ── Analogía no arbitraria ─────────────────────────────────────────────────
+// El modelo y las opciones nunca comparten objeto: la elección depende solo de
+// la relación (Stewart et al., 2001). Las dos opciones usan los mismos objetos
+// nuevos, así que solo cambia la relación entre ellos.
+type Opcion = Omit<OpcionGenerada, 'correcta'>
+const conjunto = (elementos: { c: Concepto; escala?: number; img?: string }[], nombre?: string): Opcion => ({
+  pantalla: { par: elementos.map((e) => ({ img: e.img ?? e.c.concepto, ...(e.escala ? { escala: e.escala } : {}) })) },
+  etiqueta: nombre ?? elementos.map((e) => e.c.nombre + (e.escala && e.escala < 1 ? ' (pequeño)' : '')).join('–'),
+})
+// Varios conceptos distintos entre sí
+function distintos(conceptos: Concepto[], k: number, azar: Azar): Concepto[] {
+  return barajar(conceptos, azar).slice(0, k)
+}
+function ensayoRelacion(clave: string, consigna: string, muestra: Opcion, buena: Opcion, malas: Opcion[], azar: Azar): EnsayoGenerado {
+  return {
+    clave,
+    consigna,
+    muestra: muestra.pantalla,
+    opciones: barajar([{ ...buena, correcta: true }, ...malas.map((m) => ({ ...m, correcta: false }))], azar),
+  }
+}
+
+const GRANDE = 1
+const PEQUENO = 0.5
+const SERIE = [0.45, 0.72, 1]
+const PATRONES_TRIO = ['AAB', 'ABA', 'ABB', 'ABC'] as const
+
+function paresIgual(clave: 'igual' | 'diferente', conceptos: Concepto[], azar: Azar) {
+  const [x, w, y, z] = distintos(conceptos, 4, azar)
+  const iguales = conjunto([{ c: y }, { c: y }])
+  const diferentes = conjunto([{ c: y }, { c: z }])
+  return clave === 'igual'
+    ? ensayoRelacion(clave, CONSIGNAS.pareja, conjunto([{ c: x }, { c: x }]), iguales, [diferentes], azar)
+    : ensayoRelacion(clave, CONSIGNAS.pareja, conjunto([{ c: x }, { c: w }]), diferentes, [iguales], azar)
+}
+
+function paresTamano(clave: 'grande_pequeno' | 'pequeno_grande', conceptos: Concepto[], azar: Azar) {
+  const [x, y] = distintos(conceptos, 2, azar)
+  const orden = (c: Concepto, primeroGrande: boolean) => conjunto([{ c, escala: primeroGrande ? GRANDE : PEQUENO }, { c, escala: primeroGrande ? PEQUENO : GRANDE }])
+  const g = clave === 'grande_pequeno'
+  return ensayoRelacion(clave, CONSIGNAS.pareja, orden(x, g), orden(y, g), [orden(y, !g)], azar)
+}
+
+function paresOposicion(clave: 'contrario' | 'igual', generalizacion: boolean, azar: Azar) {
+  const lista = OPUESTOS.filter(([, , uso]) => uso === (generalizacion ? 'generalizacion' : 'entrenamiento'))
+  const [p, q] = barajar(lista, azar)
+  const polo = (par: (typeof OPUESTOS)[number], i: number) => {
+    const slug = par[i]
+    return { c: { concepto: `oposicion/${slug}`, nombre: slug.replace(/-/g, ' ') } }
+  }
+  const [p1, p2] = azar() < 0.5 ? [0, 1] : [1, 0]
+  const [q1, q2] = azar() < 0.5 ? [0, 1] : [1, 0]
+  const contrarios = conjunto([polo(q, q1), polo(q, q2)])
+  const iguales = conjunto([polo(q, q1), polo(q, q1)])
+  return clave === 'contrario'
+    ? ensayoRelacion(clave, CONSIGNAS.pareja, conjunto([polo(p, p1), polo(p, p2)]), contrarios, [iguales], azar)
+    : ensayoRelacion(clave, CONSIGNAS.pareja, conjunto([polo(p, p1), polo(p, p1)]), iguales, [contrarios], azar)
+}
+
+function trioIgual(patron: (typeof PATRONES_TRIO)[number], conceptos: Concepto[], azar: Azar) {
+  const [x, w, v, y, z, u] = distintos(conceptos, 6, azar)
+  const con = (pat: string, objetos: Concepto[]) => conjunto([...pat].map((l) => ({ c: objetos['ABC'.indexOf(l)] })), pat)
+  const otros = barajar(PATRONES_TRIO.filter((p) => p !== patron), azar).slice(0, 2)
+  return ensayoRelacion(patron, CONSIGNAS.trio, con(patron, [x, w, v]), con(patron, [y, z, u]), otros.map((p) => con(p, [y, z, u])), azar)
+}
+
+function trioTamano(clave: 'creciente' | 'decreciente', conceptos: Concepto[], azar: Azar) {
+  const [x, y] = distintos(conceptos, 2, azar)
+  const serie = (c: Concepto, escalas: number[], nombre: string) => conjunto(escalas.map((escala) => ({ c, escala })), `${c.nombre} ${nombre}`)
+  const creciente = (c: Concepto) => serie(c, SERIE, 'de menor a mayor')
+  const decreciente = (c: Concepto) => serie(c, [...SERIE].reverse(), 'de mayor a menor')
+  const mezclada = serie(y, azar() < 0.5 ? [SERIE[1], SERIE[0], SERIE[2]] : [SERIE[2], SERIE[0], SERIE[1]], 'sin orden')
+  return clave === 'creciente'
+    ? ensayoRelacion(clave, CONSIGNAS.trio, creciente(x), creciente(y), [decreciente(y), mezclada], azar)
+    : ensayoRelacion(clave, CONSIGNAS.trio, decreciente(x), decreciente(y), [creciente(y), mezclada], azar)
+}
+
+function analogiaNoArbitraria(modo: ModoAnalogiaNoArbitraria, conceptos: Concepto[], n: number, generalizacion: boolean, azar: Azar): EnsayoGenerado[] {
+  if (modo === 'trios_igual') {
+    const patrones = barajar(Array.from({ length: n }, (_, i) => PATRONES_TRIO[i % PATRONES_TRIO.length]), azar)
+    return patrones.map((p) => trioIgual(p, conceptos, azar))
+  }
+  if (modo === 'trios_tamano') return alternados<'creciente' | 'decreciente'>('creciente', 'decreciente', n, azar).map((c) => trioTamano(c, conceptos, azar))
+  const tipos: ('pares_igual' | 'pares_tamano' | 'pares_oposicion')[] =
+    modo === 'pares_mezcla' ? barajar(Array.from({ length: n }, (_, i) => (['pares_igual', 'pares_tamano', 'pares_oposicion'] as const)[i % 3]), azar) : Array(n).fill(modo)
+  // Las dos claves de cada tipo a partes iguales
+  const mitad = alternados(true, false, n, azar)
+  return tipos.map((t, i) =>
+    t === 'pares_igual'
+      ? paresIgual(mitad[i] ? 'igual' : 'diferente', conceptos, azar)
+      : t === 'pares_tamano'
+        ? paresTamano(mitad[i] ? 'grande_pequeno' : 'pequeno_grande', conceptos, azar)
+        : paresOposicion(mitad[i] ? 'contrario' : 'igual', generalizacion, azar)
+  )
+}
+
 function analogia(nivel: NivelAnalogia, semilla: string, n: number, azar: Azar): EnsayoGenerado[] {
   const clase = () => (azar() < 0.5 ? 1 : 2)
   const red = (): 1 | 2 => (azar() < 0.5 ? 1 : 2)
@@ -793,7 +907,14 @@ export function generarBloque(
   // Fija las redes de la analogía (el programa del alumno)
   semilla = ''
 ): EnsayoGenerado[] {
-  if (actividad.tipo === 'analogia') return analogia(actividad.niveles[indiceNivel], semilla, n, azar)
+  if (actividad.tipo === 'analogia') {
+    const nivel = actividad.niveles[indiceNivel]
+    if (MODOS_NO_ARBITRARIOS.includes(nivel.modo as ModoAnalogiaNoArbitraria)) {
+      if (!conceptos.length && nivel.modo !== 'pares_oposicion') return []
+      return analogiaNoArbitraria(nivel.modo as ModoAnalogiaNoArbitraria, conceptos, n, generalizacion, azar)
+    }
+    return analogia(nivel, semilla, n, azar)
+  }
   if (actividad.tipo === 'causal') return causal(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'clasificacion') return clasificacion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)

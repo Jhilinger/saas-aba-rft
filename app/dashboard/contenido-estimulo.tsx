@@ -15,11 +15,13 @@ export default function ContenidoEstimulo({
 }) {
   const f = (k: number) => `calc(${lado} * ${k})`
   if ('par' in estimulo) {
+    // Pareja: dos huecos de casi media tarjeta; trío: tres de un tercio
+    const hueco = estimulo.par.length === 3 ? 0.31 : 0.46
     return (
-      <span className="flex items-center justify-center" style={{ gap: f(0.05) }}>
+      <span className="flex items-center justify-center" style={{ gap: f(estimulo.par.length === 3 ? 0.03 : 0.05) }}>
         {estimulo.par.map((e, i) => (
-          <span key={i} className="flex items-center justify-center rounded-xl bg-slate-50" style={{ width: f(0.46), height: f(0.46) }}>
-            <ContenidoEstimulo estimulo={e} lado={f(0.46)} urlImagen={urlImagen} />
+          <span key={i} className="flex items-center justify-center rounded-xl bg-slate-50" style={{ width: f(hueco), height: f(hueco) }}>
+            <ContenidoEstimulo estimulo={e} lado={f(hueco)} urlImagen={urlImagen} />
           </span>
         ))}
       </span>

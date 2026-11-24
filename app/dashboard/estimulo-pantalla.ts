@@ -17,7 +17,8 @@ export type EstimuloPantalla =
   // Formas dibujadas para comparar magnitudes: lápiz de longitud valor (0,2–1)
   // o torre de valor bloques
   | { forma: 'lapiz' | 'torre'; valor: number }
-  | { par: [EstimuloPantalla, EstimuloPantalla] }
+  // Pareja o trío presentados juntos en una tarjeta (analogías)
+  | { par: EstimuloPantalla[] }
 
 export function esEstimulo(v: unknown): v is EstimuloPantalla {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return false
@@ -26,7 +27,7 @@ export function esEstimulo(v: unknown): v is EstimuloPantalla {
   if (typeof o.img === 'string') return true
   if (typeof o.fig === 'string' && typeof o.s === 'string') return true
   if ((o.forma === 'lapiz' || o.forma === 'torre') && typeof o.valor === 'number') return true
-  return Array.isArray(o.par) && o.par.length === 2 && o.par.every(esEstimulo)
+  return Array.isArray(o.par) && o.par.length >= 2 && o.par.length <= 3 && o.par.every(esEstimulo)
 }
 
 export function parsearEstimuloPantalla(valor: unknown): EstimuloPantalla | null {
