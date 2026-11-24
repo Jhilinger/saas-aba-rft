@@ -33,7 +33,9 @@ export type NivelCausal = { nombre: string; opciones: number }
 // Abstraer la clave con relaciones no arbitrarias (imágenes del banco): pares
 // iguales/diferentes, grande-pequeño, contrarios/iguales o mezclados, y tríos
 // con el mismo patrón de igualdad o de tamaño (redes de tres miembros)
-export type ModoAnalogiaNoArbitraria = 'pares_igual' | 'pares_tamano' | 'pares_oposicion' | 'pares_mezcla' | 'trios_igual' | 'trios_tamano'
+// pares_conocidos: imagen del banco con su nombre escrito o con otro (relación
+// arbitraria que el alumno ya conoce; ayuda de Ruiz y Luciano, 2012)
+export type ModoAnalogiaNoArbitraria = 'pares_igual' | 'pares_tamano' | 'pares_oposicion' | 'pares_mezcla' | 'trios_igual' | 'trios_tamano' | 'pares_conocidos'
 export type ModoAnalogia = 'entrenar_red' | 'relaciones_entrenadas' | 'derivadas' | 'analogia' | ModoAnalogiaNoArbitraria
 export type NivelAnalogia = { nombre: string; modo: ModoAnalogia; red?: 1 | 2 }
 export type ActividadConceptos =
@@ -204,7 +206,7 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
 
 const DIMENSIONES: Dimension[] = ['tamano', 'cantidad', 'longitud', 'altura']
 const MODOS: ModoDistincion[] = ['igual_diferente', 'intruso', 'sutil']
-const MODOS_NO_ARBITRARIOS: ModoAnalogiaNoArbitraria[] = ['pares_igual', 'pares_tamano', 'pares_oposicion', 'pares_mezcla', 'trios_igual', 'trios_tamano']
+const MODOS_NO_ARBITRARIOS: ModoAnalogiaNoArbitraria[] = ['pares_igual', 'pares_tamano', 'pares_oposicion', 'pares_mezcla', 'trios_igual', 'trios_tamano', 'pares_conocidos']
 const MODOS_ANALOGIA: ModoAnalogia[] = ['entrenar_red', 'relaciones_entrenadas', 'derivadas', 'analogia', ...MODOS_NO_ARBITRARIOS]
 
 // Nivel de analogía con imágenes del banco (admite sondas con objetos nuevos)
@@ -821,7 +823,20 @@ function trioTamano(clave: 'creciente' | 'decreciente', conceptos: Concepto[], a
     : ensayoRelacion(clave, CONSIGNAS.trio, decreciente(x), decreciente(y), [creciente(y), mezclada], azar)
 }
 
+// Imagen con su nombre escrito (igual) o con el de otra cosa (diferente)
+function paresConocidos(clave: 'igual' | 'diferente', conceptos: Concepto[], azar: Azar) {
+  const [x, z, y, w] = distintos(conceptos, 4, azar)
+  const par = (imagen: Concepto, palabra: Concepto): Opcion => ({
+    pantalla: { par: [{ img: imagen.concepto }, { t: palabra.nombre.toLowerCase() }] },
+    etiqueta: `${imagen.nombre} + «${palabra.nombre.toLowerCase()}»`,
+  })
+  return clave === 'igual'
+    ? ensayoRelacion(clave, CONSIGNAS.pareja, par(x, x), par(y, y), [par(y, w)], azar)
+    : ensayoRelacion(clave, CONSIGNAS.pareja, par(x, z), par(y, w), [par(y, y)], azar)
+}
+
 function analogiaNoArbitraria(modo: ModoAnalogiaNoArbitraria, conceptos: Concepto[], n: number, generalizacion: boolean, azar: Azar): EnsayoGenerado[] {
+  if (modo === 'pares_conocidos') return alternados<'igual' | 'diferente'>('igual', 'diferente', n, azar).map((c) => paresConocidos(c, conceptos, azar))
   if (modo === 'trios_igual') {
     const patrones = barajar(Array.from({ length: n }, (_, i) => PATRONES_TRIO[i % PATRONES_TRIO.length]), azar)
     return patrones.map((p) => trioIgual(p, conceptos, azar))
