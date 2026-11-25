@@ -8,9 +8,10 @@ import type { EstimuloPantalla } from './estimulo-pantalla'
 // como indica el currículo, para que la respuesta quede bajo control de la
 // clave relacional. Cada nivel se registra como un grupo (A → A).
 
-export type ModoDistincion = 'igual_diferente' | 'intruso' | 'sutil'
+export type ModoDistincion = 'igual_diferente' | 'intruso' | 'sutil' | 'dimension'
 export type Dimension = 'tamano' | 'cantidad' | 'longitud' | 'altura'
-export type NivelDistincion = { nombre: string; modo: ModoDistincion; opciones: number }
+// dimension: igual o diferente en UNA propiedad (color, forma o tamaño, o mezcladas), con figuras
+export type NivelDistincion = { nombre: string; modo: ModoDistincion; opciones: number; dimension?: 'color' | 'forma' | 'tamano' | 'mezcla' }
 // orden: ordenar series de ese número de elementos (si hay varios, uno al azar en cada ensayo)
 export type NivelComparacion = { nombre: string; dimensiones: Dimension[]; proporcion: number; intermedio: boolean; orden?: number[] }
 export type NivelOposicion = { nombre: string; opciones: number }
@@ -171,6 +172,10 @@ export const CONSIGNAS = {
   // Analogía: relacionar pares
   pareja: '¿Qué pareja es como esta?',
   trio: '¿Qué grupo es como este?',
+  // Distinción en una dimensión
+  dimColor: '¿Son del mismo color o de color diferente?',
+  dimForma: '¿Tienen la misma forma o forma diferente?',
+  dimTamano: '¿Son del mismo tamaño o de tamaño diferente?',
 } as const
 
 export function frasesConceptos(): string[] {
@@ -205,7 +210,7 @@ export function conceptosPropiosDe(actividad: ActividadConceptos): string[] | nu
 }
 
 const DIMENSIONES: Dimension[] = ['tamano', 'cantidad', 'longitud', 'altura']
-const MODOS: ModoDistincion[] = ['igual_diferente', 'intruso', 'sutil']
+const MODOS: ModoDistincion[] = ['igual_diferente', 'intruso', 'sutil', 'dimension']
 const MODOS_NO_ARBITRARIOS: ModoAnalogiaNoArbitraria[] = ['pares_igual', 'pares_tamano', 'pares_oposicion', 'pares_mezcla', 'trios_igual', 'trios_tamano', 'pares_conocidos']
 const MODOS_ANALOGIA: ModoAnalogia[] = ['entrenar_red', 'relaciones_entrenadas', 'derivadas', 'analogia', ...MODOS_NO_ARBITRARIOS]
 
@@ -250,6 +255,9 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
       nombre: nombre(n, i),
       modo: MODOS.includes(n.modo as ModoDistincion) ? (n.modo as ModoDistincion) : 'igual_diferente',
       opciones: typeof n.opciones === 'number' ? Math.min(5, Math.max(2, Math.round(n.opciones))) : 2,
+      ...(n.modo === 'dimension'
+        ? { dimension: (['color', 'forma', 'tamano'] as const).find((d) => d === n.dimension) ?? ('mezcla' as const) }
+        : {}),
     }))
     return lista.length ? { tipo: 'distincion', niveles: lista } : null
   }
@@ -448,6 +456,45 @@ function figuraQueComparte(muestra: Fig, comunes: Propiedad[], formas: string[],
 }
 const pantallaFig = (f: Fig): EstimuloPantalla => ({ fig: 'geometrica', s: f.forma, c: f.color, escala: f.tamano })
 const etiquetaFig = (f: Fig, i: number) => `${f.forma} ${NOMBRE_COLOR[f.color]} ${f.tamano === 1 ? 'grande' : 'pequeño'} (${i + 1})`
+
+// Igual o diferente en UNA dimensión (Luciano et al., 2009): dos figuras; se pregunta por una
+// propiedad y las otras dos coinciden o no al azar, así que hay que atender solo a la pedida
+const PREGUNTA_DIMENSION: Record<Propiedad, [string, string, string]> = {
+  color: [CONSIGNAS.dimColor, 'Mismo color', 'Color diferente'],
+  forma: [CONSIGNAS.dimForma, 'Misma forma', 'Forma diferente'],
+  tamano: [CONSIGNAS.dimTamano, 'Mismo tamaño', 'Tamaño diferente'],
+}
+
+function distincionDimension(nivel: NivelDistincion, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
+  const uso = generalizacion ? 'generalizacion' : 'entrenamiento'
+  const formas = FORMAS[uso], colores = COLORES[uso]
+  const dims: Propiedad[] = nivel.dimension && nivel.dimension !== 'mezcla' ? [nivel.dimension] : PROPIEDADES
+  const al = <T,>(lista: T[]) => lista[Math.floor(azar() * lista.length)]
+  let anterior: Propiedad | null = null
+  return alternados(true, false, n, azar).map((igual) => {
+    let dim = al(dims)
+    if (dims.length > 1 && dim === anterior) dim = dims[(dims.indexOf(dim) + 1) % dims.length]
+    anterior = dim
+    const a: Fig = { forma: al(formas), color: al(colores), tamano: al(TAMANOS) }
+    // Contra el parecido global: si son iguales en la dimensión pedida, las otras casi
+    // siempre difieren (nunca idénticas); si son diferentes, las otras casi siempre coinciden
+    const otras = PROPIEDADES.filter((p) => p !== dim)
+    let otrasComunes = otras.filter(() => azar() < (igual ? 0.25 : 0.75))
+    if (igual && otrasComunes.length === otras.length) otrasComunes = otrasComunes.slice(1)
+    const b = figuraQueComparte(a, igual ? [dim, ...otrasComunes] : otrasComunes, formas, colores, azar)
+    const [consigna, si, no] = PREGUNTA_DIMENSION[dim]
+    return {
+      clave: `${dim}:${igual ? 'igual' : 'diferente'}`,
+      consigna,
+      muestra: { par: [pantallaFig(a), pantallaFig(b)] },
+      // Orden fijo: primero «mismo», luego «diferente»
+      opciones: [
+        { pantalla: { t: si }, etiqueta: si, correcta: igual },
+        { pantalla: { t: no }, etiqueta: no, correcta: !igual },
+      ],
+    }
+  })
+}
 
 function clasificacion(nivel: NivelClasificacion, generalizacion: boolean, n: number, azar: Azar): EnsayoGenerado[] {
   const uso = generalizacion ? 'generalizacion' : 'entrenamiento'
@@ -685,6 +732,8 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
   if (tipo === 'distincion') {
     if (e.clave === 'intruso')
       return { clave: e.clave, pregunta: '¿Cuál es diferente?', esperada: `Señala o nombra: ${e.opciones[correcta].etiqueta}`, estimulos: e.opciones.map((o) => o.pantalla), marcada: null }
+    // Una dimensión: ve la pareja y dice si son iguales o diferentes en esa propiedad
+    if (e.clave.includes(':')) return { clave: e.clave, pregunta: e.consigna, esperada: e.opciones[correcta].etiqueta, estimulos: [e.muestra!], marcada: null }
     return conMuestra('¿Son iguales o diferentes?', e.clave === 'igual' ? 'Iguales' : 'Diferentes')
   }
   if (tipo === 'oposicion') return conMuestra('¿Son iguales o contrarios?', e.clave === 'igual' ? 'Iguales' : 'Contrarios')
@@ -935,6 +984,8 @@ export function generarBloque(
   if (actividad.tipo === 'oposicion') return oposicion(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'espacial') return espacial(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (actividad.tipo === 'temporal') return temporal(actividad.niveles[indiceNivel], generalizacion, n, azar, conceptos)
+  if (actividad.tipo === 'distincion' && actividad.niveles[indiceNivel].modo === 'dimension')
+    return distincionDimension(actividad.niveles[indiceNivel], generalizacion, n, azar)
   if (!conceptos.length) return []
   if (actividad.tipo === 'distincion') return distincion(actividad.niveles[indiceNivel], conceptos, n, azar)
   return comparacion(actividad.niveles[indiceNivel], conceptos, n, azar)

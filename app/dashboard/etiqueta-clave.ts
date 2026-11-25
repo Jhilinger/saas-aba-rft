@@ -1,6 +1,6 @@
 // Nombre legible de la clave de un ensayo generado (abstracción en la tableta)
 
-const DIMENSION: Record<string, string> = { tamano: 'Tamaño', cantidad: 'Cantidad', longitud: 'Longitud', altura: 'Altura' }
+const DIMENSION: Record<string, string> = { tamano: 'Tamaño', cantidad: 'Cantidad', longitud: 'Longitud', altura: 'Altura', color: 'Color', forma: 'Forma' }
 const CLAVE: Record<string, string> = {
   igual: '«Igual»',
   diferente: '«Diferente»',
@@ -44,6 +44,6 @@ const CLAVE: Record<string, string> = {
 
 export function etiquetaClave(clave: string) {
   const [a, b] = clave.split(':')
-  if (b) return `${DIMENSION[a] ?? a} · «${CLAVE[b] ?? b}»`
+  if (b) return `${DIMENSION[a] ?? a} · «${(CLAVE[b] ?? b).replace(/[«»]/g, '')}»`
   return CLAVE[a] ?? a
 }
