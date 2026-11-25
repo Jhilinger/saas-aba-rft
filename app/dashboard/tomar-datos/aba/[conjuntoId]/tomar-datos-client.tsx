@@ -14,6 +14,7 @@ import { describirActividad, leerActividad } from '../../../vasos'
 import { urlImagen, type ImagenesBanco } from '../../rft/[programaId]/pantalla-tablet'
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import type { Json } from '@/database.types'
+import SelectorAyuda, { ayudasDelPrograma, etiquetaAyuda } from '../../../selector-ayuda'
 
 type Estimulo = { id: string; nombre: string; concepto_imagen?: string | null }
 
@@ -25,16 +26,6 @@ type EnsayoRegistrado = {
   latenciaMs?: number | null
 }
 
-const AYUDAS = [
-  { value: 'verbal', label: 'Verbal' },
-  { value: 'verbal_parcial', label: 'Verbal parcial' },
-  { value: 'gestual', label: 'Gestual' },
-  { value: 'visual', label: 'Visual' },
-  { value: 'modelado', label: 'Modelado' },
-  { value: 'fisica_parcial', label: 'Física parcial' },
-  { value: 'fisica_total', label: 'Física total' },
-  { value: 'textual', label: 'Textual' },
-]
 
 function generarSecuencia(estimulos: Estimulo[], n: number): Estimulo[] {
   const k = estimulos.length
@@ -105,6 +96,14 @@ export default function TomarDatosClient({
   const sinAyudas = enLineaBase || enSonda
   const [secuencia, setSecuencia] = useState<Estimulo[] | null>(null)
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
+  // Igual que en los niveles 2 a 4: ayuda elegida antes de responder, menú «⋯»,
+  // resultado hasta «Siguiente ensayo» y corrección guiada tras un error
+  const [ayudaPendiente, setAyudaPendiente] = useState<string | null>(null)
+  const [masAbierto, setMasAbierto] = useState(false)
+  const [tras, setTras] = useState<{ correcto: boolean; ayuda: string; repeticion?: boolean } | null>(null)
+  const [correccion, setCorreccion] = useState<'modelo' | 'repetir' | null>(null)
+  // Repeticiones tras la corrección (se anotan en las notas del bloque al guardarlo)
+  const [correcciones, setCorrecciones] = useState({ total: 0, bien: 0 })
   const [ensayos, setEnsayos] = useState<EnsayoRegistrado[]>([])
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -220,9 +219,14 @@ export default function TomarDatosClient({
     setNotas(tipoSonda === 'generalizacion' && contexto.trim() ? `Contexto: ${contexto.trim()}` : '')
     setResultado(null)
     setEstadoGuardado('idle')
+    setTras(null)
+    setCorreccion(null)
+    setCorrecciones({ total: 0, bien: 0 })
+    setAyudaPendiente(null)
+    setMasAbierto(false)
   }
 
-  const registrar = (correcto: boolean, ayuda: string, latenciaMs?: number) => {
+  const registrar = (correcto: boolean, ayuda: string, latenciaMs?: number, cuentaCorrecciones = correcciones) => {
     if (!secuencia) return
     const actual = secuencia[ensayos.length]
     const nuevos = [
@@ -235,12 +239,18 @@ export default function TomarDatosClient({
     if (nuevos.length === secuencia.length) {
       const duracion = segundosDesde(inicioBloque)
       setDuracionBloque(duracion)
-      intentarGuardar(nuevos, notas, tipoSonda, duracion, modo)
+      const resumen =
+        cuentaCorrecciones.total > 0 ? `Corrección del error: ${cuentaCorrecciones.bien} de ${cuentaCorrecciones.total} repeticiones bien.` : ''
+      const notasFinales = [notas.trim(), resumen].filter(Boolean).join('\n')
+      if (resumen) setNotas(notasFinales)
+      intentarGuardar(nuevos, notasFinales, tipoSonda, duracion, modo)
       setEnTableta(false)
     }
   }
 
   const deshacerUltimo = () => {
+    setTras(null)
+    setCorreccion(null)
     setEnsayos((prev) => prev.slice(0, -1))
   }
 
@@ -427,183 +437,223 @@ export default function TomarDatosClient({
     )
   }
 
+  // ── Misma pantalla que en los niveles 2 a 4: barra con Ayuda, Deshacer y «⋯»,
+  // guía siempre visible, ✓/✗, corrección guiada tras un error y «Siguiente ensayo» ──
+  const correccionPosible = !sinAyudas
+  const etiquetaAyudaPendiente = etiquetaAyuda(ayudaPendiente)
+  const marcar = (correcto: boolean) => {
+    const ultimo = ensayos.length + 1 >= secuencia.length
+    if (correccion === 'repetir') {
+      // La repetición no cambia el ensayo (cuenta como error): se lleva la cuenta para las notas
+      setCorrecciones((c) => ({ total: c.total + 1, bien: c.bien + (correcto ? 1 : 0) }))
+      setCorreccion(null)
+      if (!ultimo) setTras({ correcto: false, ayuda: 'independiente', repeticion: correcto })
+      registrar(false, 'independiente', undefined, { total: correcciones.total + 1, bien: correcciones.bien + (correcto ? 1 : 0) })
+      return
+    }
+    if (!correcto && correccionPosible) {
+      cronometro.capturar()
+      setAyudaPendiente(null)
+      setMostrandoAyudas(false)
+      setCorreccion('modelo')
+      return
+    }
+    const ayuda = correcto && ayudaPendiente ? ayudaPendiente : 'independiente'
+    setAyudaPendiente(null)
+    if (!ultimo) setTras({ correcto, ayuda })
+    registrar(correcto, ayuda)
+  }
+  const guia: { titulo: string; texto: string }[] = []
+  if (correccion === 'modelo')
+    guia.push({ titulo: 'Corrección (1 de 2):', texto: 'hágalo usted como modelo y ayúdele a hacerlo (con la ayuda que necesite). Cuando lo haya hecho, pulse «Hecho».' })
+  else if (correccion === 'repetir')
+    guia.push({ titulo: 'Corrección (2 de 2):', texto: 'repita el ensayo sin ayuda. ¿Lo hace? (El ensayo ya cuenta como error; la repetición se anota en las notas del bloque.)' })
+  else {
+    if (enLineaBase) guia.push({ titulo: 'Línea base:', texto: 'sin ayudas y sin corregir; solo registre lo que hace por sí mismo.' })
+    if (enSonda)
+      guia.push({
+        titulo: tipoSonda === 'generalizacion' ? 'Sonda de generalización:' : 'Sonda de mantenimiento:',
+        texto: `sin ayudas; no afecta al criterio de dominio.${contexto.trim() ? ` Contexto: ${contexto.trim()}.` : ''}`,
+      })
+    guia.push({ titulo: 'Presente', texto: `«${estimuloActual.nombre}» y dé la instrucción del programa (está en «⋯ › Instrucciones»).` })
+    guia.push({ titulo: 'Marque', texto: 'si lo hace o no.' })
+    if (etiquetaAyudaPendiente) guia.push({ titulo: `Ayuda: ${etiquetaAyudaPendiente}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {sinConexion && <BannerSinConexion />}
-      <div className="flex items-center justify-between text-sm text-slate-500">
-        <span aria-live="polite">
-          Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
-        </span>
-        {ensayos.length > 0 && (
-          <button onClick={deshacerUltimo} className="text-rose-700 hover:text-rose-800">
-            Deshacer último
-          </button>
-        )}
-      </div>
-      <div
-        role="progressbar"
-        aria-label="Progreso del bloque"
-        aria-valuemin={0}
-        aria-valuemax={secuencia.length}
-        aria-valuenow={ensayos.length}
-        className="h-2 overflow-hidden rounded-full bg-indigo-100"
-      >
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 text-sm text-slate-500">
+          <span aria-live="polite">
+            {enLineaBase ? 'Línea base' : enSonda ? 'Sonda' : 'Entrenamiento'} · ensayo <strong>{ensayos.length + 1}</strong> de {secuencia.length}
+            {correccion && <span className="ml-2 font-medium text-amber-700">· corrección</span>}
+          </span>
+          <span className="flex flex-wrap items-center gap-2">
+            {!sinAyudas && !tras && !correccion && (
+              <button
+                onClick={() => setMostrandoAyudas((v) => !v)}
+                className={`rounded-lg border px-3 py-1 ${ayudaPendiente ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+              >
+                {etiquetaAyudaPendiente ? `Ayuda: ${etiquetaAyudaPendiente}` : 'Ayuda'}
+              </button>
+            )}
+            {correccion ? (
+              <button onClick={() => setCorreccion(null)} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
+                Deshacer
+              </button>
+            ) : (
+              ensayos.length > 0 && (
+                <button onClick={deshacerUltimo} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
+                  Deshacer
+                </button>
+              )
+            )}
+            <button
+              onClick={() => setMasAbierto((v) => !v)}
+              aria-expanded={masAbierto}
+              className="rounded-lg border border-slate-200 px-3 py-1 text-slate-700 hover:bg-slate-50"
+            >
+              ⋯
+            </button>
+          </span>
+        </div>
         <div
-          className="h-full rounded-full bg-indigo-600 transition-[width] duration-300"
-          style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }}
-        />
-      </div>
-
-      {enLineaBase && (
-        <div className="rounded-lg bg-sky-50 border border-sky-200 px-3 py-2 text-xs text-sky-800">
-          Fase de línea base — sin ayudas, sin criterio de dominio.
+          role="progressbar"
+          aria-label="Progreso del bloque"
+          aria-valuemin={0}
+          aria-valuemax={secuencia.length}
+          aria-valuenow={ensayos.length}
+          className="h-1.5 bg-indigo-100"
+        >
+          <div className="h-full bg-indigo-600 transition-[width] duration-300" style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }} />
         </div>
-      )}
 
-      {enSonda && (
-        <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-          {tipoSonda === 'generalizacion' ? 'Sonda de generalización' : 'Sonda de mantenimiento'} — sin
-          ayudas, no afecta al criterio de dominio.
-          {contexto.trim() && <> Contexto: {contexto.trim()}.</>}
-        </div>
-      )}
-
-            {(instrucciones || ayudasPosibles || videoUrl) && (
-        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
-          {instrucciones && (
-            <div>
-              <strong>Instrucciones:</strong>
-              <p className="whitespace-pre-wrap">{instrucciones}</p>
-            </div>
-          )}
-          {!sinAyudas && ayudasPosibles && (
-            <div>
-              <strong>Ayudas sugeridas:</strong>
-              <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
-            </div>
-          )}
-          {videoUrl && (
-            <div>
-              <strong>Vídeo de ejemplo:</strong>
-              <VideoDiferido url={videoUrl} />
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
-        <p className="text-xl sm:text-2xl font-bold text-slate-800">{estimuloActual.nombre}</p>
-
-        {sinAyudas ? (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="success"
-              onClick={() => registrar(true, 'independiente')}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              ✓ Correcto
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => registrar(false, 'independiente')}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              ✗ Incorrecto
-            </Button>
-          </div>
-        ) : !mostrandoAyudas ? (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="success"
-              onClick={() => registrar(true, 'independiente')}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              ✓ Correcto sin ayuda
-            </Button>
-            <Button
-              variant="warning"
-              onClick={() => {
-                cronometro.capturar()
-                setMostrandoAyudas(true)
+        {mostrandoAyudas && !tras && !correccion && (
+          <div className="border-b border-amber-200 bg-amber-50 p-3">
+            <SelectorAyuda
+              elegida={ayudaPendiente}
+              sugeridas={ayudasDelPrograma(ayudasPosibles)}
+              onElegir={(v) => {
+                setAyudaPendiente(v)
+                setMostrandoAyudas(false)
               }}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              ✓ Correcto con ayuda
-            </Button>
+            />
+          </div>
+        )}
+
+        {tras ? (
+          <div className="space-y-4 p-4 text-center sm:p-8">
+            <div className={`rounded-xl p-4 text-left text-sm ${tras.correcto ? 'bg-emerald-50 text-emerald-900' : 'bg-rose-50 text-rose-900'}`}>
+              <p className="text-base font-semibold">
+                {tras.correcto ? '✓ Lo hace' : '✗ No lo hace'}
+                {tras.correcto && tras.ayuda !== 'independiente' ? ` (con ayuda: ${etiquetaAyuda(tras.ayuda)})` : ''}
+                {tras.repeticion !== undefined ? (tras.repeticion ? ' · en la repetición, bien' : ' · en la repetición, tampoco') : ''}
+              </p>
+              <p className="mt-1">
+                {tras.repeticion !== undefined
+                  ? tras.repeticion
+                    ? 'Refuerce que lo haya hecho bien en la repetición.'
+                    : 'No pasa nada: siga con el siguiente. Si vuelve a fallar, elija una ayuda antes de que responda.'
+                  : sinAyudas
+                    ? 'Sin consecuencias: no le diga si está bien o mal.'
+                    : tras.correcto
+                      ? 'Refuércelo ahora.'
+                      : 'Muéstrele cómo se hace antes de seguir.'}
+              </p>
+            </div>
+            <p className="text-sm text-slate-500">Prepare el siguiente ensayo. Cuando esté listo, pulse el botón: verá qué presentar.</p>
             <Button
-              variant="danger"
-              onClick={() => registrar(false, 'independiente')}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
+              variant="primary"
+              onClick={() => {
+                setTras(null)
+                cronometro.reiniciar()
+              }}
+              className="w-full py-4 text-base active:scale-[0.98] sm:w-auto sm:px-10"
             >
-              ✗ Incorrecto
+              Siguiente ensayo →
             </Button>
           </div>
         ) : (
-          <div className="space-y-3">
-            <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
-              {AYUDAS.map((a) => (
-                <button
-                  key={a.value}
-                  onClick={() => registrar(true, a.value)}
-                  disabled={isPending}
-                  className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
-                >
-                  {a.label}
-                </button>
+          <div className="space-y-5 p-4 text-center sm:p-8">
+            <div className="space-y-1 rounded-xl bg-indigo-50 px-4 py-3 text-left text-sm text-slate-700">
+              {guia.map((g, i) => (
+                <p key={i}>
+                  <strong className="text-indigo-800">{g.titulo}</strong> {g.texto}
+                </p>
               ))}
             </div>
-            <button
-              onClick={() => setMostrandoAyudas(false)}
-              className="text-sm text-slate-500 hover:text-slate-600 py-2"
-            >
-              Cancelar
-            </button>
+            <p className="text-xl font-bold text-slate-800 sm:text-2xl">{estimuloActual.nombre}</p>
+            {correccion === 'modelo' ? (
+              <Button variant="primary" onClick={() => setCorreccion('repetir')} className="w-full py-4 text-base active:scale-[0.98] sm:w-auto sm:px-10">
+                Hecho: repetir el ensayo
+              </Button>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button variant="success" onClick={() => marcar(true)} disabled={isPending} className="flex-1 py-4 text-base active:scale-[0.98] sm:py-3">
+                  ✓ Lo hace{etiquetaAyudaPendiente && !correccion ? ` (con ayuda: ${etiquetaAyudaPendiente})` : ''}
+                </Button>
+                <Button variant="danger" onClick={() => marcar(false)} disabled={isPending} className="flex-1 py-4 text-base active:scale-[0.98] sm:py-3">
+                  ✗ No lo hace
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {masAbierto && (
+          <div className="space-y-4 border-t border-slate-200 bg-slate-50 p-3 text-left text-sm">
+            {(instrucciones || ayudasPosibles || videoUrl) && (
+              <details className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-600">
+                <summary className="cursor-pointer text-sm font-medium text-slate-700">Instrucciones del programa</summary>
+                <div className="mt-2 space-y-2">
+                  {instrucciones && <p className="whitespace-pre-wrap">{instrucciones}</p>}
+                  {!sinAyudas && ayudasPosibles && (
+                    <div>
+                      <strong>Ayudas sugeridas:</strong>
+                      <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
+                    </div>
+                  )}
+                  {videoUrl && (
+                    <div>
+                      <strong>Vídeo de ejemplo:</strong>
+                      <VideoDiferido url={videoUrl} />
+                    </div>
+                  )}
+                </div>
+              </details>
+            )}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-600">Notas del bloque (opcional)</label>
+              <textarea
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                placeholder="Observaciones sobre este bloque: motivación, distracciones, contexto..."
+                rows={2}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            </div>
+            {ensayos.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium text-slate-600">Ensayos registrados</p>
+                <ul className="max-h-40 space-y-1 overflow-y-auto sm:max-h-48">
+                  {ensayos.map((e, i) => (
+                    <li key={i} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm">
+                      <span>
+                        {i + 1}. {e.estimuloNombre}
+                        {e.ayuda !== 'independiente' ? ` (${etiquetaAyuda(e.ayuda)})` : ''}
+                      </span>
+                      <span className={e.correcto ? 'text-emerald-700' : 'text-rose-600'}>{e.correcto ? '✓' : '✗'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-slate-600">Notas (opcional)</label>
-        <textarea
-          value={notas}
-          onChange={(e) => setNotas(e.target.value)}
-          placeholder="Observaciones sobre este bloque: motivación, distracciones, contexto..."
-          rows={2}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-        />
-      </div>
-
-      {ensayos.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">Ensayos registrados</p>
-          <ul className="space-y-1 max-h-40 sm:max-h-48 overflow-y-auto">
-            {ensayos.map((e, i) => (
-              <li
-                key={i}
-                className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
-              >
-                <span>
-                  {i + 1}. {e.estimuloNombre}
-                  {e.ayuda !== 'independiente' ? ` (${e.ayuda})` : ''}
-                </span>
-                <span className={e.correcto ? 'text-emerald-700' : 'text-rose-600'}>
-                  {e.correcto ? '✓' : '✗'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {isPending && (
-        <p className="text-center text-sm text-slate-500">Guardando bloque...</p>
-      )}
+      {isPending && <p className="text-center text-sm text-slate-500">Guardando bloque...</p>}
     </div>
   )
 }
