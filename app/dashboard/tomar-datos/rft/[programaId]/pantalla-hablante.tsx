@@ -40,6 +40,13 @@ export default function PantallaHablante({
   // La respuesta esperada solo se ve mientras se mantiene pulsado (el alumno
   // lector no debe poder leerla)
   const [verRespuesta, setVerRespuesta] = useState(false)
+  // Puntuado y a la espera de «Siguiente ensayo» (tiempo para reforzar)
+  const [puntuado, setPuntuado] = useState<boolean | null>(null)
+  const siguiente = () => {
+    const correcto = puntuado
+    setPuntuado(null)
+    if (correcto !== null) onResponder(correcto)
+  }
 
   useEffect(() => {
     if (!ensayo.secuencia) return
@@ -120,12 +127,28 @@ export default function PantallaHablante({
               ↺ Secuencia
             </BotonLargo>
           )}
-          <BotonLargo onActivar={() => onResponder(false)} className="!bg-rose-100 text-rose-800">
-            ✗ Incorrecta
-          </BotonLargo>
-          <BotonLargo onActivar={() => onResponder(true)} className="!bg-emerald-100 text-emerald-800">
-            ✓ Correcta
-          </BotonLargo>
+          {puntuado !== null ? (
+            <>
+              <span className={`self-center text-sm font-semibold ${puntuado ? 'text-emerald-700' : 'text-rose-700'}`}>
+                {puntuado ? '✓ Correcta' : '✗ Incorrecta'}
+              </span>
+              <BotonLargo onActivar={() => setPuntuado(null)} className="border border-slate-200 !bg-white">
+                Cambiar
+              </BotonLargo>
+              <BotonLargo onActivar={siguiente} className="!bg-indigo-600 text-white">
+                Siguiente ensayo →
+              </BotonLargo>
+            </>
+          ) : (
+            <>
+              <BotonLargo onActivar={() => setPuntuado(false)} className="!bg-rose-100 text-rose-800">
+                ✗ Incorrecta
+              </BotonLargo>
+              <BotonLargo onActivar={() => setPuntuado(true)} className="!bg-emerald-100 text-emerald-800">
+                ✓ Correcta
+              </BotonLargo>
+            </>
+          )}
         </div>
       </div>
     </div>

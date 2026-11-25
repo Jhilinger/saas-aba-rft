@@ -119,7 +119,9 @@ function Tarjeta({
   )
 }
 
-type Eleccion = { correcto: boolean; respuesta: string | null; conAyudaPantalla: boolean }
+// delTerapeuta: lo ha marcado el terapeuta (✓/✗, p. ej. como hablante); entonces la
+// pantalla espera a «Siguiente ensayo» para dar tiempo a reforzar
+type Eleccion = { correcto: boolean; respuesta: string | null; conAyudaPantalla: boolean; delTerapeuta?: boolean }
 
 // Respuesta de un ensayo completo. Con ayudas de menor a mayor, un acierto con
 // ayuda se registra como error con el nivel alcanzado, junto al resultado del
@@ -602,8 +604,8 @@ function Presentacion({
                 {verEsperada ? <span className="font-semibold text-slate-800">{textoOido(esperada)}</span> : '👁 Respuesta (mantener pulsado)'}
               </button>
             )}
-            <BotonLargo onActivar={() => onElegir({ correcto: true, respuesta: null, conAyudaPantalla: false })}>✓ Correcto</BotonLargo>
-            <BotonLargo onActivar={() => onElegir({ correcto: false, respuesta: null, conAyudaPantalla: false })}>✗ Incorrecto</BotonLargo>
+            <BotonLargo onActivar={() => onElegir({ correcto: true, respuesta: null, conAyudaPantalla: false, delTerapeuta: true })}>✓ Correcto</BotonLargo>
+            <BotonLargo onActivar={() => onElegir({ correcto: false, respuesta: null, conAyudaPantalla: false, delTerapeuta: true })}>✗ Incorrecto</BotonLargo>
           </>
         )}
       </div>
@@ -966,6 +968,8 @@ export default function PantallaTablet({
   // tras el reforzador aceleran la adquisición; Koegel, Dunlap y Dyer, 1980).
   // Tras un error y en los tests, la de siempre (igual aciertes o falles)
   const [pausaSiguiente, setPausaSiguiente] = useState(PAUSA_ENTRE_ENSAYOS)
+  // Tras puntuar el terapeuta: resultado a la vista hasta que pulse «Siguiente ensayo»
+  const [esperandoSiguiente, setEsperandoSiguiente] = useState<{ correcto: boolean } | null>(null)
 
   // Economía de fichas (solo terapeuta y entrenamiento): una estrella por acierto,
   // la última encendida destella, y al acabar el bloque una pantalla de premio
@@ -978,7 +982,9 @@ export default function PantallaTablet({
   // Registro pendiente mientras se ve el premio: se hace al pulsar «Continuar»
   const alContinuar = useRef<(() => void) | null>(null)
 
-  const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia }: RespuestaTablet) => {
+  const responder = ({ correcto, respuesta, conAyudaPantalla, nivelAyuda, transferencia, delTerapeuta }: RespuestaTablet) => {
+    // Si puntúa el terapeuta, el ensayo siguiente espera a «Siguiente ensayo»
+    if (delTerapeuta && ensayo < total - 1) setEsperandoSiguiente({ correcto })
     setPausaSiguiente(!infantil && correcto && fase === 'entrenamiento' ? PAUSA_TRAS_ELOGIO : PAUSA_ENTRE_ENSAYOS)
     // La ayuda anotada solo cuenta en un acierto (un error se registra sin ayuda);
     // un acierto después de resaltarse la correcta es un acierto con ayuda visual
@@ -1063,6 +1069,15 @@ export default function PantallaTablet({
           sinMuestra={sinMuestra}
           conTexto={conTexto}
         />
+      ) : esperandoSiguiente ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-[3vmin] px-4">
+          <p className={`font-semibold ${esperandoSiguiente.correcto ? 'text-emerald-600' : 'text-rose-600'}`} style={{ fontSize: '3vmin' }}>
+            {esperandoSiguiente.correcto ? '✓ Registrado como correcto' : '✗ Registrado como incorrecto'}
+          </p>
+          <BotonLargo onActivar={() => setEsperandoSiguiente(null)} className="border border-slate-200">
+            Siguiente ensayo (mantener pulsado)
+          </BotonLargo>
+        </div>
       ) : (
       <EnsayoTablet
         key={ensayo}

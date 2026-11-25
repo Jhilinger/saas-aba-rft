@@ -470,6 +470,14 @@ export default function TomarDatosRftClient({
   const [secuencia, setSecuencia] = useState<Clase[] | null>(null)
   const [ensayos, setEnsayos] = useState<EnsayoRft[]>([])
   const [mostrandoAyudas, setMostrandoAyudas] = useState(false)
+  // Registro con material (misma pantalla que la tableta): ayuda elegida antes
+  // de responder (se anota en el siguiente acierto), menú «⋯», respuesta
+  // correcta visible solo al mantener pulsado y, tras registrar, el resultado
+  // con qué hacer hasta pulsar «Siguiente ensayo»
+  const [ayudaPendiente, setAyudaPendiente] = useState<string | null>(null)
+  const [masAbierto, setMasAbierto] = useState(false)
+  const [verRespuesta, setVerRespuesta] = useState(false)
+  const [tras, setTras] = useState<{ correcto: boolean; ayuda: string; correcta: string | null; test: boolean } | null>(null)
   const [preguntaActual, setPreguntaActual] = useState('')
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -870,6 +878,9 @@ export default function TomarDatosRftClient({
     setNotas('')
     setResultado(null)
     setEstadoGuardado('idle')
+    setTras(null)
+    setAyudaPendiente(null)
+    setMasAbierto(false)
   }
 
   // «Preparar este bloque» desde el siguiente paso: deja elegida la combinación a mano
@@ -1064,7 +1075,10 @@ export default function TomarDatosRftClient({
     }
   }
 
-  const deshacerUltimo = () => setEnsayos((prev) => prev.slice(0, -1))
+  const deshacerUltimo = () => {
+    setTras(null)
+    setEnsayos((prev) => prev.slice(0, -1))
+  }
 
   // En la tableta, descarga al empezar las claves grabadas de todo el bloque
   // (así suenan sin esperas y aunque se corte la conexión)
@@ -1554,16 +1568,6 @@ export default function TomarDatosRftClient({
       : { correcto: '✓ Correcto sin ayuda', ayuda: '✓ Correcto con ayuda', incorrecto: '✗ Incorrecto' }
   const respuestaRegistrada = config.tipo === 'abierta' ? respuestaAbierta.trim() || null : null
 
-  // Opciones fijas: con respuesta esperada se corrige sola; si no, el terapeuta marca ✓/✗
-  const elegirOpcion = (opcion: string) => {
-    if (esperada) {
-      registrar(opcion === esperada, 'independiente', preguntaRegistro, opcion)
-    } else {
-      cronometro.capturar()
-      setRespuestaPendiente(opcion)
-    }
-  }
-
   const anadirControl = (correcto: boolean) => {
     fijarControles([
       ...controles,
@@ -1621,372 +1625,456 @@ export default function TomarDatosRftClient({
     )
   }
 
+  // ── Registro con material: la misma pantalla que la tableta, vista por el
+  // terapeuta. Toca lo que ha elegido el alumno y la app corrige; la guía dice
+  // qué colocar, qué decir y qué hacer después; «Siguiente ensayo» da tiempo a
+  // reforzar y preparar el material ──
+  const esTest = faseEfectiva !== 'entrenamiento'
+  const hablanteMaterial = formaBloque === 'hablante'
+  const nombreVisible = (nombre: string) => textoOido(nombre)
+  const correctaActual =
+    config.tipo === 'seleccion'
+      ? (() => {
+          const c = comparativos.find((x) => x.esCorrecto)
+          return c ? nombreVisible(c.estimulo.nombre) : null
+        })()
+      : esperada ?? null
+  const etiquetaAyuda = ayudaPendiente ? AYUDAS.find((a) => a.value === ayudaPendiente)?.label ?? ayudaPendiente : null
+  // Registra y, si no es el último ensayo, deja a la vista el resultado hasta «Siguiente ensayo»
+  const registrarMaterial = (correcto: boolean, respuestaAlumno: string | null) => {
+    const ayuda = correcto && ayudaPendiente ? ayudaPendiente : 'independiente'
+    const ultimo = ensayos.length + 1 >= secuencia.length
+    registrar(correcto, ayuda, preguntaRegistro, respuestaAlumno)
+    setAyudaPendiente(null)
+    setVerRespuesta(false)
+    if (!ultimo) setTras({ correcto, ayuda, correcta: correctaActual, test: esTest })
+  }
+  const siguienteEnsayo = () => {
+    setTras(null)
+    cronometro.reiniciar()
+  }
+  const guia: { titulo: string; texto: string }[] = []
+  if (hablanteMaterial)
+    guia.push({ titulo: 'Como hablante:', texto: 'diga la consigna sin presentar las opciones; el alumno responde y usted marca si es correcto.' })
+  if (apoyoVisualBloque)
+    guia.push({ titulo: 'Con fichas iguales:', texto: 'coloque una ficha igual por cada nombre de la red y señálela al decirlo. Este bloque no cuenta para el dominio.' })
+  if (config.tipo === 'seleccion' && !hablanteMaterial)
+    guia.push({
+      titulo: 'Coloque',
+      texto: `${esTransformacion ? '' : `«${nombreVisible(origenActual.nombre)}» delante del alumno y, debajo, `}de izquierda a derecha: ${comparativos.map((c) => `«${nombreVisible(c.estimulo.nombre)}»`).join(', ')}.`,
+    })
+  if (config.tipo === 'opciones') guia.push({ titulo: 'Lea', texto: 'la frase en voz alta y espere a que el alumno responda.' })
+  if (config.tipo === 'ejecucion') guia.push({ titulo: 'Presente', texto: `«${nombreVisible(origenActual.nombre)}».` })
+  if (consignaActual) guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
+  else if (config.tipo !== 'opciones') guia.push({ titulo: 'Diga', texto: 'la instrucción del programa (está en «⋯ › Instrucciones»).' })
+  guia.push(
+    esTest
+      ? { titulo: 'Es un test:', texto: 'no diga si está bien o mal ni dé ayudas; solo registre.' }
+      : { titulo: 'Toque', texto: config.tipo === 'seleccion' && !hablanteMaterial ? 'lo que haya elegido el alumno.' : 'la respuesta del alumno.' }
+  )
+  if (etiquetaAyuda) guia.push({ titulo: `Ayuda: ${etiquetaAyuda}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
+
+  const botonVerRespuesta = correctaActual && (
+    <button
+      type="button"
+      onPointerDown={() => setVerRespuesta(true)}
+      onPointerUp={() => setVerRespuesta(false)}
+      onPointerLeave={() => setVerRespuesta(false)}
+      onPointerCancel={() => setVerRespuesta(false)}
+      onContextMenu={(e) => e.preventDefault()}
+      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 [touch-action:none]"
+    >
+      {verRespuesta ? (
+        <span>
+          Correcta: <strong className="text-emerald-700">{correctaActual}</strong>
+        </span>
+      ) : (
+        '👁 Ver respuesta (mantener pulsado)'
+      )}
+    </button>
+  )
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {sinConexion && <BannerSinConexion />}
-      {formaBloque === 'hablante' && (
-        <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
-          🗣 Bloque como hablante: diga la consigna sin presentar las opciones; el alumno responde y usted marca la respuesta.
-        </p>
-      )}
-      {apoyoVisualBloque && (
-        <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
-          Con fichas iguales: coloque una ficha igual por cada nombre de la red y señálela al decirlo. Este bloque no cuenta para el dominio.
-        </p>
-      )}
-      <div className="flex items-center justify-between text-sm text-slate-500">
-        <span aria-live="polite">
-          Ensayo <strong>{ensayos.length + 1}</strong> / {secuencia.length}
-        </span>
-        <span className="flex items-center gap-4">
-          {grupoSeleccionado && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
-            <button
-              onClick={() => {
-                // Si aún no hay ensayos, el bloque pasa a hacerse con el escalón de apoyo que toque
-                if (ensayos.length === 0 && !escalonRef.current) {
-                  fijarEscalon(escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, 'tableta', clasesValidas))
-                  fijarMenorAMayor(menorAMayorPara(posicionDestino, faseEfectiva, 'tableta', clasesValidas))
-                }
-                desbloquearAudio()
-                modoBloqueRef.current = 'tableta'
-                setEnTableta(true)
-              }}
-              className="font-medium text-indigo-600 hover:text-indigo-800"
-            >
-              🖥 Pantalla del alumno
-            </button>
-          )}
-          {ensayos.length > 0 && (
-            <button onClick={deshacerUltimo} className="text-rose-700 hover:text-rose-800">
-              Deshacer último
-            </button>
-          )}
-          <button
-            onClick={() => {
-              if (ensayos.length === 0 || window.confirm('¿Descartar este bloque? Los ensayos registrados no se guardarán.')) descartarBloque()
-            }}
-            className="text-slate-500 hover:text-slate-700"
-          >
-            Descartar bloque
-          </button>
-        </span>
-      </div>
-      <div
-        role="progressbar"
-        aria-label="Progreso del bloque"
-        aria-valuemin={0}
-        aria-valuemax={secuencia.length}
-        aria-valuenow={ensayos.length}
-        className="h-2 overflow-hidden rounded-full bg-indigo-100"
-      >
-        <div
-          className="h-full rounded-full bg-indigo-600 transition-[width] duration-300"
-          style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }}
-        />
-      </div>
-
-            {(instrucciones || ayudasPosibles || videoUrl) && (
-        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600 space-y-2">
-          {instrucciones && (
-            <div>
-              <strong>Instrucciones:</strong>
-              <p className="whitespace-pre-wrap">{instrucciones}</p>
-            </div>
-          )}
-          {ayudasPosibles && (
-            <div>
-              <strong>Ayudas sugeridas:</strong>
-              <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
-            </div>
-          )}
-          {videoUrl && (
-            <div>
-              <strong>Vídeo de ejemplo:</strong>
-              <VideoDiferido url={videoUrl} />
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-8 text-center space-y-4 sm:space-y-6">
-        {consignaActual && (
-          <p className="text-sm text-slate-600">
-            Clave relacional: <strong className="text-slate-800">«{consignaActual}»</strong>
-          </p>
-        )}
-        {esTransformacion ? (
-          <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-            <VistaEstimulo estimulo={origenActual} imagenes={imagenes} />
-            <p>
-              Pregunta sobre: <strong>{origenActual.nombre}</strong> ({claseActual.nombre})
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-center gap-3">
-              <VistaEstimulo estimulo={origenActual} imagenes={imagenes} />
-              <p className="text-xl sm:text-2xl font-bold text-slate-800">{origenActual.nombre}</p>
-            </div>
-            <p className="text-xs text-slate-500">{claseActual.nombre}</p>
-          </>
-        )}
-
-        {config.tipo === 'seleccion' && (
-          <div className="flex flex-wrap justify-center gap-2">
-            {comparativos.map((c) => (
-              <span
-                key={c.claseId}
-                className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold ${
-                  c.esCorrecto
-                    ? 'border-emerald-600 bg-emerald-600 text-white'
-                    : 'border-slate-300 bg-white text-slate-600'
-                }`}
-                title={c.esCorrecto ? 'Respuesta correcta (solo visible para ti)' : ''}
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 text-sm text-slate-500">
+          <span aria-live="polite">
+            {NOMBRE_FASE_SECUENCIA[faseEfectiva as FaseSecuencia] ?? faseEfectiva} · ensayo <strong>{ensayos.length + 1}</strong> de {secuencia.length}
+          </span>
+          <span className="flex flex-wrap items-center gap-2">
+            {grupoSeleccionado && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
+              <button
+                onClick={() => {
+                  // Si aún no hay ensayos, el bloque pasa a hacerse con el escalón de apoyo que toque
+                  if (ensayos.length === 0 && !escalonRef.current) {
+                    fijarEscalon(escalonPara(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva, 'tableta', clasesValidas))
+                    fijarMenorAMayor(menorAMayorPara(posicionDestino, faseEfectiva, 'tableta', clasesValidas))
+                  }
+                  desbloquearAudio()
+                  modoBloqueRef.current = 'tableta'
+                  setTras(null)
+                  setEnTableta(true)
+                }}
+                className="rounded-lg border border-slate-200 px-3 py-1 font-medium text-indigo-600 hover:bg-indigo-50"
               >
-                <VistaEstimulo estimulo={c.estimulo} imagenes={imagenes} />
-                {c.estimulo.nombre}
-              </span>
-            ))}
-          </div>
-        )}
+                🖥 Pantalla del alumno
+              </button>
+            )}
+            {!esTest && !tras && (
+              <button
+                onClick={() => setMostrandoAyudas((v) => !v)}
+                className={`rounded-lg border px-3 py-1 ${ayudaPendiente ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+              >
+                {etiquetaAyuda ? `Ayuda: ${etiquetaAyuda}` : 'Ayuda'}
+              </button>
+            )}
+            {ensayos.length > 0 && (
+              <button onClick={deshacerUltimo} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
+                Deshacer
+              </button>
+            )}
+            <button
+              onClick={() => setMasAbierto((v) => !v)}
+              aria-expanded={masAbierto}
+              className="rounded-lg border border-slate-200 px-3 py-1 text-slate-700 hover:bg-slate-50"
+            >
+              ⋯
+            </button>
+          </span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Progreso del bloque"
+          aria-valuemin={0}
+          aria-valuemax={secuencia.length}
+          aria-valuenow={ensayos.length}
+          className="h-1.5 bg-indigo-100"
+        >
+          <div className="h-full bg-indigo-600 transition-[width] duration-300" style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }} />
+        </div>
 
-        {config.tipo !== 'seleccion' && esperada && (
-          <p className="text-sm text-slate-600">
-            Respuesta esperada: <strong className="text-emerald-700">{esperada}</strong>{' '}
-            <span className="text-xs text-slate-400">(solo visible para ti)</span>
-          </p>
-        )}
-
-        {conPregunta && (
-          <textarea
-            value={preguntaActual}
-            onChange={(e) => {
-              setPreguntaActual(e.target.value)
-              cronometro.reiniciar()
-            }}
-            placeholder={consignaActual ? `Pregunta (si no escribes otra, se guarda «${consignaActual}»)` : 'Escribe aquí la pregunta que le haces al alumno...'}
-            rows={2}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        )}
-
-        {config.tipo === 'abierta' && !mostrandoAyudas && (
-          <textarea
-            value={respuestaAbierta}
-            onChange={(e) => setRespuestaAbierta(e.target.value)}
-            placeholder="Respuesta del alumno (opcional)"
-            rows={2}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-          />
-        )}
-
-        {mostrandoAyudas ? (
-          <div className="space-y-3">
-            <p className="text-sm text-slate-600">¿Qué tipo de ayuda?</p>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
+        {mostrandoAyudas && !tras && (
+          <div className="space-y-2 border-b border-amber-200 bg-amber-50 p-3 text-sm">
+            <p className="font-medium text-amber-900">Ayuda en este ensayo</p>
+            <p className="text-xs text-amber-800">Elíjala antes de que responda: se anota en la próxima respuesta correcta.</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {AYUDAS.map((a) => (
                 <button
                   key={a.value}
-                  onClick={() =>
-                    registrar(true, a.value, preguntaRegistro, config.tipo === 'opciones' ? esperada : respuestaRegistrada)
-                  }
-                  disabled={isPending}
-                  className="rounded-lg bg-white border border-amber-300 px-3 py-3 sm:py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 active:scale-[0.98]"
+                  onClick={() => {
+                    setAyudaPendiente(a.value)
+                    setMostrandoAyudas(false)
+                  }}
+                  className={`rounded-lg px-3 py-2 text-left ${ayudaPendiente === a.value ? 'bg-amber-200 text-amber-900' : 'bg-white text-slate-700'}`}
                 >
                   {a.label}
                 </button>
               ))}
             </div>
             <button
-              onClick={() => setMostrandoAyudas(false)}
-              className="text-sm text-slate-500 hover:text-slate-600 py-2"
-            >
-              Cancelar
-            </button>
-          </div>
-        ) : config.tipo === 'opciones' && respuestaPendiente !== null ? (
-          <div className="space-y-3">
-            <p className="text-sm text-slate-600">
-              Ha respondido: <strong>{respuestaPendiente}</strong>. ¿Es correcto?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                variant="success"
-                onClick={() => registrar(true, 'independiente', preguntaRegistro, respuestaPendiente)}
-                disabled={isPending}
-                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-              >
-                ✓ Correcto
-              </Button>
-              <Button
-                variant="danger"
-                onClick={() => registrar(false, 'independiente', preguntaRegistro, respuestaPendiente)}
-                disabled={isPending}
-                className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-              >
-                ✗ Incorrecto
-              </Button>
-            </div>
-            <button onClick={() => setRespuestaPendiente(null)} className="text-sm text-slate-500 hover:text-slate-600 py-2">
-              Cambiar respuesta
-            </button>
-          </div>
-        ) : config.tipo === 'opciones' ? (
-          <div className="space-y-3">
-            <p className="text-sm text-slate-600">¿Qué ha respondido el alumno?</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {config.opciones.map((opcion) => (
-                <Button
-                  key={opcion}
-                  variant="secondary"
-                  onClick={() => elegirOpcion(opcion)}
-                  disabled={isPending}
-                  className="min-w-[7rem] py-4 sm:py-3 text-base active:scale-[0.98]"
-                >
-                  {opcion}
-                </Button>
-              ))}
-            </div>
-            <Button
-              variant="warning"
               onClick={() => {
-                cronometro.capturar()
-                setMostrandoAyudas(true)
+                setAyudaPendiente(null)
+                setMostrandoAyudas(false)
               }}
-              disabled={isPending}
-              className="w-full py-3 text-sm active:scale-[0.98]"
+              className="text-sm text-slate-500"
             >
-              ✓ Correcto con ayuda
+              Sin ayuda
+            </button>
+          </div>
+        )}
+
+        {tras ? (
+          <div className="space-y-4 p-4 text-center sm:p-8">
+            <div
+              className={`rounded-xl p-4 text-left text-sm ${tras.correcto ? 'bg-emerald-50 text-emerald-900' : 'bg-rose-50 text-rose-900'}`}
+            >
+              <p className="text-base font-semibold">
+                {tras.correcto ? '✓ Correcto' : '✗ Incorrecto'}
+                {tras.correcto && tras.ayuda !== 'independiente' ? ` (con ayuda: ${AYUDAS.find((a) => a.value === tras.ayuda)?.label ?? tras.ayuda})` : ''}
+              </p>
+              <p className="mt-1">
+                {tras.test
+                  ? 'Es un test: no le diga si está bien o mal.'
+                  : tras.correcto
+                    ? 'Refuércelo ahora.'
+                    : tras.correcta
+                      ? `La respuesta correcta era «${tras.correcta}». Muéstresela antes de seguir.`
+                      : 'Muéstrele cómo se hace antes de seguir.'}
+              </p>
+            </div>
+            <p className="text-sm text-slate-500">Recoja y prepare el material. Cuando esté listo, pase al siguiente: verá qué colocar y qué decir.</p>
+            <Button variant="primary" onClick={siguienteEnsayo} className="w-full py-4 text-base active:scale-[0.98] sm:w-auto sm:px-10">
+              Siguiente ensayo →
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="success"
-              onClick={() => registrar(true, 'independiente', preguntaRegistro, respuestaRegistrada)}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              {etiquetas.correcto}
-            </Button>
-            <Button
-              variant="warning"
-              onClick={() => {
-                cronometro.capturar()
-                setMostrandoAyudas(true)
-              }}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              {etiquetas.ayuda}
-            </Button>
-            <Button
-              variant="danger"
-              onClick={() => registrar(false, 'independiente', preguntaRegistro, respuestaRegistrada)}
-              disabled={isPending}
-              className="flex-1 py-4 sm:py-3 text-base active:scale-[0.98]"
-            >
-              {etiquetas.incorrecto}
-            </Button>
-          </div>
-        )}
-      </div>
+          <div className="space-y-5 p-4 text-center sm:p-8">
+            <div className="space-y-1 rounded-xl bg-indigo-50 px-4 py-3 text-left text-sm text-slate-700">
+              {guia.map((g, i) => (
+                <p key={i}>
+                  <strong className="text-indigo-800">{g.titulo}</strong> {g.texto}
+                </p>
+              ))}
+            </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-3 text-sm">
-        {controlAbierto ? (
-          <div className="space-y-2">
-            <p className="font-medium text-slate-700">Ensayo de control</p>
-            <p className="text-xs text-slate-500">
-              Pregunta extra (ej. de asimetría). Se guarda con el bloque, pero no cuenta para el % de acierto ni para el dominio.
-            </p>
-            <textarea
-              value={controlPregunta}
-              onChange={(e) => setControlPregunta(e.target.value)}
-              placeholder="Pregunta (ej. ¿Todos los animales son ZOG?)"
-              rows={2}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-            />
-            {config.tipo === 'opciones' ? (
-              <div className="flex flex-wrap gap-2">
-                {config.opciones.map((opcion) => (
-                  <button
-                    key={opcion}
-                    onClick={() => setControlRespuesta(opcion)}
-                    className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                      controlRespuesta === opcion ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'
-                    }`}
-                  >
-                    {opcion}
-                  </button>
-                ))}
+            {config.tipo === 'seleccion' && !esTransformacion && (
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center justify-center gap-3 rounded-xl border-2 border-slate-200 px-4 py-3">
+                  <VistaEstimulo estimulo={origenActual} imagenes={imagenes} />
+                  <p className="text-xl font-bold text-slate-800 sm:text-2xl">{nombreVisible(origenActual.nombre)}</p>
+                </div>
+                <p className="text-xs text-slate-400">{claseActual.nombre}</p>
               </div>
-            ) : (
-              <input
-                value={controlRespuesta}
-                onChange={(e) => setControlRespuesta(e.target.value)}
-                placeholder="Respuesta del alumno"
+            )}
+            {esTransformacion && config.tipo === 'seleccion' && (
+              <p className="text-sm text-slate-500">
+                Pregunta sobre: <strong>{nombreVisible(origenActual.nombre)}</strong> ({claseActual.nombre})
+              </p>
+            )}
+            {(config.tipo === 'opciones' || config.tipo === 'ejecucion' || config.tipo === 'abierta') && (
+              <div className="space-y-1">
+                <p className="text-lg font-medium text-slate-800">{consignaActual ?? nombreVisible(origenActual.nombre)}</p>
+                <p className="text-xs text-slate-400">{claseActual.nombre}</p>
+              </div>
+            )}
+
+            {conPregunta && !consignaActual && (
+              <textarea
+                value={preguntaActual}
+                onChange={(e) => {
+                  setPreguntaActual(e.target.value)
+                  cronometro.reiniciar()
+                }}
+                placeholder="Escriba aquí la pregunta que le hace al alumno (se guarda con el ensayo)"
+                rows={2}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
               />
             )}
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button variant="success" onClick={() => anadirControl(true)} disabled={!controlPregunta.trim()} className="flex-1">
-                ✓ Correcto
-              </Button>
-              <Button variant="danger" onClick={() => anadirControl(false)} disabled={!controlPregunta.trim()} className="flex-1">
-                ✗ Incorrecto
-              </Button>
-              <Button variant="secondary" onClick={() => setControlAbierto(false)}>
-                Cancelar
-              </Button>
-            </div>
+            {config.tipo === 'abierta' && (
+              <textarea
+                value={respuestaAbierta}
+                onChange={(e) => setRespuestaAbierta(e.target.value)}
+                placeholder="Respuesta del alumno (opcional)"
+                rows={2}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            )}
+
+            {config.tipo === 'seleccion' && !hablanteMaterial ? (
+              <div className="flex flex-wrap justify-center gap-3">
+                {comparativos.map((c) => (
+                  <button
+                    key={c.claseId}
+                    onClick={() => registrarMaterial(c.esCorrecto, nombreVisible(c.estimulo.nombre))}
+                    disabled={isPending}
+                    className="inline-flex min-w-[7rem] flex-col items-center gap-1 rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-base font-semibold text-slate-700 hover:border-indigo-400 active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <VistaEstimulo estimulo={c.estimulo} imagenes={imagenes} />
+                    {nombreVisible(c.estimulo.nombre)}
+                  </button>
+                ))}
+              </div>
+            ) : config.tipo === 'opciones' && respuestaPendiente !== null ? (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">
+                  Ha respondido: <strong>{respuestaPendiente}</strong>. ¿Es correcto?
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button variant="success" onClick={() => registrarMaterial(true, respuestaPendiente)} disabled={isPending} className="flex-1 py-4 text-base sm:py-3">
+                    ✓ Correcto
+                  </Button>
+                  <Button variant="danger" onClick={() => registrarMaterial(false, respuestaPendiente)} disabled={isPending} className="flex-1 py-4 text-base sm:py-3">
+                    ✗ Incorrecto
+                  </Button>
+                </div>
+                <button onClick={() => setRespuestaPendiente(null)} className="py-2 text-sm text-slate-500 hover:text-slate-600">
+                  Cambiar respuesta
+                </button>
+              </div>
+            ) : config.tipo === 'opciones' ? (
+              <div className="flex flex-wrap justify-center gap-3">
+                {config.opciones.map((opcion) => (
+                  <Button
+                    key={opcion}
+                    variant="secondary"
+                    onClick={() => {
+                      if (esperada) registrarMaterial(opcion === esperada, opcion)
+                      else {
+                        cronometro.capturar()
+                        setRespuestaPendiente(opcion)
+                      }
+                    }}
+                    disabled={isPending}
+                    className="min-w-[7rem] py-4 text-base active:scale-[0.98] sm:py-3"
+                  >
+                    {opcion}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  variant="success"
+                  onClick={() => registrarMaterial(true, config.tipo === 'abierta' ? respuestaRegistrada : null)}
+                  disabled={isPending}
+                  className="flex-1 py-4 text-base active:scale-[0.98] sm:py-3"
+                >
+                  {etiquetas.correcto.replace(' sin ayuda', '')}
+                  {etiquetaAyuda ? ` (con ayuda: ${etiquetaAyuda})` : ''}
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => registrarMaterial(false, config.tipo === 'abierta' ? respuestaRegistrada : null)}
+                  disabled={isPending}
+                  className="flex-1 py-4 text-base active:scale-[0.98] sm:py-3"
+                >
+                  {etiquetas.incorrecto}
+                </Button>
+              </div>
+            )}
+            {botonVerRespuesta}
           </div>
-        ) : (
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs text-slate-500">
-              {controles.length > 0
-                ? `Ensayos de control: ${controles.filter((c) => c.correcto).length}/${controles.length} correctos`
-                : 'Sin ensayos de control en este bloque'}
-            </span>
-            <button onClick={() => setControlAbierto(true)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800">
-              + Ensayo de control
+        )}
+
+        {masAbierto && (
+          <div className="space-y-4 border-t border-slate-200 bg-slate-50 p-3 text-left text-sm">
+            {(instrucciones || ayudasPosibles || videoUrl) && (
+              <details className="rounded-lg border border-slate-200 bg-white p-3 text-xs text-slate-600">
+                <summary className="cursor-pointer text-sm font-medium text-slate-700">Instrucciones del programa</summary>
+                <div className="mt-2 space-y-2">
+                  {instrucciones && <p className="whitespace-pre-wrap">{instrucciones}</p>}
+                  {ayudasPosibles && (
+                    <div>
+                      <strong>Ayudas sugeridas:</strong>
+                      <p className="whitespace-pre-wrap">{ayudasPosibles}</p>
+                    </div>
+                  )}
+                  {videoUrl && (
+                    <div>
+                      <strong>Vídeo de ejemplo:</strong>
+                      <VideoDiferido url={videoUrl} />
+                    </div>
+                  )}
+                </div>
+              </details>
+            )}
+
+            {conPregunta && consignaActual && (
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-600">Otra pregunta (si no usa la de la guía)</label>
+                <textarea
+                  value={preguntaActual}
+                  onChange={(e) => setPreguntaActual(e.target.value)}
+                  placeholder={`Si no escribe otra, se guarda «${consignaActual}»`}
+                  rows={2}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                />
+              </div>
+            )}
+
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              {controlAbierto ? (
+                <div className="space-y-2">
+                  <p className="font-medium text-slate-700">Ensayo de control</p>
+                  <p className="text-xs text-slate-500">
+                    Pregunta extra (ej. de asimetría). Se guarda con el bloque, pero no cuenta para el % de acierto ni para el dominio.
+                  </p>
+                  <textarea
+                    value={controlPregunta}
+                    onChange={(e) => setControlPregunta(e.target.value)}
+                    placeholder="Pregunta (ej. ¿Todos los animales son ZOG?)"
+                    rows={2}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                  />
+                  {config.tipo === 'opciones' ? (
+                    <div className="flex flex-wrap gap-2">
+                      {config.opciones.map((opcion) => (
+                        <button
+                          key={opcion}
+                          onClick={() => setControlRespuesta(opcion)}
+                          className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                            controlRespuesta === opcion ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          {opcion}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <input
+                      value={controlRespuesta}
+                      onChange={(e) => setControlRespuesta(e.target.value)}
+                      placeholder="Respuesta del alumno"
+                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+                    />
+                  )}
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button variant="success" onClick={() => anadirControl(true)} disabled={!controlPregunta.trim()} className="flex-1">
+                      ✓ Correcto
+                    </Button>
+                    <Button variant="danger" onClick={() => anadirControl(false)} disabled={!controlPregunta.trim()} className="flex-1">
+                      ✗ Incorrecto
+                    </Button>
+                    <Button variant="secondary" onClick={() => setControlAbierto(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs text-slate-500">
+                    {controles.length > 0
+                      ? `Ensayos de control: ${controles.filter((c) => c.correcto).length}/${controles.length} correctos`
+                      : 'Sin ensayos de control en este bloque'}
+                  </span>
+                  <button onClick={() => setControlAbierto(true)} className="text-sm font-medium text-indigo-600 hover:text-indigo-800">
+                    + Ensayo de control
+                  </button>
+                  <AyudaTermino clave="ensayo_control" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-600">Notas del bloque (opcional)</label>
+              <textarea
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                placeholder="Observaciones sobre este bloque: motivación, distracciones, contexto..."
+                rows={2}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
+              />
+            </div>
+
+            {ensayos.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium text-slate-600">Ensayos registrados</p>
+                <ul className="max-h-40 space-y-1 overflow-y-auto sm:max-h-48">
+                  {ensayos.map((e, i) => (
+                    <li key={i} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm">
+                      <span>
+                        {i + 1}. {e.claseNombre}
+                        {e.ayuda !== 'independiente' ? ` (${e.ayuda})` : ''}
+                      </span>
+                      <span className={e.correcto ? 'text-emerald-700' : 'text-rose-600'}>{e.correcto ? '✓' : '✗'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                if (ensayos.length === 0 || window.confirm('¿Descartar este bloque? Los ensayos registrados no se guardarán.')) descartarBloque()
+              }}
+              className="text-sm text-slate-500 hover:text-slate-700"
+            >
+              Descartar bloque
             </button>
-            <AyudaTermino clave="ensayo_control" />
           </div>
         )}
       </div>
-
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-slate-600">Notas (opcional)</label>
-        <textarea
-          value={notas}
-          onChange={(e) => setNotas(e.target.value)}
-          placeholder="Observaciones sobre este bloque: motivación, distracciones, contexto..."
-          rows={2}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base sm:text-sm"
-        />
-      </div>
-
-      {ensayos.length > 0 && (
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">Ensayos registrados</p>
-          <ul className="space-y-1 max-h-40 sm:max-h-48 overflow-y-auto">
-            {ensayos.map((e, i) => (
-              <li
-                key={i}
-                className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"
-              >
-                <span>
-                  {i + 1}. {e.claseNombre}
-                  {e.ayuda !== 'independiente' ? ` (${e.ayuda})` : ''}
-                </span>
-                <span className={e.correcto ? 'text-emerald-700' : 'text-rose-600'}>
-                  {e.correcto ? '✓' : '✗'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {isPending && <p className="text-center text-sm text-slate-500">Guardando bloque...</p>}
     </div>
