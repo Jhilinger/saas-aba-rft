@@ -11,6 +11,7 @@ import ContenidoEstimulo from '../../../contenido-estimulo'
 import { parsearEstimuloPantalla } from '../../../estimulo-pantalla'
 import { presentacionNivel, siguienteNivel } from '../../../sin-error'
 import { leerRefuerzo, sonarAcierto, type PreferenciasRefuerzo } from '../../../refuerzo-tablet'
+import SelectorAyuda, { ayudasDelPrograma, etiquetaAyuda } from '../../../selector-ayuda'
 
 // Pantalla del alumno para un bloque RFT en la tableta: la muestra arriba y
 // las comparaciones en tarjetas. El toque del alumno registra el ensayo. Las
@@ -29,16 +30,6 @@ export type ImagenesBanco = Record<string, Record<string, string>>
 // hasta que se resalta la correcta (null = sin ayuda en pantalla)
 export type ApoyoTablet = { nombre: string; opacidad: number; tamano: boolean; demora: number | null }
 
-const AYUDAS = [
-  { value: 'verbal', label: 'Verbal' },
-  { value: 'verbal_parcial', label: 'Verbal parcial' },
-  { value: 'gestual', label: 'Gestual' },
-  { value: 'visual', label: 'Visual' },
-  { value: 'modelado', label: 'Modelado' },
-  { value: 'fisica_parcial', label: 'Física parcial' },
-  { value: 'fisica_total', label: 'Física total' },
-  { value: 'textual', label: 'Textual' },
-]
 
 // Nombre entre comillas («"Agua"»): palabra que se dice, no se ve
 export function esOido(e: { nombre: string; concepto_imagen: string | null; pantalla: unknown }) {
@@ -821,7 +812,8 @@ function EnsayoTablet({
       return
     }
     if (nivel === 0) onPrimeraRespuesta()
-    if (!menorAMayor && !e.correcto && correccion) {
+    // Sin modelo cuando puntúa el terapeuta (la respuesta es oral: no hay opciones que dejar)
+    if (!menorAMayor && !e.correcto && correccion && !e.delTerapeuta) {
       primera.current = e.respuesta
       setModelo(true)
       return
@@ -895,6 +887,7 @@ export default function PantallaTablet({
   sinAudio = false,
   secuencia,
   correccion = false,
+  ayudasPosibles = null,
   etiquetasSecuencia,
   hablante = false,
   apoyoVisual = false,
@@ -933,6 +926,8 @@ export default function PantallaTablet({
   secuencia?: EstimuloTablet[]
   // Corrección del error en entrenamiento (modelo y repetición sin ayuda)
   correccion?: boolean
+  // «Ayudas sugeridas» del programa (se marcan y explican en el menú de ayuda)
+  ayudasPosibles?: string | null
   // Rótulos de la secuencia al corregir («antes», «después»)
   etiquetasSecuencia?: string[]
   // Respuesta de hablante: sin opciones; el terapeuta puntúa (respuesta esperada oculta)
@@ -1042,7 +1037,7 @@ export default function PantallaTablet({
           {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? (fase === 'generalizacion' ? 'Sonda de generalización' : fase === 'mantenimiento' ? 'Sonda de mantenimiento' : fase)} ·{' '}
           {ensayo + 1}/{total}
           {apoyo && <span className="ml-2">· {apoyo.nombre}</span>}
-          {ayuda && <span className="ml-2 font-semibold text-amber-500">ayuda: {AYUDAS.find((a) => a.value === ayuda)?.label}</span>}
+          {ayuda && <span className="ml-2 font-semibold text-amber-500">ayuda: {etiquetaAyuda(ayuda)}</span>}
         </p>
         <span className="flex gap-2">
           <BotonLargo onActivar={() => setMenuAyuda(true)} className="border border-slate-200 !bg-transparent">
@@ -1097,7 +1092,7 @@ export default function PantallaTablet({
         sinVozAutomatica={sinVozAutomatica}
         sinAudio={sinAudio}
         secuencia={secuencia}
-        correccion={correccion && fase === 'entrenamiento' && !menorAMayor && !hablante}
+        correccion={correccion && fase === 'entrenamiento' && !menorAMayor && !hablante && !ordenEsperado}
         etiquetasSecuencia={etiquetasSecuencia}
         hablante={hablante}
         apoyoVisual={apoyoVisual}
@@ -1173,33 +1168,19 @@ export default function PantallaTablet({
       )}
 
       {menuAyuda && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 p-4">
-          <div className="w-full max-w-sm space-y-2 rounded-2xl bg-white p-4 text-sm">
+        <div className="absolute inset-0 flex items-center justify-center overflow-y-auto bg-slate-900/40 p-4">
+          <div className="w-full max-w-lg space-y-2 rounded-2xl bg-white p-4 text-sm">
             <p className="font-semibold text-slate-800">Ayuda en este ensayo</p>
-            <p className="text-xs text-slate-500">Se anota en la siguiente respuesta correcta.</p>
-            <div className="grid grid-cols-2 gap-2">
-              {AYUDAS.map((a) => (
-                <button
-                  key={a.value}
-                  onClick={() => {
-                    setAyuda(a.value)
-                    setMenuAyuda(false)
-                  }}
-                  className={`rounded-lg px-3 py-2 text-left ${ayuda === a.value ? 'bg-amber-100 text-amber-800' : 'bg-slate-100'}`}
-                >
-                  {a.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => {
-                setAyuda(null)
+            <SelectorAyuda
+              elegida={ayuda}
+              sugeridas={ayudasDelPrograma(ayudasPosibles)}
+              // Con una ayuda automática en pantalla, la visual manual sobra
+              ocultar={apoyo || menorAMayor ? ['visual'] : []}
+              onElegir={(v) => {
+                setAyuda(v)
                 setMenuAyuda(false)
               }}
-              className="w-full rounded-lg px-3 py-2 text-slate-500"
-            >
-              Sin ayuda
-            </button>
+            />
           </div>
         </div>
       )}

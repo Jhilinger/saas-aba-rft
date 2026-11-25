@@ -37,6 +37,7 @@ import {
   type EscalonBloque,
 } from '../../../sin-error'
 import AyudaTermino from '../../../ayuda-termino'
+import SelectorAyuda, { ayudasDelPrograma, etiquetaAyuda } from '../../../selector-ayuda'
 import { GLOSARIO_POR_FASE } from '../../../glosario-rft'
 
 type Estimulo = { id: string; nombre: string; posicion: string | null; concepto_imagen: string | null; pantalla: unknown }
@@ -98,17 +99,6 @@ const FASES_TODAS = [
   { value: 'test_mutuo', label: 'Test de vínculo mutuo' },
   { value: 'test_combinatorio', label: 'Test de vínculo combinatorio' },
   { value: 'transformacion_funciones', label: 'Transformación de funciones' },
-]
-
-const AYUDAS = [
-  { value: 'verbal', label: 'Verbal' },
-  { value: 'verbal_parcial', label: 'Verbal parcial' },
-  { value: 'gestual', label: 'Gestual' },
-  { value: 'visual', label: 'Visual' },
-  { value: 'modelado', label: 'Modelado' },
-  { value: 'fisica_parcial', label: 'Física parcial' },
-  { value: 'fisica_total', label: 'Física total' },
-  { value: 'textual', label: 'Textual' },
 ]
 
 function barajar<T>(arr: T[]): T[] {
@@ -477,7 +467,10 @@ export default function TomarDatosRftClient({
   const [ayudaPendiente, setAyudaPendiente] = useState<string | null>(null)
   const [masAbierto, setMasAbierto] = useState(false)
   const [verRespuesta, setVerRespuesta] = useState(false)
-  const [tras, setTras] = useState<{ correcto: boolean; ayuda: string; correcta: string | null; test: boolean } | null>(null)
+  const [tras, setTras] = useState<{ correcto: boolean; ayuda: string; correcta: string | null; test: boolean; repeticion?: boolean } | null>(null)
+  // Corrección del error con material (entrenamiento): modelo con solo la correcta
+  // y repetición del ensayo sin ayuda, que se guarda aparte (como en la tableta)
+  const [correccion, setCorreccion] = useState<{ paso: 'modelo' | 'repetir'; primera: string | null; inicio: number } | null>(null)
   const [preguntaActual, setPreguntaActual] = useState('')
   const [notas, setNotas] = useState('')
   const [isPending, startTransition] = useTransition()
@@ -879,6 +872,7 @@ export default function TomarDatosRftClient({
     setResultado(null)
     setEstadoGuardado('idle')
     setTras(null)
+    setCorreccion(null)
     setAyudaPendiente(null)
     setMasAbierto(false)
   }
@@ -1077,6 +1071,7 @@ export default function TomarDatosRftClient({
 
   const deshacerUltimo = () => {
     setTras(null)
+    setCorreccion(null)
     setEnsayos((prev) => prev.slice(0, -1))
   }
 
@@ -1617,6 +1612,10 @@ export default function TomarDatosRftClient({
             ? (respuestaEsperada(claseActual.respuestas_esperadas, fase, posicionOrigen, posicionDestino) ?? '').split(',').map((x) => x.trim()).filter(Boolean)
             : undefined
         }
+        // Corrección del error en entrenamiento (modelo y repetición sin ayuda), salvo con
+        // aprendizaje sin error, que ya tiene su propia forma de evitar el error
+        correccion={!escalonBloque}
+        ayudasPosibles={ayudasPosibles}
         onResponder={(correcto, ayuda, respuestaAlumno, extra) => registrar(correcto, ayuda, undefined, respuestaAlumno, extra)}
         onMuestra={() => cronometro.reiniciar()}
         onPrimeraRespuesta={() => cronometro.capturar()}
@@ -1639,11 +1638,34 @@ export default function TomarDatosRftClient({
           return c ? nombreVisible(c.estimulo.nombre) : null
         })()
       : esperada ?? null
-  const etiquetaAyuda = ayudaPendiente ? AYUDAS.find((a) => a.value === ayudaPendiente)?.label ?? ayudaPendiente : null
+  const etiquetaAyudaPendiente = etiquetaAyuda(ayudaPendiente)
+  // Corrección del error: solo en entrenamiento, como oyente, sin ayudas
+  // automáticas de pantalla y con una respuesta que se pueda repetir
+  const correccionPosible = !esTest && !hablanteMaterial && !menorAMayorBloque && !escalonBloque && config.tipo !== 'abierta'
   // Registra y, si no es el último ensayo, deja a la vista el resultado hasta «Siguiente ensayo»
   const registrarMaterial = (correcto: boolean, respuestaAlumno: string | null) => {
-    const ayuda = correcto && ayudaPendiente ? ayudaPendiente : 'independiente'
     const ultimo = ensayos.length + 1 >= secuencia.length
+    // Repetición tras la corrección: el ensayo cuenta como el error de la primera
+    // respuesta y la repetición se guarda aparte (no cuenta para el porcentaje)
+    if (correccion?.paso === 'repetir') {
+      registrar(false, 'independiente', preguntaRegistro, correccion.primera, {
+        transferencia: { correcto, respuesta: respuestaAlumno, latenciaMs: marcaDeTiempo() - correccion.inicio },
+      })
+      setCorreccion(null)
+      setAyudaPendiente(null)
+      setVerRespuesta(false)
+      if (!ultimo) setTras({ correcto: false, ayuda: 'independiente', correcta: correctaActual, test: false, repeticion: correcto })
+      return
+    }
+    if (!correcto && correccionPosible) {
+      cronometro.capturar()
+      setAyudaPendiente(null)
+      setMostrandoAyudas(false)
+      setRespuestaPendiente(null)
+      setCorreccion({ paso: 'modelo', primera: respuestaAlumno, inicio: 0 })
+      return
+    }
+    const ayuda = correcto && ayudaPendiente ? ayudaPendiente : 'independiente'
     registrar(correcto, ayuda, preguntaRegistro, respuestaAlumno)
     setAyudaPendiente(null)
     setVerRespuesta(false)
@@ -1654,6 +1676,26 @@ export default function TomarDatosRftClient({
     cronometro.reiniciar()
   }
   const guia: { titulo: string; texto: string }[] = []
+  if (correccion?.paso === 'modelo')
+    guia.push({
+      titulo: 'Corrección (1 de 2):',
+      texto:
+        config.tipo === 'ejecucion'
+          ? 'hágalo usted como modelo y ayúdele a hacerlo. Cuando lo haya hecho con su ayuda, pulse «Hecho».'
+          : `retire las otras opciones y deje solo «${correctaActual ?? 'la correcta'}». Diga otra vez la consigna y ayúdele a elegirla. Cuando lo haya hecho, pulse «Hecho».`,
+    })
+  else if (correccion?.paso === 'repetir')
+    guia.push({
+      titulo: 'Corrección (2 de 2):',
+      texto:
+        config.tipo === 'ejecucion'
+          ? 'repita la instrucción sin ayuda. ¿Lo hace?'
+          : 'vuelva a colocar todo como al principio y repita el ensayo sin ayuda. Toque lo que elija. Esta respuesta se guarda aparte y no cuenta para el porcentaje.',
+    })
+  if (correccion && consignaActual) guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
+  if (correccion) {
+    // solo la guía de la corrección
+  } else {
   if (hablanteMaterial)
     guia.push({ titulo: 'Como hablante:', texto: 'diga la consigna sin presentar las opciones; el alumno responde y usted marca si es correcto.' })
   if (apoyoVisualBloque)
@@ -1672,7 +1714,8 @@ export default function TomarDatosRftClient({
       ? { titulo: 'Es un test:', texto: 'no diga si está bien o mal ni dé ayudas; solo registre.' }
       : { titulo: 'Toque', texto: config.tipo === 'seleccion' && !hablanteMaterial ? 'lo que haya elegido el alumno.' : 'la respuesta del alumno.' }
   )
-  if (etiquetaAyuda) guia.push({ titulo: `Ayuda: ${etiquetaAyuda}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
+  if (etiquetaAyudaPendiente) guia.push({ titulo: `Ayuda: ${etiquetaAyudaPendiente}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
+  }
 
   const botonVerRespuesta = correctaActual && (
     <button
@@ -1701,6 +1744,7 @@ export default function TomarDatosRftClient({
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 text-sm text-slate-500">
           <span aria-live="polite">
             {NOMBRE_FASE_SECUENCIA[faseEfectiva as FaseSecuencia] ?? faseEfectiva} · ensayo <strong>{ensayos.length + 1}</strong> de {secuencia.length}
+            {correccion && <span className="ml-2 font-medium text-amber-700">· corrección</span>}
           </span>
           <span className="flex flex-wrap items-center gap-2">
             {grupoSeleccionado && tabletaPosible(grupoSeleccionado, posicionOrigen, posicionDestino, faseEfectiva) && (
@@ -1721,18 +1765,24 @@ export default function TomarDatosRftClient({
                 🖥 Pantalla del alumno
               </button>
             )}
-            {!esTest && !tras && (
+            {!esTest && !tras && !correccion && (
               <button
                 onClick={() => setMostrandoAyudas((v) => !v)}
                 className={`rounded-lg border px-3 py-1 ${ayudaPendiente ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
               >
-                {etiquetaAyuda ? `Ayuda: ${etiquetaAyuda}` : 'Ayuda'}
+                {etiquetaAyudaPendiente ? `Ayuda: ${etiquetaAyuda}` : 'Ayuda'}
               </button>
             )}
-            {ensayos.length > 0 && (
-              <button onClick={deshacerUltimo} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
+            {correccion ? (
+              <button onClick={() => setCorreccion(null)} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
                 Deshacer
               </button>
+            ) : (
+              ensayos.length > 0 && (
+                <button onClick={deshacerUltimo} className="rounded-lg border border-slate-200 px-3 py-1 text-rose-700 hover:bg-rose-50">
+                  Deshacer
+                </button>
+              )
             )}
             <button
               onClick={() => setMasAbierto((v) => !v)}
@@ -1754,33 +1804,16 @@ export default function TomarDatosRftClient({
           <div className="h-full bg-indigo-600 transition-[width] duration-300" style={{ width: `${(ensayos.length / secuencia.length) * 100}%` }} />
         </div>
 
-        {mostrandoAyudas && !tras && (
-          <div className="space-y-2 border-b border-amber-200 bg-amber-50 p-3 text-sm">
-            <p className="font-medium text-amber-900">Ayuda en este ensayo</p>
-            <p className="text-xs text-amber-800">Elíjala antes de que responda: se anota en la próxima respuesta correcta.</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {AYUDAS.map((a) => (
-                <button
-                  key={a.value}
-                  onClick={() => {
-                    setAyudaPendiente(a.value)
-                    setMostrandoAyudas(false)
-                  }}
-                  className={`rounded-lg px-3 py-2 text-left ${ayudaPendiente === a.value ? 'bg-amber-200 text-amber-900' : 'bg-white text-slate-700'}`}
-                >
-                  {a.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => {
-                setAyudaPendiente(null)
+        {mostrandoAyudas && !tras && !correccion && (
+          <div className="border-b border-amber-200 bg-amber-50 p-3">
+            <SelectorAyuda
+              elegida={ayudaPendiente}
+              sugeridas={ayudasDelPrograma(ayudasPosibles)}
+              onElegir={(v) => {
+                setAyudaPendiente(v)
                 setMostrandoAyudas(false)
               }}
-              className="text-sm text-slate-500"
-            >
-              Sin ayuda
-            </button>
+            />
           </div>
         )}
 
@@ -1791,10 +1824,15 @@ export default function TomarDatosRftClient({
             >
               <p className="text-base font-semibold">
                 {tras.correcto ? '✓ Correcto' : '✗ Incorrecto'}
-                {tras.correcto && tras.ayuda !== 'independiente' ? ` (con ayuda: ${AYUDAS.find((a) => a.value === tras.ayuda)?.label ?? tras.ayuda})` : ''}
+                {tras.correcto && tras.ayuda !== 'independiente' ? ` (con ayuda: ${etiquetaAyuda(tras.ayuda)})` : ''}
+                {tras.repeticion !== undefined ? (tras.repeticion ? ' · en la repetición, bien' : ' · en la repetición, tampoco') : ''}
               </p>
               <p className="mt-1">
-                {tras.test
+                {tras.repeticion !== undefined
+                  ? tras.repeticion
+                    ? 'Refuerce que lo haya hecho bien en la repetición.'
+                    : 'No pasa nada: siga con el siguiente. Si vuelve a fallar con esta clase, elija una ayuda antes de que responda.'
+                  : tras.test
                   ? 'Es un test: no le diga si está bien o mal.'
                   : tras.correcto
                     ? 'Refuércelo ahora.'
@@ -1861,7 +1899,15 @@ export default function TomarDatosRftClient({
               />
             )}
 
-            {config.tipo === 'seleccion' && !hablanteMaterial ? (
+            {correccion?.paso === 'modelo' ? (
+              <Button
+                variant="primary"
+                onClick={() => setCorreccion({ ...correccion, paso: 'repetir', inicio: marcaDeTiempo() })}
+                className="w-full py-4 text-base active:scale-[0.98] sm:w-auto sm:px-10"
+              >
+                Hecho: repetir el ensayo
+              </Button>
+            ) : config.tipo === 'seleccion' && !hablanteMaterial ? (
               <div className="flex flex-wrap justify-center gap-3">
                 {comparativos.map((c) => (
                   <button
@@ -1921,7 +1967,7 @@ export default function TomarDatosRftClient({
                   className="flex-1 py-4 text-base active:scale-[0.98] sm:py-3"
                 >
                   {etiquetas.correcto.replace(' sin ayuda', '')}
-                  {etiquetaAyuda ? ` (con ayuda: ${etiquetaAyuda})` : ''}
+                  {etiquetaAyudaPendiente ? ` (con ayuda: ${etiquetaAyudaPendiente})` : ''}
                 </Button>
                 <Button
                   variant="danger"
@@ -1933,7 +1979,7 @@ export default function TomarDatosRftClient({
                 </Button>
               </div>
             )}
-            {botonVerRespuesta}
+            {correccion?.paso !== 'modelo' && botonVerRespuesta}
           </div>
         )}
 
