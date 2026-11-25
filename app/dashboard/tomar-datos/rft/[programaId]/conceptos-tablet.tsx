@@ -233,8 +233,10 @@ export default function ConceptosTablet({
         etiquetasSecuencia={actual.etiquetasSecuencia}
         ordenEsperado={actual.orden}
         // Corrección del error en entrenamiento (modelo y repetición sin
-        // ayuda): de momento solo en las claves temporales
-        correccion={actividad.tipo === 'temporal'}
+        // ayuda) en todas las abstracciones; la secuencia rotulada solo
+        // existe en las temporales. No se aplica en los tests ni con ayudas
+        // de menor a mayor ni como hablante (lo filtra PantallaTablet)
+        correccion
         // Conceptos generados: cada ensayo alterna las fotos 1 y 2 del concepto (múltiples ejemplares)
         alternarEjemplares
         onResponder={(correcto, ayuda, respuesta, extra: Pick<RespuestaTablet, 'nivelAyuda' | 'transferencia'>) => {
