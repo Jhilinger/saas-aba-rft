@@ -9,6 +9,7 @@ const CLAVE: Record<string, string> = {
   antes: '«Antes»',
   despues: '«Después»',
   primero: '«Primero»',
+  ultimo: '«Lo último»',
   mas: 'más',
   menos: 'menos',
   encima: '«Encima»',

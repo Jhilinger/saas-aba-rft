@@ -19,7 +19,8 @@ export type ParEspacial = 'encima_debajo' | 'dentro_fuera' | 'delante_detras'
 export type NivelEspacial = { nombre: string; pares: ParEspacial[] }
 // orden_presentacion: orden físico en que aparecen dos imágenes sin relación
 // («¿Cuál salió antes?»; Neufeld, Stewart y McElwee, 2023)
-export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'primero_despues' | 'antes_despues' }
+// primero_ultimo: secuencias de tres (Stewart y Neufeld): las tres viñetas desordenadas y «primero»/«lo último»
+export type NivelTemporal = { nombre: string; modo: 'orden_presentacion' | 'primero_despues' | 'antes_despues' | 'primero_ultimo' }
 // Clasificar por propiedades (Villarroel y Luciano: filtrado de lo común; O'Hora y Stewart, 2013:
 // control contextual de la dimensión): «una» = cada opción comparte con la muestra una sola
 // propiedad; «dos» = se alternan claves de dos propiedades y de una
@@ -145,6 +146,7 @@ export const CONSIGNAS = {
   contrario: 'Toca el contrario',
   primero: '¿Qué pasó primero?',
   despues: '¿Qué pasó después?',
+  ultimo: '¿Qué pasó lo último?',
   antes: '¿Qué pasó antes?',
   salioAntes: '¿Cuál salió antes?',
   salioDespues: '¿Cuál salió después?',
@@ -272,7 +274,14 @@ export function leerActividadConceptos(valor: Json | null | undefined): Activida
   if (o.tipo === 'temporal') {
     const lista = niveles.map((n, i) => ({
       nombre: nombre(n, i),
-      modo: n.modo === 'antes_despues' ? ('antes_despues' as const) : n.modo === 'orden_presentacion' ? ('orden_presentacion' as const) : ('primero_despues' as const),
+      modo:
+        n.modo === 'antes_despues'
+          ? ('antes_despues' as const)
+          : n.modo === 'orden_presentacion'
+            ? ('orden_presentacion' as const)
+            : n.modo === 'primero_ultimo'
+              ? ('primero_ultimo' as const)
+              : ('primero_despues' as const),
     }))
     return lista.length ? { tipo: 'temporal', niveles: lista } : null
   }
@@ -613,6 +622,12 @@ function temporal(nivel: NivelTemporal, generalizacion: boolean, n: number, azar
   const nombre = (c: string) => c.split('/')[1]
   return polos.map((polo) => {
     const s = secuencias[Math.floor(azar() * secuencias.length)]
+    if (nivel.modo === 'primero_ultimo') {
+      // Las tres viñetas desordenadas; la del medio nunca es la respuesta, así que no
+      // basta con evitar un extremo: hay que ordenar las tres
+      const opciones: OpcionGenerada[] = s.map((c, i) => ({ pantalla: { img: c }, etiqueta: nombre(c), correcta: polo === 0 ? i === 0 : i === s.length - 1 }))
+      return { clave: polo === 0 ? 'primero' : 'ultimo', consigna: polo === 0 ? CONSIGNAS.primero : CONSIGNAS.ultimo, muestra: null, opciones: barajar(opciones, azar) }
+    }
     if (nivel.modo === 'antes_despues') {
       const [antes, muestra, despues] = s
       const opciones: OpcionGenerada[] = [
@@ -754,6 +769,9 @@ export function aHablante(tipo: ActividadConceptos['tipo'], e: EnsayoGenerado, a
     return { clave: e.clave, pregunta: m ? `¿Dónde está ${m[1]}?` : '¿Dónde está?', esperada, estimulos: [e.opciones[correcta].pantalla], marcada: null }
   }
   // Temporales
+  // Secuencias de tres: las tres viñetas y la pregunta; señala o nombra la que cumple la clave
+  if (e.opciones.length === 3 && !e.muestra && !e.secuencia)
+    return { clave: e.clave, pregunta: e.consigna, esperada: `Señala o nombra: ${e.opciones[correcta].etiqueta}`, estimulos: e.opciones.map((o) => o.pantalla), marcada: null }
   const esperada = PALABRA_TEMPORAL[e.clave] ?? e.clave
   if (e.secuencia) {
     // Orden en que aparecen: tras la secuencia, los dos en orden al azar y
