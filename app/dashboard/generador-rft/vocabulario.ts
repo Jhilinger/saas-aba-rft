@@ -342,3 +342,38 @@ export const DEICTICOS: { obj: [string, string]; lug: [string, string]; act: [Ac
     tof: ['con las manos llenas de pintura', 'con las manos limpias', '¿tendría las manos sucias o limpias?', 'Sucias', 'Limpias', '¿Quién tiene las manos sucias?'],
   },
 ]
+
+// ---------------------------------------------------------------- Engaño
+// Objeto, pronombre, lugar esperado y lugar inesperado (McHugh et al., 2004). Los
+// 4 primeros son los del currículo
+export const ENGANO: [string, string, string, string][] = [
+  ['el osito', 'lo', 'el baúl de los juguetes', 'la nevera'],
+  ['las galletas', 'las', 'el bote de las galletas', 'el zapatero'],
+  ['los lápices', 'los', 'el estuche', 'la maceta'],
+  ['la pelota', 'la', 'la cesta de los juguetes', 'la lavadora'],
+  ['el cromo', 'lo', 'el álbum', 'el cajón de los calcetines'],
+  ['las llaves', 'las', 'el colgador de la entrada', 'la caja de los zapatos'],
+  ['el chocolate', 'lo', 'la despensa', 'la caja de herramientas'],
+  ['los rotuladores', 'los', 'el bote de los rotuladores', 'el frutero'],
+]
+
+// ---------------------------------------------------------------- Analogías verbales
+// Mismo par de términos con tres relaciones distintas (Carpentier et al., 2004):
+// la respuesta depende del par base, no solo del último término. Los 8 primeros
+// son los del currículo
+export const ANALOGIAS: [string, string, [string, string][]][] = [
+  ['Pájaro', 'Pez', [['volar', 'nadar'], ['nido', 'pecera'], ['plumas', 'escamas']]],
+  ['Perro', 'Gato', [['ladrar', 'maullar'], ['hueso', 'pescado'], ['cachorro', 'gatito']]],
+  ['Vaca', 'Gallina', [['leche', 'huevos'], ['mugir', 'cacarear'], ['ternero', 'pollito']]],
+  ['Pie', 'Mano', [['zapato', 'guante'], ['pierna', 'brazo'], ['chutar', 'lanzar']]],
+  ['Coche', 'Barco', [['carretera', 'mar'], ['garaje', 'puerto'], ['conductor', 'capitán']]],
+  ['Médico', 'Profesor', [['hospital', 'colegio'], ['paciente', 'alumno'], ['curar', 'enseñar']]],
+  ['Día', 'Noche', [['sol', 'luna'], ['desayuno', 'cena'], ['claro', 'oscuro']]],
+  ['Tren', 'Avión', [['vía', 'cielo'], ['estación', 'aeropuerto'], ['maquinista', 'piloto']]],
+  ['Ojo', 'Oreja', [['ver', 'oír'], ['gafas', 'auriculares'], ['pestaña', 'lóbulo']]],
+  ['Verano', 'Invierno', [['calor', 'frío'], ['bañador', 'abrigo'], ['playa', 'nieve']]],
+  ['Panadero', 'Cartero', [['pan', 'cartas'], ['panadería', 'correos'], ['horno', 'cartera']]],
+  ['Lápiz', 'Tijeras', [['escribir', 'cortar'], ['punta', 'filo'], ['estuche', 'costurero']]],
+  ['Abeja', 'Araña', [['miel', 'telaraña'], ['zumbar', 'tejer'], ['seis patas', 'ocho patas']]],
+  ['Bombero', 'Policía', [['fuego', 'ladrón'], ['manguera', 'silbato'], ['camión', 'coche patrulla']]],
+]

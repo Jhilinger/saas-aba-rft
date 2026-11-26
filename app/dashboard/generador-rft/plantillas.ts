@@ -8,11 +8,13 @@
 import {
   ACCIONES,
   ACCIONES_CATEGORIA,
+  ANALOGIAS,
   CATEGORIAS,
   COLORES,
   RASGOS,
   CONTEXTOS_DISTINCION,
   DEICTICOS,
+  ENGANO,
   DIMENSIONES,
   DISTINCION,
   LADO,
@@ -796,6 +798,72 @@ const plantillaDeictica = (clasesDe: (gi: number) => ClaseDeictica[], porGrupo: 
   })
 }
 
+// ---------------------------------------------------------------- Engaño (4.1)
+// Dónde poner un objeto según se quiera que el otro lo encuentre (1.er orden) y
+// según lo que el otro sabe de lo que intento (2.º orden; McHugh et al., 2004),
+// por «yo» y por «tú». Los grupos alternan primer y segundo orden y recorren los
+// objetos de ENGANO a partir de los que ya tiene el programa
+const engano: Plantilla = (ctx) => {
+  const gi = Math.floor((ctx.primerNumero - 1) / 4)
+  const [obj, pr, esp, ines] = ENGANO[gi % ENGANO.length]
+  const segundo = gi % 2 === 1
+  const opciones = alfabetico([cap(esp), cap(ines)])
+  const filas: [string, string][] = segundo
+    ? [
+        [`Yo tengo ${obj} y sé que tú sabes que intento esconder${pr}. ¿Dónde ${pr} escondo?`, esp],
+        [`Tú tienes ${obj} y sabes que yo sé que intentas esconder${pr}. ¿Dónde ${pr} escondes?`, esp],
+        [`Yo tengo ${obj} y sé que tú no sabes que intento esconder${pr}. ¿Dónde ${pr} escondo?`, ines],
+        [`Tú tienes ${obj} y sabes que yo no sé que intentas esconder${pr}. ¿Dónde ${pr} escondes?`, ines],
+      ]
+    : [
+        [`Yo tengo ${obj} y quiero que tú ${pr} encuentres. ¿Dónde ${pr} pongo?`, esp],
+        [`Tú tienes ${obj} y quieres que yo ${pr} encuentre. ¿Dónde ${pr} pones?`, esp],
+        [`Yo tengo ${obj} y no quiero que tú ${pr} encuentres. ¿Dónde ${pr} escondo?`, ines],
+        [`Tú tienes ${obj} y no quieres que yo ${pr} encuentre. ¿Dónde ${pr} escondes?`, ines],
+      ]
+  return filas.map(([consigna, ok], k) => ({
+    numero: ctx.primerNumero + k,
+    estimulos: [
+      { posicion: 'A', nombre: consigna.slice(0, consigna.lastIndexOf('. ') + 1), concepto_imagen: null },
+      { posicion: 'B', nombre: cap(ok), concepto_imagen: null },
+    ],
+    consignas: { 'entrenamiento:A→B': consigna },
+    respuestas_esperadas: { 'entrenamiento:A→B': cap(ok) },
+    opciones_por_fase: { 'entrenamiento:A→B': opciones },
+  }))
+}
+
+// ---------------------------------------------------------------- Analogías verbales (4.2)
+// El mismo par de términos con tres relaciones (Carpentier et al., 2004): las
+// opciones son siempre las tres respuestas del grupo, en un orden que cambia
+const ordenAnalogia = (respuestas: string[], correcta: string, posicion: number, invertir: boolean) => {
+  const resto = respuestas.filter((r) => r !== correcta)
+  const lista = invertir ? [...resto].reverse() : [...resto]
+  lista.splice(posicion, 0, correcta)
+  return lista
+}
+const analogiasVerbales: Plantilla = (ctx) => {
+  const g = Math.floor((ctx.primerNumero - 1) / 3)
+  const [x, y, relaciones] = ANALOGIAS[g % ANALOGIAS.length]
+  const respY = relaciones.map(([, b]) => b), respX = relaciones.map(([a]) => a)
+  return relaciones.map(([a, b], k) => ({
+    numero: ctx.primerNumero + k,
+    estimulos: [
+      { posicion: 'A', nombre: `${x} : ${a}`, concepto_imagen: null },
+      { posicion: 'B', nombre: `${y} : ${b}`, concepto_imagen: null },
+    ],
+    consignas: {
+      'entrenamiento:A→B': `${x} es a ${a} como ${y.toLowerCase()} es a…`,
+      'test_mutuo:B→A': `${y} es a ${b} como ${x.toLowerCase()} es a…`,
+    },
+    respuestas_esperadas: { 'entrenamiento:A→B': b, 'test_mutuo:B→A': a },
+    opciones_por_fase: {
+      'entrenamiento:A→B': ordenAnalogia(respY, b, (k + g) % 3, k % 2 === 1),
+      'test_mutuo:B→A': ordenAnalogia(respX, a, (k + g + 1) % 3, k % 2 === 0),
+    },
+  }))
+}
+
 // Programas con generador (por nombre del programa del currículo)
 const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones de Comparación': comparacionMutua,
@@ -814,6 +882,8 @@ const PLANTILLAS: Record<string, Plantilla> = {
   'Relaciones Deícticas Simples': plantillaDeictica(deicticasSimples, 7),
   'Relaciones Deícticas Invertidas': plantillaDeictica(deicticasInvertidas, 7),
   'Relaciones Deícticas Doblemente Invertidas': plantillaDeictica(deicticasDobles, 5),
+  'Comprender el Engaño': engano,
+  'Completar Analogías Verbales': analogiasVerbales,
 }
 
 export function tienePlantilla(nombrePrograma: string) {
