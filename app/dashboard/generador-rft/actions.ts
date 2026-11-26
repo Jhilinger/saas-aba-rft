@@ -71,8 +71,15 @@ export async function proponerGrupo(
 }
 
 // Vuelve a generar con la misma semilla (lo mismo que se vio en la vista previa)
-// y lo guarda como un grupo nuevo del programa
-export async function guardarGrupoGenerado(destino: Destino, programaId: string, semilla: string) {
+// y lo guarda como un grupo nuevo del programa. «cambios»: frases editadas a mano
+// en la vista previa (número de clase → clave → texto); solo se aceptan para
+// frases que ya existen, así que la estructura y las respuestas no cambian
+export async function guardarGrupoGenerado(
+  destino: Destino,
+  programaId: string,
+  semilla: string,
+  cambios: Record<number, Record<string, string>> = {}
+) {
   const supabase = await createClient()
   if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const datos = await cargar(destino, programaId)
@@ -80,10 +87,27 @@ export async function guardarGrupoGenerado(destino: Destino, programaId: string,
   const { primerNumero, grupo, usados } = analizar(datos.clases)
   const clases = generarGrupo(datos.nombre, semilla, primerNumero, usados)
   if (!clases) return { error: 'No se ha podido generar el grupo' }
-  const generado = { plantilla: datos.nombre, semilla, fecha: new Date().toISOString() }
+  let editado = false
+  for (const c of clases) {
+    for (const [clave, texto] of Object.entries(cambios[c.numero] ?? {})) {
+      const limpio = String(texto).trim().slice(0, 1000)
+      if (clave in c.consignas && limpio && limpio !== c.consignas[clave]) {
+        c.consignas[clave] = limpio
+        editado = true
+      }
+    }
+  }
+  const generado = { plantilla: datos.nombre, semilla, fecha: new Date().toISOString(), ...(editado ? { editado: true } : {}) }
 
   for (const c of clases) {
-    const fila = { nombre: `Clase ${c.numero}`, grupo, consignas: c.consignas, respuestas_esperadas: c.respuestas_esperadas ?? {}, generado }
+    const fila = {
+      nombre: `Clase ${c.numero}`,
+      grupo,
+      consignas: c.consignas,
+      respuestas_esperadas: c.respuestas_esperadas ?? {},
+      opciones_por_fase: c.opciones_por_fase ?? {},
+      generado,
+    }
     const { data: clase, error } =
       destino === 'curriculo'
         ? await supabase.from('clases_rft_base').insert({ ...fila, programa_base_id: programaId }).select('id').single()

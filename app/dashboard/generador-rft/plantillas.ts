@@ -20,13 +20,15 @@ import {
   SILABAS_DISTINCION,
 } from './vocabulario'
 
-export type EstimuloGenerado = { posicion: 'A' | 'B' | 'C'; nombre: string; concepto_imagen: string | null }
+export type EstimuloGenerado = { posicion: 'A' | 'B' | 'C' | 'D' | 'E'; nombre: string; concepto_imagen: string | null }
 // respuestas_esperadas: solo cuando la respuesta no es elegir un estímulo (p. ej. ordenar)
 export type ClaseGenerada = {
   numero: number
   estimulos: EstimuloGenerado[]
   consignas: Record<string, string>
   respuestas_esperadas?: Record<string, string>
+  // Opciones propias de la clase en cada fase («fase:O→D»), en el orden en que se muestran
+  opciones_por_fase?: Record<string, string[]>
 }
 // Lo que ya tiene el programa (para no repetir): nombres de estímulos y pares de
 // miembros de una misma clase
@@ -77,8 +79,8 @@ function factores(n: number) {
 // nuevos para el programa (nombres no usados o pares de miembros que no se han
 // relacionado nunca). Se busca clase a clase; si no hay suficientes, se permite
 // repetir lo ya usado (sin repetir dentro del grupo)
-function elegir(pool: string[], porClase: number, ctx: Contexto, porNombre: boolean): string[][] | null {
-  if (pool.length < porClase * CLASES_POR_GRUPO) return null
+function elegir(pool: string[], porClase: number, ctx: Contexto, porNombre: boolean, clases = CLASES_POR_GRUPO): string[][] | null {
+  if (pool.length < porClase * clases) return null
   const nuevo = (t: string[]) =>
     porNombre
       ? t.every((x) => !ctx.usados.nombres.has(x))
@@ -87,7 +89,7 @@ function elegir(pool: string[], porClase: number, ctx: Contexto, porNombre: bool
     for (let intento = 0; intento < 200; intento++) {
       const trozos: string[][] = []
       const libres = new Set(pool)
-      for (let j = 0; j < CLASES_POR_GRUPO; j++) {
+      for (let j = 0; j < clases; j++) {
         let elegido: string[] | null = null
         for (let k = 0; k < INTENTOS / 4 && !elegido; k++) {
           const t = muestra([...libres], porClase, ctx.azar)
@@ -97,7 +99,7 @@ function elegir(pool: string[], porClase: number, ctx: Contexto, porNombre: bool
         elegido.forEach((x) => libres.delete(x))
         trozos.push(elegido)
       }
-      if (trozos.length === CLASES_POR_GRUPO) return trozos
+      if (trozos.length === clases) return trozos
     }
   }
   return null
@@ -129,32 +131,53 @@ const comparacionMutua: Plantilla = (ctx) => {
   })
 }
 
+// Redes de comparación de 3, 4 o 5 miembros según el grupo (avanza como el
+// currículo) y, en la mitad de las clases, ensayos no lineales (Berens y Hayes,
+// 2007; Ming, Moran y Stewart, 2014): en el combinatorio y la transformación las
+// frases C–B y E–D se dicen en la dirección contraria a la entrenada. Con más de
+// 3 miembros, la transformación limita la elección a los dos que se comparan
+const POSICIONES = ['A', 'B', 'C', 'D', 'E'] as const
 const comparacionRed: Plantilla = (ctx) => {
-  const trozos = elegir(NOMBRES, 3, ctx, true)
+  const miembros = 3 + (Math.floor((ctx.primerNumero - 1) / CLASES_POR_GRUPO) % 3)
+  const trozos = elegir(NOMBRES, miembros, ctx, true)
   if (!trozos) return null
   return numeros(ctx).map((n, j) => {
-    const [a, b, c] = trozos[j]
+    const nombres = trozos[j]
     const { pol, inv, orden, alt } = factores(n)
+    const noLineal = n % 2 === 0
     const { sintagma, polos, pregunta, mejor } = DIMENSIONES[(n - 1) % DIMENSIONES.length]
     const adj = polos[pol], contra = polos[1 - pol]
-    const premisa = (x: string, y: string) => (inv ? `Comparado con ${sintagma(y)}, ${sintagma(x)} es más ${adj}.` : `${cap(sintagma(x))} es más ${adj} que ${sintagma(y)}.`)
-    const p1 = premisa(a, b), p2 = premisa(b, c)
-    const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
-    const extremos = alt ? `${c} o ${a}` : `${a} o ${c}`
+    const premisa = (x: string, y: string, a = adj) =>
+      inv ? `Comparado con ${sintagma(y)}, ${sintagma(x)} es más ${a}.` : `${cap(sintagma(x))} es más ${a} que ${sintagma(y)}.`
+    // Premisa i: relación entre la posición i (más «adj») y la i+1
+    const entrenadas = nombres.slice(0, -1).map((x, i) => premisa(x, nombres[i + 1]))
+    const enRed = nombres.slice(0, -1).map((x, i) => (noLineal && i % 2 === 1 ? premisa(nombres[i + 1], x, contra) : entrenadas[i]))
+    const ambas = (orden ? [...enRed].reverse() : enRed).join(' ')
+    const consignas: Record<string, string> = {}
+    nombres.slice(0, -1).forEach((_, i) => {
+      const [o, d] = [POSICIONES[i], POSICIONES[i + 1]]
+      consignas[`entrenamiento:${d}→${o}`] = `${entrenadas[i]} ${pregunta} más ${adj}?`
+      consignas[`test_mutuo:${o}→${d}`] = `${entrenadas[i]} ${pregunta} más ${contra}?`
+    })
+    const a = nombres[0]
+    nombres.slice(2).forEach((x, k) => {
+      const pos = POSICIONES[k + 2]
+      const extremos = alt ? `${x} o ${a}` : `${a} o ${x}`
+      consignas[`test_combinatorio:${pos}→A`] = `${ambas} ${pregunta} más ${adj}, ${extremos}?`
+      consignas[`test_combinatorio:A→${pos}`] = `${ambas} ${pregunta} más ${contra}, ${extremos}?`
+      // Situación que pide un extremo; con más de 3 miembros, solo entre A y este
+      const situacion = (s: string) => {
+        if (miembros === 3) return s
+        const corte = s.indexOf('. ¿')
+        return `${s.slice(0, corte)}. Solo pueden ir ${extremos}. ${s.slice(corte + 2)}`
+      }
+      consignas[`transformacion_funciones:A→${pos}`] = `${ambas} ${situacion(mejor[1 - pol])}`
+      consignas[`transformacion_funciones:${pos}→A`] = `${ambas} ${situacion(mejor[pol])}`
+    })
     return {
       numero: n,
-      estimulos: [{ posicion: 'A', nombre: a, concepto_imagen: null }, { posicion: 'B', nombre: b, concepto_imagen: null }, { posicion: 'C', nombre: c, concepto_imagen: null }],
-      consignas: {
-        'entrenamiento:B→A': `${p1} ${pregunta} más ${adj}?`,
-        'entrenamiento:C→B': `${p2} ${pregunta} más ${adj}?`,
-        'test_mutuo:A→B': `${p1} ${pregunta} más ${contra}?`,
-        'test_mutuo:B→C': `${p2} ${pregunta} más ${contra}?`,
-        'test_combinatorio:C→A': `${ambas} ${pregunta} más ${adj}, ${extremos}?`,
-        'test_combinatorio:A→C': `${ambas} ${pregunta} más ${contra}, ${extremos}?`,
-        // Situación que pide un extremo: A es el más «pol», C el del otro polo
-        'transformacion_funciones:A→C': `${ambas} ${mejor[1 - pol]}`,
-        'transformacion_funciones:C→A': `${ambas} ${mejor[pol]}`,
-      },
+      estimulos: nombres.map((x, i) => ({ posicion: POSICIONES[i] as EstimuloGenerado['posicion'], nombre: x, concepto_imagen: null })),
+      consignas,
     }
   })
 }
@@ -470,34 +493,85 @@ const oposicionMutua: Plantilla = (ctx) => {
   })
 }
 
+// Redes de oposición mezcladas con igualdad (Luciano et al., 2009; currículo del
+// 25 de noviembre): 4 redes por grupo, una de cada tipo (contrario+contrario,
+// contrario+igual, igual+contrario, igual+igual), para que el combinatorio no se
+// acierte respondiendo siempre «lo mismo». En entrenamiento y mutuo, las opciones
+// son los dos nombres de la frase y uno de otra red (nunca dos respuestas válidas).
+// Contrapesos: orden de cada frase, orden de las premisas y polo de la función de A
+const TIPOS_OPOSICION: ['contrario' | 'igual', 'contrario' | 'igual'][] = [
+  ['contrario', 'contrario'],
+  ['contrario', 'igual'],
+  ['igual', 'contrario'],
+  ['igual', 'igual'],
+]
 const oposicionRed: Plantilla = (ctx) => {
-  const trozos = elegir(NOMBRES, 3, ctx, true)
+  const trozos = elegir(NOMBRES, 3, ctx, true, 4)
   if (!trozos) return null
-  return numeros(ctx).map((n, j) => {
-    const [a, b, c] = trozos[j]
-    const { o, np, contrario, quien, mismo, otro } = oposicion(n)
-    const { pol, inv, orden } = factores(n)
-    const p1 = inv ? contrario(a, b) : contrario(b, a)
-    const p2 = inv ? contrario(b, c) : contrario(c, b)
-    const ambas = orden ? `${p2} ${p1}` : `${p1} ${p2}`
-    const efectoA = `${cap(np(a))} ${o.efecto[pol]}.`
+  const gi = Math.floor((ctx.primerNumero - 1) / 4)
+  const o = OPOSICION[gi % OPOSICION.length]
+  const art = o.femenino ? 'la' : 'el'
+  const np = (x: string) => `${art} ${o.sustantivo} ${x}`
+  const deNp = (x: string) => (o.femenino ? `de la ${o.sustantivo} ${x}` : `del ${o.sustantivo} ${x}`)
+  const frase = (x: string, r: string, y: string) =>
+    o.verbo === 'es'
+      ? r === 'contrario' ? `${cap(np(x))} es lo contrario ${deNp(y)}.` : `${cap(np(x))} es igual que ${np(y)}.`
+      : `${cap(np(x))} hace ${r === 'contrario' ? 'lo contrario' : 'lo mismo'} que ${np(y)}.`
+  const pregunta = (r: string, y: string) =>
+    o.verbo === 'es'
+      ? r === 'contrario' ? `¿Qué ${o.sustantivo} es lo contrario ${deNp(y)}?` : `¿Qué ${o.sustantivo} es igual que ${np(y)}?`
+      : `¿Qué ${o.sustantivo} hace ${r === 'contrario' ? 'lo contrario' : 'lo mismo'} que ${np(y)}?`
+  const [mismo, contrario] = o.verbo === 'es' ? ['Igual', 'Lo contrario'] : ['Lo mismo', 'Lo contrario']
+  const combinatorio = (x: string, y: string) =>
+    o.verbo === 'es' ? `¿${cap(np(x))} es igual que ${np(y)} o lo contrario?` : `¿${cap(np(x))} hace lo mismo o lo contrario que ${np(y)}?`
+  const [f1, f2] = o.efecto
+  const redes = trozos.map(([a, b, c], k) => {
+    const [r1, r2] = TIPOS_OPOSICION[k]
+    const pab = (k + gi) % 2 === 0 ? frase(b, r1, a) : frase(a, r1, b)
+    const pbc = (k + gi) % 2 === 1 ? frase(c, r2, b) : frase(b, r2, c)
+    const premisas = (Math.floor(k / 2) + gi) % 2 === 0 ? `${pab} ${pbc}` : `${pbc} ${pab}`
+    const fa = (k + Math.floor(gi / 2)) % 2 === 0 ? f1 : f2
+    const igual = (r1 === 'contrario') === (r2 === 'contrario')
+    const fc = igual ? fa : fa === f1 ? f2 : f1
+    return { a, b, c, r1, r2, pab, pbc, premisas, fa, fc, igual }
+  })
+  const ordenadas = (xs: string[]) => [...xs].sort((x, y) => x.localeCompare(y, 'es'))
+  return redes.map((r, k) => {
+    const n = ctx.primerNumero + k
+    const otras = redes.filter((_, j) => j !== k)
+    const A = cap(np(r.a)), B = cap(np(r.b)), C = cap(np(r.c))
+    const okComb = r.igual ? mismo : contrario
+    const tof = `${A} ${r.fa}. ${r.premisas} ${cap(np(r.c))}, ¿${f1} o ${f2}?`
     return {
       numero: n,
       estimulos: [
-        { posicion: 'A', nombre: cap(np(a)), concepto_imagen: null },
-        { posicion: 'B', nombre: cap(np(b)), concepto_imagen: null },
-        { posicion: 'C', nombre: cap(np(c)), concepto_imagen: null },
+        { posicion: 'A', nombre: A, concepto_imagen: null },
+        { posicion: 'B', nombre: B, concepto_imagen: null },
+        { posicion: 'C', nombre: C, concepto_imagen: null },
       ],
       consignas: {
-        'entrenamiento:A→B': `${p1} ${quien(a)}`,
-        'entrenamiento:B→C': `${p2} ${quien(b)}`,
-        'test_mutuo:B→A': `${p1} ${quien(b)}`,
-        'test_mutuo:C→B': `${p2} ${quien(c)}`,
-        // Dos veces «contrario» es «lo mismo»: C hace lo mismo que A
-        'test_combinatorio:A→C': `${ambas} ${mismo(a)}`,
-        'test_combinatorio:C→A': `${ambas} ${mismo(c)}`,
-        'transformacion_funciones:A→B': `${efectoA} ${ambas} ${o.quiero[1 - pol]}. ¿Qué ${o.sustantivo} ${o.elegir}?`,
-        'transformacion_funciones:A→C': `${efectoA} ${ambas} ${o.quiero[pol]}, pero ${np(a)} no está. ¿Qué ${otro} ${o.sustantivo} ${o.elegir}?`,
+        'entrenamiento:A→B': `${r.pab} ${pregunta(r.r1, r.a)}`,
+        'entrenamiento:B→C': `${r.pbc} ${pregunta(r.r2, r.b)}`,
+        'test_mutuo:B→A': `${r.pab} ${pregunta(r.r1, r.b)}`,
+        'test_combinatorio:A→C': `${r.premisas} ${combinatorio(r.c, r.a)}`,
+        'test_combinatorio:C→A': `${r.premisas} ${combinatorio(r.a, r.c)}`,
+        'transformacion_funciones:A→C': tof,
+      },
+      respuestas_esperadas: {
+        'entrenamiento:A→B': B,
+        'entrenamiento:B→C': C,
+        'test_mutuo:B→A': A,
+        'test_combinatorio:A→C': okComb,
+        'test_combinatorio:C→A': okComb,
+        'transformacion_funciones:A→C': cap(r.fc),
+      },
+      opciones_por_fase: {
+        'entrenamiento:A→B': ordenadas([B, A, cap(np(otras[k % 3].b))]),
+        'entrenamiento:B→C': ordenadas([C, B, cap(np(otras[(k + 1) % 3].c))]),
+        'test_mutuo:B→A': ordenadas([A, B, cap(np(otras[(k + 2) % 3].a))]),
+        'test_combinatorio:A→C': [mismo, contrario],
+        'test_combinatorio:C→A': [mismo, contrario],
+        'transformacion_funciones:A→C': [cap(f1), cap(f2)],
       },
     }
   })

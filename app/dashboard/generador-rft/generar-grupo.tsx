@@ -10,11 +10,14 @@ import type { ClaseGenerada } from './plantillas'
 
 const nuevaSemilla = () => Math.random().toString(36).slice(2, 10)
 
-// «Generar grupo nuevo»: propone un grupo de 3 clases con todas sus claves, se
+// «Generar grupo nuevo»: propone un grupo (3 clases, 4 en las redes de oposición) con todas sus claves, se
 // revisa en la vista previa y se guarda como un grupo más del programa. Las
 // frases generadas no tienen voz grabada: las lee el alumno o el terapeuta
 export default function GenerarGrupo({ destino, programaId }: { destino: Destino; programaId: string }) {
   const [propuesta, setPropuesta] = useState<{ semilla: string; grupo: string; clases: ClaseGenerada[] } | null>(null)
+  // Edición a mano de las frases: número de clase → clave → texto
+  const [editando, setEditando] = useState(false)
+  const [cambios, setCambios] = useState<Record<number, Record<string, string>>>({})
   const [pendiente, iniciar] = useTransition()
   const toast = useToast()
   const router = useRouter()
@@ -24,13 +27,17 @@ export default function GenerarGrupo({ destino, programaId }: { destino: Destino
       const semilla = nuevaSemilla()
       const r = await proponerGrupo(destino, programaId, semilla)
       if ('error' in r) toast(r.error, 'error')
-      else setPropuesta({ semilla, ...r })
+      else {
+        setPropuesta({ semilla, ...r })
+        setCambios({})
+        setEditando(false)
+      }
     })
 
   const guardar = () =>
     iniciar(async () => {
       if (!propuesta) return
-      const r = await guardarGrupoGenerado(destino, programaId, propuesta.semilla)
+      const r = await guardarGrupoGenerado(destino, programaId, propuesta.semilla, cambios)
       if ('error' in r && r.error) {
         toast(r.error, 'error')
         return
@@ -55,6 +62,15 @@ export default function GenerarGrupo({ destino, programaId }: { destino: Destino
         <p className="text-xs text-slate-500">
           Revisa las frases. Al guardar se crea como un grupo más del programa. No tiene voz grabada: lo lee el alumno o el terapeuta.
         </p>
+        <button type="button" onClick={() => setEditando((v) => !v)} className="mt-1 text-sm font-medium text-indigo-700 hover:text-indigo-900">
+          {editando ? 'Terminar de editar' : '✏️ Editar frases'}
+        </button>
+        {editando && (
+          <p className="mt-1 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            Puede cambiar cómo está dicha cada frase (nombres, palabras, situación), pero la respuesta correcta y las opciones no cambian:
+            compruebe que la frase sigue llevando a la misma respuesta.
+          </p>
+        )}
       </div>
       {propuesta.clases.map((c) => (
         <div key={c.numero} className="space-y-1 rounded-xl bg-white p-3 text-sm">
@@ -74,8 +90,18 @@ export default function GenerarGrupo({ destino, programaId }: { destino: Destino
                   <span className="text-xs font-medium text-slate-400">
                     {NOMBRE_FASE_SECUENCIA[fase as FaseSecuencia] ?? fase} {relacion}
                   </span>{' '}
-                  «{frase}»
+                  {editando ? (
+                    <textarea
+                      value={cambios[c.numero]?.[clave] ?? frase}
+                      onChange={(e) => setCambios((prev) => ({ ...prev, [c.numero]: { ...prev[c.numero], [clave]: e.target.value } }))}
+                      rows={2}
+                      className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1 text-sm"
+                    />
+                  ) : (
+                    <>«{cambios[c.numero]?.[clave] ?? frase}»</>
+                  )}
                   {c.respuestas_esperadas?.[clave] && <span className="text-xs text-slate-400"> → {c.respuestas_esperadas[clave]}</span>}
+                  {c.opciones_por_fase?.[clave] && <span className="text-xs text-slate-400"> (opciones: {c.opciones_por_fase[clave].join(' · ')})</span>}
                 </li>
               )
             })}
