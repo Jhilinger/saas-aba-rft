@@ -86,13 +86,16 @@ export default async function AlumnoPage({
   for (const r of requisitos ?? []) {
     requisitosDe.set(r.programa_base_id, [...(requisitosDe.get(r.programa_base_id) ?? []), r.requisito_id])
   }
+  // Alumno sin ningún progreso todavía: no se avisan los requisitos previos
+  // (saldría el aviso en casi todos los programas), igual que la secuencia
+  const sinProgreso = progreso.niveles.every((n) => !n.porcentaje && n.dominios.every((d) => !d.porcentaje))
   const opcionesBase = (programasBase ?? [])
     .map((p) => ({
       ...p,
       codigo: codificador.codigo(p),
       ordenGlobal: codificador.ordenGlobal(p),
       avisoSecuencia: p.dominio_id ? (avisosSecuencia.get(p.dominio_id) ?? null) : null,
-      requisitosPendientes: (requisitosDe.get(p.id) ?? [])
+      requisitosPendientes: sinProgreso ? [] : (requisitosDe.get(p.id) ?? [])
         .filter((r) => !dominados.has(r) && nombrePrograma.has(r))
         .map((r) => nombrePrograma.get(r)!),
       situacion: enPei.has(p.id)
