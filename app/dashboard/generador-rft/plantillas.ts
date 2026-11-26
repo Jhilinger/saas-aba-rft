@@ -12,6 +12,7 @@ import {
   COLORES,
   RASGOS,
   CONTEXTOS_DISTINCION,
+  DEICTICOS,
   DIMENSIONES,
   DISTINCION,
   LADO,
@@ -709,6 +710,92 @@ const jerarquiaRed: Plantilla = (ctx) => {
   })
 }
 
+// ---------------------------------------------------------------- Deícticas (4.1)
+// Protocolo de Barnes-Holmes y McHugh (Heagle y Rehfeldt, 2006) con
+// transformación de funciones (PEAK-T): cada escena se pregunta por «yo» y por
+// «tú» (o «ahora» y «antes»), los estímulos se intercambian en los grupos impares
+// y la clave temporal alterna «ahora/antes» y «hoy/ayer». Opciones en orden fijo
+// por estímulo (la correcta cambia de posición). El grupo recorre los juegos de
+// estímulos de DEICTICOS a partir de los que ya tiene el programa (4 del currículo)
+type ClaseDeictica = { consigna: string; ok: string; opciones: string[]; tof: boolean }
+const TU_YO = 'Si yo fuera tú y tú fueras yo'
+const AQUI = 'si aquí fuera allí y allí fuera aquí'
+const TIEMPO: [string, string, string, string][] = [
+  ['Antes', 'ahora', 'antes', 'si ahora fuera antes y antes fuera ahora'],
+  ['Ayer', 'hoy', 'ayer', 'si hoy fuera ayer y ayer fuera hoy'],
+]
+const enLugar = (l: string) => (l.startsWith('el ') ? `en el ${l.slice(3)}` : `en ${l}`)
+const objetoSinArticulo = (s: string) => cap(sinArticulo(s))
+const alfabetico = (xs: string[]) => [...xs].sort((x, y) => x.localeCompare(y, 'es'))
+function escenaDeictica(gi: number) {
+  const g = DEICTICOS[gi % DEICTICOS.length]
+  let [a, b] = g.obj, [la, lb] = g.lug, [A, B] = g.act
+  let [s, x] = g.tof
+  let [estado1, estado2] = [g.tof[3], g.tof[4]]
+  if (gi % 2) {
+    ;[a, b, la, lb, A, B, s, x] = [b, a, lb, la, B, A, x, s]
+    ;[estado1, estado2] = [estado2, estado1]
+  }
+  const [Antes, ahora, antes, HOY] = TIEMPO[gi % 2]
+  const O = alfabetico([objetoSinArticulo(a), objetoSinArticulo(b)])
+  const L = alfabetico([objetoSinArticulo(la), objetoSinArticulo(lb)])
+  const T = alfabetico([A[0], B[0]])
+  const estados = alfabetico([g.tof[3], g.tof[4]])
+  return { g, a, b, la, lb, A, B, s, x, estado1, estado2, Antes, ahora, antes, HOY, O, L, T, estados }
+}
+const deicticasSimples = (gi: number): ClaseDeictica[] => {
+  const e = escenaDeictica(gi)
+  return [
+    { consigna: `Yo tengo ${e.a} y tú ${e.b}. ¿Cuál tengo yo?`, ok: objetoSinArticulo(e.a), opciones: e.O, tof: false },
+    { consigna: `Yo tengo ${e.a} y tú ${e.b}. ¿Cuál tienes tú?`, ok: objetoSinArticulo(e.b), opciones: e.O, tof: false },
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ¿Dónde estoy yo?`, ok: objetoSinArticulo(e.la), opciones: e.L, tof: false },
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ¿Dónde estás tú?`, ok: objetoSinArticulo(e.lb), opciones: e.L, tof: false },
+    { consigna: `${e.Antes} yo ${e.A[1]}; ${e.ahora} ${e.B[3]}. ¿Qué hago ${e.ahora}?`, ok: e.B[0], opciones: e.T, tof: false },
+    { consigna: `${e.Antes} tú ${e.A[2]}; ${e.ahora} ${e.B[4]}. ¿Qué hacías ${e.antes}?`, ok: e.A[0], opciones: e.T, tof: false },
+    { consigna: `Yo estoy aquí ${e.s} y tú allí ${e.x}. ${e.g.tof[5]}`, ok: e.estado1 === e.g.tof[3] ? 'Yo' : 'Tú', opciones: ['Tú', 'Yo'], tof: true },
+  ]
+}
+const deicticasInvertidas = (gi: number): ClaseDeictica[] => {
+  const e = escenaDeictica(gi)
+  return [
+    { consigna: `Yo tengo ${e.a} y tú ${e.b}. ${TU_YO}, ¿cuál tendría yo?`, ok: objetoSinArticulo(e.b), opciones: e.O, tof: false },
+    { consigna: `Yo tengo ${e.a} y tú ${e.b}. ${TU_YO}, ¿cuál tendrías tú?`, ok: objetoSinArticulo(e.a), opciones: e.O, tof: false },
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ${cap(AQUI)}, ¿dónde estaría yo?`, ok: objetoSinArticulo(e.lb), opciones: e.L, tof: false },
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ${cap(AQUI)}, ¿dónde estarías tú?`, ok: objetoSinArticulo(e.la), opciones: e.L, tof: false },
+    { consigna: `${e.Antes} yo ${e.A[1]}; ${e.ahora} ${e.B[3]}. ${cap(e.HOY)}, ¿qué estaría haciendo ${e.ahora}?`, ok: e.A[0], opciones: e.T, tof: false },
+    { consigna: `${e.Antes} tú ${e.A[2]}; ${e.ahora} ${e.B[4]}. ${cap(e.HOY)}, ¿qué habrías hecho ${e.antes}?`, ok: e.B[0], opciones: e.T, tof: false },
+    { consigna: `Yo estoy aquí ${e.s} y tú allí ${e.x}. ${TU_YO}, ${e.g.tof[2]}`, ok: e.estado2, opciones: e.estados, tof: true },
+  ]
+}
+const deicticasDobles = (gi: number): ClaseDeictica[] => {
+  const e = escenaDeictica(gi)
+  return [
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ${TU_YO}, y ${AQUI}, ¿dónde estaría yo?`, ok: objetoSinArticulo(e.la), opciones: e.L, tof: false },
+    { consigna: `Yo estoy aquí, ${enLugar(e.la)}, y tú allí, ${enLugar(e.lb)}. ${TU_YO}, y ${AQUI}, ¿dónde estarías tú?`, ok: objetoSinArticulo(e.lb), opciones: e.L, tof: false },
+    { consigna: `${e.Antes} yo estaba allí, ${enLugar(e.la)}; ${e.ahora} estoy aquí, ${enLugar(e.lb)}. ${cap(AQUI)}, y ${e.HOY}, ¿dónde estaría ${e.ahora}?`, ok: objetoSinArticulo(e.lb), opciones: e.L, tof: false },
+    { consigna: `${e.Antes} yo estaba allí, ${enLugar(e.la)}; ${e.ahora} estoy aquí, ${enLugar(e.lb)}. ${cap(AQUI)}, y ${e.HOY}, ¿dónde habría estado ${e.antes}?`, ok: objetoSinArticulo(e.la), opciones: e.L, tof: false },
+    { consigna: `Yo estoy aquí ${e.s} y tú allí ${e.x}. ${TU_YO}, y ${AQUI}, ${e.g.tof[2]}`, ok: e.estado1, opciones: e.estados, tof: true },
+  ]
+}
+// Escena (A) y respuesta (B en entrenamiento, C en la transformación)
+const plantillaDeictica = (clasesDe: (gi: number) => ClaseDeictica[], porGrupo: number): Plantilla => (ctx) => {
+  const gi = Math.floor((ctx.primerNumero - 1) / porGrupo)
+  return clasesDe(gi).map((c, k) => {
+    const clave = c.tof ? 'transformacion_funciones:A→C' : 'entrenamiento:A→B'
+    const escena = c.consigna.slice(0, c.consigna.lastIndexOf('. ') + 1) || c.consigna
+    return {
+      numero: ctx.primerNumero + k,
+      estimulos: [
+        { posicion: 'A', nombre: escena, concepto_imagen: null },
+        { posicion: c.tof ? 'C' : 'B', nombre: c.ok, concepto_imagen: null },
+      ],
+      consignas: { [clave]: c.consigna },
+      respuestas_esperadas: { [clave]: c.ok },
+      opciones_por_fase: { [clave]: c.opciones },
+    }
+  })
+}
+
 // Programas con generador (por nombre del programa del currículo)
 const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones de Comparación': comparacionMutua,
@@ -724,6 +811,9 @@ const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones Condicionales': condicionalMutua,
   'Vincular Mutuamente Relaciones Jerárquicas': jerarquiaMutua,
   'Derivar Relaciones Jerárquicas en Redes Combinatorias': jerarquiaRed,
+  'Relaciones Deícticas Simples': plantillaDeictica(deicticasSimples, 7),
+  'Relaciones Deícticas Invertidas': plantillaDeictica(deicticasInvertidas, 7),
+  'Relaciones Deícticas Doblemente Invertidas': plantillaDeictica(deicticasDobles, 5),
 }
 
 export function tienePlantilla(nombrePrograma: string) {

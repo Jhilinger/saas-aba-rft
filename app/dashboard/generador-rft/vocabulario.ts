@@ -283,3 +283,62 @@ export const RASGOS: [string, string][] = [
   ['simpático', 'simpáticos'],
   ['tímido', 'tímidos'],
 ]
+
+// ---------------------------------------------------------------- Deícticas
+// Juegos de estímulos de las escenas deícticas (protocolo de Barnes-Holmes y
+// McHugh): dos objetos, dos lugares, dos actividades (infinitivo; yo antes; tú
+// antes; yo ahora; tú ahora; yo estaría; tú estarías; yo habría; tú habrías) y
+// una consecuencia (lugar con el estado 1, lugar con el estado 2, pregunta
+// invertida, estado 1, estado 2, «¿Quién…?» por el estado 1). Los 4 primeros son
+// los del currículo; el generador los recorre por grupo
+type Actividad = [string, string, string, string, string, string, string, string, string]
+export const DEICTICOS: { obj: [string, string]; lug: [string, string]; act: [Actividad, Actividad]; tof: [string, string, string, string, string, string] }[] = [
+  {
+    obj: ['el bloque rojo', 'el bloque verde'], lug: ['la silla azul', 'la silla negra'],
+    act: [['Ver la tele', 'veía la tele', 'veías la tele', 'veo la tele', 'ves la tele', 'estaría viendo la tele', 'estarías viendo la tele', 'habría visto la tele', 'habrías visto la tele'],
+      ['Leer un cuento', 'leía un cuento', 'leías un cuento', 'leo un cuento', 'lees un cuento', 'estaría leyendo un cuento', 'estarías leyendo un cuento', 'habría leído un cuento', 'habrías leído un cuento']],
+    tof: ['al sol', 'a la sombra', '¿tendría calor o fresco?', 'Calor', 'Fresco', '¿Quién tiene calor?'],
+  },
+  {
+    obj: ['el lápiz amarillo', 'el lápiz naranja'], lug: ['el sofá rosa', 'el sofá morado'],
+    act: [['Pintar', 'pintaba', 'pintabas', 'pinto', 'pintas', 'estaría pintando', 'estarías pintando', 'habría pintado', 'habrías pintado'],
+      ['Cantar', 'cantaba', 'cantabas', 'canto', 'cantas', 'estaría cantando', 'estarías cantando', 'habría cantado', 'habrías cantado']],
+    tof: ['bajo la lluvia sin paraguas', 'bajo el tejado', '¿estaría mojado o seco?', 'Mojado', 'Seco', '¿Quién está mojado?'],
+  },
+  {
+    obj: ['el vaso de agua', 'el vaso de zumo'], lug: ['la alfombra', 'el cojín'],
+    act: [['Bailar', 'bailaba', 'bailabas', 'bailo', 'bailas', 'estaría bailando', 'estarías bailando', 'habría bailado', 'habrías bailado'],
+      ['Jugar a la pelota', 'jugaba a la pelota', 'jugabas a la pelota', 'juego a la pelota', 'juegas a la pelota', 'estaría jugando a la pelota', 'estarías jugando a la pelota', 'habría jugado a la pelota', 'habrías jugado a la pelota']],
+    tof: ['con la mochila llena de libros', 'con la mochila vacía', '¿me pesaría mucho o poco la mochila?', 'Mucho', 'Poco', '¿A quién le pesa mucho la mochila?'],
+  },
+  {
+    obj: ['la pelota', 'el muñeco'], lug: ['el columpio', 'el tobogán'],
+    act: [['Comer macarrones', 'comía macarrones', 'comías macarrones', 'como macarrones', 'comes macarrones', 'estaría comiendo macarrones', 'estarías comiendo macarrones', 'habría comido macarrones', 'habrías comido macarrones'],
+      ['Comer pizza', 'comía pizza', 'comías pizza', 'como pizza', 'comes pizza', 'estaría comiendo pizza', 'estarías comiendo pizza', 'habría comido pizza', 'habrías comido pizza']],
+    tof: ['al lado de la música muy alta', 'lejos de la música', '¿oiría mucho ruido o poco?', 'Mucho', 'Poco', '¿Quién oye mucho ruido?'],
+  },
+  {
+    obj: ['el coche azul', 'el coche blanco'], lug: ['la mesa grande', 'la mesa pequeña'],
+    act: [['Dibujar', 'dibujaba', 'dibujabas', 'dibujo', 'dibujas', 'estaría dibujando', 'estarías dibujando', 'habría dibujado', 'habrías dibujado'],
+      ['Escuchar música', 'escuchaba música', 'escuchabas música', 'escucho música', 'escuchas música', 'estaría escuchando música', 'estarías escuchando música', 'habría escuchado música', 'habrías escuchado música']],
+    tof: ['junto a la estufa', 'junto a la ventana abierta', '¿tendría calor o frío?', 'Calor', 'Frío', '¿Quién tiene calor?'],
+  },
+  {
+    obj: ['la gorra roja', 'la gorra azul'], lug: ['el banco', 'la hamaca'],
+    act: [['Saltar', 'saltaba', 'saltabas', 'salto', 'saltas', 'estaría saltando', 'estarías saltando', 'habría saltado', 'habrías saltado'],
+      ['Correr', 'corría', 'corrías', 'corro', 'corres', 'estaría corriendo', 'estarías corriendo', 'habría corrido', 'habrías corrido']],
+    tof: ['con los ojos tapados', 'con los ojos abiertos', '¿vería algo o nada?', 'Nada', 'Algo', '¿Quién no ve nada?'],
+  },
+  {
+    obj: ['la taza grande', 'la taza pequeña'], lug: ['la cocina', 'el salón'],
+    act: [['Merendar', 'merendaba', 'merendabas', 'meriendo', 'meriendas', 'estaría merendando', 'estarías merendando', 'habría merendado', 'habrías merendado'],
+      ['Hacer los deberes', 'hacía los deberes', 'hacías los deberes', 'hago los deberes', 'haces los deberes', 'estaría haciendo los deberes', 'estarías haciendo los deberes', 'habría hecho los deberes', 'habrías hecho los deberes']],
+    tof: ['junto al bebé dormido', 'en la otra habitación', '¿tendría que hablar bajito o podría hablar alto?', 'Bajito', 'Alto', '¿Quién tiene que hablar bajito?'],
+  },
+  {
+    obj: ['el cuento de piratas', 'el cuento de dragones'], lug: ['la cama', 'la butaca'],
+    act: [['Nadar', 'nadaba', 'nadabas', 'nado', 'nadas', 'estaría nadando', 'estarías nadando', 'habría nadado', 'habrías nadado'],
+      ['Montar en bici', 'montaba en bici', 'montabas en bici', 'monto en bici', 'montas en bici', 'estaría montando en bici', 'estarías montando en bici', 'habría montado en bici', 'habrías montado en bici']],
+    tof: ['con las manos llenas de pintura', 'con las manos limpias', '¿tendría las manos sucias o limpias?', 'Sucias', 'Limpias', '¿Quién tiene las manos sucias?'],
+  },
+]
