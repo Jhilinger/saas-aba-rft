@@ -1,41 +1,41 @@
 import type { NivelProgreso } from '../alumnos/[id]/progreso/progreso-curriculo'
 
-// Secuencia del currículo en el PEI: no se asignan programas de un dominio si
+// Secuencia del currículo en el PEI: AVISA (no bloquea) cuando se asigna un
+// programa de un dominio y
 // - el nivel anterior no alcanza UMBRAL_NIVEL (media de sus dominios), o
 // - el dominio anterior del mismo nivel no alcanza UMBRAL_DOMINIO.
 // Los porcentajes son los mismos de la página de progreso. Los niveles y
 // dominios sin programas se saltan (cuenta el anterior que sí tenga).
-// El clinica_admin puede saltarse la regla con una justificación.
+// Antes era un bloqueo; desde el 2026-11-26 es solo un aviso: la app es para
+// cualquier niño (también con desarrollo típico, que puede empezar en el nivel 3)
 export const UMBRAL_NIVEL = 80
 export const UMBRAL_DOMINIO = 80
 
-export const ROLES_EXCEPCION_SECUENCIA = ['clinica_admin', 'superadmin']
-
-// dominio_id → motivo del bloqueo (los dominios sin bloqueo no aparecen)
-export function calcularBloqueos(niveles: NivelProgreso[]): Map<string, string> {
-  const bloqueos = new Map<string, string>()
+// dominio_id → aviso (los dominios sin aviso no aparecen)
+export function calcularAvisosSecuencia(niveles: NivelProgreso[]): Map<string, string> {
+  const avisos = new Map<string, string>()
 
   niveles.forEach((nivel, i) => {
     const nivelPrevio = niveles.slice(0, i).reverse().find((n) => n.porcentaje !== null)
-    const motivoNivel =
+    const avisoNivel =
       nivelPrevio && nivelPrevio.porcentaje! < UMBRAL_NIVEL
-        ? `Requiere el Nivel ${nivelPrevio.numero} al ${UMBRAL_NIVEL}% (ahora ${nivelPrevio.porcentaje}%)`
+        ? `El Nivel ${nivelPrevio.numero} está al ${nivelPrevio.porcentaje}%: se recomienda consolidarlo antes (${UMBRAL_NIVEL}%)`
         : null
 
     nivel.dominios.forEach((dominio, j) => {
-      if (motivoNivel) {
-        bloqueos.set(dominio.id, motivoNivel)
+      if (avisoNivel) {
+        avisos.set(dominio.id, avisoNivel)
         return
       }
       const dominioPrevio = nivel.dominios.slice(0, j).reverse().find((d) => d.porcentaje !== null)
       if (dominioPrevio && dominioPrevio.porcentaje! < UMBRAL_DOMINIO) {
-        bloqueos.set(
+        avisos.set(
           dominio.id,
-          `Requiere el dominio ${dominioPrevio.codigo} al ${UMBRAL_DOMINIO}% (ahora ${dominioPrevio.porcentaje}%)`
+          `El dominio ${dominioPrevio.codigo} está al ${dominioPrevio.porcentaje}%: se recomienda consolidarlo antes (${UMBRAL_DOMINIO}%)`
         )
       }
     })
   })
 
-  return bloqueos
+  return avisos
 }

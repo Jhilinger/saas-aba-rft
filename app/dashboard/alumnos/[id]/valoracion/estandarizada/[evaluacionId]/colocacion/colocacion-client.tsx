@@ -43,19 +43,15 @@ export default function ColocacionClient({
   alumnoId,
   evaluacionId,
   aplicadaAt,
-  nivelInicio,
   filas,
   propuestos,
-  bloqueados,
   soloLectura = false,
 }: {
   alumnoId: string
   evaluacionId: string
   aplicadaAt: string | null
-  nivelInicio: number | null
   filas: FilaColocacion[]
   propuestos: ProgramaPropuesto[]
-  bloqueados: number
   // Aplica la evaluación cualquier terapeuta; la colocación la decide quien diseña
   soloLectura?: boolean
 }) {
@@ -173,19 +169,11 @@ export default function ColocacionClient({
           <div>
             <p className="font-semibold text-slate-800">2. Programas para empezar</p>
             <p className="text-sm text-slate-500">
-              Primero los emergentes (parcial) y después los no adquiridos, en el orden del currículo; solo de dominios
-              desbloqueados y con los requisitos dominados.
+              Primero los emergentes (parcial) y después los no adquiridos, en el orden del currículo, con los requisitos
+              dominados.
             </p>
           </div>
 
-          {bloqueados > 0 && (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-              {bloqueados} programas evaluados como no o parcial están en dominios bloqueados por la secuencia del
-              currículo.
-              {nivelInicio !== null && nivelInicio > 1 &&
-                ` Los niveles por debajo del ${nivelInicio} no se evaluaron: márcalos en Punto de partida o usa la excepción de secuencia.`}
-            </p>
-          )}
 
           {propuestos.length === 0 ? (
             <p className="text-sm text-slate-500">No hay programas disponibles para proponer.</p>

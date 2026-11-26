@@ -16,8 +16,8 @@ type ProgramaBase = {
   clinica_id: string | null
   visibilidad: string
   creado_por: string
-  // Motivo si la secuencia del currículo bloquea su dominio para este alumno
-  bloqueo: string | null
+  // Aviso si el nivel o dominio anterior no está consolidado (no bloquea)
+  avisoSecuencia: string | null
   // Requisitos previos que el alumno todavía no domina (solo avisan)
   requisitosPendientes: string[]
   // Ya en el PEI o dominado (PEI o valoración): no tiene sentido importarlo
@@ -41,30 +41,24 @@ const FUENTES: { key: Fuente; label: string }[] = [
 type Grupo = { clave: string; titulo: string; subtitulo?: string; programas: ProgramaBase[] }
 
 // Importador del PEI: panel desplegable con la lista de programas que se
-// pueden añadir (fuera del PEI, no dominados y, salvo que se pidan, no
-// bloqueados por la secuencia), agrupados como el resto de la app
+// pueden añadir (fuera del PEI y no dominados), agrupados como el resto de la
+// app. La secuencia del currículo y los requisitos previos solo avisan
 export default function AsignarProgramaForm({
   alumnoId,
   programasBase,
   niveles,
   miPerfilId,
-  puedeForzar,
   abiertoInicial,
 }: {
   alumnoId: string
   programasBase: ProgramaBase[]
   niveles: Nivel[]
   miPerfilId: string
-  // clinica_admin/superadmin: puede asignar bloqueados con justificación
-  puedeForzar: boolean
   abiertoInicial: boolean
 }) {
   const [abierto, setAbierto] = useState(abiertoInicial)
   const [fuente, setFuente] = useState<Fuente>('base')
-  const [mostrarBloqueados, setMostrarBloqueados] = useState(false)
   const [importandoId, setImportandoId] = useState<string | null>(null)
-  const [excepcionId, setExcepcionId] = useState<string | null>(null)
-  const [justificacion, setJustificacion] = useState('')
   const [, startTransition] = useTransition()
   const router = useRouter()
   const toast = useToast()
@@ -78,8 +72,7 @@ export default function AsignarProgramaForm({
   const candidatos = listaDeFuente.filter((p) => p.situacion === 'disponible')
   const numEnPei = listaDeFuente.filter((p) => p.situacion === 'en_pei').length
   const numDominados = listaDeFuente.filter((p) => p.situacion === 'dominado').length
-  const numBloqueados = candidatos.filter((p) => p.bloqueo).length
-  const visibles = candidatos.filter((p) => mostrarBloqueados || !p.bloqueo)
+  const visibles = candidatos
 
   // Currículo: por nivel y dominio. Complementarios: por área.
   const grupos: Grupo[] = useMemo(() => {
@@ -109,18 +102,16 @@ export default function AsignarProgramaForm({
       }))
   }, [fuente, niveles, visibles])
 
-  const importar = (p: ProgramaBase, conJustificacion?: string) => {
+  const importar = (p: ProgramaBase) => {
     setImportandoId(p.id)
     startTransition(async () => {
-      const res = await importarPrograma(alumnoId, p.id, conJustificacion)
+      const res = await importarPrograma(alumnoId, p.id)
       setImportandoId(null)
       if (res.error) {
         toast(res.error, 'error')
         return
       }
       toast(`"${p.nombre}" añadido al PEI`, 'exito')
-      setExcepcionId(null)
-      setJustificacion('')
       router.refresh()
     })
   }
@@ -146,10 +137,7 @@ export default function AsignarProgramaForm({
         {FUENTES.map((f) => (
           <button
             key={f.key}
-            onClick={() => {
-              setFuente(f.key)
-              setExcepcionId(null)
-            }}
+            onClick={() => setFuente(f.key)}
             className={`rounded-lg px-3 py-1.5 font-medium ${
               fuente === f.key ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200'
             }`}
@@ -166,21 +154,7 @@ export default function AsignarProgramaForm({
           </strong>
           {numEnPei > 0 && ` · ${numEnPei} ya en el PEI`}
           {numDominados > 0 && ` · ${numDominados} ${numDominados === 1 ? 'dominado' : 'dominados'}`}
-          {numBloqueados > 0 && !mostrarBloqueados && ` · 🔒 ${numBloqueados} ${numBloqueados === 1 ? 'bloqueado' : 'bloqueados'}`}
         </p>
-        {numBloqueados > 0 && (
-          <label className="flex items-center gap-1.5">
-            <input
-              type="checkbox"
-              checked={mostrarBloqueados}
-              onChange={(e) => {
-                setMostrarBloqueados(e.target.checked)
-                setExcepcionId(null)
-              }}
-            />
-            Mostrar bloqueados ({numBloqueados})
-          </label>
-        )}
       </div>
 
       {grupos.map((g) => (
@@ -195,64 +169,23 @@ export default function AsignarProgramaForm({
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   {p.codigo && <span className="w-14 shrink-0 font-mono text-xs text-slate-500">{p.codigo}</span>}
                   <span className="min-w-0 flex-1 text-slate-800">
-                    {p.bloqueo && '🔒 '}
                     {p.nombre}
                     <span className="ml-2 text-xs text-slate-400">{p.tipo === 'rft' ? 'Relacional' : 'Directo'}</span>
                   </span>
-                  {!p.bloqueo ? (
-                    <Button
-                      variant="secondary"
-                      onClick={() => importar(p)}
-                      disabled={importandoId !== null}
-                      className="px-3 py-1.5 text-xs font-medium"
-                    >
-                      {importandoId === p.id ? 'Añadiendo...' : 'Añadir'}
-                    </Button>
-                  ) : puedeForzar && excepcionId !== p.id ? (
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setExcepcionId(p.id)
-                        setJustificacion('')
-                      }}
-                      className="px-3 py-1.5 text-xs font-medium"
-                    >
-                      Añadir con excepción
-                    </Button>
-                  ) : null}
+                  <Button
+                    variant="secondary"
+                    onClick={() => importar(p)}
+                    disabled={importandoId !== null}
+                    className="px-3 py-1.5 text-xs font-medium"
+                  >
+                    {importandoId === p.id ? 'Añadiendo...' : 'Añadir'}
+                  </Button>
                 </div>
-                {p.bloqueo && <p className="text-xs text-amber-700">{p.bloqueo}.</p>}
+                {p.avisoSecuencia && <p className="text-xs text-amber-700">⚠ {p.avisoSecuencia}.</p>}
                 {p.requisitosPendientes.length > 0 && (
                   <p className="text-xs text-amber-700">
                     ⚠ Requisitos previos sin dominar: {p.requisitosPendientes.join(' · ')}
                   </p>
-                )}
-                {excepcionId === p.id && (
-                  <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                    <label className="block space-y-1">
-                      <span className="text-xs font-semibold text-slate-700">Justificación clínica (obligatoria)</span>
-                      <textarea
-                        value={justificacion}
-                        onChange={(e) => setJustificacion(e.target.value)}
-                        rows={2}
-                        autoFocus
-                        placeholder="ej. Lo domina en contexto natural; se trabaja para generalizar"
-                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base sm:text-sm"
-                      />
-                    </label>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => importar(p, justificacion)}
-                        disabled={!justificacion.trim() || importandoId !== null}
-                        className="px-3 py-1.5 text-xs"
-                      >
-                        {importandoId === p.id ? 'Añadiendo...' : 'Añadir con excepción'}
-                      </Button>
-                      <Button variant="secondary" onClick={() => setExcepcionId(null)} className="px-3 py-1.5 text-xs">
-                        Cancelar
-                      </Button>
-                    </div>
-                  </div>
                 )}
               </li>
             ))}
@@ -268,18 +201,14 @@ export default function AsignarProgramaForm({
               : fuente === 'clinica'
                 ? 'Tu clínica todavía no tiene programas propios. Créalos desde "Programas de la clínica".'
                 : 'Todavía no has creado programas propios. Créalos desde "Mis programas".'
-            : numBloqueados > 0
-              ? 'No hay programas disponibles ahora mismo: los que quedan están bloqueados hasta que el alumno consiga el nivel o dominio anterior.'
-              : 'No quedan programas por añadir: todos están ya en el PEI o dominados.'}
+            : 'No quedan programas por añadir: todos están ya en el PEI o dominados.'}
         </p>
       )}
 
-      {numBloqueados > 0 && !puedeForzar && mostrarBloqueados && (
-        <p className="text-xs text-slate-500">
-          Los programas con 🔒 se desbloquean cuando el alumno consigue el nivel o dominio anterior. Si hay un motivo
-          clínico para adelantarlos, el administrador de la clínica puede añadirlos con una justificación.
-        </p>
-      )}
+      <p className="text-xs text-slate-500">
+        Los avisos ⚠ son recomendaciones: el nivel o dominio anterior, o los requisitos previos, aún no están consolidados. Puede
+        añadir el programa igualmente si el alumno está preparado (por ejemplo, un niño con desarrollo típico que empieza en el nivel 3).
+      </p>
     </div>
   )
 }

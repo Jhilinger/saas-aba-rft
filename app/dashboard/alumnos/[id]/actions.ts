@@ -4,17 +4,14 @@ import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar, SIN_PERMISO_DISENO } from '../../permisos'
 import { revalidatePath } from 'next/cache'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../curriculo/estructura'
-import { calcularBloqueos, ROLES_EXCEPCION_SECUENCIA } from '../../curriculo/secuencia'
-import { cargarProgresoAlumno } from './progreso/cargar-progreso'
 
 type TipoPrograma = 'aba_clasico' | 'rft' | 'conducta'
 
 // Importa un programa (del Currículo base, Programas de la clínica o Mis programas
 // — los 3 viven en la misma tabla programas_base): copia sus conjuntos y
 // estímulos (solo aplica de verdad a ABA; en RFT solo se copian los metadatos)
-// Si el dominio del programa está bloqueado por la secuencia del currículo,
-// solo el clinica_admin/superadmin puede importarlo, con justificación.
-export async function importarPrograma(alumnoId: string, programaBaseId: string, justificacion?: string) {
+// La secuencia del currículo solo avisa en el selector del PEI: no bloquea.
+export async function importarPrograma(alumnoId: string, programaBaseId: string) {
   const supabase = await createClient()
   if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
   const { data: { user } } = await supabase.auth.getUser()
@@ -33,25 +30,6 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
   const estructura = await cargarEstructuraCurriculo(supabase)
   // orden en el alumno = clave global del currículo (nivel, dominio, posición)
   const ordenGlobal = crearCodificador(estructura).ordenGlobal(base)
-
-  let excepcion: { excepcion_secuencia: string; excepcion_por: string } | null = null
-  if (base.dominio_id) {
-    const { data: alumno } = await supabase.from('alumnos').select('id, clinica_id').eq('id', alumnoId).single()
-    if (!alumno) return { error: 'Alumno no encontrado' }
-
-    const { niveles } = await cargarProgresoAlumno(supabase, alumno, estructura)
-    const motivo = calcularBloqueos(niveles).get(base.dominio_id)
-    if (motivo) {
-      const texto = justificacion?.trim()
-      if (!texto) return { error: `"${base.nombre}" está bloqueado: ${motivo}.` }
-
-      const { data: perfil } = await supabase.from('perfiles').select('rol').eq('id', user.id).single()
-      if (!perfil || !ROLES_EXCEPCION_SECUENCIA.includes(perfil.rol)) {
-        return { error: 'Solo el administrador de la clínica puede saltarse la secuencia del currículo.' }
-      }
-      excepcion = { excepcion_secuencia: texto, excepcion_por: user.id }
-    }
-  }
 
   const { data: programaAlumno, error: insertError } = await supabase
     .from('programas_alumno')
@@ -82,7 +60,6 @@ export async function importarPrograma(alumnoId: string, programaBaseId: string,
       actividad_tablet: base.actividad_tablet,
       opciones_clase: base.opciones_clase,
       alternar_ejemplares: base.alternar_ejemplares,
-      ...excepcion,
     })
     .select('id')
     .single()

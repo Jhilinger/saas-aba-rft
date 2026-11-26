@@ -58,19 +58,18 @@ export function notaColocacion(fecha: string, evidencias: Evidencia[]) {
 export const MAX_PROPUESTA = 8
 
 // Programas para empezar: primero los emergentes (parcial), después los no
-// adquiridos, en el orden del currículo; solo de dominios desbloqueados, con
-// los requisitos dominados y que no estén ya en el PEI
+// adquiridos, en el orden del currículo; con los requisitos dominados y que
+// no estén ya en el PEI (la secuencia del currículo ya no bloquea)
 export function proponerProgramas(
   programas: { id: string; ordenGlobal: number | null; dominioId: string | null }[],
   valoraciones: Map<string, Valoracion>,
-  opciones: { enPei: Set<string>; dominados: Set<string>; bloqueos: Map<string, string>; requisitosDe: Map<string, string[]> }
+  opciones: { enPei: Set<string>; dominados: Set<string>; requisitosDe: Map<string, string[]> }
 ): string[] {
   const prioridad = (v: Valoracion | undefined) => (v === 'parcial' ? 0 : v === 'no' ? 1 : null)
   return programas
     .filter((p) => {
       if (prioridad(valoraciones.get(p.id)) === null || p.ordenGlobal === null) return false
       if (opciones.enPei.has(p.id) || opciones.dominados.has(p.id)) return false
-      if (p.dominioId && opciones.bloqueos.has(p.dominioId)) return false
       return (opciones.requisitosDe.get(p.id) ?? []).every((r) => opciones.dominados.has(r))
     })
     .sort(

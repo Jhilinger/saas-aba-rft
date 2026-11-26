@@ -180,8 +180,8 @@ export async function prepararSesion(alumnoId: string, claveModulo: string): Pro
     for (const baseId of ordenBases) {
       let copia = datos.copias.find((c) => c.programa_base_id === baseId)
       if (!copia) {
-        // Siguiente programa del módulo: se importa ahora (sin pasar por los bloqueos del currículo profesional)
-        const res = await importarPrograma(alumnoId, baseId, 'App infantil: orden del módulo')
+        // Siguiente programa del módulo: se importa ahora
+        const res = await importarPrograma(alumnoId, baseId)
         if ('error' in res && res.error) return { error: res.error }
         datos = await cargar()
         copia = datos.copias.find((c) => c.programa_base_id === baseId)

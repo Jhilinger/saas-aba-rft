@@ -4,7 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import AsignarProgramaForm from '../asignar-programa-form'
 import PeiTabla from '../pei-tabla'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
-import { calcularBloqueos, ROLES_EXCEPCION_SECUENCIA } from '../../../curriculo/secuencia'
+import { calcularAvisosSecuencia } from '../../../curriculo/secuencia'
 import { cargarProgresoAlumno } from '../progreso/cargar-progreso'
 
 export default async function AlumnoPage({
@@ -52,9 +52,8 @@ export default async function AlumnoPage({
     supabase.from('requisitos_programa').select('programa_base_id, requisito_id'),
   ])
 
-  // Secuencia del currículo: dominios bloqueados para este alumno
-  const bloqueos = calcularBloqueos(progreso.niveles)
-  const puedeForzar = ROLES_EXCEPCION_SECUENCIA.includes(perfil.rol)
+  // Secuencia del currículo: avisos por dominio (no bloquean)
+  const avisosSecuencia = calcularAvisosSecuencia(progreso.niveles)
   const disena = await puedeDisenar(supabase)
 
   // Para filtrar el selector: ya en el PEI, o dominados (PEI o valoración inicial)
@@ -92,7 +91,7 @@ export default async function AlumnoPage({
       ...p,
       codigo: codificador.codigo(p),
       ordenGlobal: codificador.ordenGlobal(p),
-      bloqueo: p.dominio_id ? (bloqueos.get(p.dominio_id) ?? null) : null,
+      avisoSecuencia: p.dominio_id ? (avisosSecuencia.get(p.dominio_id) ?? null) : null,
       requisitosPendientes: (requisitosDe.get(p.id) ?? [])
         .filter((r) => !dominados.has(r) && nombrePrograma.has(r))
         .map((r) => nombrePrograma.get(r)!),
@@ -118,7 +117,6 @@ export default async function AlumnoPage({
           programasBase={opcionesBase}
           niveles={niveles}
           miPerfilId={perfil.id}
-          puedeForzar={puedeForzar}
           abiertoInicial={programasPei.length === 0}
         />
       ) : (

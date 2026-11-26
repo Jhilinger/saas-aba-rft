@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { cargarItems, cargarRespuestas, cargarVinculos } from '../../cargar'
 import { calcularColocacion, proponerProgramas, type Valoracion } from '../../colocacion'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../../../../curriculo/estructura'
-import { calcularBloqueos } from '../../../../../../curriculo/secuencia'
-import { cargarProgresoAlumno } from '../../../../progreso/cargar-progreso'
 import ColocacionClient, { type FilaColocacion, type ProgramaPropuesto } from './colocacion-client'
 import { puedeDisenar } from '../../../../../../permisos'
 
@@ -102,9 +100,7 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
     .sort((a, b) => a.ordenGlobal - b.ordenGlobal)
 
   let propuestos: ProgramaPropuesto[] = []
-  let bloqueados = 0
   if (evaluacion.colocacion_aplicada_at) {
-    const bloqueos = calcularBloqueos((await cargarProgresoAlumno(supabase, alumno, estructura)).niveles)
     const valoracionPorPrograma = new Map(
       (valoraciones ?? []).map((v) => [v.programa_base_id, v.valoracion as Valoracion])
     )
@@ -121,7 +117,7 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
     propuestos = proponerProgramas(
       [...programas.values()].map((p) => ({ id: p.id, ordenGlobal: p.ordenGlobal, dominioId: p.dominio_id })),
       valoracionPorPrograma,
-      { enPei, dominados, bloqueos, requisitosDe }
+      { enPei, dominados, requisitosDe }
     ).map((id) => {
       const p = programas.get(id)!
       return {
@@ -131,10 +127,6 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
       }
     })
 
-    bloqueados = filas.filter((f) => {
-      const dominioId = programas.get(f.programaBaseId)?.dominio_id
-      return f.propuesta !== 'dominado' && !enPei.has(f.programaBaseId) && dominioId && bloqueos.has(dominioId)
-    }).length
   }
 
   return (
@@ -144,10 +136,8 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
         alumnoId={alumnoId}
         evaluacionId={evaluacionId}
         aplicadaAt={evaluacion.colocacion_aplicada_at}
-        nivelInicio={evaluacion.nivel_inicio}
         filas={filas}
         propuestos={propuestos}
-        bloqueados={bloqueados}
         soloLectura={!(await puedeDisenar(supabase))}
       />
     </div>
