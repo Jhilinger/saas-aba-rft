@@ -7,6 +7,10 @@
 
 import {
   ACCIONES,
+  ACCIONES_CATEGORIA,
+  CATEGORIAS,
+  COLORES,
+  RASGOS,
   CONTEXTOS_DISTINCION,
   DIMENSIONES,
   DISTINCION,
@@ -604,6 +608,107 @@ const condicionalMutua: Plantilla = (ctx) => {
   })
 }
 
+// ---------------------------------------------------------------- Jerarquía
+// «Vincular Mutuamente Relaciones Jerárquicas»: categoría real y miembro («Toby
+// es un perro»; «El BRIL es una fruta»). Transformación de arriba abajo (lo común
+// de la categoría pasa al miembro; lo de otra categoría, no) y de abajo arriba
+// (lo propio del miembro solo vale para «alguno», no para «todos»)
+const jerarquiaMutua: Plantilla = (ctx) => {
+  const cats = muestra(CATEGORIAS, CLASES_POR_GRUPO + 1, ctx.azar)
+  const trozos = elegir(NOMBRES, 1, ctx, true)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const cat = cats[j], otra = cats[CLASES_POR_GRUPO]
+    const nombre = cat.animal ? trozos[j][0] : `el ${trozos[j][0].toUpperCase()}`
+    const Nombre = cap(nombre)
+    const un = cat.femenino ? 'una' : 'un'
+    const los = cat.femenino ? 'las' : 'los'
+    const color = COLORES[(n - 1) % COLORES.length]
+    // El color del miembro concuerda con él (un animal, con la categoría; «el BRIL», en masculino);
+    // el de la pregunta, con la categoría
+    const colorMiembro = cat.animal && cat.femenino ? color[1] : color[0]
+    const [colorCat, colorPl] = cat.femenino ? [color[1], color[3]] : [color[0], color[2]]
+    const deArriba = (n - 1) % 2 === 0
+    const premisa = `${Nombre} es ${un} ${cat.sing}.`
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: cap(cat.sing), concepto_imagen: null },
+        { posicion: 'B', nombre: Nombre, concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:B→A': `${premisa} ¿Qué es ${nombre}?`,
+        'test_mutuo:A→B': `${premisa} ¿Cuál de estos es ${un} ${cat.sing}?`,
+        'transformacion_funciones:A→B': deArriba
+          ? `${cap(los)} ${cat.pl} ${cat.funcion[1]}. ${premisa} ¿${cap(cat.funcion[0])} ${nombre}?`
+          : `${cap(los)} ${cat.pl} ${cat.funcion[1]} y ${otra.femenino ? 'las' : 'los'} ${otra.pl} ${otra.funcion[1]}. ${premisa} ¿${cap(otra.funcion[0])} ${nombre}?`,
+        'transformacion_funciones:B→A': deArriba
+          ? `${premisa} ${Nombre} es ${colorMiembro}. ¿${cat.femenino ? 'Todas' : 'Todos'} ${los} ${cat.pl} son ${colorPl}?`
+          : `${premisa} ${Nombre} es ${colorMiembro}. ¿${cat.femenino ? 'Alguna' : 'Alguno'} de ${los} ${cat.pl} es ${colorCat}?`,
+      },
+      respuestas_esperadas: {
+        'transformacion_funciones:A→B': deArriba ? 'Sí' : 'No',
+        'transformacion_funciones:B→A': deArriba ? 'No' : 'Sí',
+      },
+    }
+  })
+}
+
+// «Derivar Relaciones Jerárquicas en Redes Combinatorias»: red de Villarroel y
+// Luciano de tres niveles y dos ramas (A arriba; B y C debajo; D en B y E en C),
+// con nombres inventados y una función en cada nodo. Inclusión (Sí) y distinción
+// entre ramas (No), transformación de arriba abajo (Sí), sin cruzar ramas (No),
+// de abajo arriba («todos» No / «alguno» Sí) y lo común a dos ramas (la función
+// de arriba, la dominante), con opciones propias de la clase
+const jerarquiaRed: Plantilla = (ctx) => {
+  const trozos = elegir(NOMBRES, 5, ctx, true)
+  if (!trozos) return null
+  return numeros(ctx).map((n, j) => {
+    const [A, B, C, D, E] = trozos[j].map((x) => x.toUpperCase())
+    const accion = ACCIONES_CATEGORIA[(n - 1) % ACCIONES_CATEGORIA.length]
+    const [rB, rC, rD, rE] = muestra(RASGOS, 4, ctx.azar)
+    const contexto = `Los ${B} y los ${C} son ${A}. El ${D} es un ${B} y el ${E} es un ${C}.`
+    const todos = (n - 1) % 2 === 0
+    const comun = `Que ${accion[0]}`
+    const opcionesComun = muestra([comun, `Que son ${rB[1]}`, `Que son ${rC[1]}`, `Que son ${rD[1]}`], 4, ctx.azar)
+    return {
+      numero: n,
+      estimulos: [
+        { posicion: 'A', nombre: `Los ${A}`, concepto_imagen: null },
+        { posicion: 'B', nombre: `Los ${B}`, concepto_imagen: null },
+        { posicion: 'C', nombre: `Los ${C}`, concepto_imagen: null },
+        { posicion: 'D', nombre: `El ${D}`, concepto_imagen: null },
+        { posicion: 'E', nombre: `El ${E}`, concepto_imagen: null },
+      ],
+      consignas: {
+        'entrenamiento:B→A': `Los ${B} son ${A}. ¿Qué son los ${B}?`,
+        'entrenamiento:C→A': `Los ${C} son ${A}. ¿Qué son los ${C}?`,
+        'entrenamiento:D→B': `El ${D} es un ${B}. ¿Qué es el ${D}, un ${B} o un ${C}?`,
+        'entrenamiento:E→C': `El ${E} es un ${C}. ¿Qué es el ${E}, un ${C} o un ${B}?`,
+        'test_mutuo:B→D': `El ${D} es un ${B}. ¿Cuál de estos es un ${B}?`,
+        'test_mutuo:C→E': `El ${E} es un ${C}. ¿Cuál de estos es un ${C}?`,
+        'test_combinatorio:D→A': `${contexto} ¿Es el ${D} un ${A}?`,
+        'test_combinatorio:D→C': `${contexto} ¿Es el ${D} un ${C}?`,
+        'transformacion_funciones:A→D': `${contexto} Los ${A} ${accion[0]}. ¿${cap(accion[1])} el ${D}?`,
+        'transformacion_funciones:B→E': `${contexto} Los ${B} son ${rB[1]}. ¿Es ${rB[0]} el ${E}?`,
+        'transformacion_funciones:D→A': todos
+          ? `${contexto} El ${D} es ${rD[0]}. ¿Todos los ${A} son ${rD[1]}?`
+          : `${contexto} El ${D} es ${rD[0]}. ¿Alguno de los ${A} es ${rD[0]}?`,
+        'transformacion_funciones:D→E': `${contexto} Los ${A} ${accion[0]}. Los ${B} son ${rB[1]} y los ${C}, ${rC[1]}. El ${D} es ${rD[0]} y el ${E}, ${rE[0]}. ¿Qué tienen en común el ${D} y el ${E}?`,
+      },
+      respuestas_esperadas: {
+        'test_combinatorio:D→A': 'Sí',
+        'test_combinatorio:D→C': 'No',
+        'transformacion_funciones:A→D': 'Sí',
+        'transformacion_funciones:B→E': 'No',
+        'transformacion_funciones:D→A': todos ? 'No' : 'Sí',
+        'transformacion_funciones:D→E': comun,
+      },
+      opciones_por_fase: { 'transformacion_funciones:D→E': opcionesComun },
+    }
+  })
+}
+
 // Programas con generador (por nombre del programa del currículo)
 const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones de Comparación': comparacionMutua,
@@ -617,6 +722,8 @@ const PLANTILLAS: Record<string, Plantilla> = {
   'Vincular Mutuamente Relaciones de Oposición': oposicionMutua,
   'Derivar Relaciones de Oposición en Redes Combinatorias': oposicionRed,
   'Vincular Mutuamente Relaciones Condicionales': condicionalMutua,
+  'Vincular Mutuamente Relaciones Jerárquicas': jerarquiaMutua,
+  'Derivar Relaciones Jerárquicas en Redes Combinatorias': jerarquiaRed,
 }
 
 export function tienePlantilla(nombrePrograma: string) {

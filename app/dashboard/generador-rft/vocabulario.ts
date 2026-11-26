@@ -229,3 +229,57 @@ export const OPOSICION: {
 // ---------------------------------------------------------------- Condicionales
 // Parejas de personajes (el que hace la condición y el que responde)
 export const PAREJAS = [['Pim', 'Tok'], ['Lu', 'Mo'], ['Kiri', 'Dax'], ['Bo', 'Fi']] as const
+
+// ---------------------------------------------------------------- Jerarquía
+// Categorías reales para «Vincular Mutuamente Relaciones Jerárquicas»: lo común
+// de la categoría (función, en singular y plural) y si sus miembros llevan nombre
+// propio (animales: «Toby es un perro») o inventado («El BRIL es una fruta»)
+export const CATEGORIAS: { sing: string; pl: string; femenino: boolean; animal: boolean; funcion: [string, string] }[] = [
+  { sing: 'perro', pl: 'perros', femenino: false, animal: true, funcion: ['ladra', 'ladran'] },
+  { sing: 'gato', pl: 'gatos', femenino: false, animal: true, funcion: ['maúlla', 'maúllan'] },
+  { sing: 'pájaro', pl: 'pájaros', femenino: false, animal: true, funcion: ['vuela', 'vuelan'] },
+  { sing: 'pez', pl: 'peces', femenino: false, animal: true, funcion: ['nada', 'nadan'] },
+  { sing: 'vaca', pl: 'vacas', femenino: true, animal: true, funcion: ['da leche', 'dan leche'] },
+  { sing: 'gallina', pl: 'gallinas', femenino: true, animal: true, funcion: ['pone huevos', 'ponen huevos'] },
+  { sing: 'fruta', pl: 'frutas', femenino: true, animal: false, funcion: ['se guarda en el frutero', 'se guardan en el frutero'] },
+  { sing: 'juguete', pl: 'juguetes', femenino: false, animal: false, funcion: ['se guarda en el baúl', 'se guardan en el baúl'] },
+  { sing: 'herramienta', pl: 'herramientas', femenino: true, animal: false, funcion: ['se guarda en la caja de herramientas', 'se guardan en la caja de herramientas'] },
+  { sing: 'prenda de ropa', pl: 'prendas de ropa', femenino: true, animal: false, funcion: ['se guarda en el armario', 'se guardan en el armario'] },
+]
+// Colores (lo propio de un miembro): masculino, femenino, masculino plural, femenino plural
+export const COLORES: [string, string, string, string][] = [
+  ['blanco', 'blanca', 'blancos', 'blancas'],
+  ['negro', 'negra', 'negros', 'negras'],
+  ['marrón', 'marrón', 'marrones', 'marrones'],
+  ['gris', 'gris', 'grises', 'grises'],
+  ['rojo', 'roja', 'rojos', 'rojas'],
+  ['amarillo', 'amarilla', 'amarillos', 'amarillas'],
+  ['azul', 'azul', 'azules', 'azules'],
+  ['verde', 'verde', 'verdes', 'verdes'],
+]
+// Red jerárquica inventada (Villarroel y Luciano): función de la categoría de
+// arriba (acción, plural y singular) y rasgos de las de abajo y de cada miembro
+export const ACCIONES_CATEGORIA: [string, string][] = [
+  ['viven en las montañas', 'vive en las montañas'],
+  ['comen solo fruta', 'come solo fruta'],
+  ['duermen en cuevas', 'duerme en cuevas'],
+  ['nadan en el lago', 'nada en el lago'],
+  ['vuelan de noche', 'vuela de noche'],
+  ['cantan al amanecer', 'canta al amanecer'],
+  ['tienen cuatro patas', 'tiene cuatro patas'],
+  ['beben agua de lluvia', 'bebe agua de lluvia'],
+]
+export const RASGOS: [string, string][] = [
+  ['trabajador', 'trabajadores'],
+  ['ruidoso', 'ruidosos'],
+  ['gruñón', 'gruñones'],
+  ['tranquilo', 'tranquilos'],
+  ['pequeño', 'pequeños'],
+  ['fuerte', 'fuertes'],
+  ['curioso', 'curiosos'],
+  ['valiente', 'valientes'],
+  ['dormilón', 'dormilones'],
+  ['rápido', 'rápidos'],
+  ['simpático', 'simpáticos'],
+  ['tímido', 'tímidos'],
+]
