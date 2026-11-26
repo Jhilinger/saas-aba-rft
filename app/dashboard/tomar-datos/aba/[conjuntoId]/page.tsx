@@ -75,6 +75,7 @@ export default async function TomarDatosAbaPage({
 
             <TomarDatosClient
         conjuntoId={conjunto.id}
+        nombreConjunto={conjunto.nombre}
         programaAlumnoId={programa.id}
         alumnoId={programa.alumno_id}
         estimulos={conjunto.estimulos_alumno}

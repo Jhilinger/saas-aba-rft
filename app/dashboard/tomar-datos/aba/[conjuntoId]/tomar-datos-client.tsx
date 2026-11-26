@@ -15,6 +15,7 @@ import { urlImagen, type ImagenesBanco } from '../../rft/[programaId]/pantalla-t
 import { desbloquearAudio, precargarFraseRft } from '../../../voz'
 import type { Json } from '@/database.types'
 import SelectorAyuda, { ayudasDelPrograma, etiquetaAyuda } from '../../../selector-ayuda'
+import CronometroEscalon, { segundosDelConjunto } from './cronometro-escalon'
 
 type Estimulo = { id: string; nombre: string; concepto_imagen?: string | null }
 
@@ -58,6 +59,7 @@ function generarSecuencia(estimulos: Estimulo[], n: number): Estimulo[] {
 
 export default function TomarDatosClient({
   conjuntoId,
+  nombreConjunto = '',
   programaAlumnoId,
   alumnoId,
   estimulos,
@@ -70,6 +72,8 @@ export default function TomarDatosClient({
   imagenes,
 }: {
   conjuntoId: string
+  // Nombre del conjunto: si lleva un tiempo («Esperar 5 s»), la pantalla ofrece un cronómetro
+  nombreConjunto?: string
   programaAlumnoId: string
   alumnoId: string
   estimulos: Estimulo[]
@@ -440,6 +444,7 @@ export default function TomarDatosClient({
   // ── Misma pantalla que en los niveles 2 a 4: barra con Ayuda, Deshacer y «⋯»,
   // guía siempre visible, ✓/✗, corrección guiada tras un error y «Siguiente ensayo» ──
   const correccionPosible = !sinAyudas
+  const segundosEscalon = segundosDelConjunto(nombreConjunto)
   const etiquetaAyudaPendiente = etiquetaAyuda(ayudaPendiente)
   const marcar = (correcto: boolean) => {
     const ultimo = ensayos.length + 1 >= secuencia.length
@@ -476,6 +481,7 @@ export default function TomarDatosClient({
         texto: `sin ayudas; no afecta al criterio de dominio.${contexto.trim() ? ` Contexto: ${contexto.trim()}.` : ''}`,
       })
     guia.push({ titulo: 'Presente', texto: `«${estimuloActual.nombre}» y dé la instrucción del programa (está en «⋯ › Instrucciones»).` })
+    if (segundosEscalon) guia.push({ titulo: 'Cuente', texto: `con el cronómetro: pulse al dar la instrucción. Lo hace si aguanta los ${segundosEscalon >= 60 ? `${Math.round(segundosEscalon / 6) / 10} min` : `${segundosEscalon} s`}.` })
     guia.push({ titulo: 'Marque', texto: 'si lo hace o no.' })
     if (etiquetaAyudaPendiente) guia.push({ titulo: `Ayuda: ${etiquetaAyudaPendiente}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
   }
@@ -584,6 +590,7 @@ export default function TomarDatosClient({
               ))}
             </div>
             <p className="text-xl font-bold text-slate-800 sm:text-2xl">{estimuloActual.nombre}</p>
+            {segundosEscalon && correccion !== 'modelo' && <CronometroEscalon key={`${ensayos.length}-${correccion ?? ''}`} objetivo={segundosEscalon} />}
             {correccion === 'modelo' ? (
               <Button variant="primary" onClick={() => setCorreccion('repetir')} className="w-full py-4 text-base active:scale-[0.98] sm:w-auto sm:px-10">
                 Hecho: repetir el ensayo
