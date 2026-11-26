@@ -1696,7 +1696,7 @@ export default function TomarDatosRftClient({
             ? 'vuelva a leer la frase y repita la pregunta sin ayuda. Toque lo que responda. Esta respuesta se guarda aparte y no cuenta para el porcentaje.'
             : 'vuelva a colocar todo como al principio y repita el ensayo sin ayuda. Toque lo que elija. Esta respuesta se guarda aparte y no cuenta para el porcentaje.',
     })
-  if (correccion && consignaActual) guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
+  if (correccion && consignaActual && config.tipo !== 'ejecucion') guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
   if (correccion) {
     // solo la guía de la corrección
   } else {
@@ -1711,13 +1711,20 @@ export default function TomarDatosRftClient({
       texto: `${esTransformacion || esOido(origenActual) ? 'las opciones' : `«${nombreVisible(origenActual.nombre)}» delante del alumno y, debajo,`} de izquierda a derecha: ${comparativos.map((c) => `«${nombreVisible(c.estimulo.nombre)}»`).join(', ')}.`,
     })
   if (config.tipo === 'opciones') guia.push({ titulo: 'Lea', texto: 'la frase en voz alta y espere a que el alumno responda.' })
-  if (config.tipo === 'ejecucion') guia.push({ titulo: 'Presente', texto: `«${nombreVisible(origenActual.nombre)}».` })
-  if (consignaActual) guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
+  // Ejecución con consigna (p. ej. «Usar Autoinstrucciones»): la consigna es una
+  // indicación para el terapeuta, no una frase para el alumno
+  const consignaEsIndicacion = config.tipo === 'ejecucion' && !!consignaActual
+  if (config.tipo === 'ejecucion' && !consignaEsIndicacion) guia.push({ titulo: 'Presente', texto: `«${nombreVisible(origenActual.nombre)}».` })
+  if (consignaEsIndicacion) guia.push({ titulo: 'Qué hacer:', texto: consignaActual! })
+  // Con opciones de texto, la frase ya se ve en grande debajo («Lea la frase…»)
+  else if (consignaActual && config.tipo !== 'opciones') guia.push({ titulo: 'Diga', texto: `«${consignaActual}»` })
   else if (config.tipo !== 'opciones') guia.push({ titulo: 'Diga', texto: 'la instrucción del programa (está en «⋯ › Instrucciones»).' })
   guia.push(
     esTest
       ? { titulo: 'Es un test:', texto: 'no diga si está bien o mal ni dé ayudas; solo registre.' }
-      : { titulo: 'Toque', texto: config.tipo === 'seleccion' && !hablanteMaterial ? 'lo que haya elegido el alumno.' : 'la respuesta del alumno.' }
+      : config.tipo === 'ejecucion'
+        ? { titulo: 'Marque', texto: 'si lo hace o no.' }
+        : { titulo: 'Toque', texto: config.tipo === 'seleccion' && !hablanteMaterial ? 'lo que haya elegido el alumno.' : 'la respuesta del alumno.' }
   )
   if (etiquetaAyudaPendiente) guia.push({ titulo: `Ayuda: ${etiquetaAyudaPendiente}.`, texto: 'Se anotará en la próxima respuesta correcta.' })
   }
@@ -1877,7 +1884,9 @@ export default function TomarDatosRftClient({
             )}
             {(config.tipo === 'opciones' || config.tipo === 'ejecucion' || config.tipo === 'abierta') && (
               <div className="space-y-1">
-                <p className="text-lg font-medium text-slate-800">{consignaActual ?? nombreVisible(origenActual.nombre)}</p>
+                <p className="text-lg font-medium text-slate-800">
+                  {config.tipo === 'ejecucion' ? nombreVisible(origenActual.nombre) : consignaActual ?? nombreVisible(origenActual.nombre)}
+                </p>
                 <p className="text-xs text-slate-400">{claseActual.nombre}</p>
               </div>
             )}

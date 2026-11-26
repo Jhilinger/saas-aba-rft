@@ -177,6 +177,7 @@ export default function TomarDatosClient({
       inicioBloque?: number | null
       duracionBloque?: number | null
       modo?: 'material' | 'tableta'
+      correcciones?: { total: number; bien: number }
     }>(claveProgreso)
     if (guardado) {
       setSecuencia(guardado.secuencia)
@@ -187,6 +188,7 @@ export default function TomarDatosClient({
       setInicioBloque(guardado.inicioBloque ?? null)
       setDuracionBloque(guardado.duracionBloque ?? null)
       setModo(guardado.modo ?? 'material')
+      setCorrecciones(guardado.correcciones ?? { total: 0, bien: 0 })
       if (guardado.ensayos.length > 0 && guardado.ensayos.length === guardado.secuencia.length) {
         intentarGuardar(guardado.ensayos, guardado.notas, guardado.tipoSonda ?? 'normal', guardado.duracionBloque ?? null, guardado.modo ?? 'material')
       }
@@ -261,8 +263,8 @@ export default function TomarDatosClient({
   // Guarda el progreso en el dispositivo según se registra cada ensayo
   useEffect(() => {
     if (!secuencia) return
-    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo })
-  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo, claveProgreso])
+    guardarProgreso(claveProgreso, { secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo, correcciones })
+  }, [secuencia, ensayos, notas, tamanoBloque, tipoSonda, inicioBloque, duracionBloque, modo, correcciones, claveProgreso])
 
   if (resultado) {
     return (
