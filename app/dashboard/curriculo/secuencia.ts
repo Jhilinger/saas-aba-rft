@@ -14,6 +14,9 @@ export const UMBRAL_DOMINIO = 80
 // dominio_id → aviso (los dominios sin aviso no aparecen)
 export function calcularAvisosSecuencia(niveles: NivelProgreso[]): Map<string, string> {
   const avisos = new Map<string, string>()
+  // Alumno sin ningún progreso todavía (todo al 0 % o sin datos): no se avisa,
+  // porque saldría el mismo aviso en casi todos los programas
+  if (niveles.every((n) => !n.porcentaje && n.dominios.every((d) => !d.porcentaje))) return avisos
 
   niveles.forEach((nivel, i) => {
     const nivelPrevio = niveles.slice(0, i).reverse().find((n) => n.porcentaje !== null)
