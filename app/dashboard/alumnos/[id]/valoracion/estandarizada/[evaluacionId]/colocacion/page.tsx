@@ -104,9 +104,15 @@ export default async function ColocacionPage({ params }: { params: Promise<{ id:
     const valoracionPorPrograma = new Map(
       (valoraciones ?? []).map((v) => [v.programa_base_id, v.valoracion as Valoracion])
     )
+    // Para los requisitos, lo que el cribado dio por superado (niveles por debajo
+    // del de inicio, fuera de la ruta) cuenta como dominado: si no, a un niño que
+    // empieza en el nivel 3 no se le propondría nada
+    const nivelInicio = evaluacion.nivel_inicio ?? 1
+    const superadosPorCribado = [...programas.values()].filter((p) => p.dominio && p.dominio.nivel < nivelInicio).map((p) => p.id)
     const dominados = new Set([
       ...dominadosPei,
       ...(valoraciones ?? []).filter((v) => v.valoracion === 'dominado').map((v) => v.programa_base_id),
+      ...superadosPorCribado,
     ])
     const requisitosDe = new Map<string, string[]>()
     for (const r of requisitos ?? []) {
