@@ -89,3 +89,27 @@ export async function marcarDominadosEnBloque(alumnoId: string, programaBaseIds:
   revalidatePath(`/dashboard/alumnos/${alumnoId}`, 'layout')
   return { success: true, marcados: filas.length }
 }
+
+// Valoración de todo un dominio de una vez (el punto de partida es aproximado):
+// se aplica a los programas indicados, sustituyendo lo que tuvieran
+export async function valorarDominio(alumnoId: string, programaBaseIds: string[], valoracion: 'dominado' | 'parcial' | 'no' | null) {
+  const supabase = await createClient()
+  if (!(await puedeDisenar(supabase))) return { error: SIN_PERMISO_DISENO }
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'No autenticado' }
+  const ids = [...new Set(programaBaseIds)].slice(0, 300)
+  if (ids.length === 0) return { success: true }
+  if (valoracion === null) {
+    const { error } = await supabase.from('evaluaciones_iniciales').delete().eq('alumno_id', alumnoId).in('programa_base_id', ids)
+    if (error) return { error: error.message }
+  } else {
+    const ahora = new Date().toISOString()
+    const { error } = await supabase.from('evaluaciones_iniciales').upsert(
+      ids.map((id) => ({ alumno_id: alumnoId, programa_base_id: id, valoracion, notas: 'Por dominio', evaluado_por: user.id, updated_at: ahora })),
+      { onConflict: 'alumno_id,programa_base_id' }
+    )
+    if (error) return { error: error.message }
+  }
+  revalidatePath(`/dashboard/alumnos/${alumnoId}`, 'layout')
+  return { success: true }
+}

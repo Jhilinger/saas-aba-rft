@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { puedeDisenar } from '../../../permisos'
 import { redirect, notFound } from 'next/navigation'
@@ -5,6 +6,7 @@ import AsignarProgramaForm from '../asignar-programa-form'
 import PeiTabla from '../pei-tabla'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 import { calcularAvisosSecuencia } from '../../../curriculo/secuencia'
+import { textoResultado } from '../valoracion/entrevista/resultado'
 import { cargarProgresoAlumno } from '../progreso/cargar-progreso'
 
 export default async function AlumnoPage({
@@ -51,6 +53,14 @@ export default async function AlumnoPage({
     cargarProgresoAlumno(supabase, alumno, estructura),
     supabase.from('requisitos_programa').select('programa_base_id, requisito_id'),
   ])
+  // Entrevistas iniciales finalizadas: orientan por dónde empezar (no se importa nada)
+  const { data: entrevistas } = await supabase
+    .from('entrevistas_iniciales')
+    .select('id, finalizada_at, created_at, dominio_recomendado, lagunas, pendientes')
+    .eq('alumno_id', id)
+    .eq('estado', 'finalizada')
+    .order('created_at', { ascending: false })
+    .limit(5)
 
   // Secuencia del currículo: avisos por dominio (no bloquean)
   const avisosSecuencia = calcularAvisosSecuencia(progreso.niveles)
@@ -114,6 +124,22 @@ export default async function AlumnoPage({
   return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold text-slate-800">Plan Educativo Individualizado (PEI)</h2>
+      {(entrevistas ?? []).length > 0 && (
+        <div className="space-y-1 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+          {(entrevistas ?? []).map((e, i) => (
+            <p key={e.id} className={i === 0 ? 'font-medium' : 'text-sky-800/80'}>
+              Entrevista inicial del {new Date(e.finalizada_at ?? e.created_at).toLocaleDateString('es-ES')}:{' '}
+              {textoResultado(e.dominio_recomendado, e.lagunas, e.pendientes)}
+            </p>
+          ))}
+          <p className="text-xs text-sky-800/80">
+            Es una orientación: elija los programas con su criterio y las recomendaciones del currículo.{' '}
+            <Link href={`/dashboard/alumnos/${id}/valoracion/entrevista`} className="font-medium underline">
+              Ver entrevistas
+            </Link>
+          </p>
+        </div>
+      )}
       {disena ? (
         <AsignarProgramaForm
           alumnoId={id}

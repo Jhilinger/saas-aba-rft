@@ -4,16 +4,16 @@ import Link from 'next/link'
 import PuntoPartidaClient, { type NivelPartida, type ProgramaPartida, type Origen } from './punto-partida-client'
 import { cargarEstructuraCurriculo, crearCodificador } from '../../../curriculo/estructura'
 import { puedeDisenar } from '../../../permisos'
-import { ESTADO_EVALUACION } from './estandarizada/etiquetas'
+import { textoResultado } from './entrevista/resultado'
 import { Panel } from '../../../../ui'
 
 const VALORACIONES = ['dominado', 'parcial', 'no'] as const
 type Valoracion = (typeof VALORACIONES)[number]
 
-// Punto de partida del alumno en el currículo: la valoración de cada
-// programa (de la evaluación estandarizada, manual o por dominio en el PEI).
-// La evaluación estandarizada es la vía principal; aquí se revisa y se
-// completa lo que ella no cubre.
+// Punto de partida del alumno en el currículo: valoración por dominio (y, si
+// hace falta, por programa). La entrevista inicial la rellena de forma
+// aproximada; aquí se revisa y se corrige. La antigua evaluación estandarizada
+// de 80 ítems se retiró el 2026-11-27 (sus datos se conservan).
 export default async function PuntoPartidaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: alumnoId } = await params
   const supabase = await createClient()
@@ -37,11 +37,11 @@ export default async function PuntoPartidaPage({ params }: { params: Promise<{ i
       supabase.from('evaluaciones_iniciales').select('programa_base_id, valoracion, notas').eq('alumno_id', alumnoId),
       supabase.from('programas_alumno').select('programa_base_id, estado').eq('alumno_id', alumnoId).not('programa_base_id', 'is', null),
       supabase
-        .from('evaluaciones')
-        .select('id, estado, iniciada_at, colocacion_aplicada_at')
+        .from('entrevistas_iniciales')
+        .select('id, estado, created_at, dominio_recomendado, lagunas, pendientes')
         .eq('alumno_id', alumnoId)
         .neq('estado', 'anulada')
-        .order('iniciada_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(1),
       cargarEstructuraCurriculo(supabase),
       puedeDisenar(supabase),
@@ -64,7 +64,7 @@ export default async function PuntoPartidaPage({ params }: { params: Promise<{ i
       const valoracion = v && (VALORACIONES as readonly string[]).includes(v.valoracion) ? (v.valoracion as Valoracion) : null
       let origen: Origen = null
       if (dominadosPei.has(p.id)) origen = 'pei'
-      else if (v?.notas?.startsWith('Evaluación estandarizada')) origen = 'evaluacion'
+      else if (v?.notas?.startsWith('Evaluación estandarizada') || v?.notas?.startsWith('Entrevista inicial')) origen = 'evaluacion'
       else if (v?.notas?.startsWith('Marcado en bloque')) origen = 'bloque'
       else if (v) origen = 'manual'
       return {
@@ -86,8 +86,7 @@ export default async function PuntoPartidaPage({ params }: { params: Promise<{ i
   }))
 
   const ultima = evaluaciones?.[0] ?? null
-  const base = `/dashboard/alumnos/${alumnoId}/valoracion/estandarizada`
-  const estadoUltima = ultima ? (ESTADO_EVALUACION[ultima.estado] ?? ESTADO_EVALUACION.en_curso) : null
+  const base = `/dashboard/alumnos/${alumnoId}/valoracion/entrevista`
 
   return (
     <div className="space-y-4">
@@ -95,30 +94,21 @@ export default async function PuntoPartidaPage({ params }: { params: Promise<{ i
 
       <Panel className="flex flex-wrap items-center justify-between gap-3 p-4">
         <div className="space-y-0.5">
-          <p className="font-semibold text-slate-800">Evaluación inicial estandarizada</p>
-          {ultima && estadoUltima ? (
-            <p className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
-              Última: {new Date(ultima.iniciada_at).toLocaleDateString('es-ES')}
-              <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${estadoUltima.color}`}>{estadoUltima.label}</span>
-              {ultima.estado === 'finalizada' && !ultima.colocacion_aplicada_at && (
-                <span className="text-amber-700">· colocación pendiente</span>
-              )}
+          <p className="font-semibold text-slate-800">Entrevista inicial</p>
+          {ultima ? (
+            <p className="text-sm text-slate-600">
+              {new Date(ultima.created_at).toLocaleDateString('es-ES')}:{' '}
+              {ultima.estado === 'finalizada' ? textoResultado(ultima.dominio_recomendado, ultima.lagunas, ultima.pendientes) : 'en curso'}
             </p>
           ) : (
-            <p className="text-sm text-slate-600">Es el punto de partida recomendado: decide el nivel y valora los programas.</p>
+            <p className="text-sm text-slate-600">Preguntas a la familia que sitúan al alumno, de forma aproximada, en nivel y dominio.</p>
           )}
         </div>
         <Link
-          href={ultima?.estado === 'en_curso' ? `${base}/${ultima.id}` : ultima?.estado === 'finalizada' && !ultima.colocacion_aplicada_at ? `${base}/${ultima.id}/colocacion` : base}
+          href={ultima?.estado === 'en_curso' ? `${base}/${ultima.id}` : base}
           className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
         >
-          {ultima?.estado === 'en_curso'
-            ? 'Continuar la evaluación'
-            : ultima?.estado === 'finalizada' && !ultima.colocacion_aplicada_at
-              ? 'Hacer la colocación'
-              : ultima
-                ? 'Ver evaluaciones'
-                : 'Empezar la evaluación'}
+          {ultima?.estado === 'en_curso' ? 'Continuar la entrevista' : ultima ? 'Ver o hacer otra entrevista' : 'Hacer la entrevista'}
         </Link>
       </Panel>
 

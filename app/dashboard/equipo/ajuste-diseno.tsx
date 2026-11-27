@@ -31,7 +31,7 @@ export function AjusteDiseno({ modo }: { modo: Modo }) {
     <Panel className="space-y-3 p-4 sm:p-5">
       <div>
         <p className="font-medium text-slate-800">¿Quién diseña los PEI?</p>
-        <p className="text-sm text-slate-500">La toma de datos y la evaluación estandarizada están siempre abiertas a todo el equipo.</p>
+        <p className="text-sm text-slate-500">La toma de datos y la entrevista inicial están siempre abiertas a todo el equipo.</p>
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         {OPCIONES.map((o) => (

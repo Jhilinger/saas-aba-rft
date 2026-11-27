@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { borrarValoracion, guardarValoracion, marcarDominadosEnBloque } from './actions'
+import { borrarValoracion, guardarValoracion, marcarDominadosEnBloque, valorarDominio } from './actions'
 import { useToast } from '../../../../providers/toast-provider'
 import { Button, Panel } from '../../../../ui'
 
@@ -37,7 +37,7 @@ const ETIQUETA: Record<Valoracion, { label: string; corta: string; color: string
 }
 
 const ORIGEN: Record<NonNullable<Origen>, string> = {
-  evaluacion: 'Evaluación',
+  evaluacion: 'Entrevista',
   manual: 'Manual',
   bloque: 'En bloque',
   pei: 'Dominado en el PEI',
@@ -148,6 +148,37 @@ export default function PuntoPartidaClient({
     })
   }
 
+  // Todo el dominio de una vez (salvo lo dominado en el PEI, que manda)
+  const DOMINIO: { v: Valoracion; label: string }[] = [
+    { v: 'dominado', label: 'Superado' },
+    { v: 'parcial', label: 'En parte' },
+    { v: 'no', label: 'Por trabajar' },
+  ]
+  const valorDominio = (ps: ProgramaPartida[]): Valoracion | null => {
+    const vs = new Set(ps.map((p) => p.valoracion))
+    return vs.size === 1 ? ([...vs][0] ?? null) : null
+  }
+  const cambiarDominio = (ps: ProgramaPartida[], valoracion: Valoracion | null) => {
+    const editables = ps.filter((p) => p.origen !== 'pei')
+    const anteriores = new Map(editables.map((p) => [p.id, p.valoracion]))
+    setValores((m) => {
+      const nuevo = new Map(m)
+      editables.forEach((p) => nuevo.set(p.id, valoracion))
+      return nuevo
+    })
+    startTransition(async () => {
+      const res = await valorarDominio(alumnoId, editables.map((p) => p.id), valoracion)
+      if (res?.error) {
+        toast(res.error, 'error')
+        setValores((m) => {
+          const nuevo = new Map(m)
+          anteriores.forEach((v, id) => nuevo.set(id, v))
+          return nuevo
+        })
+      }
+    })
+  }
+
   const filtros: { valor: Filtro; label: string }[] = [
     { valor: 'todos', label: 'Todos' },
     { valor: 'sin_valorar', label: `Sin valorar (${actuales.filter((p) => !p.valoracion).length})` },
@@ -207,7 +238,29 @@ export default function PuntoPartidaClient({
                     <span className="font-medium text-slate-700">
                       {d.codigo} {d.nombre}
                     </span>
-                    <Recuento programas={delDominio} />
+                    <span className="flex flex-wrap items-center gap-2">
+                      {!soloLectura && (
+                        <span className="flex gap-1" onClick={(e) => e.preventDefault()}>
+                          {DOMINIO.map(({ v, label }) => {
+                            const activo = valorDominio(delDominio) === v
+                            return (
+                              <button
+                                key={v}
+                                onClick={() => cambiarDominio(delDominio, activo ? null : v)}
+                                disabled={isPending}
+                                title={activo ? 'Quitar la valoración del dominio' : `Todo el dominio: ${label.toLowerCase()}`}
+                                className={`rounded-md border px-2 py-0.5 text-xs font-medium ${
+                                  activo ? ETIQUETA[v].color : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            )
+                          })}
+                        </span>
+                      )}
+                      <Recuento programas={delDominio} />
+                    </span>
                   </summary>
                   <ul className="divide-y divide-slate-100 border-t border-slate-100">
                     {filas.map((p) => (

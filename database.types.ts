@@ -1085,6 +1085,72 @@ export type Database = {
           },
         ]
       }
+      entrevistas_iniciales: {
+        Row: {
+          alumno_id: string
+          creado_por: string | null
+          created_at: string
+          dominio_recomendado: string | null
+          estado: string
+          finalizada_at: string | null
+          id: string
+          lagunas: string[]
+          modalidad: string
+          nivel_recomendado: number | null
+          nivel_salto: number | null
+          notas: string | null
+          pendientes: number[]
+          respuestas: Json
+        }
+        Insert: {
+          alumno_id: string
+          creado_por?: string | null
+          created_at?: string
+          dominio_recomendado?: string | null
+          estado?: string
+          finalizada_at?: string | null
+          id?: string
+          lagunas?: string[]
+          modalidad?: string
+          nivel_recomendado?: number | null
+          nivel_salto?: number | null
+          notas?: string | null
+          pendientes?: number[]
+          respuestas?: Json
+        }
+        Update: {
+          alumno_id?: string
+          creado_por?: string | null
+          created_at?: string
+          dominio_recomendado?: string | null
+          estado?: string
+          finalizada_at?: string | null
+          id?: string
+          lagunas?: string[]
+          modalidad?: string
+          nivel_recomendado?: number | null
+          nivel_salto?: number | null
+          notas?: string | null
+          pendientes?: number[]
+          respuestas?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entrevistas_iniciales_alumno_id_fkey"
+            columns: ["alumno_id"]
+            isOneToOne: false
+            referencedRelation: "alumnos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entrevistas_iniciales_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estimulos_alumno: {
         Row: {
           concepto_imagen: string | null

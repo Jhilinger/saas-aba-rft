@@ -1,0 +1,75 @@
+// Entrevista inicial (el terapeuta pregunta y la familia responde): preguntas en el
+// orden del currículo, de 1 a 3 por dominio, con un ejemplo. No es exhaustiva:
+// sitúa aproximadamente en nivel y dominio. Revisada por el usuario el 2026-11-27.
+// «item»: ítem de tableta de la antigua evaluación para «Comprobar ahora».
+
+export type Pregunta = { n: number; dominio: string; pregunta: string; ejemplo: string; item?: string }
+
+export const NOMBRE_DOMINIO: Record<string, string> = {
+  '1.1': "Atención conjunta y control de estímulo",
+  '1.2': "Peticiones",
+  '1.3': "Imitación",
+  '1.4': "Rutinas verbales",
+  '2.1': "Emparejar lo que es igual",
+  '2.2': "Entender y decir nombres",
+  '2.3': "Preguntas sobre las cosas y lectura",
+  '2.4': "Reaccionar a algo nuevo por lo que se le dice",
+  '3.1': "Igual y diferente",
+  '3.2': "Lo contrario",
+  '3.3': "Comparar",
+  '3.4': "Dónde están las cosas",
+  '3.5': "Antes y después",
+  '3.6': "Categorías",
+  '3.7': "Si… entonces y porqué",
+  '4.1': "Ponerse en el lugar del otro",
+  '4.2': "Analogías y lenguaje figurado",
+  '4.3': "Lenguaje no literal y conversación",
+  '4.4': "Reglas, pensamientos y autorregulación",
+}
+
+export const PREGUNTAS: Pregunta[] = [
+  { n: 1, dominio: '1.1', pregunta: "¿Mira cuando le llaman por su nombre?", ejemplo: "Gira la cabeza al oír «Lucía» desde el otro lado de la habitación." },
+  { n: 2, dominio: '1.1', pregunta: "¿Mira hacia lo que se le señala?", ejemplo: "Le dicen «¡Mira, un perro!» señalando y mira hacia donde apunta el dedo." },
+  { n: 3, dominio: '1.1', pregunta: "¿Puede estar sentado en una actividad unos minutos y esperar su turno?", ejemplo: "Espera a que le toque tirar el dado sin levantarse ni coger el dado." },
+  { n: 4, dominio: '1.2', pregunta: "¿Pide lo que quiere con palabras, signos o pictogramas, sin que se lo pregunten?", ejemplo: "Dice «agua» o señala el pictograma del agua cuando tiene sed." },
+  { n: 5, dominio: '1.2', pregunta: "¿Pide ayuda o pide permiso?", ejemplo: "«¿Me abres?», «¿Puedo coger el coche?»." },
+  { n: 6, dominio: '1.2', pregunta: "¿Acepta un «no» o un «ahora no» sin una rabieta fuerte?", ejemplo: "Le dicen «Ahora no hay tableta, después» y espera o hace otra cosa." },
+  { n: 7, dominio: '1.3', pregunta: "¿Imita gestos o acciones cuando se le dice «haz esto»?", ejemplo: "Aplaudir, tocarse la cabeza, meter un cubo en una caja." },
+  { n: 8, dominio: '1.3', pregunta: "¿Repite sonidos o palabras que se le dicen?", ejemplo: "Le dicen «Di pelota» y dice «pelota», aunque no la pronuncie perfecta." },
+  { n: 9, dominio: '1.4', pregunta: "¿Completa canciones o frases conocidas?", ejemplo: "«Cumpleaños…» → «¡feliz!»; «Uno, dos…» → «tres»." },
+  { n: 10, dominio: '1.4', pregunta: "¿Responde a preguntas sobre él mismo?", ejemplo: "«¿Cómo te llamas?», «¿Cuántos años tienes?»." },
+  { n: 11, dominio: '2.1', pregunta: "¿Empareja cosas iguales o parecidas?", ejemplo: "Junta dos calcetines iguales, o la foto de un coche con el coche de juguete." },
+  { n: 12, dominio: '2.2', pregunta: "¿Señala o da al menos 10 cosas cuando se las nombran?", ejemplo: "«Dame la pelota», «¿Dónde está el perro?»." },
+  { n: 13, dominio: '2.2', pregunta: "¿Dice el nombre de al menos 10 cosas?", ejemplo: "Ve un perro y dice «perro»; ve la leche y dice «leche»." },
+  { n: 14, dominio: '2.2', pregunta: "¿Dice el nombre de al menos 50 cosas, acciones o personas?", ejemplo: "Comidas, animales, ropa, «come», «salta», «abuela»…" },
+  { n: 15, dominio: '2.2', pregunta: "Cuando aprende una palabra nueva de una forma, ¿la usa de la otra sin que se la enseñen?", ejemplo: "Le dicen «Esto es un koala» y, al preguntarle después «¿Qué es esto?», dice «koala»." },
+  { n: 16, dominio: '2.3', pregunta: "¿Responde a «¿para qué sirve…?» y a cómo son las cosas?", ejemplo: "«¿Para qué sirve una cuchara?» → «para comer»; «¿Cómo es el hielo?» → «frío»." },
+  { n: 17, dominio: '2.3', pregunta: "¿Responde a «¿quién?», «¿dónde?» y «¿cuándo?» sobre cosas que no están delante?", ejemplo: "«¿Quién te ha traído al cole?», «¿Dónde duermes?», «¿Cuándo te bañas?»." },
+  { n: 18, dominio: '2.3', pregunta: "¿Relaciona el número escrito, su nombre y la cantidad (o la palabra escrita, su nombre y lo que es)?", ejemplo: "Ve el «5», dice «cinco» y coge cinco caramelos; o lee «pan» y señala el pan." },
+  { n: 19, dominio: '2.4', pregunta: "Si se le dice que algo nuevo es como otra cosa que conoce, ¿reacciona igual sin haberlo vivido?", ejemplo: "«Este bote tiene lo mismo que el de las galletas» y quiere abrirlo; «El ZUM pica como una abeja» y no lo toca." },
+  { n: 20, dominio: '3.1', pregunta: "¿Entiende y usa «igual» y «diferente», también con cosas que solo se le cuentan?", ejemplo: "«¿Estos dos son iguales o diferentes?» con dos cosas parecidas; «El TOK es diferente del PIM. ¿Son iguales?».", item: 'EV-3.1-2' },
+  { n: 21, dominio: '3.2', pregunta: "¿Entiende «lo contrario»?", ejemplo: "«¿Qué es lo contrario de frío?» → «caliente»; «Si no está lleno, ¿cómo está?» → «vacío»." },
+  { n: 22, dominio: '3.2', pregunta: "¿Usa lo contrario con cosas que no ha visto?", ejemplo: "«La poción PIM hace crecer y la TOK hace lo contrario. ¿Qué hace la TOK?» → «encoger».", item: 'EV-3.2-3' },
+  { n: 23, dominio: '3.3', pregunta: "¿Entiende «más… que» y «menos… que»?", ejemplo: "«¿Qué torre es más alta?»; «¿Quién tiene menos caramelos?».", item: 'EV-3.3-3' },
+  { n: 24, dominio: '3.3', pregunta: "¿Deduce comparaciones que no ha visto?", ejemplo: "«Ana es más alta que Luis, y Luis más alto que Pepe. ¿Quién es el más bajo?» → «Pepe».", item: 'EV-3.3-4' },
+  { n: 25, dominio: '3.4', pregunta: "¿Entiende «delante, detrás, encima, debajo, al lado»?", ejemplo: "«Pon el coche debajo de la mesa»; «¿Qué hay encima de la cama?»." },
+  { n: 26, dominio: '3.4', pregunta: "¿Deduce posiciones que no ha visto?", ejemplo: "«La pelota está delante de la caja y la caja delante del cubo. ¿Qué está más atrás?» → «el cubo»." },
+  { n: 27, dominio: '3.5', pregunta: "¿Entiende «antes» y «después»?", ejemplo: "«Primero nos lavamos las manos y después comemos. ¿Qué hacemos antes?».", item: 'EV-3.5-1' },
+  { n: 28, dominio: '3.5', pregunta: "¿Deduce el orden de sucesos que no ha visto?", ejemplo: "«Desayuno antes de ir al cole y voy al cole antes de comer. ¿Qué hago primero?» → «desayunar»." },
+  { n: 29, dominio: '3.6', pregunta: "¿Sabe a qué grupo pertenece cada cosa?", ejemplo: "«¿Qué es un perro?» → «un animal»; separa la ropa de la comida.", item: 'EV-3.6-2' },
+  { n: 30, dominio: '3.6', pregunta: "¿Aplica a algo nuevo lo que sabe de su grupo, sin pasarlo a todo el grupo?", ejemplo: "«El BRIL es una fruta. ¿Se puede comer?» → «sí»; «Toby es un perro blanco. ¿Todos los perros son blancos?» → «no».", item: 'EV-3.6-4' },
+  { n: 31, dominio: '3.7', pregunta: "¿Entiende «si… entonces» y «porque»?", ejemplo: "«Si llueve, cogemos el paraguas»; «¿Por qué está mojado el suelo?» → «porque ha llovido»." },
+  { n: 32, dominio: '3.7', pregunta: "¿Sigue una regla nueva y la cambia si cambia la regla?", ejemplo: "«Si te doy la tarjeta roja, aplaudes; si es azul, saltas», y luego al revés." },
+  { n: 33, dominio: '4.1', pregunta: "¿Usa bien «yo» y «tú», «mío» y «tuyo»?", ejemplo: "Dice «dame tu lápiz» (el del otro) y no «dame mi lápiz»." },
+  { n: 34, dominio: '4.1', pregunta: "¿Entiende cómo se siente otro por lo que le pasa?", ejemplo: "«A Luis se le rompe su juguete. ¿Cómo se siente?» → «triste»." },
+  { n: 35, dominio: '4.1', pregunta: "¿Entiende que otro puede ver, saber o creer algo distinto que él?", ejemplo: "«Mamá no ha visto que hemos movido las llaves. ¿Dónde las buscará?» → donde estaban antes." },
+  { n: 36, dominio: '4.2', pregunta: "¿Entiende analogías y comparaciones figuradas?", ejemplo: "«Pájaro es a volar como pez es a…» → «nadar»; «Es una tortuga» quiere decir que va muy despacio.", item: 'EV-4.2-2' },
+  { n: 37, dominio: '4.2', pregunta: "¿Entiende expresiones hechas o refranes sencillos?", ejemplo: "«Estar en las nubes», «Es pan comido», «Más vale tarde que nunca».", item: 'EV-4.2-4' },
+  { n: 38, dominio: '4.3', pregunta: "¿Entiende peticiones indirectas y bromas?", ejemplo: "«¿Puedes pasarme la sal?» y la pasa (no contesta «sí»); «¡Qué buen día!» cuando llueve a cántaros.", item: 'EV-4.3-5' },
+  { n: 39, dominio: '4.3', pregunta: "¿Adapta cómo habla según con quién habla?", ejemplo: "Habla distinto a su hermano pequeño que a la profesora." },
+  { n: 40, dominio: '4.4', pregunta: "¿Distingue seguir una norma porque se la dicen de seguirla porque funciona?", ejemplo: "«Me pongo el abrigo porque hace frío», no solo «porque lo dice mamá».", item: 'EV-4.4-2' },
+  { n: 41, dominio: '4.4', pregunta: "¿Se da instrucciones a sí mismo para calmarse o hacer algo difícil?", ejemplo: "«Espero, después me toca»; respira cuando algo le sale mal." },
+  { n: 42, dominio: '4.4', pregunta: "¿Distingue lo que piensa de lo que pasa de verdad?", ejemplo: "«Pienso que me van a reñir, pero no lo sé seguro».", item: 'EV-4.4-4' },
+]
+
+export const nivelDe = (dominio: string) => Number(dominio.split('.')[0])
